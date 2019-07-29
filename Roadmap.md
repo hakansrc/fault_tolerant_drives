@@ -10,6 +10,8 @@
 - Intorduction to AC Machine Design. Fortino, Giancarlo Goldgof, Dmitry Heirman, Don Hosain, Ekram
 - Electrical Machine Drives Control: An Introduction. Pyrhöonen, Juha Hrabovcová, Valéria R Semken, Scott
 
+3 - Dealing with sprints **in progress**
+
 ### Long-term goals
 
 

@@ -8,7 +8,7 @@
 
 2 - Readings on machine design and electrical drive&control. Following books will be examined.
 - Intorduction to AC Machine Design. Fortino, Giancarlo Goldgof, Dmitry Heirman, Don Hosain, Ekram
-- Electrical Machine Drives Control: An Introduction. Pyrhöonen, Juha Hrabovcová, Valéria R Semken, Scott
+- Electrical Machine Drives Control: An Introduction. Pyrhöonen, Juha Hrabovcová, Valéria R Semken, Scott **(First 3 chapters are examined)**
 
 3 - Dealing with sprints **in progress**
 

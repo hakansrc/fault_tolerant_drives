@@ -35,7 +35,7 @@ Simulation results of voltage waveforms and flux distributions are provided. At 
 
 ### - Chapter 5: Modelling of Multi Three- Phase Sectored Machines for Radial Force Control
 It is suggested that due to the non-idealities the drive must be analysed as a multiphase model. Derives the formulas using space vector decomposition approach (SVD) (lost around here). Derives the equations for a triple three-phase sectored machine. Experimental results are also provided.
-![control algorithm for the three sector-three phase ](fig5_24.png)
+![control algorithm for the three sector-three phase ](fig5_24.PNG)
 
 ### - Chapter 6: 
 

@@ -23,3 +23,12 @@
 - Design of Multilevel Integrated Modular Motor Drive with Gallium Nitride Power Devices.
 - Design and Analysis of Fractional-Slot Concentrated-Winding Multiphase Fault-Tolerant Permanent Magnet Synchronous Machines.
 - Space Vector Modulation applied to a split phase winding of a PMSM. 
+
+
+
+
+
+##### Some important terminologies
+
+- Space vector decomposition
+- Multi-Stator approach

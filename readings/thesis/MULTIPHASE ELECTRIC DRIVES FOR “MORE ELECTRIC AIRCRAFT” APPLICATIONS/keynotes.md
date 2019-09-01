@@ -45,3 +45,4 @@ It is suggested that due to the non-idealities the drive must be analysed as a m
 1 - Space vector decomposition can be important, will be investigated.  
 2 - Chapter 5 reference [12] will be investigated.
 3 - Various ideas rose in my mind about multi phase control. There are numerous parts that are not clear in my mind. I might revisit this the future.
+4 - Chapter 6 reference [5] and [2] seem interesting

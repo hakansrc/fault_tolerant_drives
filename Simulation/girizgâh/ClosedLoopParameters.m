@@ -10,4 +10,5 @@ Vin = Vdesired;%Vdesired+Pout/Vdesired*Rin;
 sw_frequency = 20e3;
 interleaving_angle_1 = 0;
 ref_frequency = 2*pi*50;
-ma = 0.9; %asd
+Tload = 15;
+ma = 0.9; 

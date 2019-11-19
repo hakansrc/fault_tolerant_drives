@@ -1,6 +1,6 @@
 clc
 clear
-Sampling_time = 1e-6;
+SamplingTime = 1e-6;
 Tend = 5;
 DCLINK_Cap = 100e-6;
 Rin = 1e-6;

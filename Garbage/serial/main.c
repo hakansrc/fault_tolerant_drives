@@ -17,6 +17,7 @@ __interrupt void cpu_timer1_isr(void);
 __interrupt void cpu_timer2_isr(void);
 __interrupt void SCIB_RX_FIFO_isr(void);
 void Gpio_Select1();
+void SciSendFloat(float *fVariableToSend);
 
 
 LibSciSettings SciSettings;
@@ -34,6 +35,7 @@ float number2= -53.4;
 char carrynumber1[4];
 char carrynumber2[4];
 char *ptrnumber1;
+unsigned int sendthroughsciflag = 0;
 int main(void)
 {
     /**/
@@ -88,7 +90,7 @@ int main(void)
     IER |= M_INT13;
     IER |= M_INT14;
 
-    SciSettings.BaudRate = BAUD115200;  /*baud 115200*/
+    SciSettings.BaudRate = BAUD460800;  /*baud 115200*/
     SciSettings.CharacterBits = 7;      /*8 character bits*/
     SciSettings.ParityEnable = 0;       /*parity disabled*/
     SciSettings.ParityType = 0;         /*odd parity*/
@@ -108,6 +110,7 @@ int main(void)
     //memcpy((float *)carrynumber1,&number1,4);
     //memcpy(carrynumber2,&number2,4);
     //sprintf(carrynumber1,"%x",number1);
+#if 0
     int *p;
     int *p2;
     p = &number1;
@@ -121,6 +124,7 @@ int main(void)
     carrynumber2[2] = __byte(p2,2);
     carrynumber2[1] = __byte(p2,1);
     carrynumber2[0] = __byte(p2,0);
+#endif
     while(1)
     {
 #if 0
@@ -149,11 +153,20 @@ int main(void)
         ScibUartSend(ptrnumber1+2, 2);
         ScibUartSend(ptrnumber1+3, 2);
         */
+        /*
         ScibUartSend(carrynumber1, 4);
         ScibUartSend(carrynumber2, 4);
+        */
 
+        //SciSendFloat(&number1);
+        //SciSendFloat(&number2);
         //ScibUartSend((char *)&carrynumber1, 4);
         DELAY_US(delaytime);
+
+        if(sendthroughsciflag==1)
+        {
+
+        }
     }
 }
 
@@ -172,6 +185,14 @@ __interrupt void cpu_timer1_isr(void)
     GpioDataRegs.GPBTOGGLE.bit.GPIO34 = 1;   //blue
     CpuTimer1.InterruptCount++;
     epwm_duty = (0.5*sin(2*PI * 50 * spwm_counter / SWFREQ - 2 * PI / 3) + 1) / 2;
+    spwm_counter += 1;
+    //epwm_duty = 0.012;
+    SciSendFloat(&epwm_duty);
+    if (spwm_counter > ((SWFREQ / 50) - 1))
+    {
+        spwm_counter = 0;
+        sendthroughsciflag = 1;
+    }
     PieCtrlRegs.PIEACK.all = PIEACK_GROUP1;
 }
 
@@ -252,3 +273,12 @@ __interrupt void SCIB_RX_FIFO_isr(void)
 }
 
 
+void SciSendFloat(float *fVariableToSend)
+{
+    char cPartitionTheNumber[4];
+    cPartitionTheNumber[3] = __byte((int *)fVariableToSend,3);
+    cPartitionTheNumber[2] = __byte((int *)fVariableToSend,2);
+    cPartitionTheNumber[1] = __byte((int *)fVariableToSend,1);
+    cPartitionTheNumber[0] = __byte((int *)fVariableToSend,0);
+    ScibUartSend(cPartitionTheNumber, 4);
+}

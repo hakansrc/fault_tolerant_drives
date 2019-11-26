@@ -10,8 +10,8 @@ Ab_converted = zeros(800,1);
 Ab_convertedint = zeros(800,1);
 global Serialreadcount
 Serialreadcount = 0;
-s = serial('COM6','BaudRate',460800,'Parity','none','Timeout',6);
-s.BytesAvailableFcnCount = 8;
+s = serial('COM6','BaudRate',230400,'Parity','none','Timeout',6);
+s.BytesAvailableFcnCount = 512;
 s.BytesAvailableFcnMode = 'byte';
 s.BytesAvailableFcn = @SerialReadServant;
 % plot(x,y,'ButtonDownFcn',@SerialReadServant)
@@ -22,16 +22,17 @@ fopen(s);
 % pause(1);
 % fclose(s);
 
-while(0)
+while(1)
     if(PlotFlag==1)
         for i=1:800
 %             Ab_convertedint(i) = typecast(uint32(hex2dec(strcat(dec2hex(Ab_arrayed(4+4*(i-1))),dec2hex(Ab_arrayed(3+4*(i-1))),dec2hex(Ab_arrayed(2+4*(i-1))),dec2hex(Ab_arrayed(1+4*(i-1)))))),'int32');
-            Ab_convertedint(i) = hex2dec(strcat(dec2hex(Ab_arrayed(4+4*(i-1))),dec2hex(Ab_arrayed(3+4*(i-1))),dec2hex(Ab_arrayed(2+4*(i-1))),dec2hex(Ab_arrayed(1+4*(i-1)))));
+            Ab_convertedint(i) = hex2dec(strcat(dec2hex(Ab_arrayed(4+4*(i-1)),2),dec2hex(Ab_arrayed(3+4*(i-1)),2),dec2hex(Ab_arrayed(2+4*(i-1)),2),dec2hex(Ab_arrayed(1+4*(i-1)),2)));
             Ab_converted(i) = Ab_convertedint(i)/4294967295;
 %             fprintf("%f\n",Ab_converted(i));
         end
 %         Ab_arrayed = zeros(160000,1);
           plot(Ab_converted);
+          ylim([0 1])
 %           fprintf("%f\n",Ab_converted(i));
 
         PlotFlag = 0;
@@ -46,7 +47,7 @@ function [] =  SerialReadServant(src,evt)
 global Ab Ab_arrayed PlotFlag NumberOfReceivedBytes Serialreadcount maxvalue
 Serialreadcount = Serialreadcount+1;    
 
-if 0 %comment out here for now
+if 1 %comment out here for now
     if(PlotFlag==0)
         Ab = fread(src,src.BytesAvailable);
         Ab_arrayed((NumberOfReceivedBytes+1):(NumberOfReceivedBytes+512),1)=Ab;
@@ -73,11 +74,11 @@ else
 %     fprintf("the number is:%d\n",typecast(uint32(hex2dec(strcat(dec2hex(Ab(4)),dec2hex(Ab(3)),dec2hex(Ab(2)),dec2hex(Ab(1))))),'int32'));
 %     fprintf("the number is:%d\n",typecast(uint32(hex2dec(strcat(dec2hex(Ab(8)),dec2hex(Ab(7)),dec2hex(Ab(6)),dec2hex(Ab(5))))),'int32'));
    
-    fprintf("the number is:%d\n",hex2dec(strcat(dec2hex(Ab(4)),dec2hex(Ab(3)),dec2hex(Ab(2)),dec2hex(Ab(1)))));
-    fprintf("dutynumber is:%f\n",hex2dec(strcat(dec2hex(Ab(4)),dec2hex(Ab(3)),dec2hex(Ab(2)),dec2hex(Ab(1))))/1073741823);
+    fprintf("the number is:%d\n",hex2dec(strcat(dec2hex(Ab(4),2),dec2hex(Ab(3),2),dec2hex(Ab(2),2),dec2hex(Ab(1),2))));
+    fprintf("dutynumber is:%f\n",hex2dec(strcat(dec2hex(Ab(4),2),dec2hex(Ab(3),2),dec2hex(Ab(2),2),dec2hex(Ab(1),2)))/1073741823);
     fprintf("the number is:%d\n",hex2dec(strcat(dec2hex(Ab(8)),dec2hex(Ab(7)),dec2hex(Ab(6)),dec2hex(Ab(5)))));
-    if(maxvalue<(hex2dec(strcat(dec2hex(Ab(4)),dec2hex(Ab(3)),dec2hex(Ab(2)),dec2hex(Ab(1))))/1073741823))
-        maxvalue = hex2dec(strcat(dec2hex(Ab(4)),dec2hex(Ab(3)),dec2hex(Ab(2)),dec2hex(Ab(1))))/1073741823;
+    if(maxvalue<(hex2dec(strcat(dec2hex(Ab(4),2),dec2hex(Ab(3),2),dec2hex(Ab(2),2),dec2hex(Ab(1),2)))/1073741823))
+        maxvalue = hex2dec(strcat(dec2hex(Ab(4),2),dec2hex(Ab(3),2),dec2hex(Ab(2),2),dec2hex(Ab(1),2)))/1073741823;
     end
     fprintf("the max value is %f\n",maxvalue);
 end

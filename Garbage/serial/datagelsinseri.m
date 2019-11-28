@@ -10,7 +10,7 @@ Ab_converted = zeros(800,1);
 Ab_convertedint = zeros(800,1);
 global Serialreadcount
 Serialreadcount = 0;
-s = serial('COM6','BaudRate',230400,'Parity','none','Timeout',6);
+s = serial('COM4','BaudRate',230400,'Parity','none','Timeout',6);
 s.BytesAvailableFcnCount = 512;
 s.BytesAvailableFcnMode = 'byte';
 s.BytesAvailableFcn = @SerialReadServant;

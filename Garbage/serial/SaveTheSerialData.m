@@ -17,8 +17,8 @@ global SaveTheDataFlag                      %This is just a flag, for non user o
 BaudRateValue = 460800*2;               %921600 is the maximum baudrate value for now
 TimeoutValue = 6;                       %Allowed time in seconds to complete read and write operations, returned as a numeric value.
 CallbackFunctionByteNumber=512;         %the callback function is called when this amount of bytes are read from the channel
-TheSaveUpperLimit = 0.5*1024*1024;       
-WindowArea = 50*1024;
+TheSaveUpperLimit = 1024*1024;       
+WindowArea = 10*1024;
 TagNumber1 = '0001';                    %Tag values, these values should match with the tags stated in the DSP code (tag values are stored along with the TheSaveArrayRaw)
 TagNumber2 = '0002';
 TagNumber3 = '0003';
@@ -51,16 +51,16 @@ while(1)
         TheSaveArrayScreened = TheSaveArrayRaw(RawDataIndexPrevious:(RawDataIndexPrevious+WindowArea),1);
         %% Tag 1 conversion and elimination for live visualization
         Tag_1_Indices = strfind(TheSaveArrayScreened',TagNumber1);
+        Tag_1_Value = zeros(1,numel(Tag_1_Indices));
         if(isempty(Tag_1_Indices)==0)
             if(IsMainSignalOffsetProper==0)
                 MainSignalOffset = mod((Tag_1_Indices(1)-1),4);
                 IsMainSignalOffsetProper = 1;
             end
-            Tag_1_Value = zeros(1,numel(Tag_1_Indices));
             for i=1:numel(Tag_1_Indices)
                 Tag_1_Indices(i) = Tag_1_Indices(i)-(i-1)*8;
                 if (Tag_1_Indices(i)+8)<=numel(TheSaveArrayScreened)
-                    Tag_1_Value(i) = typecast(uint32(hex2dec(strcat(dec2hex(TheSaveArrayScreened(7+Tag_1_Indices(i)),2),dec2hex(TheSaveArrayScreened(6+Tag_1_Indices(i)),2),dec2hex(TheSaveArrayScreened(5+Tag_1_Indices(i)),2),dec2hex(TheSaveArrayScreened(4+Tag_1_Indices(i)),2)))),'single')
+                    Tag_1_Value(i) = typecast(uint32(hex2dec(strcat(dec2hex(TheSaveArrayScreened(7+Tag_1_Indices(i)),2),dec2hex(TheSaveArrayScreened(6+Tag_1_Indices(i)),2),dec2hex(TheSaveArrayScreened(5+Tag_1_Indices(i)),2),dec2hex(TheSaveArrayScreened(4+Tag_1_Indices(i)),2)))),'single');
                     for j = 1:8
                         TheSaveArrayScreened(Tag_1_Indices(i)) = [];
                     end
@@ -73,16 +73,16 @@ while(1)
         end
         %% Tag 2 conversion and elimination for live visualization
         Tag_2_Indices = strfind(TheSaveArrayScreened',TagNumber2);
+        Tag_2_Value = zeros(1,numel(Tag_2_Indices));      
         if(isempty(Tag_2_Indices)==0)
             if(IsMainSignalOffsetProper==0)
                 MainSignalOffset = mod((Tag_2_Indices(1)-1),4);
                 IsMainSignalOffsetProper = 1;
             end            
-            Tag_2_Value = zeros(1,numel(Tag_2_Indices));
             for i=1:numel(Tag_2_Indices)
                 Tag_2_Indices(i) = Tag_2_Indices(i)-(i-1)*8;
                 if (Tag_2_Indices(i)+8)<=numel(TheSaveArrayScreened)
-                    Tag_2_Value(i) = typecast(uint32(hex2dec(strcat(dec2hex(TheSaveArrayScreened(7+Tag_2_Indices(i)),2),dec2hex(TheSaveArrayScreened(6+Tag_2_Indices(i)),2),dec2hex(TheSaveArrayScreened(5+Tag_2_Indices(i)),2),dec2hex(TheSaveArrayScreened(4+Tag_2_Indices(i)),2)))),'single')
+                    Tag_2_Value(i) = typecast(uint32(hex2dec(strcat(dec2hex(TheSaveArrayScreened(7+Tag_2_Indices(i)),2),dec2hex(TheSaveArrayScreened(6+Tag_2_Indices(i)),2),dec2hex(TheSaveArrayScreened(5+Tag_2_Indices(i)),2),dec2hex(TheSaveArrayScreened(4+Tag_2_Indices(i)),2)))),'single');
                     for j = 1:8
                         TheSaveArrayScreened(Tag_2_Indices(i)) = [];
                     end
@@ -95,16 +95,16 @@ while(1)
         end
         %% Tag 3 conversion and elimination for live visualization
         Tag_3_Indices = strfind(TheSaveArrayScreened',TagNumber3);
+        Tag_3_Value = zeros(1,numel(Tag_3_Indices));
         if(isempty(Tag_3_Indices)==0)
             if(IsMainSignalOffsetProper==0)
                 MainSignalOffset = mod((Tag_3_Indices(1)-1),4);
                 IsMainSignalOffsetProper = 1;
             end              
-            Tag_3_Value = zeros(1,numel(Tag_3_Indices));
             for i=1:numel(Tag_3_Indices)
                 Tag_3_Indices(i) = Tag_3_Indices(i)-(i-1)*8;
                 if (Tag_3_Indices(i)+8)<=numel(TheSaveArrayScreened)
-                    Tag_3_Value(i) = typecast(uint32(hex2dec(strcat(dec2hex(TheSaveArrayScreened(7+Tag_3_Indices(i)),2),dec2hex(TheSaveArrayScreened(6+Tag_3_Indices(i)),2),dec2hex(TheSaveArrayScreened(5+Tag_3_Indices(i)),2),dec2hex(TheSaveArrayScreened(4+Tag_3_Indices(i)),2)))),'single')
+                    Tag_3_Value(i) = typecast(uint32(hex2dec(strcat(dec2hex(TheSaveArrayScreened(7+Tag_3_Indices(i)),2),dec2hex(TheSaveArrayScreened(6+Tag_3_Indices(i)),2),dec2hex(TheSaveArrayScreened(5+Tag_3_Indices(i)),2),dec2hex(TheSaveArrayScreened(4+Tag_3_Indices(i)),2)))),'single');
                     for j = 1:8
                         TheSaveArrayScreened(Tag_3_Indices(i)) = [];
                     end
@@ -117,16 +117,16 @@ while(1)
         end      
         %% Tag 4 conversion and elimination for live visualization
         Tag_4_Indices = strfind(TheSaveArrayScreened',TagNumber4);
+        Tag_4_Value = zeros(1,numel(Tag_4_Indices));
         if(isempty(Tag_4_Indices)==0)
             if(IsMainSignalOffsetProper==0)
                 MainSignalOffset = mod((Tag_4_Indices(1)-1),4);
                 IsMainSignalOffsetProper = 1;
             end              
-            Tag_4_Value = zeros(1,numel(Tag_4_Indices));
             for i=1:numel(Tag_4_Indices)
                 Tag_4_Indices(i) = Tag_4_Indices(i)-(i-1)*8;
                 if (Tag_4_Indices(i)+8)<=numel(TheSaveArrayScreened)
-                    Tag_4_Value(i) = typecast(uint32(hex2dec(strcat(dec2hex(TheSaveArrayScreened(7+Tag_4_Indices(i)),2),dec2hex(TheSaveArrayScreened(6+Tag_4_Indices(i)),2),dec2hex(TheSaveArrayScreened(5+Tag_4_Indices(i)),2),dec2hex(TheSaveArrayScreened(4+Tag_4_Indices(i)),2)))),'single')
+                    Tag_4_Value(i) = typecast(uint32(hex2dec(strcat(dec2hex(TheSaveArrayScreened(7+Tag_4_Indices(i)),2),dec2hex(TheSaveArrayScreened(6+Tag_4_Indices(i)),2),dec2hex(TheSaveArrayScreened(5+Tag_4_Indices(i)),2),dec2hex(TheSaveArrayScreened(4+Tag_4_Indices(i)),2)))),'single');
                     for j = 1:8
                         TheSaveArrayScreened(Tag_4_Indices(i)) = [];
                     end
@@ -139,16 +139,16 @@ while(1)
         end  
         %% Tag 5 conversion and elimination for live visualization
         Tag_5_Indices = strfind(TheSaveArrayScreened',TagNumber5);
+        Tag_5_Value = zeros(1,numel(Tag_5_Indices));
         if(isempty(Tag_5_Indices)==0)
             if(IsMainSignalOffsetProper==0)
                 MainSignalOffset = mod((Tag_5_Indices(1)-1),4);
                 IsMainSignalOffsetProper = 1;
             end              
-            Tag_5_Value = zeros(1,numel(Tag_5_Indices));
             for i=1:numel(Tag_5_Indices)
                 Tag_5_Indices(i) = Tag_5_Indices(i)-(i-1)*8;
                 if (Tag_5_Indices(i)+8)<=numel(TheSaveArrayScreened)
-                    Tag_5_Value(i) = typecast(uint32(hex2dec(strcat(dec2hex(TheSaveArrayScreened(7+Tag_5_Indices(i)),2),dec2hex(TheSaveArrayScreened(6+Tag_5_Indices(i)),2),dec2hex(TheSaveArrayScreened(5+Tag_5_Indices(i)),2),dec2hex(TheSaveArrayScreened(4+Tag_5_Indices(i)),2)))),'single')
+                    Tag_5_Value(i) = typecast(uint32(hex2dec(strcat(dec2hex(TheSaveArrayScreened(7+Tag_5_Indices(i)),2),dec2hex(TheSaveArrayScreened(6+Tag_5_Indices(i)),2),dec2hex(TheSaveArrayScreened(5+Tag_5_Indices(i)),2),dec2hex(TheSaveArrayScreened(4+Tag_5_Indices(i)),2)))),'single');
                     for j = 1:8
                         TheSaveArrayScreened(Tag_5_Indices(i)) = [];
                     end
@@ -169,25 +169,44 @@ while(1)
             plot(MainSignalConverted);
             ylim([0 1])
             drawnow;
+            fprintf("%s:%f\t\t%s:%f\t\t%s:%f\t\t%s:%f\t\t%s:%f\t\t\n",TagNumber1,mean(Tag_1_Value),TagNumber2,mean(Tag_2_Value),TagNumber3,mean(Tag_3_Value),TagNumber4,mean(Tag_4_Value),TagNumber5,mean(Tag_5_Value));
         end
-        if (EnableSaving==1)
-            if(SaveTheDataFlag==1)
+        if(SaveTheDataFlag == 1)
+            if(EnableSaving==1)
                 FileName = sprintf("TestData/TestData%s", datestr(now, 'ddmmyyHHMMSS'));
                 save(FileName,'TheSaveArrayRaw','TagNumber1','TagNumber2','TagNumber3','TagNumber4','TagNumber5');
                 TheSaveArrayRaw = zeros(TheSaveUpperLimit,1);          %clear the raw data because it is saved
                 RawDataIndexPrevious = 0;
                 RawDataIndex = 0;
-                SaveTheDataFlag = 0;                                    % let the callback function continue
+                SaveTheDataFlag = 0;
+            else
+                TheSaveArrayRaw = zeros(TheSaveUpperLimit,1);          %clear the raw data because it is saved
+                RawDataIndexPrevious = 0;
+                RawDataIndex = 0;
+                SaveTheDataFlag = 0;
             end
         else
-            SaveTheDataFlag = 0;        % just pass
+            pause(0.01);
         end
         ShowTheDataFlag = 0;
     else
-        if(EnableSaving==1)
-            pause(1);%wait for one second between operations
+        
+        if(SaveTheDataFlag == 1)
+            if(EnableSaving==1)
+                FileName = sprintf("TestData/TestData%s", datestr(now, 'ddmmyyHHMMSS'));
+                save(FileName,'TheSaveArrayRaw','TagNumber1','TagNumber2','TagNumber3','TagNumber4','TagNumber5');
+                TheSaveArrayRaw = zeros(TheSaveUpperLimit,1);          %clear the raw data because it is saved
+                RawDataIndexPrevious = 0;
+                RawDataIndex = 0;
+                SaveTheDataFlag = 0;
+            else
+                TheSaveArrayRaw = zeros(TheSaveUpperLimit,1);          %clear the raw data because it is saved
+                RawDataIndexPrevious = 0;
+                RawDataIndex = 0;
+                SaveTheDataFlag = 0;
+            end
         else
-            pause(0.01);    %if your computer's fan blows high, increase this value
+            pause(0.01);
         end
         
     end

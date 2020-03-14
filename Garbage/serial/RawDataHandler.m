@@ -1,4 +1,4 @@
-load('TestData/TestData151219172903.mat');
+% load('TestData/TestData151219172903.mat');
 % TheSaveArrayRaw = TheSaveArrayRaw;
 %% Tag 1 conversion and elimination
 Tag_1_Indices = strfind(TheSaveArrayRaw',TagNumber1);

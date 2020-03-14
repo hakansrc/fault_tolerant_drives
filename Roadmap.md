@@ -1,3 +1,5 @@
+##### This part is redundant. Now I ise trello for tracking my studies.
+
 ##### This is the repository that I keep my studies on fault tolerant electrical drives.
 
 ### Short-term goals

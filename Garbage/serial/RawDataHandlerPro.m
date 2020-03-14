@@ -37,20 +37,46 @@ if(isempty(Tag_1_Indices)==0)
     Tag_1_Value = zeros(1,numel(Tag_1_Indices));
     Tag_1_Value = typecast(uint32(hex2dec(strcat(dec2hex(TheSaveArrayRaw(7+Tag_1_Indices(1:end)),2),dec2hex(TheSaveArrayRaw(6+Tag_1_Indices(1:end)),2),dec2hex(TheSaveArrayRaw(5+Tag_1_Indices(1:end)),2),dec2hex(TheSaveArrayRaw(4+Tag_1_Indices(1:end)),2)))),'single');
 
-    for i=1:numel(Tag_1_Indices)
-        Tag_1_Indices(i) = Tag_1_Indices(i)-(i-1)*8;
-        if (Tag_1_Indices(i)+8)<=numel(TheSaveArrayRaw)
-%             Tag_1_Value(i) = typecast(uint32(hex2dec(strcat(dec2hex(TheSaveArrayRaw(7+Tag_1_Indices(i)),2),dec2hex(TheSaveArrayRaw(6+Tag_1_Indices(i)),2),dec2hex(TheSaveArrayRaw(5+Tag_1_Indices(i)),2),dec2hex(TheSaveArrayRaw(4+Tag_1_Indices(i)),2)))),'single');
-            for j = 1:8
-                TheSaveArrayRaw(Tag_1_Indices(i)) = [];
-            end
-        else
-            for j = 1:(numel(TheSaveArrayRaw)-Tag_1_Indices(i))
-                TheSaveArrayRaw(Tag_1_Indices(i)) = [];
-            end
-        end
+    for i=numel(Tag_1_Indices):1
+        TheSaveArrayRaw(Tag_1_Indices(i)) = [];
+        TheSaveArrayRaw(Tag_1_Indices(i)) = [];
+        TheSaveArrayRaw(Tag_1_Indices(i)) = [];
+        TheSaveArrayRaw(Tag_1_Indices(i)) = [];
+        TheSaveArrayRaw(Tag_1_Indices(i)) = [];
+        TheSaveArrayRaw(Tag_1_Indices(i)) = [];
+        TheSaveArrayRaw(Tag_1_Indices(i)) = [];
+        TheSaveArrayRaw(Tag_1_Indices(i)) = [];
+%         TheSaveArrayRaw(Tag_1_Indices((numel(Tag_1_Indices)-(i-1)))) = [];
+%         TheSaveArrayRaw(Tag_1_Indices((numel(Tag_1_Indices)-(i-1)))) = [];
+%         TheSaveArrayRaw(Tag_1_Indices((numel(Tag_1_Indices)-(i-1)))) = [];
+%         TheSaveArrayRaw(Tag_1_Indices((numel(Tag_1_Indices)-(i-1)))) = [];
+%         TheSaveArrayRaw(Tag_1_Indices((numel(Tag_1_Indices)-(i-1)))) = [];
+%         TheSaveArrayRaw(Tag_1_Indices((numel(Tag_1_Indices)-(i-1)))) = [];
+%         TheSaveArrayRaw(Tag_1_Indices((numel(Tag_1_Indices)-(i-1)))) = [];
+%         Tag_1_Indices(i) = Tag_1_Indices(i)-(i-1)*1;
+%         TheSaveArrayRaw(Tag_1_Indices(1:end)) = [];
+
+%         if (Tag_1_Indices(i)+8)<=numel(TheSaveArrayRaw)
+% %             Tag_1_Value(i) = typecast(uint32(hex2dec(strcat(dec2hex(TheSaveArrayRaw(7+Tag_1_Indices(i)),2),dec2hex(TheSaveArrayRaw(6+Tag_1_Indices(i)),2),dec2hex(TheSaveArrayRaw(5+Tag_1_Indices(i)),2),dec2hex(TheSaveArrayRaw(4+Tag_1_Indices(i)),2)))),'single');
+%             for j = 1:8
+%                 TheSaveArrayRaw(Tag_1_Indices(i)) = [];
+%             end
+%         else
+%             for j = 1:(numel(TheSaveArrayRaw)-Tag_1_Indices(i))
+%                 TheSaveArrayRaw(Tag_1_Indices(i)) = [];
+%             end
+%         end
     end
 end
+%     TheSaveArrayRaw(Tag_1_Indices(end:1)) = [];
+%     TheSaveArrayRaw(Tag_1_Indices(end:1)) = [];
+%     TheSaveArrayRaw(Tag_1_Indices(end:1)) = [];
+%     TheSaveArrayRaw(Tag_1_Indices(end:1)) = [];
+%     TheSaveArrayRaw(Tag_1_Indices(end:1)) = [];
+%     TheSaveArrayRaw(Tag_1_Indices(end:1)) = [];
+%     TheSaveArrayRaw(Tag_1_Indices(end:1)) = [];
+%     TheSaveArrayRaw(Tag_1_Indices(end:1)) = [];
+
 %     TheSaveArrayRaw(Tag_1_Indices(1:end)) = [];
 %     TheSaveArrayRaw(Tag_1_Indices(1:end)) = [];
 %     TheSaveArrayRaw(Tag_1_Indices(1:end)) = [];

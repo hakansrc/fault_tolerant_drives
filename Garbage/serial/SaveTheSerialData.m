@@ -14,18 +14,18 @@ global TheSaveUpperLimit                    %This value is the number of bytes o
 global WindowArea                           %This variable states amount of data to be shown to the user during the operation
 global SaveTheDataFlag                      %This is just a flag, for non user operations
 %% IMPORTANT DEFINITIONS
-BaudRateValue = 460800*2;               %921600 is the maximum baudrate value for now
+BaudRateValue = 115200;               %921600 is the maximum baudrate value for now
 TimeoutValue = 6;                       %Allowed time in seconds to complete read and write operations, returned as a numeric value.
 CallbackFunctionByteNumber=512;         %the callback function is called when this amount of bytes are read from the channel
-TheSaveUpperLimit = 1024*1024;       
-WindowArea = 10*1024;
+TheSaveUpperLimit = 20*1024;       
+WindowArea = 5*1024;
 TagNumber1 = '0001';                    %Tag values, these values should match with the tags stated in the DSP code (tag values are stored along with the TheSaveArrayRaw)
 TagNumber2 = '0002';
 TagNumber3 = '0003';
 TagNumber4 = '0004';
 TagNumber5 = '0005';
 
-EnableSaving = 1;                       %set 0 in order to disable saving of variable (recommended to stay at 1)
+EnableSaving = 0;                       %set 0 in order to disable saving of variable (recommended to stay at 1)
 EnablePlotting = 1;                     %set 0 in order to disable plotting of taken variables (for live visualization)
 
 %% Main function
@@ -37,7 +37,7 @@ TheSaveArrayRaw = zeros(TheSaveUpperLimit,1);	%initialize the variable
 MainSignalOffset = 0;                           %initialize the variable
 IsMainSignalOffsetProper = 0;                   %initialize the variable
 
-SerialChannel = serial('COM4','BaudRate',BaudRateValue,'Parity','none','Timeout',6);    %open the serial channel
+SerialChannel = serial('COM9','BaudRate',BaudRateValue,'Parity','none','Timeout',6);    %open the serial channel
 SerialChannel.BytesAvailableFcnCount = CallbackFunctionByteNumber;  %set the callback function byte number
 SerialChannel.BytesAvailableFcnMode = 'byte';                       %set the callback function type
 SerialChannel.BytesAvailableFcn = @SerialReadCallbackFunction;      %state the callback function to be called
@@ -168,6 +168,7 @@ while(1)
         if (EnablePlotting==1)  %for live visualization
             plot(MainSignalConverted);
             ylim([0 1])
+            xlim([0 WindowArea/4])
             drawnow;
             fprintf("%s:%f\t\t%s:%f\t\t%s:%f\t\t%s:%f\t\t%s:%f\t\t\n",TagNumber1,mean(Tag_1_Value),TagNumber2,mean(Tag_2_Value),TagNumber3,mean(Tag_3_Value),TagNumber4,mean(Tag_4_Value),TagNumber5,mean(Tag_5_Value));
         end

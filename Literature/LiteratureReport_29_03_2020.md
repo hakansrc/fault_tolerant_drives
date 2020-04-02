@@ -83,6 +83,14 @@ parameters, which can be dealt with automatically by the robustness of the contr
 - Since the transformations are not valid in a fault condition, in order to track the generated time varying reference signals, proportional resonant controller is proposed for different RPM values. 
 - TMS320F28335 is used. (10kHz PWM frequency)
 
+### MODEL PREDICTIVE CONTROL OF FIVE-PHASE PERMANENT MAGNET ASSISTED SYNCHRONOUS RELUCTANCE MOTOR (2018)
+- It has stated that the model predictive has not been extensively studied for multiphase machines.
+- Optimization is done for MTPA.
+- Comparison is done with a benchmark controller and the developed MPC controller.
+- Model parameter adaption is done. The resistances are updated depending on the fault and change in temperature.
+- TMS320F28335 is used. 
+
+
 
 
 

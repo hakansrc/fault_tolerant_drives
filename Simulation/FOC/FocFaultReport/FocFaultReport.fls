@@ -1,0 +1,176 @@
+PWD c:\Users\hakan\Documents\GitHub\fault_tolerant_drives\Simulation\FOC\FocFaultReport
+INPUT C:\Users\hakan\AppData\Local\MiKTeX\2.9\miktex\data\le\pdftex\pdflatex.fmt
+INPUT c:\Users\hakan\Documents\GitHub\fault_tolerant_drives\Simulation\FOC\FocFaultReport\FocFaultReport.tex
+OUTPUT c:\Users\hakan\Documents\GitHub\fault_tolerant_drives\Simulation\FOC\FocFaultReport\FocFaultReport.log
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\tex\latex\base\article.cls
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\tex\latex\base\article.cls
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\tex\latex\base\size10.clo
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\tex\latex\base\size10.clo
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\tex\latex\base\inputenc.sty
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\tex\latex\base\inputenc.sty
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\tex\latex\natbib\natbib.sty
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\tex\latex\natbib\natbib.sty
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\tex\latex\graphics\graphicx.sty
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\tex\latex\graphics\graphicx.sty
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\tex\latex\graphics\keyval.sty
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\tex\latex\graphics\keyval.sty
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\tex\latex\graphics\graphics.sty
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\tex\latex\graphics\graphics.sty
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\tex\latex\graphics\trig.sty
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\tex\latex\graphics\trig.sty
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\tex\latex\graphics-cfg\graphics.cfg
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\tex\latex\graphics-cfg\graphics.cfg
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\tex\latex\graphics-def\pdftex.def
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\tex\latex\graphics-def\pdftex.def
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\tex\latex\tools\indentfirst.sty
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\tex\latex\tools\indentfirst.sty
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\tex\latex\siunitx\siunitx.sty
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\tex\latex\siunitx\siunitx.sty
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\tex\latex\l3kernel\expl3.sty
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\tex\latex\l3kernel\expl3.sty
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\tex\latex\l3backend\l3backend-pdfmode.def
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\tex\latex\l3backend\l3backend-pdfmode.def
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\tex\latex\l3packages\xparse\xparse.sty
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\tex\latex\l3packages\xparse\xparse.sty
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\tex\latex\amsmath\amstext.sty
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\tex\latex\amsmath\amstext.sty
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\tex\latex\amsmath\amsgen.sty
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\tex\latex\amsmath\amsgen.sty
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\tex\latex\tools\array.sty
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\tex\latex\tools\array.sty
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\tex\latex\l3packages\l3keys2e\l3keys2e.sty
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\tex\latex\l3packages\l3keys2e\l3keys2e.sty
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\tex\latex\translator\translator.sty
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\tex\latex\translator\translator.sty
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\tex\latex\translator\translator.sty
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\tex\latex\svg\svg.sty
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\tex\latex\svg\svg.sty
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\tex\generic\iftex\iftex.sty
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\tex\generic\iftex\iftex.sty
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\tex\latex\koma-script\scrbase.sty
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\tex\latex\koma-script\scrbase.sty
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\tex\latex\koma-script\scrlfile.sty
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\tex\latex\koma-script\scrlfile.sty
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\tex\latex\pdftexcmds\pdftexcmds.sty
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\tex\latex\pdftexcmds\pdftexcmds.sty
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\tex\generic\infwarerr\infwarerr.sty
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\tex\generic\infwarerr\infwarerr.sty
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\tex\generic\ltxcmds\ltxcmds.sty
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\tex\generic\ltxcmds\ltxcmds.sty
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\tex\latex\tools\shellesc.sty
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\tex\latex\tools\shellesc.sty
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\tex\latex\trimspaces\trimspaces.sty
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\tex\latex\trimspaces\trimspaces.sty
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\tex\latex\xcolor\xcolor.sty
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\tex\latex\xcolor\xcolor.sty
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\tex\latex\graphics-cfg\color.cfg
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\tex\latex\graphics-cfg\color.cfg
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\tex\latex\transparent\transparent.sty
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\tex\latex\transparent\transparent.sty
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\tex\latex\auxhook\auxhook.sty
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\tex\latex\auxhook\auxhook.sty
+INPUT c:\Users\hakan\Documents\GitHub\fault_tolerant_drives\Simulation\FOC\FocFaultReport\FocFaultReport.aux
+INPUT c:\Users\hakan\Documents\GitHub\fault_tolerant_drives\Simulation\FOC\FocFaultReport\FocFaultReport.aux
+OUTPUT c:\Users\hakan\Documents\GitHub\fault_tolerant_drives\Simulation\FOC\FocFaultReport\FocFaultReport.aux
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\tex\context\base\mkii\supp-pdf.mkii
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\tex\context\base\mkii\supp-pdf.mkii
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\tex\latex\epstopdf-pkg\epstopdf-base.sty
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\tex\latex\epstopdf-pkg\epstopdf-base.sty
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\tex\latex\translator\translator-basic-dictionary-English.dict
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\tex\latex\translator\translator-basic-dictionary-English.dict
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\tex\latex\siunitx\siunitx-abbreviations.cfg
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\tex\latex\siunitx\siunitx-abbreviations.cfg
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\fonts\tfm\public\cm\cmss10.tfm
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\fonts\tfm\public\cm\cmss8.tfm
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\fonts\tfm\public\cm\cmss8.tfm
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\fonts\tfm\public\cm\cmtt10.tfm
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\fonts\tfm\public\cm\cmtt8.tfm
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\fonts\tfm\public\cm\cmtt8.tfm
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\fonts\tfm\public\cm\cmr17.tfm
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\fonts\tfm\public\cm\cmr12.tfm
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\fonts\tfm\public\cm\cmr8.tfm
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\fonts\tfm\public\cm\cmr6.tfm
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\fonts\tfm\public\cm\cmmi12.tfm
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\fonts\tfm\public\cm\cmmi8.tfm
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\fonts\tfm\public\cm\cmmi6.tfm
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\fonts\tfm\public\cm\cmsy10.tfm
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\fonts\tfm\public\cm\cmsy8.tfm
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\fonts\tfm\public\cm\cmsy6.tfm
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\fonts\tfm\public\cm\cmss12.tfm
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\fonts\tfm\public\cm\cmss8.tfm
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\fonts\tfm\public\cm\cmss8.tfm
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\fonts\tfm\public\cm\cmtt12.tfm
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\fonts\tfm\public\cm\cmtt8.tfm
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\fonts\tfm\public\cm\cmtt8.tfm
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\fonts\tfm\public\cm\cmr12.tfm
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\fonts\tfm\public\cm\cmbx12.tfm
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\fonts\tfm\jknappen\ec\tcrm1000.tfm
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\fonts\tfm\public\cm\cmbx12.tfm
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\fonts\tfm\public\cm\cmbx10.tfm
+OUTPUT c:\Users\hakan\Documents\GitHub\fault_tolerant_drives\Simulation\FOC\FocFaultReport\FocFaultReport.pdf
+INPUT C:\Users\hakan\AppData\Local\MiKTeX\2.9\pdftex\config\pdftex.map
+INPUT c:\Users\hakan\Documents\GitHub\fault_tolerant_drives\Simulation\FOC\FocFaultReport\Figures\ResistiveLoad\Vabc.png
+INPUT c:\Users\hakan\Documents\GitHub\fault_tolerant_drives\Simulation\FOC\FocFaultReport\Figures\ResistiveLoad\Vabc.png
+INPUT c:\Users\hakan\Documents\GitHub\fault_tolerant_drives\Simulation\FOC\FocFaultReport\Figures\ResistiveLoad\Vabc.png
+INPUT c:\Users\hakan\Documents\GitHub\fault_tolerant_drives\Simulation\FOC\FocFaultReport\Figures\ResistiveLoad\Vabc.png
+INPUT c:\Users\hakan\Documents\GitHub\fault_tolerant_drives\Simulation\FOC\FocFaultReport\Figures\ResistiveLoad\Vabc.png
+INPUT c:\Users\hakan\Documents\GitHub\fault_tolerant_drives\Simulation\FOC\FocFaultReport\Figures\ResistiveLoad\Iabc.png
+INPUT c:\Users\hakan\Documents\GitHub\fault_tolerant_drives\Simulation\FOC\FocFaultReport\Figures\ResistiveLoad\Iabc.png
+INPUT c:\Users\hakan\Documents\GitHub\fault_tolerant_drives\Simulation\FOC\FocFaultReport\Figures\ResistiveLoad\Iabc.png
+INPUT c:\Users\hakan\Documents\GitHub\fault_tolerant_drives\Simulation\FOC\FocFaultReport\Figures\ResistiveLoad\Iabc.png
+INPUT c:\Users\hakan\Documents\GitHub\fault_tolerant_drives\Simulation\FOC\FocFaultReport\Figures\ResistiveLoad\Iabc.png
+INPUT c:\Users\hakan\Documents\GitHub\fault_tolerant_drives\Simulation\FOC\FocFaultReport\Figures\ResistiveLoad\Vqd0.png
+INPUT c:\Users\hakan\Documents\GitHub\fault_tolerant_drives\Simulation\FOC\FocFaultReport\Figures\ResistiveLoad\Vqd0.png
+INPUT c:\Users\hakan\Documents\GitHub\fault_tolerant_drives\Simulation\FOC\FocFaultReport\Figures\ResistiveLoad\Vqd0.png
+INPUT c:\Users\hakan\Documents\GitHub\fault_tolerant_drives\Simulation\FOC\FocFaultReport\Figures\ResistiveLoad\Vqd0.png
+INPUT c:\Users\hakan\Documents\GitHub\fault_tolerant_drives\Simulation\FOC\FocFaultReport\Figures\ResistiveLoad\Vqd0.png
+INPUT c:\Users\hakan\Documents\GitHub\fault_tolerant_drives\Simulation\FOC\FocFaultReport\Figures\ResistiveLoad\Iqd0.png
+INPUT c:\Users\hakan\Documents\GitHub\fault_tolerant_drives\Simulation\FOC\FocFaultReport\Figures\ResistiveLoad\Iqd0.png
+INPUT c:\Users\hakan\Documents\GitHub\fault_tolerant_drives\Simulation\FOC\FocFaultReport\Figures\ResistiveLoad\Iqd0.png
+INPUT c:\Users\hakan\Documents\GitHub\fault_tolerant_drives\Simulation\FOC\FocFaultReport\Figures\ResistiveLoad\Iqd0.png
+INPUT c:\Users\hakan\Documents\GitHub\fault_tolerant_drives\Simulation\FOC\FocFaultReport\Figures\ResistiveLoad\Iqd0.png
+INPUT c:\Users\hakan\Documents\GitHub\fault_tolerant_drives\Simulation\FOC\FocFaultReport\Figures\SingleModule\FaultMoment.png
+INPUT c:\Users\hakan\Documents\GitHub\fault_tolerant_drives\Simulation\FOC\FocFaultReport\Figures\SingleModule\FaultMoment.png
+INPUT c:\Users\hakan\Documents\GitHub\fault_tolerant_drives\Simulation\FOC\FocFaultReport\Figures\SingleModule\FaultMoment.png
+INPUT c:\Users\hakan\Documents\GitHub\fault_tolerant_drives\Simulation\FOC\FocFaultReport\Figures\SingleModule\FaultMoment.png
+INPUT c:\Users\hakan\Documents\GitHub\fault_tolerant_drives\Simulation\FOC\FocFaultReport\Figures\SingleModule\FaultMoment.png
+INPUT c:\Users\hakan\Documents\GitHub\fault_tolerant_drives\Simulation\FOC\FocFaultReport\Figures\SingleModule\SpeedRefUpdateUnderFault.png
+INPUT c:\Users\hakan\Documents\GitHub\fault_tolerant_drives\Simulation\FOC\FocFaultReport\Figures\SingleModule\SpeedRefUpdateUnderFault.png
+INPUT c:\Users\hakan\Documents\GitHub\fault_tolerant_drives\Simulation\FOC\FocFaultReport\Figures\SingleModule\SpeedRefUpdateUnderFault.png
+INPUT c:\Users\hakan\Documents\GitHub\fault_tolerant_drives\Simulation\FOC\FocFaultReport\Figures\SingleModule\SpeedRefUpdateUnderFault.png
+INPUT c:\Users\hakan\Documents\GitHub\fault_tolerant_drives\Simulation\FOC\FocFaultReport\Figures\SingleModule\SpeedRefUpdateUnderFault.png
+INPUT c:\Users\hakan\Documents\GitHub\fault_tolerant_drives\Simulation\FOC\FocFaultReport\Figures\SingleModule\Overall.png
+INPUT c:\Users\hakan\Documents\GitHub\fault_tolerant_drives\Simulation\FOC\FocFaultReport\Figures\SingleModule\Overall.png
+INPUT c:\Users\hakan\Documents\GitHub\fault_tolerant_drives\Simulation\FOC\FocFaultReport\Figures\SingleModule\Overall.png
+INPUT c:\Users\hakan\Documents\GitHub\fault_tolerant_drives\Simulation\FOC\FocFaultReport\Figures\SingleModule\Overall.png
+INPUT c:\Users\hakan\Documents\GitHub\fault_tolerant_drives\Simulation\FOC\FocFaultReport\Figures\SingleModule\Overall.png
+INPUT c:\Users\hakan\Documents\GitHub\fault_tolerant_drives\Simulation\FOC\FocFaultReport\Figures\DualModule\Overall.png
+INPUT c:\Users\hakan\Documents\GitHub\fault_tolerant_drives\Simulation\FOC\FocFaultReport\Figures\DualModule\Overall.png
+INPUT c:\Users\hakan\Documents\GitHub\fault_tolerant_drives\Simulation\FOC\FocFaultReport\Figures\DualModule\Overall.png
+INPUT c:\Users\hakan\Documents\GitHub\fault_tolerant_drives\Simulation\FOC\FocFaultReport\Figures\DualModule\Overall.png
+INPUT c:\Users\hakan\Documents\GitHub\fault_tolerant_drives\Simulation\FOC\FocFaultReport\Figures\DualModule\Overall.png
+INPUT c:\Users\hakan\Documents\GitHub\fault_tolerant_drives\Simulation\FOC\FocFaultReport\FocFaultReport.bbl
+INPUT c:\Users\hakan\Documents\GitHub\fault_tolerant_drives\Simulation\FOC\FocFaultReport\FocFaultReport.bbl
+INPUT c:\Users\hakan\Documents\GitHub\fault_tolerant_drives\Simulation\FOC\FocFaultReport\FocFaultReport.aux
+INPUT C:\Users\hakan\AppData\Local\MiKTeX\2.9\fonts\pk\ljfour\jknappen\ec\dpi600\tcrm1000.pk
+INPUT C:\Users\hakan\AppData\Local\MiKTeX\2.9\fonts\pk\ljfour\jknappen\ec\dpi600\tcrm1000.pk
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\fonts\type1\public\amsfonts\cm\cmbx10.pfb
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\fonts\type1\public\amsfonts\cm\cmbx10.pfb
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\fonts\type1\public\amsfonts\cm\cmbx12.pfb
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\fonts\type1\public\amsfonts\cm\cmbx12.pfb
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\fonts\type1\public\amsfonts\cm\cmex10.pfb
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\fonts\type1\public\amsfonts\cm\cmex10.pfb
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\fonts\type1\public\amsfonts\cm\cmmi10.pfb
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\fonts\type1\public\amsfonts\cm\cmmi10.pfb
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\fonts\type1\public\amsfonts\cm\cmmi7.pfb
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\fonts\type1\public\amsfonts\cm\cmmi7.pfb
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\fonts\type1\public\amsfonts\cm\cmr10.pfb
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\fonts\type1\public\amsfonts\cm\cmr10.pfb
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\fonts\type1\public\amsfonts\cm\cmr12.pfb
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\fonts\type1\public\amsfonts\cm\cmr12.pfb
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\fonts\type1\public\amsfonts\cm\cmr17.pfb
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\fonts\type1\public\amsfonts\cm\cmr17.pfb
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\fonts\type1\public\amsfonts\cm\cmr7.pfb
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\fonts\type1\public\amsfonts\cm\cmr7.pfb
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\fonts\type1\public\amsfonts\cm\cmsy10.pfb
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\fonts\type1\public\amsfonts\cm\cmsy10.pfb

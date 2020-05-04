@@ -71,27 +71,32 @@ v_q = \frac{2}{3}\Bigg(sin(\theta)cos(\theta-\frac{2\pi}{3}) - sin(\theta)cos(\t
  v_0 = \frac{2}{3}(\frac{1}{2}sin(\theta)-\frac{1}{2}sin(\theta)) = 0
 \end{equation}
 
-It can be seen that the iq current and id currents are oscillating at frequency 100 Hz (see Figure \ref{fig:ResistiveLoad_Vqd0} and \ref{fig:ResistiveLoad_Iqd0}). The q component has a DC component as can be seen from Eqn. \ref{eq:eqnVq_1}. This DC component value states that under faulty conditions, this phase configuration can produce torque. However, since the d component is not zero anymore, it can cause saturation and/or demagnetization. This point should be taken into consideration when applying FOC.
-
-
+It can be seen that the iq current and id currents are oscillating at frequency 100 Hz (see Figure \ref{fig:ResistiveLoad_Vqd0} and \ref{fig:ResistiveLoad_Iqd0}). The q component has a DC component as can be seen from Eqn. \ref{eq:eqnVq_1}. This DC component value states that under faulty conditions, this phase configuration can produce torque. However, since the d component is not zero anymore, it can cause saturation and/or demagnetization. This point should be taken into consideration when applying FOC. The simulation model is provided in \ref{fig:ModelResistive}.
 
 \begin{figure}[h!]
 \centering
-\includegraphics[scale=0.3]{Figures/ResistiveLoad/Vabc.png}
+\includegraphics[scale=0.35]{Figures/ResistiveLoad/Model.PNG}
+\caption{Voltage waveforms }
+\label{fig:ModelResistive}
+\end{figure}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[scale=0.35]{Figures/ResistiveLoad/Vabc.png}
 \caption{Voltage waveforms }
 \label{fig:ResistiveLoad_Vabc}
 \end{figure}
 
 \begin{figure}[h!]
 \centering
-\includegraphics[scale=0.3]{Figures/ResistiveLoad/Iabc.png}
+\includegraphics[scale=0.35]{Figures/ResistiveLoad/Iabc.png}
 \caption{Current waveforms}
 \label{fig:ResistiveLoad_Iabc}
 \end{figure}
 
 \begin{figure}[h!]
 \centering
-\includegraphics[scale=0.3]{Figures/ResistiveLoad/Vqd0.png}
+\includegraphics[scale=0.35]{Figures/ResistiveLoad/Vqd0.png}
 \caption{qd0 voltages}
 \label{fig:ResistiveLoad_Vqd0}
 \end{figure}
@@ -99,14 +104,14 @@ It can be seen that the iq current and id currents are oscillating at frequency 
 
 \begin{figure}[h!]
 \centering
-\includegraphics[scale=0.3]{Figures/ResistiveLoad/Iqd0.png}
+\includegraphics[scale=0.35]{Figures/ResistiveLoad/Iqd0.png}
 \caption{qd0 currents}
 \label{fig:ResistiveLoad_Iqd0}
 \end{figure}
 
 
 \section{Single Three Phase Motor Drive - One Phase Fault}
-In this section, a three phase machine is simulated for an open phase fault, similar to the that of previous section. The simulation results are provided in Figures \ref{fig:fault_moment}, \ref{fig:ref_update_under_fault}, \ref{fig:overall_single}. Properties of the simulation as follows
+In this section, a three phase machine is simulated for an open phase fault, similar to the that of previous section. The speed of the machine is controlled using FOC. The simulation results are provided in Figures \ref{fig:fault_moment}, \ref{fig:ref_update_under_fault}, \ref{fig:overall_single}. Properties of the simulation as follows
 \begin{itemize}
     \item Speed ref starts at 200 rpm and updated to 100 rpm at t=6sec
     \item Open phase fault (on phase A) occurs at t=3sec
@@ -157,7 +162,11 @@ The FOC tries to equalize the torque efforts of both modules. The module 2 seems
 \label{fig:overall_dual}
 \end{figure}
 
+\subsection{Conclusion}
+
+In this report it is observed that the machine with single module can continue its operation and generate torque. However, since a rotating MMF cannot be created, the generated torque has many ripples. 
+In the dual module case, the second module is nearly unaffected. To reduce the torque ripple in the case of a fault, the healthy module can continue operation with a considerable contribution to torque from the faulty module.
+
 
 \bibliographystyle{plain}
-\bibliography{references}
 \end{document}

@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.21 (MiKTeX 2.9.7400 64-bit) (preloaded format=pdflatex 2020.4.25)  26 APR 2020 13:23
+This is pdfTeX, Version 3.14159265-2.6-1.40.21 (MiKTeX 2.9.7400 64-bit) (preloaded format=pdflatex 2020.4.25)  4 MAY 2020 23:13
 entering extended mode
 **c:/Users/hakan/Documents/GitHub/fault_tolerant_drives/Simulation/FOC/FocFaultReport/FocFaultReport.tex
 (c:/Users/hakan/Documents/GitHub/fault_tolerant_drives/Simulation/FOC/FocFaultReport/FocFaultReport.tex
@@ -225,87 +225,110 @@ Underfull \hbox (badness 10000) in paragraph at lines 40--41
 [1
 
 {C:/Users/hakan/AppData/Local/MiKTeX/2.9/pdftex/config/pdftex.map}]
-<Figures/ResistiveLoad/Vabc.png, id=16, 1433.355pt x 755.07094pt>
+<Figures/ResistiveLoad/Model.PNG, id=16, 877.02657pt x 457.71pt>
+File: Figures/ResistiveLoad/Model.PNG Graphic file (type png)
+<use Figures/ResistiveLoad/Model.PNG>
+Package pdftex.def Info: Figures/ResistiveLoad/Model.PNG  used on input line 78.
+(pdftex.def)             Requested size: 306.9639pt x 160.2009pt.
+<Figures/ResistiveLoad/Vabc.png, id=18, 1398.72563pt x 755.07094pt>
 File: Figures/ResistiveLoad/Vabc.png Graphic file (type png)
 <use Figures/ResistiveLoad/Vabc.png>
-Package pdftex.def Info: Figures/ResistiveLoad/Vabc.png  used on input line 80.
-(pdftex.def)             Requested size: 430.00983pt x 226.52303pt.
-<Figures/ResistiveLoad/Iabc.png, id=17, 1398.72563pt x 755.07094pt>
+Package pdftex.def Info: Figures/ResistiveLoad/Vabc.png  used on input line 85.
+(pdftex.def)             Requested size: 489.56131pt x 264.27878pt.
+
+Overfull \hbox (18.08882pt too wide) in paragraph at lines 85--86
+ [][] 
+ []
+
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+<Figures/ResistiveLoad/Iabc.png, id=19, 1398.72563pt x 755.07094pt>
 File: Figures/ResistiveLoad/Iabc.png Graphic file (type png)
 <use Figures/ResistiveLoad/Iabc.png>
-Package pdftex.def Info: Figures/ResistiveLoad/Iabc.png  used on input line 87.
-(pdftex.def)             Requested size: 419.62093pt x 226.52303pt.
+Package pdftex.def Info: Figures/ResistiveLoad/Iabc.png  used on input line 92.
+(pdftex.def)             Requested size: 489.56131pt x 264.27878pt.
+
+Overfull \hbox (18.08882pt too wide) in paragraph at lines 92--93
+ [][] 
+ []
 
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
-<Figures/ResistiveLoad/Vqd0.png, id=18, 1398.72563pt x 755.07094pt>
+<Figures/ResistiveLoad/Vqd0.png, id=20, 1398.72563pt x 755.07094pt>
 File: Figures/ResistiveLoad/Vqd0.png Graphic file (type png)
 <use Figures/ResistiveLoad/Vqd0.png>
-Package pdftex.def Info: Figures/ResistiveLoad/Vqd0.png  used on input line 94.
-(pdftex.def)             Requested size: 419.62093pt x 226.52303pt.
+Package pdftex.def Info: Figures/ResistiveLoad/Vqd0.png  used on input line 99.
+(pdftex.def)             Requested size: 489.56131pt x 264.27878pt.
+
+Overfull \hbox (18.08882pt too wide) in paragraph at lines 99--100
+ [][] 
+ []
+
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
-<Figures/ResistiveLoad/Iqd0.png, id=19, 1398.72563pt x 755.07094pt>
+<Figures/ResistiveLoad/Iqd0.png, id=21, 1398.72563pt x 755.07094pt>
 File: Figures/ResistiveLoad/Iqd0.png Graphic file (type png)
 <use Figures/ResistiveLoad/Iqd0.png>
-Package pdftex.def Info: Figures/ResistiveLoad/Iqd0.png  used on input line 102.
+Package pdftex.def Info: Figures/ResistiveLoad/Iqd0.png  used on input line 107.
+(pdftex.def)             Requested size: 489.56131pt x 264.27878pt.
+
+Overfull \hbox (18.08882pt too wide) in paragraph at lines 107--108
+ [][] 
+ []
+
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+<Figures/SingleModule/FaultMoment.png, id=22, 1398.72563pt x 755.07094pt>
+File: Figures/SingleModule/FaultMoment.png Graphic file (type png)
+<use Figures/SingleModule/FaultMoment.png>
+Package pdftex.def Info: Figures/SingleModule/FaultMoment.png  used on input line 127.
 (pdftex.def)             Requested size: 419.62093pt x 226.52303pt.
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
-<Figures/SingleModule/FaultMoment.png, id=20, 1398.72563pt x 1360.33218pt>
-File: Figures/SingleModule/FaultMoment.png Graphic file (type png)
-<use Figures/SingleModule/FaultMoment.png>
-Package pdftex.def Info: Figures/SingleModule/FaultMoment.png  used on input line 122.
-(pdftex.def)             Requested size: 419.62093pt x 408.1028pt.
-
-LaTeX Warning: `!h' float specifier changed to `!ht'.
-
-<Figures/SingleModule/SpeedRefUpdateUnderFault.png, id=21, 1398.72563pt x 1360.33218pt>
+<Figures/SingleModule/SpeedRefUpdateUnderFault.png, id=23, 1398.72563pt x 755.07094pt>
 File: Figures/SingleModule/SpeedRefUpdateUnderFault.png Graphic file (type png)
 <use Figures/SingleModule/SpeedRefUpdateUnderFault.png>
-Package pdftex.def Info: Figures/SingleModule/SpeedRefUpdateUnderFault.png  used on input line 129.
-(pdftex.def)             Requested size: 419.62093pt x 408.1028pt.
+Package pdftex.def Info: Figures/SingleModule/SpeedRefUpdateUnderFault.png  used on input line 134.
+(pdftex.def)             Requested size: 419.62093pt x 226.52303pt.
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
-<Figures/SingleModule/Overall.png, id=22, 1398.72563pt x 1360.33218pt>
+<Figures/SingleModule/Overall.png, id=24, 1398.72563pt x 755.07094pt>
 File: Figures/SingleModule/Overall.png Graphic file (type png)
 <use Figures/SingleModule/Overall.png>
-Package pdftex.def Info: Figures/SingleModule/Overall.png  used on input line 136.
-(pdftex.def)             Requested size: 419.62093pt x 408.1028pt.
+Package pdftex.def Info: Figures/SingleModule/Overall.png  used on input line 141.
+(pdftex.def)             Requested size: 419.62093pt x 226.52303pt.
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
-[2 <c:/Users/hakan/Documents/GitHub/fault_tolerant_drives/Simulation/FOC/FocFaultReport/Figures/ResistiveLoad/Vabc.png>]
-<Figures/DualModule/Overall.png, id=26, 1398.72563pt x 1085.55562pt>
+[2 <c:/Users/hakan/Documents/GitHub/fault_tolerant_drives/Simulation/FOC/FocFaultReport/Figures/ResistiveLoad/Model.PNG>] [3 <c:/Users/hakan/Documents/GitHub/fault_tolerant_drives/Simulation/FOC/FocFaultReport/Figures/ResistiveLoad/Vabc.png (PNG copy)> <c:/Users/hakan/Documents/GitHub/fault_tolerant_drives/Simulation/FOC/FocFaultReport/Figures/ResistiveLoad/Iabc.png (PNG copy)>]
+<Figures/DualModule/Overall.png, id=32, 1398.72563pt x 755.07094pt>
 File: Figures/DualModule/Overall.png Graphic file (type png)
 <use Figures/DualModule/Overall.png>
-Package pdftex.def Info: Figures/DualModule/Overall.png  used on input line 155.
-(pdftex.def)             Requested size: 419.62093pt x 325.66919pt.
+Package pdftex.def Info: Figures/DualModule/Overall.png  used on input line 160.
+(pdftex.def)             Requested size: 419.62093pt x 226.52303pt.
 
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
-(c:/Users\hakan\Documents\GitHub\fault_tolerant_drives\Simulation\FOC\FocFaultReport\FocFaultReport.bbl
-
-Package natbib Warning: Empty `thebibliography' environment on input line 3.
-
-) [3 <c:/Users/hakan/Documents/GitHub/fault_tolerant_drives/Simulation/FOC/FocFaultReport/Figures/ResistiveLoad/Iabc.png> <c:/Users/hakan/Documents/GitHub/fault_tolerant_drives/Simulation/FOC/FocFaultReport/Figures/ResistiveLoad/Vqd0.png>] [4 <c:/Users/hakan/Documents/GitHub/fault_tolerant_drives/Simulation/FOC/FocFaultReport/Figures/ResistiveLoad/Iqd0.png>] [5 <c:/Users/hakan/Documents/GitHub/fault_tolerant_drives/Simulation/FOC/FocFaultReport/Figures/SingleModule/FaultMoment.png>] [6 <c:/Users/hakan/Documents/GitHub/fault_tolerant_drives/Simulation/FOC/FocFaultReport/Figures/SingleModule/SpeedRefUpdateUnderFault.png>] [7 <c:/Users/hakan/Documents/GitHub/fault_tolerant_drives/Simulation/FOC/FocFaultReport/Figures/SingleModule/Overall.png>] [8 <c:/Users/hakan/Documents/GitHub/fault_tolerant_drives/Simulation/FOC/FocFaultReport/Figures/DualModule/Overall.png>] (c:/Users\hakan\Documents\GitHub\fault_tolerant_drives\Simulation\FOC\FocFaultReport\FocFaultReport.aux) ) 
+[4 <c:/Users/hakan/Documents/GitHub/fault_tolerant_drives/Simulation/FOC/FocFaultReport/Figures/ResistiveLoad/Vqd0.png (PNG copy)> <c:/Users/hakan/Documents/GitHub/fault_tolerant_drives/Simulation/FOC/FocFaultReport/Figures/ResistiveLoad/Iqd0.png (PNG copy)>] [5 <c:/Users/hakan/Documents/GitHub/fault_tolerant_drives/Simulation/FOC/FocFaultReport/Figures/SingleModule/FaultMoment.png (PNG copy)> <c:/Users/hakan/Documents/GitHub/fault_tolerant_drives/Simulation/FOC/FocFaultReport/Figures/SingleModule/SpeedRefUpdateUnderFault.png (PNG copy)>] [6 <c:/Users/hakan/Documents/GitHub/fault_tolerant_drives/Simulation/FOC/FocFaultReport/Figures/SingleModule/Overall.png (PNG copy)> <c:/Users/hakan/Documents/GitHub/fault_tolerant_drives/Simulation/FOC/FocFaultReport/Figures/DualModule/Overall.png (PNG copy)>] (c:/Users\hakan\Documents\GitHub\fault_tolerant_drives\Simulation\FOC\FocFaultReport\FocFaultReport.aux) ) 
 Here is how much of TeX's memory you used:
- 5908 strings out of 480930
- 130803 string characters out of 2899761
- 383204 words of memory out of 3000000
- 21704 multiletter control sequences out of 15000+200000
+ 5911 strings out of 480930
+ 130759 string characters out of 2899761
+ 384212 words of memory out of 3000000
+ 21708 multiletter control sequences out of 15000+200000
  539749 words of font info for 51 fonts, out of 3000000 for 9000
  1141 hyphenation exceptions out of 8191
- 36i,7n,46p,641b,498s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 36i,7n,46p,703b,498s stack positions out of 5000i,500n,10000p,200000b,50000s
  <C:\Users\hakan\AppData\Local\MiKTeX\2.9\fonts/pk/ljfour/jknappen/ec/dpi600\tcrm1000.pk><C:/Users/hakan/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmbx10.pfb><C:/Users/hakan/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmbx12.pfb><C:/Users/hakan/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmex10.pfb><C:/Users/hakan/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmmi10.pfb><C:/Users/hakan/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmmi7.pfb><C:/Users/hakan/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmr10.pfb><C:/Users/hakan/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmr12.pfb><C:/Users/hakan/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmr17.pfb><C:/Users/hakan/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmr7.pfb><C:/Users/hakan/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmsy10.pfb>
-Output written on c:/Users\hakan\Documents\GitHub\fault_tolerant_drives\Simulation\FOC\FocFaultReport\FocFaultReport.pdf (8 pages, 956609 bytes).
+Output written on c:/Users\hakan\Documents\GitHub\fault_tolerant_drives\Simulation\FOC\FocFaultReport\FocFaultReport.pdf (6 pages, 838228 bytes).
 PDF statistics:
- 82 PDF objects out of 1000 (max. 8388607)
+ 77 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
- 41 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 46 words of extra memory for PDF output out of 10000 (max. 10000000)
 

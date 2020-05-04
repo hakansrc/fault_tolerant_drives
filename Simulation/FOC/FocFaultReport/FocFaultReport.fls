@@ -109,6 +109,11 @@ INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\fonts\tfm\public\cm\cmbx1
 INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\fonts\tfm\public\cm\cmbx10.tfm
 OUTPUT c:\Users\hakan\Documents\GitHub\fault_tolerant_drives\Simulation\FOC\FocFaultReport\FocFaultReport.pdf
 INPUT C:\Users\hakan\AppData\Local\MiKTeX\2.9\pdftex\config\pdftex.map
+INPUT c:\Users\hakan\Documents\GitHub\fault_tolerant_drives\Simulation\FOC\FocFaultReport\Figures\ResistiveLoad\Model.PNG
+INPUT c:\Users\hakan\Documents\GitHub\fault_tolerant_drives\Simulation\FOC\FocFaultReport\Figures\ResistiveLoad\Model.PNG
+INPUT c:\Users\hakan\Documents\GitHub\fault_tolerant_drives\Simulation\FOC\FocFaultReport\Figures\ResistiveLoad\Model.PNG
+INPUT c:\Users\hakan\Documents\GitHub\fault_tolerant_drives\Simulation\FOC\FocFaultReport\Figures\ResistiveLoad\Model.PNG
+INPUT c:\Users\hakan\Documents\GitHub\fault_tolerant_drives\Simulation\FOC\FocFaultReport\Figures\ResistiveLoad\Model.PNG
 INPUT c:\Users\hakan\Documents\GitHub\fault_tolerant_drives\Simulation\FOC\FocFaultReport\Figures\ResistiveLoad\Vabc.png
 INPUT c:\Users\hakan\Documents\GitHub\fault_tolerant_drives\Simulation\FOC\FocFaultReport\Figures\ResistiveLoad\Vabc.png
 INPUT c:\Users\hakan\Documents\GitHub\fault_tolerant_drives\Simulation\FOC\FocFaultReport\Figures\ResistiveLoad\Vabc.png
@@ -149,8 +154,6 @@ INPUT c:\Users\hakan\Documents\GitHub\fault_tolerant_drives\Simulation\FOC\FocFa
 INPUT c:\Users\hakan\Documents\GitHub\fault_tolerant_drives\Simulation\FOC\FocFaultReport\Figures\DualModule\Overall.png
 INPUT c:\Users\hakan\Documents\GitHub\fault_tolerant_drives\Simulation\FOC\FocFaultReport\Figures\DualModule\Overall.png
 INPUT c:\Users\hakan\Documents\GitHub\fault_tolerant_drives\Simulation\FOC\FocFaultReport\Figures\DualModule\Overall.png
-INPUT c:\Users\hakan\Documents\GitHub\fault_tolerant_drives\Simulation\FOC\FocFaultReport\FocFaultReport.bbl
-INPUT c:\Users\hakan\Documents\GitHub\fault_tolerant_drives\Simulation\FOC\FocFaultReport\FocFaultReport.bbl
 INPUT c:\Users\hakan\Documents\GitHub\fault_tolerant_drives\Simulation\FOC\FocFaultReport\FocFaultReport.aux
 INPUT C:\Users\hakan\AppData\Local\MiKTeX\2.9\fonts\pk\ljfour\jknappen\ec\dpi600\tcrm1000.pk
 INPUT C:\Users\hakan\AppData\Local\MiKTeX\2.9\fonts\pk\ljfour\jknappen\ec\dpi600\tcrm1000.pk

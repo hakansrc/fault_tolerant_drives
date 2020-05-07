@@ -36,35 +36,35 @@ MeanInducedVoltagePeak = (sqrt(2)/12)*(Module1Phase_A_600RPM_Vrms+Module1Phase_B
     Module4Phase_A_600RPM_Vrms+Module4Phase_B_600RPM_Vrms+Module4Phase_C_600RPM_Vrms);
 FluxPM = MeanInducedVoltagePeak/(2*pi*100);
 
-Module1Phase_A_Lq = 3.72;
-Module1Phase_B_Lq = 3.68;
-Module1Phase_C_Lq = 3.56;
-Module2Phase_A_Lq = 3.51;
-Module2Phase_B_Lq = 3.43;
-Module2Phase_C_Lq = 3.62;
-Module3Phase_A_Lq = 3.55;
-Module3Phase_B_Lq = 3.67;
-Module3Phase_C_Lq = 3.68;
-Module4Phase_A_Lq = 3.58;
-Module4Phase_B_Lq = 3.64;
-Module4Phase_C_Lq = 3.62;
+Module1Phase_A_Lq = 3.72e-3;
+Module1Phase_B_Lq = 3.68e-3;
+Module1Phase_C_Lq = 3.56e-3;
+Module2Phase_A_Lq = 3.51e-3;
+Module2Phase_B_Lq = 3.43e-3;
+Module2Phase_C_Lq = 3.62e-3;
+Module3Phase_A_Lq = 3.55e-3;
+Module3Phase_B_Lq = 3.67e-3;
+Module3Phase_C_Lq = 3.68e-3;
+Module4Phase_A_Lq = 3.58e-3;
+Module4Phase_B_Lq = 3.64e-3;
+Module4Phase_C_Lq = 3.62e-3;
 MeanLq = (1/12)*(Module1Phase_A_Lq+Module1Phase_B_Lq+Module1Phase_C_Lq+...
     Module2Phase_A_Lq+Module2Phase_B_Lq+Module2Phase_C_Lq+...
     Module3Phase_A_Lq+Module3Phase_B_Lq+Module3Phase_C_Lq+...
     Module4Phase_A_Lq+Module4Phase_B_Lq+Module4Phase_C_Lq);
 
-Module1Phase_A_Ld = 3.2;
-Module1Phase_B_Ld = 3.18;
-Module1Phase_C_Ld = 3.12;
-Module2Phase_A_Ld = 3.05;
-Module2Phase_B_Ld = 2.94;
-Module2Phase_C_Ld = 3.07;
-Module3Phase_A_Ld = 2.99;
-Module3Phase_B_Ld = 3.02;
-Module3Phase_C_Ld = 3.07;
-Module4Phase_A_Ld = 2.98;
-Module4Phase_B_Ld = 3.12;
-Module4Phase_C_Ld = 3.12;
+Module1Phase_A_Ld = 3.2e-3;
+Module1Phase_B_Ld = 3.18e-3;
+Module1Phase_C_Ld = 3.12e-3;
+Module2Phase_A_Ld = 3.05e-3;
+Module2Phase_B_Ld = 2.94e-3;
+Module2Phase_C_Ld = 3.07e-3;
+Module3Phase_A_Ld = 2.99e-3;
+Module3Phase_B_Ld = 3.02e-3;
+Module3Phase_C_Ld = 3.07e-3;
+Module4Phase_A_Ld = 2.98e-3;
+Module4Phase_B_Ld = 3.12e-3;
+Module4Phase_C_Ld = 3.12e-3;
 MeanLd = (1/12)*(Module1Phase_A_Ld+Module1Phase_B_Ld+Module1Phase_C_Ld+...
     Module2Phase_A_Ld+Module2Phase_B_Ld+Module2Phase_C_Ld+...
     Module3Phase_A_Ld+Module3Phase_B_Ld+Module3Phase_C_Ld+...
@@ -83,3 +83,5 @@ Vin = Vdc + Rin*(Pout/Vdc);
 %% Other parameters
 Load_Nominal_Freq = 50;
 THD_mean_frequency = 50;
+VoltageVector = [0 0 0; 0 0 1; 0 1 0; 0 1 1; 1 0 0; 1 0 1; 1 1 0; 1 1 1];
+

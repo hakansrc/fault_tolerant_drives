@@ -89,3 +89,4 @@ SpeedRefUpdateTime = 0.25;
 Tload1 = 15; %Nm
 Tload2 = 30;
 TloadUpdateTime = 0.75;
+FaultTime = 5;

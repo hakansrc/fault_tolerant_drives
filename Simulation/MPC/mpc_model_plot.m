@@ -31,7 +31,7 @@ grid on
 figure
 % hold all
 subplot(2,1,1)
-plot(out.Simout_TorqueSpeedMeas.Electromagnetic_torque_Te__N_m_,'LineWidth',2);
+plot(out.Simout_TorqueSpeedMeas.Te,'LineWidth',2);
 hold on
 plot(out.Simout_TorqueSpeedRef.Tload,'LineWidth',2);
 set(gca,'FontSize',12,'FontWeight','bold')
@@ -41,7 +41,7 @@ legend('Te','Tload')
 ylim([-150 150])
 grid on
 subplot(2,1,2)
-plot(out.Simout_TorqueSpeedMeas.Rotor_speed_wm__rad_s_  ,'LineWidth',2);
+plot(out.Simout_TorqueSpeedMeas.wmech  ,'LineWidth',2);
 hold on
 plot(out.Simout_TorqueSpeedRef.wref  ,'LineWidth',2);
 % hold off

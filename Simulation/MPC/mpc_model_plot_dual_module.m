@@ -1,34 +1,34 @@
 close all
 %%
-figure
-hold all
-plot(out.Simout_PhaseCurrents_abc.M1_Ia,'LineWidth',2);
-plot(out.Simout_PhaseCurrents_abc.M1_Ib,'LineWidth',2);
-plot(out.Simout_PhaseCurrents_abc.M1_Ic,'LineWidth',2);
-hold off
-xlabel('Time (sec)','FontSize',12,'FontWeight','bold');
-ylabel('Current (A)','FontSize',12,'FontWeight','bold');
-title('Iabc M1')
-legend('Ia','Ib','Ic')
-set(gca,'FontSize',12,'FontWeight','bold')
-ylim([-60 60])
-
-grid on
-
-figure
-hold all
-plot(out.Simout_PhaseCurrents_abc.M2_Ia,'LineWidth',2);
-plot(out.Simout_PhaseCurrents_abc.M2_Ib,'LineWidth',2);
-plot(out.Simout_PhaseCurrents_abc.M2_Ic,'LineWidth',2);
-hold off
-xlabel('Time (sec)','FontSize',12,'FontWeight','bold');
-ylabel('Current (A)','FontSize',12,'FontWeight','bold');
-title('Iabc M2')
-legend('Ia','Ib','Ic')
-set(gca,'FontSize',12,'FontWeight','bold')
+% figure
+% hold all
+% plot(out.Simout_PhaseCurrents_abc.M1_Ia,'LineWidth',2);
+% plot(out.Simout_PhaseCurrents_abc.M1_Ib,'LineWidth',2);
+% plot(out.Simout_PhaseCurrents_abc.M1_Ic,'LineWidth',2);
+% hold off
+% xlabel('Time (sec)','FontSize',12,'FontWeight','bold');
+% ylabel('Current (A)','FontSize',12,'FontWeight','bold');
+% title('Iabc M1')
+% legend('Ia','Ib','Ic')
+% set(gca,'FontSize',12,'FontWeight','bold')
 % ylim([-60 60])
-
-grid on
+% 
+% grid on
+% 
+% figure
+% hold all
+% plot(out.Simout_PhaseCurrents_abc.M2_Ia,'LineWidth',2);
+% plot(out.Simout_PhaseCurrents_abc.M2_Ib,'LineWidth',2);
+% plot(out.Simout_PhaseCurrents_abc.M2_Ic,'LineWidth',2);
+% hold off
+% xlabel('Time (sec)','FontSize',12,'FontWeight','bold');
+% ylabel('Current (A)','FontSize',12,'FontWeight','bold');
+% title('Iabc M2')
+% legend('Ia','Ib','Ic')
+% set(gca,'FontSize',12,'FontWeight','bold')
+% % ylim([-60 60])
+% 
+% grid on
 %%
 figure
 hold all
@@ -37,21 +37,21 @@ plot(out.Simout_PhaseCurrents_dq.M1_iqs,'LineWidth',2);
 hold off
 xlabel('Time (sec)','FontSize',12,'FontWeight','bold');
 ylabel('Current (A)','FontSize',12,'FontWeight','bold');
-title('M1 Idq')
-legend('Id','Iq')
+% title('M1 Idq')
+% legend('Id','Iq')
 set(gca,'FontSize',12,'FontWeight','bold')
 ylim([-60 60])
 grid on
 
-figure
+% figure
 hold all
 plot(out.Simout_PhaseCurrents_dq.M2_ids,'LineWidth',2);
 plot(out.Simout_PhaseCurrents_dq.M2_iqs,'LineWidth',2);
 hold off
 xlabel('Time (sec)','FontSize',12,'FontWeight','bold');
 ylabel('Current (A)','FontSize',12,'FontWeight','bold');
-title('M2 Idq')
-legend('Id','Iq')
+% title('M2 Idq')
+legend('M1 Id','M1 Iq','M2 Id','M2 Iq')
 set(gca,'FontSize',12,'FontWeight','bold')
 % ylim([-60 60])
 grid on

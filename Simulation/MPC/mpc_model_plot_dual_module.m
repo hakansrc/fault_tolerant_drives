@@ -56,6 +56,9 @@ set(gca,'FontSize',12,'FontWeight','bold')
 % ylim([-60 60])
 grid on
 %%
+xlimval_upper = 0.58;
+xlimval_lower = 0.48;
+
 figure
 % title('')
 % hold all
@@ -63,15 +66,31 @@ subplot(2,1,1)
 plot(out.Simout_TorqueSpeedMeas.M1_Te,'LineWidth',2);
 hold on
 plot(out.Simout_TorqueSpeedMeas.M2_Te,'LineWidth',2);
+grid on
+% hold on
+% plot((out.Simout_TorqueSpeedMeas.M1_Te+out.Simout_TorqueSpeedMeas.M2_Te),'LineWidth',2);
+% hold on
+% plot(out.Simout_TorqueSpeedRef.Combined_Tload,'LineWidth',2);
+set(gca,'FontSize',12,'FontWeight','bold')
+xlabel('Time (sec)','FontSize',12,'FontWeight','bold');
+ylabel('Torque (Nm)','FontSize',12,'FontWeight','bold');
+legend('M1 Te','M2 Te')
+xlim([xlimval_lower xlimval_upper])
+subplot(2,1,2)
+grid on 
+plot((out.Simout_TorqueSpeedMeas.M1_Te+out.Simout_TorqueSpeedMeas.M2_Te),'LineWidth',2);
 hold on
 plot(out.Simout_TorqueSpeedRef.Combined_Tload,'LineWidth',2);
 set(gca,'FontSize',12,'FontWeight','bold')
 xlabel('Time (sec)','FontSize',12,'FontWeight','bold');
 ylabel('Torque (Nm)','FontSize',12,'FontWeight','bold');
-legend('M1 Te','M2 Te','Tload')
+legend('M1 Te + M2 Te','Tload')
 % ylim([-150 150])
 grid on
-subplot(2,1,2)
+xlim([xlimval_lower xlimval_upper])
+%%
+% subplot(3,1,3)
+figure
 plot(out.Simout_TorqueSpeedMeas.M1_wmech  ,'LineWidth',2);
 hold on
 plot(out.Simout_TorqueSpeedMeas.M2_wmech  ,'LineWidth',2);

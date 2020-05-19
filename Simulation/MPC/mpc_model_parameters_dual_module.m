@@ -1,7 +1,7 @@
 clear
 clc
 %% Simulation parameters
-Sampling_time = 0.5e-6;
+Sampling_time = 1e-6;
 ref_frequency = 100*pi;
 Tfinal = 3; %seconds
 %% PMSM parameters
@@ -93,10 +93,10 @@ Vin = Vdc + Rin*(Pout/Vdc);
 %% Other parameters
 Load_Nominal_Freq = 50;
 THD_mean_frequency = 50;
-SpeedRef1 = 600; % RPM
+SpeedRef1 = 300; % RPM
 SpeedRef2 = 300;
 SpeedRefUpdateTime = 2;
 Tload1 = 20; %Nm
-Tload2 = 60;
+Tload2 = 20;
 TloadUpdateTime = 1;
-M1_FaultTime = 5;
+M1_FaultTime = 0.5;

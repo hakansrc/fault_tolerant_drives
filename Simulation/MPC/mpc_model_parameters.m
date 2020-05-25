@@ -3,11 +3,11 @@ clc
 %% Simulation parameters
 Sampling_time = 1e-6;
 ref_frequency = 100*pi;
-Tfinal = 1; %seconds
+Tfinal = 3; %seconds
 %% PMSM parameters
 MotorSpeed = 600; % rpm
 PolePairs = 10;
-EfRated = 80; % Volts
+EfRated = 80.3; % Volts
 Ls = 3.51e-3; % Henries
 Rs = 321e-3; % Ohms
 VoltageConstant = EfRated*sqrt(6)/MotorSpeed*1e3;% Vll-peak/krpm
@@ -83,10 +83,10 @@ Vin = Vdc + Rin*(Pout/Vdc);
 %% Other parameters
 Load_Nominal_Freq = 50;
 THD_mean_frequency = 50;
-SpeedRef1 = 600; % RPM
+SpeedRef1 = 300; % RPM
 SpeedRef2 = 300;
-SpeedRefUpdateTime = 0.25;
-Tload1 = 15; %Nm
-Tload2 = 30;
-TloadUpdateTime = 0.75;
+SpeedRefUpdateTime = 2;
+Tload1 = 10; %Nm
+Tload2 = 20;
+TloadUpdateTime = 2;
 FaultTime = 5;

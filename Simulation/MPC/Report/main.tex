@@ -1,8 +1,12 @@
 \documentclass{article}
 \usepackage[utf8]{inputenc}
 
-\title{Notes on Permanent Magnet Synchronous Machine (PMSM) Model Predictive Control (MPC) and Operation Under Open Circuit Fault}
-\author{hakan saraç}
+
+\font\myfont=cmr12 at 25pt
+%\title{\myfont Notes on Permanent Magnet Synchronous Machine (PMSM) Model %Predictive Control (MPC) and Operation Under Open Circuit Fault}
+\font\hisfont=cmr12 at 15pt
+
+\author{\hisfont Hakan Saraç}
 \date{}
 
 
@@ -56,8 +60,12 @@
 
 
 \begin{document}
-
+\title{\line(1,0){250}\\\myfont Notes on Permanent Magnet Synchronous Machine (PMSM) Model Predictive Control (MPC) and Operation Under Open Circuit Fault\\\line(1,0){250}}
 \maketitle
+\newpage
+\tableofcontents
+\newpage
+
 
 \section{Introduction}
 In this handnote, I will be explaining my findings on PMSM control using MPC. At first, I will introduce the formula sets and PMSM state space model and how to implement MPC. Then, for a 3 phase PMSM I will be explaining my implementation and test results. After that, the implementation of MPC for a two-three-phase group machine will be discussed. Lastly, the two-three-phase group machine will be investigated under open circuit faults.
@@ -168,7 +176,7 @@ For two module configuration, the cost function has been evaluated with differen
 \end{itemize}
 
 \subsection{Seperate Cost Functions for Each Module}
-The seperate cost functions can be seen in line \ref{line:Two_Module_cost1} and line \ref{line:Two_Module_cost2}. 
+The seperate cost functions can be seen in line \ref{line:Two_Module_cost1} and line \ref{line:Two_Module_cost2} of Listing \ref{code:TwoModuleSeperateCost}. 
 
 
 \subsubsection{Healthy Operation}

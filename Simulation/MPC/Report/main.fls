@@ -8,6 +8,8 @@ INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\tex\latex\base\size10.clo
 INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\tex\latex\base\size10.clo
 INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\tex\latex\base\inputenc.sty
 INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\tex\latex\base\inputenc.sty
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\fonts\tfm\public\cm\cmr12.tfm
+INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\fonts\tfm\public\cm\cmr12.tfm
 INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\tex\latex\float\float.sty
 INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\tex\latex\float\float.sty
 INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\tex\latex\comment\comment.sty
@@ -398,8 +400,12 @@ INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\fonts\tfm\public\amsfonts
 INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\fonts\tfm\public\cm\cmbsy10.tfm
 INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\fonts\tfm\public\amsfonts\cmextra\cmbsy8.tfm
 INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\fonts\tfm\public\amsfonts\cmextra\cmbsy6.tfm
+INPUT C:\Users\hakan\AppData\Local\MiKTeX\2.9\pdftex\config\pdftex.map
 INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\fonts\tfm\public\cm\cmr12.tfm
 INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\fonts\tfm\public\cm\cmbx12.tfm
+INPUT c:\Users\hakan\Documents\GitHub\fault_tolerant_drives\Simulation\MPC\Report\main.toc
+INPUT c:\Users\hakan\Documents\GitHub\fault_tolerant_drives\Simulation\MPC\Report\main.toc
+OUTPUT c:\Users\hakan\Documents\GitHub\fault_tolerant_drives\Simulation\MPC\Report\main.toc
 INPUT c:\Users\hakan\Documents\GitHub\fault_tolerant_drives\Simulation\MPC\Report\Figures\MPC_PMSM_block_diagram.PNG
 INPUT c:\Users\hakan\Documents\GitHub\fault_tolerant_drives\Simulation\MPC\Report\Figures\MPC_PMSM_block_diagram.PNG
 INPUT c:\Users\hakan\Documents\GitHub\fault_tolerant_drives\Simulation\MPC\Report\Figures\MPC_PMSM_block_diagram.PNG
@@ -410,7 +416,6 @@ INPUT c:\Users\hakan\Documents\GitHub\fault_tolerant_drives\Simulation\MPC\Repor
 INPUT c:\Users\hakan\Documents\GitHub\fault_tolerant_drives\Simulation\MPC\Report\Figures\StateSpaceModel.PNG
 INPUT c:\Users\hakan\Documents\GitHub\fault_tolerant_drives\Simulation\MPC\Report\Figures\StateSpaceModel.PNG
 INPUT c:\Users\hakan\Documents\GitHub\fault_tolerant_drives\Simulation\MPC\Report\Figures\StateSpaceModel.PNG
-INPUT C:\Users\hakan\AppData\Local\MiKTeX\2.9\pdftex\config\pdftex.map
 INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\fonts\tfm\jknappen\ec\tcrm1000.tfm
 INPUT c:\Users\hakan\Documents\GitHub\fault_tolerant_drives\Simulation\MPC\Report\Figures\OneModuleSimulinkModel.PNG
 INPUT c:\Users\hakan\Documents\GitHub\fault_tolerant_drives\Simulation\MPC\Report\Figures\OneModuleSimulinkModel.PNG
@@ -639,8 +644,6 @@ INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\fonts\type1\public\amsfon
 INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\fonts\type1\public\amsfonts\cm\cmr10.pfb
 INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\fonts\type1\public\amsfonts\cm\cmr12.pfb
 INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\fonts\type1\public\amsfonts\cm\cmr12.pfb
-INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\fonts\type1\public\amsfonts\cm\cmr17.pfb
-INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\fonts\type1\public\amsfonts\cm\cmr17.pfb
 INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\fonts\type1\public\amsfonts\cm\cmr8.pfb
 INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\fonts\type1\public\amsfonts\cm\cmr8.pfb
 INPUT C:\Users\hakan\AppData\Local\Programs\MiKTeX 2.9\fonts\type1\public\amsfonts\cm\cmti10.pfb

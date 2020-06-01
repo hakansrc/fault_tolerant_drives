@@ -1,0 +1,13 @@
+Fixes
+1- Normalize the cost function quantities
+2- add 
+
+
+TODOs
+1- Torque ripple
+    1-a- kontrolcü fevri davranıyor
+    1-b- Kontrolcü yavaşlatılabilir mi?
+2- Infinite punishment verilmeli mi?
+3- Faulty durumda park transformu güncelleyelim
+4- Faulty mode literature survey
+

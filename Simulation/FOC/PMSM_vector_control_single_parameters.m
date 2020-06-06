@@ -1,8 +1,8 @@
 %% PMSM Vector Control Simulation Parameters
 
 % Simulation parameters
-Ts = 1000e-9; % sec
-Tfinal = 10; % sec
+Ts = 1e-6; % sec
+Tfinal = 2; % sec
 Ripth = 0.1; % sec 
 
 % PMSM parameters
@@ -15,14 +15,14 @@ VoltageConstant = EfRated*sqrt(6)/MotorSpeed*1e3;% Vll-peak/krpm
 Inertia = 1e-2; % kgm^2
 ViscousFriction = 1e-3; % Nms
 MotorSpeedRad = MotorSpeed*pi/30; % rad/sec
-LoadTorque1 = 5; % Nm
-LoadTorque2 = 5; % Nm
-LoadTorqueStepTime = 3; % s
+LoadTorque1 = 10; % Nm
+LoadTorque2 = 20; % Nm
+LoadTorqueStepTime = 0.5; % s
 
 % Drive parameters
 fsw = 40e3; % Hz
 fout = 100; % Hz
-Vdc = 100; % Volts
+Vdc = 270; % Volts
 m = 3;
 np = 1;
 ns = 1;
@@ -38,13 +38,13 @@ Pout = 2e3; % W
 n = ns*np;
 
 % Control parameters
-SpeedRef1 = 200; % rpm
-SpeedRef2 = 100; % rpm
-SpeedRefStepTime = 6; % s
+SpeedRef1 = 600; % rpm
+SpeedRef2 = 200; % rpm
+SpeedRefStepTime = 0.5; % s
 
 Idref = 0;
-SpeedPIDmax = 20;
-SpeedPIDmin = -20;
+SpeedPIDmax = 40;
+SpeedPIDmin = -40;
 IrefOverTref = MotorSpeedRad/(EfRated*3);
 IdPIDmax = Vdc/5;
 IdPIDmin = -Vdc/5;

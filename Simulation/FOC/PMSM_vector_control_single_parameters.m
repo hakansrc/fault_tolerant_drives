@@ -15,9 +15,7 @@ VoltageConstant = EfRated*sqrt(6)/MotorSpeed*1e3;% Vll-peak/krpm
 Inertia = 1e-2; % kgm^2
 ViscousFriction = 1e-3; % Nms
 MotorSpeedRad = MotorSpeed*pi/30; % rad/sec
-LoadTorque1 = 10; % Nm
-LoadTorque2 = 20; % Nm
-LoadTorqueStepTime = 0.5; % s
+
 
 % Drive parameters
 fsw = 40e3; % Hz
@@ -37,14 +35,18 @@ Pout = 2e3; % W
 % Calculated parameters
 n = ns*np;
 
-% Control parameters
 SpeedRef1 = 600; % rpm
 SpeedRef2 = 200; % rpm
 SpeedRefStepTime = 0.5; % s
+LoadTorque1 = 30; % Nm
+LoadTorque2 = 20; % Nm
+LoadTorqueStepTime = 0.5; % s
+FaultTime = 10;
 
+% Control parameters
 Idref = 0;
-SpeedPIDmax = 40;
-SpeedPIDmin = -40;
+SpeedPIDmax = 60;
+SpeedPIDmin = -60;
 IrefOverTref = MotorSpeedRad/(EfRated*3);
 IdPIDmax = Vdc/5;
 IdPIDmin = -Vdc/5;

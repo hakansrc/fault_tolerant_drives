@@ -1,0 +1,71 @@
+TMS320C2000 Assembler PC v18.12.4 Sat Jul 18 15:28:10 2020
+
+Copyright (c) 1996-2018 Texas Instruments Incorporated
+C:/ti/controlSUITE/device_support/F2837xD/v170/F2837xD_common/source/F2837xD_usDelay.asm PAGE    1
+
+       1              ;//###########################################################################
+       2              ;// TITLE: Simple delay function
+       3              ;// DESCRIPTION:
+       4              ;// This is a simple delay function that can be used to insert a specified
+       5              ;// delay into code.
+       6              ;// This function is only accurate if executed from internal zero-waitstate
+       7              ;// SARAM. If it is executed from waitstate memory then the delay will be
+       8              ;// longer then specified.
+       9              ;// To use this function:
+      10              ;//  1 - update the CPU clock speed in the F2837xD_Examples.h
+      11              ;//    file. For example:
+      12              ;//    #define CPU_RATE 6.667L // for a 150MHz CPU clock speed
+      13              ;//  2 - Call this function by using the DELAY_US(A) macro
+      14              ;//    that is defined in the F2837xD_Device.h file.  This macro
+      15              ;//    will convert the number of microseconds specified
+      16              ;//    into a loop count for use with this function.
+      17              ;//    This count will be based on the CPU frequency you specify.
+      18              ;//  3 - For the most accurate delay
+      19              ;//    - Execute this function in 0 waitstate RAM.
+      20              ;//    - Disable interrupts before calling the function
+      21              ;//      If you do not disable interrupts, then think of
+      22              ;//      this as an "at least" delay function as the actual
+      23              ;//      delay may be longer.
+      24              ;//  The C assembly call from the DELAY_US(time) macro will
+      25              ;//  look as follows:
+      26              ;//  extern void Delay(long LoopCount);
+      27              ;//        MOV   AL,#LowLoopCount
+      28              ;//        MOV   AH,#HighLoopCount
+      29              ;//        LCR   _Delay
+      30              ;//  Or as follows (if count is less then 16-bits):
+      31              ;//        MOV   ACC,#LoopCount
+      32              ;//        LCR   _Delay
+      33              ;//###########################################################################
+      34              ;// $TI Release: F2837xD Support Library v170 $
+      35              ;// $Release Date: Mon Sep 21 16:52:10 CDT 2015 $
+      36              ;// $Copyright: Copyright (C) 2013-2015 Texas Instruments Incorporated -
+      37              ;//             http://www.ti.com/ ALL RIGHTS RESERVED $
+      38              ;//###########################################################################
+      39              
+      40                     .def _F28x_usDelay
+      41 00000000              .sect "ramfuncs"
+      42              
+      43                      .global  __F28x_usDelay
+      44 00000000       _F28x_usDelay:
+      45 00000000 1901          SUB    ACC,#1
+      46 00000001 56C3          BF     _F28x_usDelay,GEQ    ;; Loop if ACC >= 0
+         00000002 FFFF 
+      47 00000003 0006          LRETR
+      48              
+      49              ;There is a 9/10 cycle overhead and each loop
+      50              ;takes five cycles. The LoopCount is given by
+      51              ;the following formula:
+      52              ;  DELAY_CPU_CYCLES = 9 + 5*LoopCount
+      53              ; LoopCount = (DELAY_CPU_CYCLES - 9) / 5
+      54              ; The macro DELAY_US(A) performs this calculation for you
+TMS320C2000 Assembler PC v18.12.4 Sat Jul 18 15:28:10 2020
+
+Copyright (c) 1996-2018 Texas Instruments Incorporated
+C:/ti/controlSUITE/device_support/F2837xD/v170/F2837xD_common/source/F2837xD_usDelay.asm PAGE    2
+
+      55              ;
+      56              ;
+      57              
+      58              
+
+No Assembly Errors, No Assembly Warnings

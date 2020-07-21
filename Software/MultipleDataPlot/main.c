@@ -67,7 +67,7 @@ int main(void)
     /*Initialize cpu timers*/
     InitCpuTimers();
     ConfigCpuTimer(&CpuTimer0, 200, 28*1000000/512); //1 seconds
-    ConfigCpuTimer(&CpuTimer1, 200, 1000000); //1 seconds
+    ConfigCpuTimer(&CpuTimer1, 200, 400); //2.5khz
     ConfigCpuTimer(&CpuTimer2, 200, 1000000); //1 seconds
     CpuTimer0Regs.TCR.all = 0x4000; // enable cpu timer interrupt
     CpuTimer1Regs.TCR.all = 0x4000; // enable cpu timer interrupt
@@ -144,7 +144,8 @@ __interrupt void cpu_timer0_isr(void)
     SciaRegs.SCITXBUF.all = 62;
     SciaRegs.SCITXBUF.all = 62;
     DELAY_US(44);
-#else
+#elif 0
+    //fFloatToBeSent[0] = cos
     SciSendMultipleFloatWithTheTag(fFloatToBeSent,6,&SciaRegs);
 #endif
 
@@ -166,7 +167,18 @@ __interrupt void cpu_timer0_isr(void)
 
 __interrupt void cpu_timer1_isr(void)
 {
+#define PI 3.14159
     CpuTimer1.InterruptCount++;
+#if 1
+    fFloatToBeSent[0] = cos(2.0*PI*50.0*((float )CpuTimer1.InterruptCount)/2500.0);
+    fFloatToBeSent[1] = cos(2.0*PI*60.0*((float )CpuTimer1.InterruptCount)/2500.0);
+    fFloatToBeSent[2] = cos(2.0*PI*70.0*((float )CpuTimer1.InterruptCount)/2500.0);
+    fFloatToBeSent[3] = cos(2.0*PI*80.0*((float )CpuTimer1.InterruptCount)/2500.0);
+    fFloatToBeSent[4] = cos(2.0*PI*90.0*((float )CpuTimer1.InterruptCount)/2500.0);
+    fFloatToBeSent[5] = cos(2.0*PI*100.0*((float )CpuTimer1.InterruptCount)/2500.0);
+#endif
+    SciSendMultipleFloatWithTheTag(fFloatToBeSent,6,&SciaRegs);
+
     PieCtrlRegs.PIEACK.all = PIEACK_GROUP1;
 }
 

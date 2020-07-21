@@ -14,11 +14,11 @@ global TheSaveUpperLimit                    %This value is the number of bytes o
 global WindowArea                           %This variable states amount of data to be shown to the user during the operation
 global SaveTheDataFlag     
 %% IMPORTANT DEFINITIONS
-BaudRateValue = 921600;                 %921600 is the maximum baudrate value for now
+BaudRateValue = 892857;                 %921600 is the maximum baudrate value for now
 TimeoutValue = 6;                       %Allowed time in seconds to complete read and write operations, returned as a numeric value.
 CallbackFunctionByteNumber=512;         %the callback function is called when this amount of bytes are read from the channel
-TheSaveUpperLimit = 2048;       
-WindowArea = 1024;
+TheSaveUpperLimit = 2048*10;       
+WindowArea = 1024*10;
 % TagNumber1 = '0001';                    %Tag values, these values should match with the tags stated in the DSP code (tag values are stored along with the TheSaveArrayRaw)
 % TagNumber2 = '0002';
 % TagNumber3 = '0003';
@@ -55,43 +55,97 @@ while(1)
         IsMainSignalOffsetProper = 0;
         TheSaveArrayScreened = TheSaveArrayRaw(RawDataIndexPrevious:(RawDataIndexPrevious+WindowArea),1);
         TheTagIndices = strfind(TheSaveArrayScreened',TheTag);
+        
+%         TheDataConvertedValues = zeros(6,numel(TheTagIndices));              
+         
+        
         if(isempty(TheTagIndices)==0)
             if(IsMainSignalOffsetProper==0)
                 MainSignalOffset = mod((TheTagIndices(1)-1),4);
                 IsMainSignalOffsetProper = 1;
             end
-            for i=1:numel(TheTagIndices)
-                if(i+TheTagIndices(i)+8)<numel(TheSaveArrayScreened)
-                    TheTagValue(1,1) = TheSaveArrayScreened(TheTagIndices(i)+TheTagByteSize+0)
-                    TheTagValue(1,2) = TheSaveArrayScreened(TheTagIndices(i)+TheTagByteSize+1)
-                    TheTagValue(1,3) = TheSaveArrayScreened(TheTagIndices(i)+TheTagByteSize+2)
-                    TheTagValue(1,4) = TheSaveArrayScreened(TheTagIndices(i)+TheTagByteSize+3)
-                    
-                    TheTagValue(2,1) = TheSaveArrayScreened(TheTagIndices(i)+TheTagByteSize+4)
-                    TheTagValue(2,2) = TheSaveArrayScreened(TheTagIndices(i)+TheTagByteSize+5)
-                    TheTagValue(2,3) = TheSaveArrayScreened(TheTagIndices(i)+TheTagByteSize+6)
-                    TheTagValue(2,4) = TheSaveArrayScreened(TheTagIndices(i)+TheTagByteSize+7)
-                    
-                    TheTagValue(3,1) = TheSaveArrayScreened(TheTagIndices(i)+TheTagByteSize+8)
-                    TheTagValue(3,2) = TheSaveArrayScreened(TheTagIndices(i)+TheTagByteSize+9)
-                    TheTagValue(3,3) = TheSaveArrayScreened(TheTagIndices(i)+TheTagByteSize+10)
-                    TheTagValue(3,4) = TheSaveArrayScreened(TheTagIndices(i)+TheTagByteSize+11)
-                    
-                    TheTagValue(4,1) = TheSaveArrayScreened(TheTagIndices(i)+TheTagByteSize+12)
-                    TheTagValue(4,2) = TheSaveArrayScreened(TheTagIndices(i)+TheTagByteSize+13)
-                    TheTagValue(4,3) = TheSaveArrayScreened(TheTagIndices(i)+TheTagByteSize+14)
-                    TheTagValue(4,4) = TheSaveArrayScreened(TheTagIndices(i)+TheTagByteSize+15)                        
-                    
-                    TheTagValue(5,1) = TheSaveArrayScreened(TheTagIndices(i)+TheTagByteSize+16)
-                    TheTagValue(5,2) = TheSaveArrayScreened(TheTagIndices(i)+TheTagByteSize+17)
-                    TheTagValue(5,3) = TheSaveArrayScreened(TheTagIndices(i)+TheTagByteSize+18)
-                    TheTagValue(5,4) = TheSaveArrayScreened(TheTagIndices(i)+TheTagByteSize+19)                        
-                    
-                    TheTagValue(6,1) = TheSaveArrayScreened(TheTagIndices(i)+TheTagByteSize+20)
-                    TheTagValue(6,2) = TheSaveArrayScreened(TheTagIndices(i)+TheTagByteSize+21)
-                    TheTagValue(6,3) = TheSaveArrayScreened(TheTagIndices(i)+TheTagByteSize+22)
-                    TheTagValue(6,4) = TheSaveArrayScreened(TheTagIndices(i)+TheTagByteSize+23)                                            
+            for i=1:(numel(TheTagIndices)-1)
+                if(i+TheTagIndices(i)+4*6)<numel(TheSaveArrayScreened)
+                    if(TheTagIndices(i)-TheTagIndices(i+1))~=(-28)
+                        continue;
+                    end
+                    for a=1:6
+                        TheTagValue(a,1) = TheSaveArrayScreened(TheTagIndices(i)+TheTagByteSize+0+(a-1)*4);
+                        TheTagValue(a,2) = TheSaveArrayScreened(TheTagIndices(i)+TheTagByteSize+1+(a-1)*4);
+                        TheTagValue(a,3) = TheSaveArrayScreened(TheTagIndices(i)+TheTagByteSize+2+(a-1)*4);
+                        TheTagValue(a,4) = TheSaveArrayScreened(TheTagIndices(i)+TheTagByteSize+3+(a-1)*4);                        
+                        TheDataConvertedValues(a,i) = typecast(uint32(hex2dec(strcat(dec2hex(TheSaveArrayScreened(7+(a-1)*4+TheTagIndices(i)),2),dec2hex(TheSaveArrayScreened(6+(a-1)*4+TheTagIndices(i)),2),dec2hex(TheSaveArrayScreened(5+(a-1)*4+TheTagIndices(i)),2),dec2hex(TheSaveArrayScreened(4+(a-1)*4+TheTagIndices(i)),2)))),'single');                        
+                    end
+%                     TheTagValue(1,1) = TheSaveArrayScreened(TheTagIndices(i)+TheTagByteSize+0);
+%                     TheTagValue(1,2) = TheSaveArrayScreened(TheTagIndices(i)+TheTagByteSize+1);
+%                     TheTagValue(1,3) = TheSaveArrayScreened(TheTagIndices(i)+TheTagByteSize+2);
+%                     TheTagValue(1,4) = TheSaveArrayScreened(TheTagIndices(i)+TheTagByteSize+3);
+%                     TheDataConvertedValues(1,i) = typecast(uint32(hex2dec(strcat(dec2hex(TheSaveArrayScreened(7+TheTagIndices(i)),2),dec2hex(TheSaveArrayScreened(6+TheTagIndices(i)),2),dec2hex(TheSaveArrayScreened(5+TheTagIndices(i)),2),dec2hex(TheSaveArrayScreened(4+TheTagIndices(i)),2)))),'single');
+%                     
+%                     TheTagValue(2,1) = TheSaveArrayScreened(TheTagIndices(i)+TheTagByteSize+4);
+%                     TheTagValue(2,2) = TheSaveArrayScreened(TheTagIndices(i)+TheTagByteSize+5);
+%                     TheTagValue(2,3) = TheSaveArrayScreened(TheTagIndices(i)+TheTagByteSize+6);
+%                     TheTagValue(2,4) = TheSaveArrayScreened(TheTagIndices(i)+TheTagByteSize+7);
+%                     TheDataConvertedValues(2,i) = typecast(uint32(hex2dec(strcat(dec2hex(TheSaveArrayScreened(11+TheTagIndices(i)),2),dec2hex(TheSaveArrayScreened(10+TheTagIndices(i)),2),dec2hex(TheSaveArrayScreened(9+TheTagIndices(i)),2),dec2hex(TheSaveArrayScreened(8+TheTagIndices(i)),2)))),'single');
+% 
+%                     TheTagValue(3,1) = TheSaveArrayScreened(TheTagIndices(i)+TheTagByteSize+8);
+%                     TheTagValue(3,2) = TheSaveArrayScreened(TheTagIndices(i)+TheTagByteSize+9);
+%                     TheTagValue(3,3) = TheSaveArrayScreened(TheTagIndices(i)+TheTagByteSize+10);
+%                     TheTagValue(3,4) = TheSaveArrayScreened(TheTagIndices(i)+TheTagByteSize+11);
+%                     TheDataConvertedValues(3,i) = typecast(uint32(hex2dec(strcat(dec2hex(TheSaveArrayScreened(15+TheTagIndices(i)),2),dec2hex(TheSaveArrayScreened(14+TheTagIndices(i)),2),dec2hex(TheSaveArrayScreened(13+TheTagIndices(i)),2),dec2hex(TheSaveArrayScreened(12+TheTagIndices(i)),2)))),'single');
+% 
+%                     TheTagValue(4,1) = TheSaveArrayScreened(TheTagIndices(i)+TheTagByteSize+12);
+%                     TheTagValue(4,2) = TheSaveArrayScreened(TheTagIndices(i)+TheTagByteSize+13);
+%                     TheTagValue(4,3) = TheSaveArrayScreened(TheTagIndices(i)+TheTagByteSize+14);
+%                     TheTagValue(4,4) = TheSaveArrayScreened(TheTagIndices(i)+TheTagByteSize+15);                        
+%                     TheDataConvertedValues(4,i) = typecast(uint32(hex2dec(strcat(dec2hex(TheSaveArrayScreened(19+TheTagIndices(i)),2),dec2hex(TheSaveArrayScreened(18+TheTagIndices(i)),2),dec2hex(TheSaveArrayScreened(17+TheTagIndices(i)),2),dec2hex(TheSaveArrayScreened(16+TheTagIndices(i)),2)))),'single');
+% 
+%                     TheTagValue(5,1) = TheSaveArrayScreened(TheTagIndices(i)+TheTagByteSize+16);
+%                     TheTagValue(5,2) = TheSaveArrayScreened(TheTagIndices(i)+TheTagByteSize+17);
+%                     TheTagValue(5,3) = TheSaveArrayScreened(TheTagIndices(i)+TheTagByteSize+18);
+%                     TheTagValue(5,4) = TheSaveArrayScreened(TheTagIndices(i)+TheTagByteSize+19);                       
+%                     TheDataConvertedValues(5,i) = typecast(uint32(hex2dec(strcat(dec2hex(TheSaveArrayScreened(23+TheTagIndices(i)),2),dec2hex(TheSaveArrayScreened(22+TheTagIndices(i)),2),dec2hex(TheSaveArrayScreened(21+TheTagIndices(i)),2),dec2hex(TheSaveArrayScreened(20+TheTagIndices(i)),2)))),'single');
+% 
+%                     TheTagValue(6,1) = TheSaveArrayScreened(TheTagIndices(i)+TheTagByteSize+20);
+%                     TheTagValue(6,2) = TheSaveArrayScreened(TheTagIndices(i)+TheTagByteSize+21);
+%                     TheTagValue(6,3) = TheSaveArrayScreened(TheTagIndices(i)+TheTagByteSize+22);
+%                     TheTagValue(6,4) = TheSaveArrayScreened(TheTagIndices(i)+TheTagByteSize+23);               
+%                     TheDataConvertedValues(6,i) = typecast(uint32(hex2dec(strcat(dec2hex(TheSaveArrayScreened(27+TheTagIndices(i)),2),dec2hex(TheSaveArrayScreened(26+TheTagIndices(i)),2),dec2hex(TheSaveArrayScreened(25+TheTagIndices(i)),2),dec2hex(TheSaveArrayScreened(24+TheTagIndices(i)),2)))),'single');
+                             
                 end
+            end
+            if (EnablePlotting==1)  %for live visualization
+                subplot(3,2,1)
+                plot(TheDataConvertedValues(1,:));
+                subplot(3,2,2)
+                plot(TheDataConvertedValues(2,:));
+                subplot(3,2,3)
+                plot(TheDataConvertedValues(3,:));
+                subplot(3,2,4)
+                plot(TheDataConvertedValues(4,:));
+                subplot(3,2,5)
+                plot(TheDataConvertedValues(5,:));
+                subplot(3,2,6)
+                plot(TheDataConvertedValues(6,:));
+                for i = 1:numel(TheDataConvertedValues)
+                    if(TheDataConvertedValues(i)>5)
+                        GoToBreak = 1;
+                        break;
+                    else
+                        GoToBreak = 0;
+                    end
+                end
+                if GoToBreak ==1
+                    break;
+                end
+                if any (abs(TheDataConvertedValues)>5)
+                    break
+                end
+%                 ylim([-0.05 0.05])
+%                 xlim([0 WindowArea/4])
+                grid on
+                drawnow;
+%                 fprintf("%s:%f\t\t%s:%f\t\t%s:%f\t\t%s:%f\t\t%s:%f\t\t\n",TagNumber1,mean(Tag_1_Value),TagNumber2,mean(Tag_2_Value),TagNumber3,mean(Tag_3_Value),TagNumber4,mean(Tag_4_Value),TagNumber5,mean(Tag_5_Value));
             end
 
         end

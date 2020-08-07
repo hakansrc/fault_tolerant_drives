@@ -9,7 +9,7 @@
 #define MFDS_LIB_CPU_FREQ   200e6
 #define MFDS_THETAG              "hsrc"
 #define MFDS_THETAGBYTESIZE      4
-#define MFDS_SCILIBBUFFERLENGTH      128
+#define MFDS_SCILIBBUFFERLENGTH      256
 #define MFDS_SCIARXBUFFERSIZE        64
 #define MFDS_MULTIPLEFLOATARRAYSIZE (24+MFDS_THETAGBYTESIZE)
 
@@ -34,7 +34,7 @@ int SciSendMultipleFloatWithTheTag(float *FloatArrayToBeSent, uint16_t ui16Numbe
 
     for(theIndex=MFDS_THETAGBYTESIZE;theIndex<((ui16NumberOfFloats)*4+MFDS_THETAGBYTESIZE);theIndex++)
     {
-        cSendMultipleFloatArray[theIndex] = __byte((int *) FloatArrayToBeSent,theIndex-4);
+        cSendMultipleFloatArray[theIndex] = __byte((int *) FloatArrayToBeSent,theIndex-MFDS_THETAGBYTESIZE);
     }
     memcpy(cSendMultipleFloatArray, MFDS_THETAG, MFDS_THETAGBYTESIZE);
     return SciaUartSend_NoInterrupt(cSendMultipleFloatArray, ((ui16NumberOfFloats)*4+MFDS_THETAGBYTESIZE));
@@ -80,12 +80,7 @@ void InitializeSciaRegisters(float fSciBaudRate)
     float lspclkdivider = 0;
     float lspclkfreq = 0;
 
-    EALLOW;
-    GpioCtrlRegs.GPBGMUX1.bit.GPIO42 = 3;
-    GpioCtrlRegs.GPBMUX1.bit.GPIO42 = 3;
-    GpioCtrlRegs.GPBGMUX1.bit.GPIO43 = 3;
-    GpioCtrlRegs.GPBMUX1.bit.GPIO43 = 3;
-    EDIS;
+
 
 #define SCI_FREQ        fSciBaudRate
 #define SCI_PRD         (((float)lspclkdivider)/(SCI_FREQ*8))-1

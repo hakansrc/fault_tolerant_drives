@@ -6,7 +6,6 @@ fclose(instrfind) % call this command for stopping callback function
 % the callback function
 global SerialReadArray                          %the read values are put here first, in bytes
 global TheRawDataIsInProcessFlag                %when this is set to 1, the main function shows the WindowArea of received data to the user, used for live visualizing of the main signal
-global RawDataIndex RawDataIndexPrevious        %To track down the index of the raw data
 global RawDataArray                             %This is the raw data array, inside which the all received data is put. This array is saved along with the tags when the received number of bytes reaches ProcessRawDataThresholdInBytes value
 global GoToGarbage                              %During the processing of RawDataArray, a little bit of data goes to garbage
 global CallbackFunctionByteNumber               %This value states when to call the callback function
@@ -14,12 +13,11 @@ global ProcessRawDataThresholdInBytes           %This value is the number of byt
 %% CONSTANT DEFINITIONS
 BaudRateValue = 921600;                         %921600 is the maximum baudrate value for now
 TimeoutValue = 6;                               %Allowed time in seconds to complete read and write operations, returned as a numeric value.
-CallbackFunctionByteNumber=512;                 %the callback function is called when this amount of bytes are read from the channel
-%% VARIABLE DEFINITIONS
 TheTag = 'hsrc';                                %the tag which is put in front of every float data, the tag should match the tag used in the DSP
 TheTagByteSize = 4;                             %the byte size of the tag
 NumberOfFloatsPerPacket = 6;                    %number of floats to be sent at one sending
-
+CallbackFunctionByteNumber=512;                 %the callback function is called when this amount of bytes are read from the channel
+%% VARIABLE DEFINITIONS
 EnableSaving = 0;                               %set 0 in order to disable saving of the received data (recommended to stay at 1)
 ProcessRawDataThresholdInBytes = 2048*50/16;    %the received data will be saved and/or converted and plotted when ProcessRawDataThresholdInBytes bytes of data is received
 EnablePlotting = 1;                             %set 0 in order to disable plotting of taken variables (for live visualization)
@@ -27,8 +25,6 @@ DataSampleRate = 2500;                          %this used for determinining the
 TheSerialChannelDevice = 'COM5';                %set the serial channel device, (this value can be found the device manager)
 
 %% Main function
-RawDataIndex = 1;                               %initialize the variable
-RawDataIndexPrevious = 1;                       %initialize the variable
 TheRawDataIsInProcessFlag = 0;                  %initialize the variable
 RawDataArray = zeros(ProcessRawDataThresholdInBytes,1);      %initialize the variable
 TheTagValue = zeros(6,4);                       %initialize the variable

@@ -1,162 +1,124 @@
 clc
 clear
-% fclose(instrfind) % call this command for stopping callback function
-%% IMPORTANT VARIABLES
+fclose(instrfind) % call this command for stopping callback function
+%% GLOBAL VARIABLES
 % global variables are used for communication between the main function and
 % the callback function
-global SerialReadArray                      %the read values are put here first, in bytes
-global ShowTheDataFlag                      %when this is set to 1, the main function shows the WindowArea of received data to the user, used for live visualizing of the main signal
-global RawDataIndex RawDataIndexPrevious    %To track down the index of the raw data
-global TheSaveArrayRaw                      %This is the raw data array, inside which the all received data is put. This array is saved along with the tags when the received number of bytes reaches TheSaveUpperLimit value
-global GoToGarbage                          %During the saving of TheSaveArrayRaw, a little bit of data goes to garbage
-global CallbackFunctionByteNumber           %This value states when to call the callback function
-global TheSaveUpperLimit                    %This value is the number of bytes of data to be saved as raw data (TheSaveArrayRaw)
-global WindowArea                           %This variable states amount of data to be shown to the user during the operation
-global SaveTheDataFlag     
-%% IMPORTANT DEFINITIONS
-BaudRateValue = 892857;                 %921600 is the maximum baudrate value for now
-TimeoutValue = 6;                       %Allowed time in seconds to complete read and write operations, returned as a numeric value.
-CallbackFunctionByteNumber=512;         %the callback function is called when this amount of bytes are read from the channel
-TheSaveUpperLimit = 2048*50;       
-WindowArea = 1024*50;
-% TagNumber1 = '0001';                    %Tag values, these values should match with the tags stated in the DSP code (tag values are stored along with the TheSaveArrayRaw)
-% TagNumber2 = '0002';
-% TagNumber3 = '0003';
-% TagNumber4 = '0004';
-% TagNumber5 = '0005';
-TheTag = 'hsrc';
-TheTagByteSize = 4;
-NumberOfFloatsPerPacket = 6;
+global SerialReadArray                          %the read values are put here first, in bytes
+global TheRawDataIsInProcessFlag                %when this is set to 1, the main function shows the WindowArea of received data to the user, used for live visualizing of the main signal
+global RawDataIndex RawDataIndexPrevious        %To track down the index of the raw data
+global RawDataArray                             %This is the raw data array, inside which the all received data is put. This array is saved along with the tags when the received number of bytes reaches ProcessRawDataThresholdInBytes value
+global GoToGarbage                              %During the processing of RawDataArray, a little bit of data goes to garbage
+global CallbackFunctionByteNumber               %This value states when to call the callback function
+global ProcessRawDataThresholdInBytes           %This value is the number of bytes of data to be saved as raw data (RawDataArray)
+%% CONSTANT DEFINITIONS
+BaudRateValue = 921600;                         %921600 is the maximum baudrate value for now
+TimeoutValue = 6;                               %Allowed time in seconds to complete read and write operations, returned as a numeric value.
+CallbackFunctionByteNumber=512;                 %the callback function is called when this amount of bytes are read from the channel
+%% VARIABLE DEFINITIONS
+TheTag = 'hsrc';                                %the tag which is put in front of every float data, the tag should match the tag used in the DSP
+TheTagByteSize = 4;                             %the byte size of the tag
+NumberOfFloatsPerPacket = 6;                    %number of floats to be sent at one sending
 
-EnableSaving = 1;                       %set 0 in order to disable saving of variable (recommended to stay at 1)
-EnablePlotting = 1;                     %set 0 in order to disable plotting of taken variables (for live visualization)
+EnableSaving = 0;                               %set 0 in order to disable saving of the received data (recommended to stay at 1)
+ProcessRawDataThresholdInBytes = 2048*50/16;    %the received data will be saved and/or converted and plotted when ProcessRawDataThresholdInBytes bytes of data is received
+EnablePlotting = 1;                             %set 0 in order to disable plotting of taken variables (for live visualization)
+DataSampleRate = 2500;                          %this used for determinining the tag on the plots
+TheSerialChannelDevice = 'COM5';                %set the serial channel device, (this value can be found the device manager)
 
 %% Main function
 RawDataIndex = 1;                               %initialize the variable
 RawDataIndexPrevious = 1;                       %initialize the variable
-ShowTheDataFlag = 0;                            %initialize the variable
-SaveTheDataFlag = 0;                            %initialize the variable
-TheSaveArrayRaw = zeros(TheSaveUpperLimit,1);	%initialize the variable
-MainSignalOffset = 0;                           %initialize the variable
-IsMainSignalOffsetProper = 0;                   %initialize the variable
+TheRawDataIsInProcessFlag = 0;                  %initialize the variable
+RawDataArray = zeros(ProcessRawDataThresholdInBytes,1);      %initialize the variable
+TheTagValue = zeros(6,4);                       %initialize the variable
 
 
-SerialChannel = serial('COM5','BaudRate',BaudRateValue,'Parity','none','Timeout',6);    %open the serial channel
+SerialChannel = serial(TheSerialChannelDevice,'BaudRate',BaudRateValue,'Parity','none','Timeout',6);    %open the serial channel
 SerialChannel.BytesAvailableFcnCount = CallbackFunctionByteNumber;  %set the callback function byte number
-SerialChannel.BytesAvailableFcnMode = 'byte';                       %set the callback function type
+SerialChannel.BytesAvailableFcnMode = "byte";                       %set the callback function type
 SerialChannel.BytesAvailableFcn = @SerialReadCallbackFunction;      %state the callback function to be called
 fopen(SerialChannel);                                               %open the serial channel port
 if (EnableSaving==1)
     mkdir TestData                              %create directory for saving data
 end
-TheTagValue = zeros(6,4);
 while(1)
-    if(ShowTheDataFlag==1)
+    if(TheRawDataIsInProcessFlag==1)
         TheTagValue = zeros(6,4);
-        IsMainSignalOffsetProper = 0;
-        TheSaveArrayScreened = TheSaveArrayRaw(RawDataIndexPrevious:(RawDataIndexPrevious+WindowArea),1);
-        TheTagIndices = strfind(TheSaveArrayScreened',TheTag);        
+        %IsMainSignalOffsetProper = 0;
+        TheTagIndices = 0;
+        TheDataConvertedValues = 0;
+        TheSaveArrayScreened = RawDataArray;%RawDataArray(RawDataIndexPrevious:(RawDataIndexPrevious+WindowArea),1);
+        TheTagIndices = strfind(TheSaveArrayScreened',TheTag);
         if(isempty(TheTagIndices)==0)
-            for i=1:(numel(TheTagIndices)-1)
+            for i=1:(numel(TheTagIndices))
                 if(i+TheTagIndices(i)+4*6)<numel(TheSaveArrayScreened)
                     if(TheTagIndices(i)-TheTagIndices(i+1))~=(-(TheTagByteSize+4*NumberOfFloatsPerPacket))
-                        continue;
+                        fprintf("Deficient data. Some part of the data will not be transformed, saved and/or plotted\n");
+                        break;
                     end
                     for a=1:NumberOfFloatsPerPacket
                         TheTagValue(a,1) = TheSaveArrayScreened(TheTagIndices(i)+TheTagByteSize+0+(a-1)*4);
                         TheTagValue(a,2) = TheSaveArrayScreened(TheTagIndices(i)+TheTagByteSize+1+(a-1)*4);
                         TheTagValue(a,3) = TheSaveArrayScreened(TheTagIndices(i)+TheTagByteSize+2+(a-1)*4);
-                        TheTagValue(a,4) = TheSaveArrayScreened(TheTagIndices(i)+TheTagByteSize+3+(a-1)*4);                        
-                        TheDataConvertedValues(a,i) = typecast(uint32(hex2dec(strcat(dec2hex(TheSaveArrayScreened(7+(a-1)*4+TheTagIndices(i)),2),dec2hex(TheSaveArrayScreened(6+(a-1)*4+TheTagIndices(i)),2),dec2hex(TheSaveArrayScreened(5+(a-1)*4+TheTagIndices(i)),2),dec2hex(TheSaveArrayScreened(4+(a-1)*4+TheTagIndices(i)),2)))),'single');                        
+                        TheTagValue(a,4) = TheSaveArrayScreened(TheTagIndices(i)+TheTagByteSize+3+(a-1)*4);
+                        TheDataConvertedValues(a,i) = typecast(uint32(hex2dec(strcat(dec2hex(TheTagValue(a,4),2),dec2hex(TheTagValue(a,3),2),dec2hex(TheTagValue(a,2),2),dec2hex(TheTagValue(a,1),2)))),'single');
                     end
                 end
             end
             if (EnablePlotting==1)  %for live visualization
                 for i=1:NumberOfFloatsPerPacket
                     subplot(3,2,i)
-                    plot(TheDataConvertedValues(i,:));                    
+                    plot((1:numel(TheDataConvertedValues(i,:)))/DataSampleRate,TheDataConvertedValues(i,:));
+                    grid on
                 end
-                for i = 1:numel(TheDataConvertedValues)
-                    if(TheDataConvertedValues(i)>5)
-                        GoToBreak = 1;
-                        break;
-                    else
-                        GoToBreak = 0;
-                    end
-                end
-                if GoToBreak ==1
-                    break;
-                end
-                if any (abs(TheDataConvertedValues)>5)
-                    break
-                end
-%                 ylim([-0.05 0.05])
-%                 xlim([0 WindowArea/4])
-                grid on
+                TheDataConvertedValues = 0;
                 drawnow;
             end
-
+            
         end
-        ShowTheDataFlag = 0;
-    end
-    if(SaveTheDataFlag == 1)
+        TheRawDataIsInProcessFlag = 0;
         if(EnableSaving==1)
             FileName = sprintf("TestData/TestData%s", datestr(now, 'ddmmyyHHMMSS'));
-            save(FileName,'TheSaveArrayRaw','TheTag','TheTagByteSize','NumberOfFloatsPerPacket');
-            TheSaveArrayRaw = zeros(TheSaveUpperLimit,1);          %clear the raw data because it is saved
-            RawDataIndexPrevious = 1;
-            RawDataIndex = 1;
-            SaveTheDataFlag = 0;
-          
+            save(FileName,'RawDataArray','TheTag','TheTagByteSize','NumberOfFloatsPerPacket','DataSampleRate');
+            RawDataArray = 0;
+            TheRawDataIsInProcessFlag = 0;
         else
-            TheSaveArrayRaw = zeros(TheSaveUpperLimit,1);          %clear the raw data because it is saved
-            RawDataIndexPrevious = 1;
-            RawDataIndex = 1;
-            SaveTheDataFlag = 0;
+            RawDataArray = 0;
+            TheRawDataIsInProcessFlag = 0;
         end
     else
         pause(0.01);
     end
+    
 end
 
 %% The callback function
 
 function [] =  SerialReadCallbackFunction(TheSerialChannel,TheEvent)
-global RawDataIndex RawDataIndexPrevious
-global CallbackFunctionByteNumber
-global SerialReadArray          %the read values are put here first
-global TheSaveArrayRaw          %The callback function stores the data inside this large array, initialized inside the main function
-global ShowTheDataFlag          %when this is set to 1, the main function takes data from TheSaveArrayRaw and show the last WindowArea amount of it to the user
-global WindowArea               %This variable states amount of data to be shown to the user during the operation
-global GoToGarbage              %During the saving of TheSaveArrayRaw, a little bit of data goes to garbage
-global SaveTheDataFlag          %This is just a flag, for non user operations
-global TheSaveUpperLimit        %This value is the number of bytes of data to be saved as raw data (TheSaveArrayRaw)
+global CallbackFunctionByteNumber   %the callback function is trigger when this number of bytes have been received
+global SerialReadArray              %the read values are put here first
+global RawDataArray                 %The callback function stores the data inside this large array, initialized inside the main function
+global GoToGarbage                  %During the saving of RawDataArray, a little bit of data goes to garbage
+global TheRawDataIsInProcessFlag    %This is just a flag, for non user operations
+global ProcessRawDataThresholdInBytes            %This value is the number of bytes of data to be saved as raw data (RawDataArray)
 
-
-if(SaveTheDataFlag == 0)
+if(TheSerialChannel.BytesAvailable==0)
+    return;
+end
+if(TheRawDataIsInProcessFlag == 0)
     % fill in the raw data array
     SerialReadArray = fread(TheSerialChannel,TheSerialChannel.BytesAvailable);
-    TheSaveArrayRaw((RawDataIndex+1):(RawDataIndex+CallbackFunctionByteNumber),1)=SerialReadArray;
-    RawDataIndex = RawDataIndex+512;
+    RawDataArray = cat(1,RawDataArray,SerialReadArray);
 else
     %it means we are saving right now, dont mess with the raw data array for a
-    %little while, be a patient child.
-    GoToGarbage = fread(TheSerialChannel,TheSerialChannel.BytesAvailable); %just read and pass, dont store , otherwise the callback does not work  
+    %little while, be a patient fellow.
+    GoToGarbage = fread(TheSerialChannel,TheSerialChannel.BytesAvailable); %just read and pass, dont store , otherwise the callback does not work
+    return;
 end
-
-if(ShowTheDataFlag == 0)
-    % if requested amount of data have arrived, show them to us during the
-    % operation
-    if((RawDataIndex-RawDataIndexPrevious)>WindowArea)
-        RawDataIndexPrevious = RawDataIndex-WindowArea;
-        ShowTheDataFlag = 1;
-    end
-    
-end
-if(RawDataIndex >= TheSaveUpperLimit)
+if(numel(RawDataArray) >= ProcessRawDataThresholdInBytes)
     % Raw data has reached to its specified limit, just save it and wait
     % for new data when the saving operation has finished
-    SaveTheDataFlag = 1;
+    TheRawDataIsInProcessFlag = 1;
 end
-
 end

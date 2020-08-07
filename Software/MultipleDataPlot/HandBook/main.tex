@@ -60,7 +60,7 @@
 
 
 \begin{document}
-\title{\line(1,0){250}\\\myfont Multiple Data Plot Library Handbook \\\line(1,0){250}}
+\title{\line(1,0){250}\\\myfont Embedded Environment Visualizer Library Handbook \\\line(1,0){250}}
 \maketitle
 \newpage
 \tableofcontents
@@ -70,7 +70,7 @@
 \section{Introduction}
 
 
-This document explains how to use the Multiple Data Plot Library (MDPL). MDPL consists of three parts: two matlab routines and a library. These parts are called:
+This document explains how to use the Embedded Environment Visualizer Library (EEVL). EEVL consists of three parts: two matlab routines and a library. These parts are called:
 \begin{itemize}
 	\item DataReceiver.m
 	\item RawDataHandler.m
@@ -84,13 +84,39 @@ The aim of this library is to be able to collect, visualize and save data from a
 
 
 
-\section{DataReceiver.m} 
-This routine is the main routine that collects, saves, plots the received data on the computer. This routine has several options, which are:
+\section{Matlab Routines} 
+\subsection{DataReceiver.m} 
+
+This routine is the main routine that collects, saves, plots the received data on the computer. 
+\subsubsection{Options}
+\label{subsubsection:Options}
+This routine has several options, which are:
 \begin{itemize}
-	\item 
+	\item \textbf{EnableSaving :} This enables/disables the saving of the received data. The received data is tagged with date and hour information.
+	\item \textbf{ProcessRawDataThresholdInBytes :} When this routine received \textbf{ProcessRawDataThresholdInBytes} bytes of data, the received data is processed plotted/saved.
+	\item \textbf{EnablePlotting :} This enables/disables the plotting of the received data. The received data is being plotted with time axis. 
+	\item \textbf{DataSampleRate (Hz):} This variable is used for determining the time axis of the plotting. It should match the data sending rate of the DSP.
+	\item \textbf{TheSerialChannelDevice :} The serial channel port seen by the computer is stated in this variable. The port value can be determined from the device manager. For the example given in Figure \ref{fig:DeviceManager}, TheSerialChannelDevice should be set as 'COM5'.
 \end{itemize}
+
+\subsection{RawDataHandler.m}
+The saved data by DataReceiver.m routine can be handled using this routine.
+\subsection{Operation} TODO
+After setting the options mentioned in \ref{subsubsection:Options}, this routine can be run in matlab.
+
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.5]{Figures/DeviceManager.png}
+	\caption{The serial port on the Device Manager screen}
+	\label{fig:DeviceManager}
+	\end{figure}
+
 \subsection{Aim}
-\subsection{User variables}
+
+\section{MultipleFloatDataSender library}
+This library is the critical part of the EEVL. For the embedded environment, all the necessary functions and/or variables are defined in this library. 
+
 
 \bibliographystyle{plain}
 \bibliography{references}

@@ -1,4 +1,8 @@
 \contentsline {section}{\numberline {1}Introduction}{3}{section.1}%
-\contentsline {section}{\numberline {2}DataReceiver.m}{3}{section.2}%
-\contentsline {subsection}{\numberline {2.1}Aim}{3}{subsection.2.1}%
-\contentsline {subsection}{\numberline {2.2}User variables}{3}{subsection.2.2}%
+\contentsline {section}{\numberline {2}Matlab Routines}{3}{section.2}%
+\contentsline {subsection}{\numberline {2.1}DataReceiver.m}{3}{subsection.2.1}%
+\contentsline {subsubsection}{\numberline {2.1.1}Options}{3}{subsubsection.2.1.1}%
+\contentsline {subsection}{\numberline {2.2}RawDataHandler.m}{3}{subsection.2.2}%
+\contentsline {subsection}{\numberline {2.3}Operation}{3}{subsection.2.3}%
+\contentsline {subsection}{\numberline {2.4}Aim}{4}{subsection.2.4}%
+\contentsline {section}{\numberline {3}MultipleFloatDataSender library}{4}{section.3}%

@@ -1,4 +1,8 @@
 \BOOKMARK [1][-]{section.1}{Introduction}{}% 1
-\BOOKMARK [1][-]{section.2}{DataReceiver.m}{}% 2
-\BOOKMARK [2][-]{subsection.2.1}{Aim}{section.2}% 3
-\BOOKMARK [2][-]{subsection.2.2}{User variables}{section.2}% 4
+\BOOKMARK [1][-]{section.2}{Matlab Routines}{}% 2
+\BOOKMARK [2][-]{subsection.2.1}{DataReceiver.m}{section.2}% 3
+\BOOKMARK [3][-]{subsubsection.2.1.1}{Options}{subsection.2.1}% 4
+\BOOKMARK [2][-]{subsection.2.2}{RawDataHandler.m}{section.2}% 5
+\BOOKMARK [2][-]{subsection.2.3}{Operation}{section.2}% 6
+\BOOKMARK [2][-]{subsection.2.4}{Aim}{section.2}% 7
+\BOOKMARK [1][-]{section.3}{MultipleFloatDataSender library}{}% 8

@@ -3,6 +3,12 @@
 \BOOKMARK [2][-]{subsection.2.1}{DataReceiver.m}{section.2}% 3
 \BOOKMARK [3][-]{subsubsection.2.1.1}{Options}{subsection.2.1}% 4
 \BOOKMARK [2][-]{subsection.2.2}{RawDataHandler.m}{section.2}% 5
-\BOOKMARK [2][-]{subsection.2.3}{Operation}{section.2}% 6
-\BOOKMARK [2][-]{subsection.2.4}{Aim}{section.2}% 7
-\BOOKMARK [1][-]{section.3}{MultipleFloatDataSender library}{}% 8
+\BOOKMARK [1][-]{section.3}{MultipleFloatDataSender library}{}% 6
+\BOOKMARK [2][-]{subsection.3.1}{Adding library to a CCS project}{section.3}% 7
+\BOOKMARK [2][-]{subsection.3.2}{The content of the MultipleFloatDataSender library}{section.3}% 8
+\BOOKMARK [3][-]{subsubsection.3.2.1}{void InitializeSciaRegisters\(float fSciBaudRate\)}{subsection.3.2}% 9
+\BOOKMARK [3][-]{subsubsection.3.2.2}{void SciaBackgroundTask\(void\)}{subsection.3.2}% 10
+\BOOKMARK [3][-]{subsubsection.3.2.3}{int SciSendMultipleFloatWithTheTag\(float *FloatArrayToBeSent, uint16\137t ui16NumberOfFloats\)}{subsection.3.2}% 11
+\BOOKMARK [3][-]{subsubsection.3.2.4}{int SciaUartSend\137NoInterrupt\(char *BuffWriteArray, unsigned int lengthOfData\);}{subsection.3.2}% 12
+\BOOKMARK [1][-]{section.4}{Using the EEVL library}{}% 13
+\BOOKMARK [1][-]{section.5}{Bugs and Warnings}{}% 14

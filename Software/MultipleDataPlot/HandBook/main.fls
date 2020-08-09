@@ -330,6 +330,35 @@ INPUT C:\Program Files\MiKTeX\tex\latex\pdflscape\pdflscape.sty
 INPUT C:\Program Files\MiKTeX\tex\latex\pdflscape\pdflscape.sty
 INPUT C:\Program Files\MiKTeX\tex\latex\graphics\lscape.sty
 INPUT C:\Program Files\MiKTeX\tex\latex\graphics\lscape.sty
+INPUT C:\Program Files\MiKTeX\tex\latex\base\fontenc.sty
+INPUT C:\Program Files\MiKTeX\tex\latex\base\fontenc.sty
+INPUT C:\Program Files\MiKTeX\fonts\tfm\jknappen\ec\ecrm1000.tfm
+INPUT C:\Program Files\MiKTeX\tex\latex\base\textcomp.sty
+INPUT C:\Program Files\MiKTeX\tex\latex\base\textcomp.sty
+INPUT C:\Program Files\MiKTeX\tex\latex\titlesec\titlesec.sty
+INPUT C:\Program Files\MiKTeX\tex\latex\titlesec\titlesec.sty
+INPUT C:\Program Files\MiKTeX\tex\latex\koma-script\scrextend.sty
+INPUT C:\Program Files\MiKTeX\tex\latex\koma-script\scrextend.sty
+INPUT C:\Program Files\MiKTeX\tex\latex\koma-script\scrkbase.sty
+INPUT C:\Program Files\MiKTeX\tex\latex\koma-script\scrkbase.sty
+INPUT C:\Program Files\MiKTeX\tex\generic\babel\babel.sty
+INPUT C:\Program Files\MiKTeX\tex\generic\babel\babel.sty
+INPUT C:\Program Files\MiKTeX\tex\generic\babel\babel.def
+INPUT C:\Program Files\MiKTeX\tex\generic\babel\txtbabel.def
+INPUT C:\Program Files\MiKTeX\tex\latex\arabi\bblopts.cfg
+INPUT C:\Program Files\MiKTeX\tex\latex\arabi\bblopts.cfg
+INPUT C:\Program Files\MiKTeX\tex\latex\babel-english\english.ldf
+INPUT C:\Program Files\MiKTeX\tex\latex\babel-english\english.ldf
+INPUT C:\Program Files\MiKTeX\tex\latex\blindtext\blindtext.sty
+INPUT C:\Program Files\MiKTeX\tex\latex\blindtext\blindtext.sty
+INPUT C:\Program Files\MiKTeX\tex\latex\tools\xspace.sty
+INPUT C:\Program Files\MiKTeX\tex\latex\tools\xspace.sty
+INPUT C:\Program Files\MiKTeX\tex\latex\movie15\movie15.sty
+INPUT C:\Program Files\MiKTeX\tex\latex\movie15\movie15.sty
+INPUT C:\Program Files\MiKTeX\tex\latex\base\ifthen.sty
+INPUT C:\Program Files\MiKTeX\tex\latex\base\ifthen.sty
+INPUT C:\Program Files\MiKTeX\tex\latex\oberdiek\ifdraft.sty
+INPUT C:\Program Files\MiKTeX\tex\latex\oberdiek\ifdraft.sty
 INPUT C:\Program Files\MiKTeX\tex\latex\listings\lstlang1.sty
 INPUT C:\Program Files\MiKTeX\tex\latex\listings\lstlang1.sty
 INPUT c:\Users\admin\Documents\GitHub\fault_tolerant_drives\Software\MultipleDataPlot\HandBook\main.aux
@@ -374,7 +403,8 @@ INPUT C:\Program Files\MiKTeX\fonts\tfm\public\cm\cmss8.tfm
 INPUT C:\Program Files\MiKTeX\fonts\tfm\public\cm\cmtt10.tfm
 INPUT C:\Program Files\MiKTeX\fonts\tfm\public\cm\cmtt8.tfm
 INPUT C:\Program Files\MiKTeX\fonts\tfm\public\cm\cmtt8.tfm
-INPUT C:\Program Files\MiKTeX\fonts\tfm\public\cm\cmr17.tfm
+INPUT C:\Program Files\MiKTeX\fonts\tfm\jknappen\ec\ecrm1728.tfm
+INPUT C:\Program Files\MiKTeX\fonts\tfm\jknappen\ec\ecrm1200.tfm
 INPUT C:\Program Files\MiKTeX\fonts\tfm\public\cm\cmr12.tfm
 INPUT C:\Program Files\MiKTeX\fonts\tfm\public\cm\cmr8.tfm
 INPUT C:\Program Files\MiKTeX\fonts\tfm\public\cm\cmr6.tfm
@@ -403,28 +433,63 @@ INPUT C:\Program Files\MiKTeX\fonts\tfm\public\cm\cmbsy10.tfm
 INPUT C:\Program Files\MiKTeX\fonts\tfm\public\amsfonts\cmextra\cmbsy8.tfm
 INPUT C:\Program Files\MiKTeX\fonts\tfm\public\amsfonts\cmextra\cmbsy6.tfm
 INPUT C:\Users\admin\AppData\Local\MiKTeX\pdftex\config\pdftex.map
-INPUT C:\Program Files\MiKTeX\fonts\tfm\public\cm\cmr12.tfm
-INPUT C:\Program Files\MiKTeX\fonts\tfm\public\cm\cmbx12.tfm
+INPUT C:\Program Files\MiKTeX\fonts\tfm\jknappen\ec\ecrm1440.tfm
+INPUT C:\Program Files\MiKTeX\fonts\tfm\jknappen\ec\ecbx1440.tfm
 INPUT c:\Users\admin\Documents\GitHub\fault_tolerant_drives\Software\MultipleDataPlot\HandBook\main.toc
 INPUT c:\Users\admin\Documents\GitHub\fault_tolerant_drives\Software\MultipleDataPlot\HandBook\main.toc
+INPUT C:\Program Files\MiKTeX\fonts\tfm\jknappen\ec\ecbx1000.tfm
 OUTPUT c:\Users\admin\Documents\GitHub\fault_tolerant_drives\Software\MultipleDataPlot\HandBook\main.toc
 INPUT C:\Program Files\MiKTeX\fonts\tfm\jknappen\ec\tcrm1000.tfm
+INPUT C:\Program Files\MiKTeX\fonts\tfm\jknappen\ec\ecbx1200.tfm
 INPUT c:\Users\admin\Documents\GitHub\fault_tolerant_drives\Software\MultipleDataPlot\HandBook\Figures\DeviceManager.png
 INPUT c:\Users\admin\Documents\GitHub\fault_tolerant_drives\Software\MultipleDataPlot\HandBook\Figures\DeviceManager.png
 INPUT c:\Users\admin\Documents\GitHub\fault_tolerant_drives\Software\MultipleDataPlot\HandBook\Figures\DeviceManager.png
 INPUT c:\Users\admin\Documents\GitHub\fault_tolerant_drives\Software\MultipleDataPlot\HandBook\Figures\DeviceManager.png
 INPUT c:\Users\admin\Documents\GitHub\fault_tolerant_drives\Software\MultipleDataPlot\HandBook\Figures\DeviceManager.png
+INPUT c:\Users\admin\Documents\GitHub\fault_tolerant_drives\Software\MultipleDataPlot\HandBook\Figures\dotlibfile.png
+INPUT c:\Users\admin\Documents\GitHub\fault_tolerant_drives\Software\MultipleDataPlot\HandBook\Figures\dotlibfile.png
+INPUT c:\Users\admin\Documents\GitHub\fault_tolerant_drives\Software\MultipleDataPlot\HandBook\Figures\dotlibfile.png
+INPUT c:\Users\admin\Documents\GitHub\fault_tolerant_drives\Software\MultipleDataPlot\HandBook\Figures\dotlibfile.png
+INPUT c:\Users\admin\Documents\GitHub\fault_tolerant_drives\Software\MultipleDataPlot\HandBook\Figures\dotlibfile.png
+INPUT c:\Users\admin\Documents\GitHub\fault_tolerant_drives\Software\MultipleDataPlot\HandBook\Figures\libraryincludepath.png
+INPUT c:\Users\admin\Documents\GitHub\fault_tolerant_drives\Software\MultipleDataPlot\HandBook\Figures\libraryincludepath.png
+INPUT c:\Users\admin\Documents\GitHub\fault_tolerant_drives\Software\MultipleDataPlot\HandBook\Figures\libraryincludepath.png
+INPUT c:\Users\admin\Documents\GitHub\fault_tolerant_drives\Software\MultipleDataPlot\HandBook\Figures\libraryincludepath.png
+INPUT c:\Users\admin\Documents\GitHub\fault_tolerant_drives\Software\MultipleDataPlot\HandBook\Figures\libraryincludepath.png
+INPUT c:\Users\admin\Documents\GitHub\fault_tolerant_drives\Software\MultipleDataPlot\HandBook\Figures\includeheader.png
+INPUT c:\Users\admin\Documents\GitHub\fault_tolerant_drives\Software\MultipleDataPlot\HandBook\Figures\includeheader.png
+INPUT c:\Users\admin\Documents\GitHub\fault_tolerant_drives\Software\MultipleDataPlot\HandBook\Figures\includeheader.png
+INPUT c:\Users\admin\Documents\GitHub\fault_tolerant_drives\Software\MultipleDataPlot\HandBook\Figures\includeheader.png
+INPUT c:\Users\admin\Documents\GitHub\fault_tolerant_drives\Software\MultipleDataPlot\HandBook\Figures\includeheader.png
+INPUT c:\Users\admin\Documents\GitHub\fault_tolerant_drives\Software\MultipleDataPlot\HandBook\Figures\deficientdataerror.PNG
+INPUT c:\Users\admin\Documents\GitHub\fault_tolerant_drives\Software\MultipleDataPlot\HandBook\Figures\deficientdataerror.PNG
+INPUT c:\Users\admin\Documents\GitHub\fault_tolerant_drives\Software\MultipleDataPlot\HandBook\Figures\deficientdataerror.PNG
+INPUT c:\Users\admin\Documents\GitHub\fault_tolerant_drives\Software\MultipleDataPlot\HandBook\Figures\deficientdataerror.PNG
+INPUT c:\Users\admin\Documents\GitHub\fault_tolerant_drives\Software\MultipleDataPlot\HandBook\Figures\deficientdataerror.PNG
+INPUT c:\Users\admin\Documents\GitHub\fault_tolerant_drives\Software\MultipleDataPlot\HandBook\Figures\alreadyopen.PNG
+INPUT c:\Users\admin\Documents\GitHub\fault_tolerant_drives\Software\MultipleDataPlot\HandBook\Figures\alreadyopen.PNG
+INPUT c:\Users\admin\Documents\GitHub\fault_tolerant_drives\Software\MultipleDataPlot\HandBook\Figures\alreadyopen.PNG
+INPUT c:\Users\admin\Documents\GitHub\fault_tolerant_drives\Software\MultipleDataPlot\HandBook\Figures\alreadyopen.PNG
+INPUT c:\Users\admin\Documents\GitHub\fault_tolerant_drives\Software\MultipleDataPlot\HandBook\Figures\alreadyopen.PNG
 INPUT c:\Users\admin\Documents\GitHub\fault_tolerant_drives\Software\MultipleDataPlot\HandBook\main.bbl
 INPUT c:\Users\admin\Documents\GitHub\fault_tolerant_drives\Software\MultipleDataPlot\HandBook\main.bbl
 INPUT c:\Users\admin\Documents\GitHub\fault_tolerant_drives\Software\MultipleDataPlot\HandBook\main.aux
 INPUT c:\Users\admin\Documents\GitHub\fault_tolerant_drives\Software\MultipleDataPlot\HandBook\main.out
 INPUT c:\Users\admin\Documents\GitHub\fault_tolerant_drives\Software\MultipleDataPlot\HandBook\main.out
+INPUT C:\Users\admin\AppData\Local\MiKTeX\fonts\pk\ljfour\jknappen\ec\dpi600\ecbx1200.pk
+INPUT C:\Users\admin\AppData\Local\MiKTeX\fonts\pk\ljfour\jknappen\ec\dpi600\ecbx1200.pk
 INPUT C:\Users\admin\AppData\Local\MiKTeX\fonts\pk\ljfour\jknappen\ec\dpi600\tcrm1000.pk
 INPUT C:\Users\admin\AppData\Local\MiKTeX\fonts\pk\ljfour\jknappen\ec\dpi600\tcrm1000.pk
-INPUT C:\Program Files\MiKTeX\fonts\type1\public\amsfonts\cm\cmbx10.pfb
-INPUT C:\Program Files\MiKTeX\fonts\type1\public\amsfonts\cm\cmbx10.pfb
-INPUT C:\Program Files\MiKTeX\fonts\type1\public\amsfonts\cm\cmbx12.pfb
-INPUT C:\Program Files\MiKTeX\fonts\type1\public\amsfonts\cm\cmbx12.pfb
+INPUT C:\Users\admin\AppData\Local\MiKTeX\fonts\pk\ljfour\jknappen\ec\dpi600\ecbx1000.pk
+INPUT C:\Users\admin\AppData\Local\MiKTeX\fonts\pk\ljfour\jknappen\ec\dpi600\ecbx1000.pk
+INPUT C:\Users\admin\AppData\Local\MiKTeX\fonts\pk\ljfour\jknappen\ec\dpi600\ecbx1440.pk
+INPUT C:\Users\admin\AppData\Local\MiKTeX\fonts\pk\ljfour\jknappen\ec\dpi600\ecbx1440.pk
+INPUT C:\Users\admin\AppData\Local\MiKTeX\fonts\pk\ljfour\jknappen\ec\dpi600\ecrm1000.pk
+INPUT C:\Users\admin\AppData\Local\MiKTeX\fonts\pk\ljfour\jknappen\ec\dpi600\ecrm1000.pk
+INPUT C:\Users\admin\AppData\Local\MiKTeX\fonts\pk\ljfour\jknappen\ec\dpi600\ecrm1200.pk
+INPUT C:\Users\admin\AppData\Local\MiKTeX\fonts\pk\ljfour\jknappen\ec\dpi600\ecrm1200.pk
+INPUT C:\Program Files\MiKTeX\fonts\type1\public\amsfonts\cm\cmmi10.pfb
+INPUT C:\Program Files\MiKTeX\fonts\type1\public\amsfonts\cm\cmmi10.pfb
 INPUT C:\Program Files\MiKTeX\fonts\type1\public\amsfonts\cm\cmr10.pfb
 INPUT C:\Program Files\MiKTeX\fonts\type1\public\amsfonts\cm\cmr10.pfb
 INPUT C:\Program Files\MiKTeX\fonts\type1\public\amsfonts\cm\cmr12.pfb

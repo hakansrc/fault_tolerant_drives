@@ -89,14 +89,16 @@ intangle1 = 0;
 Pout = 2e3; % W
 Rin = 1e-3;
 Vin = Vdc + Rin*(Pout/Vdc);
-
+wrated = 600*2*pi/60;
+Trated = Pout/wrated;
+iqrated = Trated/(1.5*PolePairs*FluxPM);
 %% Other parameters
 Load_Nominal_Freq = 50;
 THD_mean_frequency = 50;
-SpeedRef1 = 300; % RPM
-SpeedRef2 = 300;
-SpeedRefUpdateTime = 2;
+SpeedRef1 = 100; % RPM
+SpeedRef2 = 600;
+SpeedRefUpdateTime = 1;
 Tload1 = 20; %Nm
 Tload2 = 40;
 TloadUpdateTime = 2;
-M1_FaultTime = .5;
+M1_FaultTime = 50;

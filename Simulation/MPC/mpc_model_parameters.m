@@ -85,8 +85,8 @@ iqrated = Trated/(1.5*PolePairs*FluxPM);
 %% Other parameters
 Load_Nominal_Freq = 50;
 THD_mean_frequency = 50;
-SpeedRef1 = 100; % RPM
-SpeedRef2 = 600;
+SpeedRef1 = 300; % RPM
+SpeedRef2 = 300;
 SpeedRefUpdateTime = 2;
 Tload1 = 10; %Nm
 Tload2 = Trated;

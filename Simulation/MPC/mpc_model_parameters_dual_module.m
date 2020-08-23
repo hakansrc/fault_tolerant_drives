@@ -7,7 +7,7 @@ Tfinal = 3; %seconds
 %% PMSM parameters
 MotorSpeed = 600; % rpm
 PolePairs = 10;
-EfRated = 80; % Volts
+EfRated = 80.3; % Volts
 Ls = 3.51e-3; % Henries
 Rs = 321e-3; % Ohms
 VoltageConstant = EfRated*sqrt(6)/MotorSpeed*1e3;% Vll-peak/krpm

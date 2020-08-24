@@ -7,3 +7,7 @@ Simulation/MPC/slprj/*
 Simulation/Utilities/SpaceVectorPwm/slprj
 Simulation/MPC/mpc_model.slxc
 Simulation/MPC/mpc_model.slx.autosave
+Simulation/MPC/mpc_model_dual_module.slxc
+*.slxc
+Simulation/MPC/mpc_model_dual_module.slxc
+Simulation/MPC/mpc_model_dual_module.slxc

@@ -66,81 +66,91 @@
 \tableofcontents
 \newpage
 
+\section{Simulation Results}
+\subsection{One Module}
+The simulation parameters are as follows:
+\begin{center}
+ \begin{tabular}{||c | c | c | c||} 
+ \hline
+Speed Ref (rpm) & Tload (Nm)  \\ [0.5ex] 
+ \hline\hline
+200-$>$600 (at t=2sec) & 10-$>$31.83 (at t=1sec)  \\ 
+ \hline
+\end{tabular}
+\end{center}
 
-\section{One Module}
-\subsection{Healthy Operation}
-This section contains informations.
+\subsubsection{Healthy Operation}
 
 
 
-\begin{figure}[h!]
+\begin{figure}[H]
 \centering
 \includegraphics[scale=0.35]{SimulationResults/one_module/Iabc.eps}
 \caption{abc Phase Currents for Healthy One Module Operation}
 \label{fig:PhaseCurrentsAbcOneModuleHealthy}
 \end{figure}
 
-\begin{figure}[h!]
+\begin{figure}[H]
 \centering
 \includegraphics[scale=0.35]{SimulationResults/one_module/Idq_iqripple.eps}
 \caption{dq Phase Currents and Iq Ripple Estimation for Healthy One Module Operation}
 \label{fig:PhaseCurrentsDqOneModuleHealthy}
 \end{figure}
 
-\begin{figure}[h!]
+\begin{figure}[H]
 \centering
 \includegraphics[scale=0.35]{SimulationResults/one_module/speed_fsw.eps}
 \caption{Shaft Speed and Switching Frequency for Healthy One Module Operation}
 \label{fig:ShaftSpeedFswOneModuleHealthy}
 \end{figure}
 
-\begin{figure}[h!]
+\begin{figure}[H]
 \centering
 \includegraphics[scale=0.35]{SimulationResults/one_module/te_iqripple_fsw.eps}
 \caption{Torque, Iq Ripple and Switching Frequency for Healthy One Module Operation}
 \label{fig:TorqueIqrippleFswOneModuleHealthy}
 \end{figure}
 
-\begin{figure}[h!]
+\begin{figure}[H]
 \centering
 \includegraphics[scale=0.35]{SimulationResults/one_module/te_speed.eps}
 \caption{Torque and Shaft Speed for Healthy One Module Operation}
 \label{fig:TorqueShaftSpeedOneModuleHealthy}
 \end{figure}
 
-\section{Two Modules}
-\subsection{Healthy Operation}
+\subsection{Two Modules}
+\subsubsection{Healthy Operation}
 This section contains informations.
 
-\begin{figure}[h!]
+\begin{figure}[H]
 \centering
 \includegraphics[scale=0.35]{SimulationResults/two_modules/healthy/Iabc.eps}
 \caption{abc Phase Currents for Healthy Two Modules Operation}
 \label{fig:PhaseCurrentsAbcTwoModulesHealthy}
 \end{figure}
 
-\begin{figure}[h!]
+\begin{figure}[H]
 \centering
 \includegraphics[scale=0.35]{SimulationResults/two_modules/healthy/Idq_iqripple.eps}
 \caption{dq Phase Currents for Healthy Two Modules Operation}
 \label{fig:PhaseCurrentsDqTwoModulesHealthy}
 \end{figure}
 
-\begin{figure}[h!]
+\begin{figure}[H]
 \centering
 \includegraphics[scale=0.35]{SimulationResults/two_modules/healthy/speed.eps}
 \caption{Shaft Speed for Healthy Two Modules Operation}
 \label{fig:ShaftSpeedTwoModulesHealthy}
 \end{figure}
 
-\begin{figure}[h!]
+\begin{figure}[H]
 \centering
 \includegraphics[scale=0.35]{SimulationResults/two_modules/healthy/speed_fsw_iqripple.eps}
 \caption{Shaft Speed and Switching Frequency for Healthy Two Modules Operation}
 \label{fig:ShaftSpeedFswIqRippleTwoModulesHealthy}
 \end{figure}
 
-\begin{figure}[h!]
+\begin{figure}[H]
 \centering
 \includegraphics[scale=0.35]{SimulationResults/two_modules/healthy/tref_tload.eps}
 \caption{Torque Waveform for Healthy Two Modules Operation}
@@ -148,88 +158,88 @@ This section contains informations.
 \end{figure}
 
 
-\subsection{Faulty Operation}
+\subsubsection{Faulty Operation}
 
-\begin{figure}[h!]
+\begin{figure}[H]
 \centering
 \includegraphics[scale=0.35]{SimulationResults/two_modules/faulty/Iabc.eps}
 \caption{abc Phase Currents for Faulty Two Modules Operation}
 \label{fig:PhaseCurrentsAbcTwoModulesFaulty}
 \end{figure}
 
-\begin{figure}[h!]
+\begin{figure}[H]
 \centering
 \includegraphics[scale=0.35]{SimulationResults/two_modules/faulty/Idq_iqripple.eps}
 \caption{dq Phase Currents for Faulty Two Modules Operation}
 \label{fig:PhaseCurrentsDqTwoModulesFaulty}
 \end{figure}
 
-\begin{figure}[h!]
+\begin{figure}[H]
 \centering
 \includegraphics[scale=0.35]{SimulationResults/two_modules/faulty/speed.eps}
 \caption{Shaft Speed for Faulty Two Modules Operation}
 \label{fig:ShaftSpeedTwoModulesFaulty}
 \end{figure}
 
-\begin{figure}[h!]
+\begin{figure}[H]
 \centering
 \includegraphics[scale=0.35]{SimulationResults/two_modules/faulty/speed_fsw_iqripple.eps}
 \caption{Shaft Speed and Switching Frequency for Faulty Two Modules Operation}
 \label{fig:ShaftSpeedFswIqRippleTwoModulesFaulty}
 \end{figure}
 
-\begin{figure}[h!]
+\begin{figure}[H]
 \centering
 \includegraphics[scale=0.35]{SimulationResults/two_modules/faulty/tref_tload.eps}
 \caption{Torque Waveform for Faulty Two Modules Operation}
 \label{fig:TorqueTwoModulesFaulty}
 \end{figure}
 
-\subsection{Faulty Operation Equal Torque Shared}
+\subsubsection{Faulty Operation Equal Torque Shared}
 
-\begin{figure}[h!]
+\begin{figure}[H]
 \centering
 \includegraphics[scale=0.35]{SimulationResults/two_modules/faulty_torqueshared/Iabc.eps}
 \caption{abc Phase Currents for Faulty (equal torque shared) Two Modules Operation}
 \label{fig:PhaseCurrentsAbcTwoModulesFaultyEqualTorque}
 \end{figure}
 
-\begin{figure}[h!]
+\begin{figure}[H]
 \centering
 \includegraphics[scale=0.35]{SimulationResults/two_modules/faulty_torqueshared/Idq_iqripple.eps}
 \caption{dq Phase Currents for Faulty (equal torque shared) Two Modules Operation}
 \label{fig:PhaseCurrentsDqTwoModulesFaultyEqualTorque}
 \end{figure}
 
-\begin{figure}[h!]
+\begin{figure}[H]
 \centering
 \includegraphics[scale=0.35]{SimulationResults/two_modules/faulty_torqueshared/speed.eps}
 \caption{Shaft Speed for Faulty (equal torque shared) Two Modules Operation}
 \label{fig:ShaftSpeedTwoModulesFaultyEqualTorque}
 \end{figure}
 
-\begin{figure}[h!]
+\begin{figure}[H]
 \centering
 \includegraphics[scale=0.35]{SimulationResults/two_modules/faulty_torqueshared/speed_fsw_iqripple.eps}
 \caption{Shaft Speed and Switching Frequency for Faulty (equal torque shared) Two Modules Operation}
 \label{fig:ShaftSpeedFswIqRippleTwoModulesFaultyEqualTorque}
 \end{figure}
 
-\begin{figure}[h!]
+\begin{figure}[H]
 \centering
 \includegraphics[scale=0.35]{SimulationResults/two_modules/faulty_torqueshared/tref_tload.eps}
 \caption{Torque Waveform for Faulty (equal torque shared) Two Modules Operation}
 \label{fig:TorqueTwoModulesFaultyEqualTorque}
 \end{figure}
 
-\begin{figure}[h!]
+\begin{figure}[H]
 \centering
 \includegraphics[scale=0.35]{SimulationResults/two_modules/faulty_torqueshared/tref_tload_close.eps}
 \caption{Torque Waveform for Faulty (equal torque shared) Two Modules Operation (fault moment)}
 \label{fig:TorqueTwoModulesFaultyEqualTorqueClose}
 \end{figure}
 
-\begin{figure}[h!]
+\begin{figure}[H]
 \centering
 \includegraphics[scale=0.35]{SimulationResults/two_modules/faulty_torqueshared/Idq_iqripple_fsw_close.eps}
 \caption{dq Phase Currents for Faulty (equal torque shared) Two Modules Operation (closer)}

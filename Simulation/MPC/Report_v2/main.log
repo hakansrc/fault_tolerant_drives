@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.21 (MiKTeX 20.7) (preloaded format=pdflatex 2020.8.6)  24 AUG 2020 23:19
+This is pdfTeX, Version 3.14159265-2.6-1.40.21 (MiKTeX 20.7) (preloaded format=pdflatex 2020.8.6)  26 AUG 2020 21:13
 entering extended mode
 **c:/Users/hakan/Documents/GitHub/fault_tolerant_drives/Simulation/MPC/Report_v2/main.tex
 (c:/Users/hakan/Documents/GitHub/fault_tolerant_drives/Simulation/MPC/Report_v2/main.tex
@@ -760,7 +760,7 @@ Package epstopdf Info: Output file is already uptodate.
 
 
 pdfTeX warning: pdflatex (file c:/Users/hakan/Documents/GitHub/fault_tolerant_drives/Simulation/MPC/Report_v2/SimulationResults/one_module/Iabc-eps-converted-to.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
-<SimulationResults/one_module/Iabc-eps-converted-to.pdf, id=45, 1399.2275pt x 754.82pt>
+<SimulationResults/one_module/Iabc-eps-converted-to.pdf, id=50, 1399.2275pt x 754.82pt>
 File: SimulationResults/one_module/Iabc-eps-converted-to.pdf Graphic file (type pdf)
 <use SimulationResults/one_module/Iabc-eps-converted-to.pdf>
 Package pdftex.def Info: SimulationResults/one_module/Iabc-eps-converted-to.pdf  used on input line 78.
@@ -782,7 +782,7 @@ Package epstopdf Info: Output file is already uptodate.
 
 
 pdfTeX warning: pdflatex (file c:/Users/hakan/Documents/GitHub/fault_tolerant_drives/Simulation/MPC/Report_v2/SimulationResults/one_module/Idq_iqripple-eps-converted-to.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
-<SimulationResults/one_module/Idq_iqripple-eps-converted-to.pdf, id=46, 1399.2275pt x 754.82pt>
+<SimulationResults/one_module/Idq_iqripple-eps-converted-to.pdf, id=51, 1399.2275pt x 754.82pt>
 File: SimulationResults/one_module/Idq_iqripple-eps-converted-to.pdf Graphic file (type pdf)
 <use SimulationResults/one_module/Idq_iqripple-eps-converted-to.pdf>
 Package pdftex.def Info: SimulationResults/one_module/Idq_iqripple-eps-converted-to.pdf  used on input line 85.
@@ -804,7 +804,7 @@ Package epstopdf Info: Output file is already uptodate.
 
 
 pdfTeX warning: pdflatex (file c:/Users/hakan/Documents/GitHub/fault_tolerant_drives/Simulation/MPC/Report_v2/SimulationResults/one_module/speed_fsw-eps-converted-to.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
-<SimulationResults/one_module/speed_fsw-eps-converted-to.pdf, id=47, 1399.2275pt x 754.82pt>
+<SimulationResults/one_module/speed_fsw-eps-converted-to.pdf, id=52, 1399.2275pt x 754.82pt>
 File: SimulationResults/one_module/speed_fsw-eps-converted-to.pdf Graphic file (type pdf)
 <use SimulationResults/one_module/speed_fsw-eps-converted-to.pdf>
 Package pdftex.def Info: SimulationResults/one_module/speed_fsw-eps-converted-to.pdf  used on input line 92.
@@ -829,7 +829,7 @@ Package epstopdf Info: Output file is already uptodate.
 
 
 pdfTeX warning: pdflatex (file c:/Users/hakan/Documents/GitHub/fault_tolerant_drives/Simulation/MPC/Report_v2/SimulationResults/one_module/te_iqripple_fsw-eps-converted-to.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
-<SimulationResults/one_module/te_iqripple_fsw-eps-converted-to.pdf, id=48, 1399.2275pt x 754.82pt>
+<SimulationResults/one_module/te_iqripple_fsw-eps-converted-to.pdf, id=53, 1399.2275pt x 754.82pt>
 File: SimulationResults/one_module/te_iqripple_fsw-eps-converted-to.pdf Graphic file (type pdf)
 <use SimulationResults/one_module/te_iqripple_fsw-eps-converted-to.pdf>
 Package pdftex.def Info: SimulationResults/one_module/te_iqripple_fsw-eps-converted-to.pdf  used on input line 99.
@@ -854,7 +854,7 @@ Package epstopdf Info: Output file is already uptodate.
 
 
 pdfTeX warning: pdflatex (file c:/Users/hakan/Documents/GitHub/fault_tolerant_drives/Simulation/MPC/Report_v2/SimulationResults/one_module/te_speed-eps-converted-to.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
-<SimulationResults/one_module/te_speed-eps-converted-to.pdf, id=49, 1399.2275pt x 754.82pt>
+<SimulationResults/one_module/te_speed-eps-converted-to.pdf, id=54, 1399.2275pt x 754.82pt>
 File: SimulationResults/one_module/te_speed-eps-converted-to.pdf Graphic file (type pdf)
 <use SimulationResults/one_module/te_speed-eps-converted-to.pdf>
 Package pdftex.def Info: SimulationResults/one_module/te_speed-eps-converted-to.pdf  used on input line 106.
@@ -879,7 +879,7 @@ Package epstopdf Info: Output file is already uptodate.
 
 
 pdfTeX warning: pdflatex (file c:/Users/hakan/Documents/GitHub/fault_tolerant_drives/Simulation/MPC/Report_v2/SimulationResults/two_modules/healthy/Iabc-eps-converted-to.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
-<SimulationResults/two_modules/healthy/Iabc-eps-converted-to.pdf, id=50, 1399.2275pt x 754.82pt>
+<SimulationResults/two_modules/healthy/Iabc-eps-converted-to.pdf, id=55, 1399.2275pt x 754.82pt>
 File: SimulationResults/two_modules/healthy/Iabc-eps-converted-to.pdf Graphic file (type pdf)
 <use SimulationResults/two_modules/healthy/Iabc-eps-converted-to.pdf>
 Package pdftex.def Info: SimulationResults/two_modules/healthy/Iabc-eps-converted-to.pdf  used on input line 117.
@@ -905,7 +905,7 @@ Package epstopdf Info: Output file is already uptodate.
 
 
 pdfTeX warning: pdflatex (file c:/Users/hakan/Documents/GitHub/fault_tolerant_drives/Simulation/MPC/Report_v2/SimulationResults/two_modules/healthy/Idq_iqripple-eps-converted-to.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
-<SimulationResults/two_modules/healthy/Idq_iqripple-eps-converted-to.pdf, id=69, 1399.2275pt x 754.82pt>
+<SimulationResults/two_modules/healthy/Idq_iqripple-eps-converted-to.pdf, id=74, 1399.2275pt x 754.82pt>
 File: SimulationResults/two_modules/healthy/Idq_iqripple-eps-converted-to.pdf Graphic file (type pdf)
 <use SimulationResults/two_modules/healthy/Idq_iqripple-eps-converted-to.pdf>
 Package pdftex.def Info: SimulationResults/two_modules/healthy/Idq_iqripple-eps-converted-to.pdf  used on input line 124.
@@ -930,7 +930,7 @@ Package epstopdf Info: Output file is already uptodate.
 
 
 pdfTeX warning: pdflatex (file c:/Users/hakan/Documents/GitHub/fault_tolerant_drives/Simulation/MPC/Report_v2/SimulationResults/two_modules/healthy/speed-eps-converted-to.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
-<SimulationResults/two_modules/healthy/speed-eps-converted-to.pdf, id=70, 1399.2275pt x 754.82pt>
+<SimulationResults/two_modules/healthy/speed-eps-converted-to.pdf, id=75, 1399.2275pt x 754.82pt>
 File: SimulationResults/two_modules/healthy/speed-eps-converted-to.pdf Graphic file (type pdf)
 <use SimulationResults/two_modules/healthy/speed-eps-converted-to.pdf>
 Package pdftex.def Info: SimulationResults/two_modules/healthy/speed-eps-converted-to.pdf  used on input line 131.
@@ -955,7 +955,7 @@ Package epstopdf Info: Output file is already uptodate.
 
 
 pdfTeX warning: pdflatex (file c:/Users/hakan/Documents/GitHub/fault_tolerant_drives/Simulation/MPC/Report_v2/SimulationResults/two_modules/healthy/speed_fsw_iqripple-eps-converted-to.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
-<SimulationResults/two_modules/healthy/speed_fsw_iqripple-eps-converted-to.pdf, id=71, 1399.2275pt x 754.82pt>
+<SimulationResults/two_modules/healthy/speed_fsw_iqripple-eps-converted-to.pdf, id=76, 1399.2275pt x 754.82pt>
 File: SimulationResults/two_modules/healthy/speed_fsw_iqripple-eps-converted-to.pdf Graphic file (type pdf)
 <use SimulationResults/two_modules/healthy/speed_fsw_iqripple-eps-converted-to.pdf>
 Package pdftex.def Info: SimulationResults/two_modules/healthy/speed_fsw_iqripple-eps-converted-to.pdf  used on input line 138.
@@ -980,7 +980,7 @@ Package epstopdf Info: Output file is already uptodate.
 
 
 pdfTeX warning: pdflatex (file c:/Users/hakan/Documents/GitHub/fault_tolerant_drives/Simulation/MPC/Report_v2/SimulationResults/two_modules/healthy/tref_tload-eps-converted-to.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
-<SimulationResults/two_modules/healthy/tref_tload-eps-converted-to.pdf, id=72, 1399.2275pt x 754.82pt>
+<SimulationResults/two_modules/healthy/tref_tload-eps-converted-to.pdf, id=77, 1399.2275pt x 754.82pt>
 File: SimulationResults/two_modules/healthy/tref_tload-eps-converted-to.pdf Graphic file (type pdf)
 <use SimulationResults/two_modules/healthy/tref_tload-eps-converted-to.pdf>
 Package pdftex.def Info: SimulationResults/two_modules/healthy/tref_tload-eps-converted-to.pdf  used on input line 145.
@@ -993,32 +993,333 @@ Overfull \hbox (18.26448pt too wide) in paragraph at lines 145--146
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
+Package epstopdf Info: Source file: <SimulationResults/two_modules/faulty/Iabc.eps>
+(epstopdf)                    date: 2020-08-24 22:29:58
+(epstopdf)                    size: 271686 bytes
+(epstopdf)             Output file: <SimulationResults/two_modules/faulty/Iabc-eps-converted-to.pdf>
+(epstopdf)                    date: 2020-08-26 21:01:19
+(epstopdf)                    size: 358085 bytes
+(epstopdf)             Command: <epstopdf --outfile=SimulationResults/two_modules/faulty/Iabc-eps-converted-to.pdf SimulationResults/two_modules/faulty/Iabc.eps>
+(epstopdf)             \includegraphics on input line 155.
+Package epstopdf Info: Output file is already uptodate.
+
+
+pdfTeX warning: pdflatex (file c:/Users/hakan/Documents/GitHub/fault_tolerant_drives/Simulation/MPC/Report_v2/SimulationResults/two_modules/faulty/Iabc-eps-converted-to.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
+<SimulationResults/two_modules/faulty/Iabc-eps-converted-to.pdf, id=78, 1399.2275pt x 754.82pt>
+File: SimulationResults/two_modules/faulty/Iabc-eps-converted-to.pdf Graphic file (type pdf)
+<use SimulationResults/two_modules/faulty/Iabc-eps-converted-to.pdf>
+Package pdftex.def Info: SimulationResults/two_modules/faulty/Iabc-eps-converted-to.pdf  used on input line 155.
+(pdftex.def)             Requested size: 489.73697pt x 264.19096pt.
+
+Overfull \hbox (18.26448pt too wide) in paragraph at lines 155--156
+ [][] 
+ []
+
+[4 <c:/Users/hakan/Documents/GitHub/fault_tolerant_drives/Simulation/MPC/Report_v2/SimulationResults/one_module/speed_fsw-eps-converted-to.pdf> <c:/Users/hakan/Documents/GitHub/fault_tolerant_drives/Simulation/MPC/Report_v2/SimulationResults/one_module/te_iqripple_fsw-eps-converted-to.pdf>]
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+Package epstopdf Info: Source file: <SimulationResults/two_modules/faulty/Idq_iqripple.eps>
+(epstopdf)                    date: 2020-08-24 22:29:58
+(epstopdf)                    size: 187137 bytes
+(epstopdf)             Output file: <SimulationResults/two_modules/faulty/Idq_iqripple-eps-converted-to.pdf>
+(epstopdf)                    date: 2020-08-26 21:01:20
+(epstopdf)                    size: 191192 bytes
+(epstopdf)             Command: <epstopdf --outfile=SimulationResults/two_modules/faulty/Idq_iqripple-eps-converted-to.pdf SimulationResults/two_modules/faulty/Idq_iqripple.eps>
+(epstopdf)             \includegraphics on input line 162.
+Package epstopdf Info: Output file is already uptodate.
+
+
+pdfTeX warning: pdflatex (file c:/Users/hakan/Documents/GitHub/fault_tolerant_drives/Simulation/MPC/Report_v2/SimulationResults/two_modules/faulty/Idq_iqripple-eps-converted-to.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
+<SimulationResults/two_modules/faulty/Idq_iqripple-eps-converted-to.pdf, id=97, 1399.2275pt x 754.82pt>
+File: SimulationResults/two_modules/faulty/Idq_iqripple-eps-converted-to.pdf Graphic file (type pdf)
+<use SimulationResults/two_modules/faulty/Idq_iqripple-eps-converted-to.pdf>
+Package pdftex.def Info: SimulationResults/two_modules/faulty/Idq_iqripple-eps-converted-to.pdf  used on input line 162.
+(pdftex.def)             Requested size: 489.73697pt x 264.19096pt.
+
+Overfull \hbox (18.26448pt too wide) in paragraph at lines 162--163
+ [][] 
+ []
+
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+Package epstopdf Info: Source file: <SimulationResults/two_modules/faulty/speed.eps>
+(epstopdf)                    date: 2020-08-24 22:29:58
+(epstopdf)                    size: 105512 bytes
+(epstopdf)             Output file: <SimulationResults/two_modules/faulty/speed-eps-converted-to.pdf>
+(epstopdf)                    date: 2020-08-26 21:01:22
+(epstopdf)                    size: 105236 bytes
+(epstopdf)             Command: <epstopdf --outfile=SimulationResults/two_modules/faulty/speed-eps-converted-to.pdf SimulationResults/two_modules/faulty/speed.eps>
+(epstopdf)             \includegraphics on input line 169.
+Package epstopdf Info: Output file is already uptodate.
+
+
+pdfTeX warning: pdflatex (file c:/Users/hakan/Documents/GitHub/fault_tolerant_drives/Simulation/MPC/Report_v2/SimulationResults/two_modules/faulty/speed-eps-converted-to.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
+<SimulationResults/two_modules/faulty/speed-eps-converted-to.pdf, id=98, 1399.2275pt x 754.82pt>
+File: SimulationResults/two_modules/faulty/speed-eps-converted-to.pdf Graphic file (type pdf)
+<use SimulationResults/two_modules/faulty/speed-eps-converted-to.pdf>
+Package pdftex.def Info: SimulationResults/two_modules/faulty/speed-eps-converted-to.pdf  used on input line 169.
+(pdftex.def)             Requested size: 489.73697pt x 264.19096pt.
+
+Overfull \hbox (18.26448pt too wide) in paragraph at lines 169--170
+ [][] 
+ []
+
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+Package epstopdf Info: Source file: <SimulationResults/two_modules/faulty/speed_fsw_iqripple.eps>
+(epstopdf)                    date: 2020-08-24 22:29:58
+(epstopdf)                    size: 202060 bytes
+(epstopdf)             Output file: <SimulationResults/two_modules/faulty/speed_fsw_iqripple-eps-converted-to.pdf>
+(epstopdf)                    date: 2020-08-26 21:01:23
+(epstopdf)                    size: 305700 bytes
+(epstopdf)             Command: <epstopdf --outfile=SimulationResults/two_modules/faulty/speed_fsw_iqripple-eps-converted-to.pdf SimulationResults/two_modules/faulty/speed_fsw_iqripple.eps>
+(epstopdf)             \includegraphics on input line 176.
+Package epstopdf Info: Output file is already uptodate.
+
+
+pdfTeX warning: pdflatex (file c:/Users/hakan/Documents/GitHub/fault_tolerant_drives/Simulation/MPC/Report_v2/SimulationResults/two_modules/faulty/speed_fsw_iqripple-eps-converted-to.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
+<SimulationResults/two_modules/faulty/speed_fsw_iqripple-eps-converted-to.pdf, id=99, 1399.2275pt x 754.82pt>
+File: SimulationResults/two_modules/faulty/speed_fsw_iqripple-eps-converted-to.pdf Graphic file (type pdf)
+<use SimulationResults/two_modules/faulty/speed_fsw_iqripple-eps-converted-to.pdf>
+Package pdftex.def Info: SimulationResults/two_modules/faulty/speed_fsw_iqripple-eps-converted-to.pdf  used on input line 176.
+(pdftex.def)             Requested size: 489.73697pt x 264.19096pt.
+
+Overfull \hbox (18.26448pt too wide) in paragraph at lines 176--177
+ [][] 
+ []
+
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+Package epstopdf Info: Source file: <SimulationResults/two_modules/faulty/tref_tload.eps>
+(epstopdf)                    date: 2020-08-24 22:29:58
+(epstopdf)                    size: 156251 bytes
+(epstopdf)             Output file: <SimulationResults/two_modules/faulty/tref_tload-eps-converted-to.pdf>
+(epstopdf)                    date: 2020-08-26 21:01:25
+(epstopdf)                    size: 154644 bytes
+(epstopdf)             Command: <epstopdf --outfile=SimulationResults/two_modules/faulty/tref_tload-eps-converted-to.pdf SimulationResults/two_modules/faulty/tref_tload.eps>
+(epstopdf)             \includegraphics on input line 183.
+Package epstopdf Info: Output file is already uptodate.
+
+
+pdfTeX warning: pdflatex (file c:/Users/hakan/Documents/GitHub/fault_tolerant_drives/Simulation/MPC/Report_v2/SimulationResults/two_modules/faulty/tref_tload-eps-converted-to.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
+<SimulationResults/two_modules/faulty/tref_tload-eps-converted-to.pdf, id=100, 1399.2275pt x 754.82pt>
+File: SimulationResults/two_modules/faulty/tref_tload-eps-converted-to.pdf Graphic file (type pdf)
+<use SimulationResults/two_modules/faulty/tref_tload-eps-converted-to.pdf>
+Package pdftex.def Info: SimulationResults/two_modules/faulty/tref_tload-eps-converted-to.pdf  used on input line 183.
+(pdftex.def)             Requested size: 489.73697pt x 264.19096pt.
+
+Overfull \hbox (18.26448pt too wide) in paragraph at lines 183--184
+ [][] 
+ []
+
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+Package epstopdf Info: Source file: <SimulationResults/two_modules/faulty_torqueshared/Iabc.eps>
+(epstopdf)                    date: 2020-08-24 22:29:58
+(epstopdf)                    size: 272249 bytes
+(epstopdf)             Output file: <SimulationResults/two_modules/faulty_torqueshared/Iabc-eps-converted-to.pdf>
+(epstopdf)                    date: 2020-08-26 21:04:04
+(epstopdf)                    size: 611494 bytes
+(epstopdf)             Command: <epstopdf --outfile=SimulationResults/two_modules/faulty_torqueshared/Iabc-eps-converted-to.pdf SimulationResults/two_modules/faulty_torqueshared/Iabc.eps>
+(epstopdf)             \includegraphics on input line 192.
+Package epstopdf Info: Output file is already uptodate.
+
+
+pdfTeX warning: pdflatex (file c:/Users/hakan/Documents/GitHub/fault_tolerant_drives/Simulation/MPC/Report_v2/SimulationResults/two_modules/faulty_torqueshared/Iabc-eps-converted-to.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
+<SimulationResults/two_modules/faulty_torqueshared/Iabc-eps-converted-to.pdf, id=101, 1399.2275pt x 754.82pt>
+File: SimulationResults/two_modules/faulty_torqueshared/Iabc-eps-converted-to.pdf Graphic file (type pdf)
+<use SimulationResults/two_modules/faulty_torqueshared/Iabc-eps-converted-to.pdf>
+Package pdftex.def Info: SimulationResults/two_modules/faulty_torqueshared/Iabc-eps-converted-to.pdf  used on input line 192.
+(pdftex.def)             Requested size: 489.73697pt x 264.19096pt.
+
+Overfull \hbox (18.26448pt too wide) in paragraph at lines 192--193
+ [][] 
+ []
+
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+Package epstopdf Info: Source file: <SimulationResults/two_modules/faulty_torqueshared/Idq_iqripple.eps>
+(epstopdf)                    date: 2020-08-24 22:29:58
+(epstopdf)                    size: 172583 bytes
+(epstopdf)             Output file: <SimulationResults/two_modules/faulty_torqueshared/Idq_iqripple-eps-converted-to.pdf>
+(epstopdf)                    date: 2020-08-26 21:04:06
+(epstopdf)                    size: 178421 bytes
+(epstopdf)             Command: <epstopdf --outfile=SimulationResults/two_modules/faulty_torqueshared/Idq_iqripple-eps-converted-to.pdf SimulationResults/two_modules/faulty_torqueshared/Idq_iqripple.eps>
+(epstopdf)             \includegraphics on input line 199.
+Package epstopdf Info: Output file is already uptodate.
+
+
+pdfTeX warning: pdflatex (file c:/Users/hakan/Documents/GitHub/fault_tolerant_drives/Simulation/MPC/Report_v2/SimulationResults/two_modules/faulty_torqueshared/Idq_iqripple-eps-converted-to.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
+<SimulationResults/two_modules/faulty_torqueshared/Idq_iqripple-eps-converted-to.pdf, id=102, 1399.2275pt x 754.82pt>
+File: SimulationResults/two_modules/faulty_torqueshared/Idq_iqripple-eps-converted-to.pdf Graphic file (type pdf)
+<use SimulationResults/two_modules/faulty_torqueshared/Idq_iqripple-eps-converted-to.pdf>
+Package pdftex.def Info: SimulationResults/two_modules/faulty_torqueshared/Idq_iqripple-eps-converted-to.pdf  used on input line 199.
+(pdftex.def)             Requested size: 489.73697pt x 264.19096pt.
+
+Overfull \hbox (18.26448pt too wide) in paragraph at lines 199--200
+ [][] 
+ []
+
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+Package epstopdf Info: Source file: <SimulationResults/two_modules/faulty_torqueshared/speed.eps>
+(epstopdf)                    date: 2020-08-24 22:29:58
+(epstopdf)                    size: 98318 bytes
+(epstopdf)             Output file: <SimulationResults/two_modules/faulty_torqueshared/speed-eps-converted-to.pdf>
+(epstopdf)                    date: 2020-08-26 21:04:07
+(epstopdf)                    size: 98101 bytes
+(epstopdf)             Command: <epstopdf --outfile=SimulationResults/two_modules/faulty_torqueshared/speed-eps-converted-to.pdf SimulationResults/two_modules/faulty_torqueshared/speed.eps>
+(epstopdf)             \includegraphics on input line 206.
+Package epstopdf Info: Output file is already uptodate.
+
+
+pdfTeX warning: pdflatex (file c:/Users/hakan/Documents/GitHub/fault_tolerant_drives/Simulation/MPC/Report_v2/SimulationResults/two_modules/faulty_torqueshared/speed-eps-converted-to.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
+<SimulationResults/two_modules/faulty_torqueshared/speed-eps-converted-to.pdf, id=103, 1399.2275pt x 754.82pt>
+File: SimulationResults/two_modules/faulty_torqueshared/speed-eps-converted-to.pdf Graphic file (type pdf)
+<use SimulationResults/two_modules/faulty_torqueshared/speed-eps-converted-to.pdf>
+Package pdftex.def Info: SimulationResults/two_modules/faulty_torqueshared/speed-eps-converted-to.pdf  used on input line 206.
+(pdftex.def)             Requested size: 489.73697pt x 264.19096pt.
+
+Overfull \hbox (18.26448pt too wide) in paragraph at lines 206--207
+ [][] 
+ []
+
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+Package epstopdf Info: Source file: <SimulationResults/two_modules/faulty_torqueshared/speed_fsw_iqripple.eps>
+(epstopdf)                    date: 2020-08-24 22:29:58
+(epstopdf)                    size: 174056 bytes
+(epstopdf)             Output file: <SimulationResults/two_modules/faulty_torqueshared/speed_fsw_iqripple-eps-converted-to.pdf>
+(epstopdf)                    date: 2020-08-26 21:04:08
+(epstopdf)                    size: 181613 bytes
+(epstopdf)             Command: <epstopdf --outfile=SimulationResults/two_modules/faulty_torqueshared/speed_fsw_iqripple-eps-converted-to.pdf SimulationResults/two_modules/faulty_torqueshared/speed_fsw_iqripple.eps>
+(epstopdf)             \includegraphics on input line 213.
+Package epstopdf Info: Output file is already uptodate.
+
+
+pdfTeX warning: pdflatex (file c:/Users/hakan/Documents/GitHub/fault_tolerant_drives/Simulation/MPC/Report_v2/SimulationResults/two_modules/faulty_torqueshared/speed_fsw_iqripple-eps-converted-to.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
+<SimulationResults/two_modules/faulty_torqueshared/speed_fsw_iqripple-eps-converted-to.pdf, id=104, 1399.2275pt x 754.82pt>
+File: SimulationResults/two_modules/faulty_torqueshared/speed_fsw_iqripple-eps-converted-to.pdf Graphic file (type pdf)
+<use SimulationResults/two_modules/faulty_torqueshared/speed_fsw_iqripple-eps-converted-to.pdf>
+Package pdftex.def Info: SimulationResults/two_modules/faulty_torqueshared/speed_fsw_iqripple-eps-converted-to.pdf  used on input line 213.
+(pdftex.def)             Requested size: 489.73697pt x 264.19096pt.
+
+Overfull \hbox (18.26448pt too wide) in paragraph at lines 213--214
+ [][] 
+ []
+
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+Package epstopdf Info: Source file: <SimulationResults/two_modules/faulty_torqueshared/tref_tload.eps>
+(epstopdf)                    date: 2020-08-24 22:29:58
+(epstopdf)                    size: 134234 bytes
+(epstopdf)             Output file: <SimulationResults/two_modules/faulty_torqueshared/tref_tload-eps-converted-to.pdf>
+(epstopdf)                    date: 2020-08-26 21:04:10
+(epstopdf)                    size: 137424 bytes
+(epstopdf)             Command: <epstopdf --outfile=SimulationResults/two_modules/faulty_torqueshared/tref_tload-eps-converted-to.pdf SimulationResults/two_modules/faulty_torqueshared/tref_tload.eps>
+(epstopdf)             \includegraphics on input line 220.
+Package epstopdf Info: Output file is already uptodate.
+
+
+pdfTeX warning: pdflatex (file c:/Users/hakan/Documents/GitHub/fault_tolerant_drives/Simulation/MPC/Report_v2/SimulationResults/two_modules/faulty_torqueshared/tref_tload-eps-converted-to.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
+<SimulationResults/two_modules/faulty_torqueshared/tref_tload-eps-converted-to.pdf, id=105, 1399.2275pt x 754.82pt>
+File: SimulationResults/two_modules/faulty_torqueshared/tref_tload-eps-converted-to.pdf Graphic file (type pdf)
+<use SimulationResults/two_modules/faulty_torqueshared/tref_tload-eps-converted-to.pdf>
+Package pdftex.def Info: SimulationResults/two_modules/faulty_torqueshared/tref_tload-eps-converted-to.pdf  used on input line 220.
+(pdftex.def)             Requested size: 489.73697pt x 264.19096pt.
+
+Overfull \hbox (18.26448pt too wide) in paragraph at lines 220--221
+ [][] 
+ []
+
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+Package epstopdf Info: Source file: <SimulationResults/two_modules/faulty_torqueshared/tref_tload_close.eps>
+(epstopdf)                    date: 2020-08-24 22:29:58
+(epstopdf)                    size: 180972 bytes
+(epstopdf)             Output file: <SimulationResults/two_modules/faulty_torqueshared/tref_tload_close-eps-converted-to.pdf>
+(epstopdf)                    date: 2020-08-26 21:11:44
+(epstopdf)                    size: 177456 bytes
+(epstopdf)             Command: <epstopdf --outfile=SimulationResults/two_modules/faulty_torqueshared/tref_tload_close-eps-converted-to.pdf SimulationResults/two_modules/faulty_torqueshared/tref_tload_close.eps>
+(epstopdf)             \includegraphics on input line 227.
+Package epstopdf Info: Output file is already uptodate.
+
+
+pdfTeX warning: pdflatex (file c:/Users/hakan/Documents/GitHub/fault_tolerant_drives/Simulation/MPC/Report_v2/SimulationResults/two_modules/faulty_torqueshared/tref_tload_close-eps-converted-to.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
+<SimulationResults/two_modules/faulty_torqueshared/tref_tload_close-eps-converted-to.pdf, id=106, 1399.2275pt x 754.82pt>
+File: SimulationResults/two_modules/faulty_torqueshared/tref_tload_close-eps-converted-to.pdf Graphic file (type pdf)
+<use SimulationResults/two_modules/faulty_torqueshared/tref_tload_close-eps-converted-to.pdf>
+Package pdftex.def Info: SimulationResults/two_modules/faulty_torqueshared/tref_tload_close-eps-converted-to.pdf  used on input line 227.
+(pdftex.def)             Requested size: 489.73697pt x 264.19096pt.
+
+Overfull \hbox (18.26448pt too wide) in paragraph at lines 227--228
+ [][] 
+ []
+
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+Package epstopdf Info: Source file: <SimulationResults/two_modules/faulty_torqueshared/Idq_iqripple_fsw_close.eps>
+(epstopdf)                    date: 2020-08-24 22:29:58
+(epstopdf)                    size: 255343 bytes
+(epstopdf)             Output file: <SimulationResults/two_modules/faulty_torqueshared/Idq_iqripple_fsw_close-eps-converted-to.pdf>
+(epstopdf)                    date: 2020-08-26 21:12:10
+(epstopdf)                    size: 256847 bytes
+(epstopdf)             Command: <epstopdf --outfile=SimulationResults/two_modules/faulty_torqueshared/Idq_iqripple_fsw_close-eps-converted-to.pdf SimulationResults/two_modules/faulty_torqueshared/Idq_iqripple_fsw_close.eps>
+(epstopdf)             \includegraphics on input line 234.
+Package epstopdf Info: Output file is already uptodate.
+
+
+pdfTeX warning: pdflatex (file c:/Users/hakan/Documents/GitHub/fault_tolerant_drives/Simulation/MPC/Report_v2/SimulationResults/two_modules/faulty_torqueshared/Idq_iqripple_fsw_close-eps-converted-to.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
+<SimulationResults/two_modules/faulty_torqueshared/Idq_iqripple_fsw_close-eps-converted-to.pdf, id=107, 1399.2275pt x 754.82pt>
+File: SimulationResults/two_modules/faulty_torqueshared/Idq_iqripple_fsw_close-eps-converted-to.pdf Graphic file (type pdf)
+<use SimulationResults/two_modules/faulty_torqueshared/Idq_iqripple_fsw_close-eps-converted-to.pdf>
+Package pdftex.def Info: SimulationResults/two_modules/faulty_torqueshared/Idq_iqripple_fsw_close-eps-converted-to.pdf  used on input line 234.
+(pdftex.def)             Requested size: 489.73697pt x 264.19096pt.
+
+Overfull \hbox (18.26448pt too wide) in paragraph at lines 234--235
+ [][] 
+ []
+
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
 (c:/Users\hakan\Documents\GitHub\fault_tolerant_drives\Simulation\MPC\Report_v2\main.bbl
 
 Package natbib Warning: Empty `thebibliography' environment on input line 3.
 
-) [4 <c:/Users/hakan/Documents/GitHub/fault_tolerant_drives/Simulation/MPC/Report_v2/SimulationResults/one_module/speed_fsw-eps-converted-to.pdf> <c:/Users/hakan/Documents/GitHub/fault_tolerant_drives/Simulation/MPC/Report_v2/SimulationResults/one_module/te_iqripple_fsw-eps-converted-to.pdf>] [5 <c:/Users/hakan/Documents/GitHub/fault_tolerant_drives/Simulation/MPC/Report_v2/SimulationResults/one_module/te_speed-eps-converted-to.pdf> <c:/Users/hakan/Documents/GitHub/fault_tolerant_drives/Simulation/MPC/Report_v2/SimulationResults/two_modules/healthy/Iabc-eps-converted-to.pdf>] [6 <c:/Users/hakan/Documents/GitHub/fault_tolerant_drives/Simulation/MPC/Report_v2/SimulationResults/two_modules/healthy/Idq_iqripple-eps-converted-to.pdf> <c:/Users/hakan/Documents/GitHub/fault_tolerant_drives/Simulation/MPC/Report_v2/SimulationResults/two_modules/healthy/speed-eps-converted-to.pdf>] [7 <c:/Users/hakan/Documents/GitHub/fault_tolerant_drives/Simulation/MPC/Report_v2/SimulationResults/two_modules/healthy/speed_fsw_iqripple-eps-converted-to.pdf> <c:/Users/hakan/Documents/GitHub/fault_tolerant_drives/Simulation/MPC/Report_v2/SimulationResults/two_modules/healthy/tref_tload-eps-converted-to.pdf>]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 156.
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 156.
+) [5 <c:/Users/hakan/Documents/GitHub/fault_tolerant_drives/Simulation/MPC/Report_v2/SimulationResults/one_module/te_speed-eps-converted-to.pdf> <c:/Users/hakan/Documents/GitHub/fault_tolerant_drives/Simulation/MPC/Report_v2/SimulationResults/two_modules/healthy/Iabc-eps-converted-to.pdf>] [6 <c:/Users/hakan/Documents/GitHub/fault_tolerant_drives/Simulation/MPC/Report_v2/SimulationResults/two_modules/healthy/Idq_iqripple-eps-converted-to.pdf> <c:/Users/hakan/Documents/GitHub/fault_tolerant_drives/Simulation/MPC/Report_v2/SimulationResults/two_modules/healthy/speed-eps-converted-to.pdf>] [7 <c:/Users/hakan/Documents/GitHub/fault_tolerant_drives/Simulation/MPC/Report_v2/SimulationResults/two_modules/healthy/speed_fsw_iqripple-eps-converted-to.pdf> <c:/Users/hakan/Documents/GitHub/fault_tolerant_drives/Simulation/MPC/Report_v2/SimulationResults/two_modules/healthy/tref_tload-eps-converted-to.pdf>] [8 <c:/Users/hakan/Documents/GitHub/fault_tolerant_drives/Simulation/MPC/Report_v2/SimulationResults/two_modules/faulty/Iabc-eps-converted-to.pdf> <c:/Users/hakan/Documents/GitHub/fault_tolerant_drives/Simulation/MPC/Report_v2/SimulationResults/two_modules/faulty/Idq_iqripple-eps-converted-to.pdf>] [9 <c:/Users/hakan/Documents/GitHub/fault_tolerant_drives/Simulation/MPC/Report_v2/SimulationResults/two_modules/faulty/speed-eps-converted-to.pdf> <c:/Users/hakan/Documents/GitHub/fault_tolerant_drives/Simulation/MPC/Report_v2/SimulationResults/two_modules/faulty/speed_fsw_iqripple-eps-converted-to.pdf>] [10 <c:/Users/hakan/Documents/GitHub/fault_tolerant_drives/Simulation/MPC/Report_v2/SimulationResults/two_modules/faulty/tref_tload-eps-converted-to.pdf> <c:/Users/hakan/Documents/GitHub/fault_tolerant_drives/Simulation/MPC/Report_v2/SimulationResults/two_modules/faulty_torqueshared/Iabc-eps-converted-to.pdf>] [11 <c:/Users/hakan/Documents/GitHub/fault_tolerant_drives/Simulation/MPC/Report_v2/SimulationResults/two_modules/faulty_torqueshared/Idq_iqripple-eps-converted-to.pdf> <c:/Users/hakan/Documents/GitHub/fault_tolerant_drives/Simulation/MPC/Report_v2/SimulationResults/two_modules/faulty_torqueshared/speed-eps-converted-to.pdf>] [12 <c:/Users/hakan/Documents/GitHub/fault_tolerant_drives/Simulation/MPC/Report_v2/SimulationResults/two_modules/faulty_torqueshared/speed_fsw_iqripple-eps-converted-to.pdf> <c:/Users/hakan/Documents/GitHub/fault_tolerant_drives/Simulation/MPC/Report_v2/SimulationResults/two_modules/faulty_torqueshared/tref_tload-eps-converted-to.pdf>] [13 <c:/Users/hakan/Documents/GitHub/fault_tolerant_drives/Simulation/MPC/Report_v2/SimulationResults/two_modules/faulty_torqueshared/tref_tload_close-eps-converted-to.pdf> <c:/Users/hakan/Documents/GitHub/fault_tolerant_drives/Simulation/MPC/Report_v2/SimulationResults/two_modules/faulty_torqueshared/Idq_iqripple_fsw_close-eps-converted-to.pdf>]
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 241.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 241.
  (c:/Users\hakan\Documents\GitHub\fault_tolerant_drives\Simulation\MPC\Report_v2\main.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 156.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 156.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 241.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 241.
 Package rerunfilecheck Info: File `main.out' has not changed.
-(rerunfilecheck)             Checksum: 46F7E43F9E888E2A73AD0D5903729BBC;288.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 156.
+(rerunfilecheck)             Checksum: C168CEDE5F53338B318A4640B76C36F4;373.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 241.
  ) 
 Here is how much of TeX's memory you used:
- 34213 strings out of 481225
- 840699 string characters out of 2906175
- 1376410 words of memory out of 3000000
- 49104 multiletter control sequences out of 15000+200000
+ 34309 strings out of 481225
+ 846485 string characters out of 2906175
+ 1379410 words of memory out of 3000000
+ 49177 multiletter control sequences out of 15000+200000
  548799 words of font info for 78 fonts, out of 3000000 for 9000
  1141 hyphenation exceptions out of 8191
- 79i,7n,136p,801b,738s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 79i,7n,136p,801b,744s stack positions out of 5000i,500n,10000p,200000b,50000s
 <C:/Users/hakan/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmbx10.pfb><C:/Users/hakan/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmbx12.pfb><C:/Users/hakan/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr10.pfb><C:/Users/hakan/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr12.pfb>
-Output written on c:/Users\hakan\Documents\GitHub\fault_tolerant_drives\Simulation\MPC\Report_v2\main.pdf (7 pages, 2230545 bytes).
+Output written on c:/Users\hakan\Documents\GitHub\fault_tolerant_drives\Simulation\MPC\Report_v2\main.pdf (13 pages, 4972840 bytes).
 PDF statistics:
- 169 PDF objects out of 1000 (max. 8388607)
- 25 named destinations out of 1000 (max. 500000)
- 103 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 300 PDF objects out of 1000 (max. 8388607)
+ 44 named destinations out of 1000 (max. 500000)
+ 171 words of extra memory for PDF output out of 10000 (max. 10000000)
 

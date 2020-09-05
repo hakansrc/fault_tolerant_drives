@@ -19,7 +19,7 @@ NumberOfFloatsPerPacket = 6;                    %number of floats to be sent at 
 CallbackFunctionByteNumber=512;                 %the callback function is called when this amount of bytes are read from the channel
 %% VARIABLE DEFINITIONS
 EnableSaving = 0;                               %set 0 in order to disable saving of the received data (recommended to stay at 1)
-ProcessRawDataThresholdInBytes = 2048*50/16;    %the received data will be saved and/or converted and plotted when ProcessRawDataThresholdInBytes bytes of data is received
+ProcessRawDataThresholdInBytes = 2048*50/4;    %the received data will be saved and/or converted and plotted when ProcessRawDataThresholdInBytes bytes of data is received
 EnablePlotting = 1;                             %set 0 in order to disable plotting of taken variables (for live visualization)
 DataSampleRate = 2500;                          %this used for determinining the tag on the plots
 TheSerialChannelDevice = 'COM5';                %set the serial channel device, (this value can be found the device manager)
@@ -32,6 +32,7 @@ TheTagValue = zeros(6,4);                       %initialize the variable
 
 SerialChannel = serial(TheSerialChannelDevice,'BaudRate',BaudRateValue,'Parity','none','Timeout',6);    %open the serial channel
 SerialChannel.BytesAvailableFcnCount = CallbackFunctionByteNumber;  %set the callback function byte number
+SerialChannel.InputBufferSize = ProcessRawDataThresholdInBytes*2;
 SerialChannel.BytesAvailableFcnMode = "byte";                       %set the callback function type
 SerialChannel.BytesAvailableFcn = @SerialReadCallbackFunction;      %state the callback function to be called
 fopen(SerialChannel);                                               %open the serial channel port
@@ -64,6 +65,9 @@ while(1)
             end
             if (EnablePlotting==1)  %for live visualization
                 for i=1:NumberOfFloatsPerPacket
+                    if(numel(TheDataConvertedValues)==1)
+                       break; 
+                    end
                     subplot(3,2,i)
                     plot((1:numel(TheDataConvertedValues(i,:)))/DataSampleRate,TheDataConvertedValues(i,:));
                     grid on
@@ -84,7 +88,7 @@ while(1)
             TheRawDataIsInProcessFlag = 0;
         end
     else
-        pause(0.01);
+        pause(0.001);
     end
     
 end

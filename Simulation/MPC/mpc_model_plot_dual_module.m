@@ -234,3 +234,36 @@ legend('Module 1','Module 2')
 set(gca,'FontSize',FontSize,'FontWeight','bold')
 xlim([2.5 2.55])
 grid on
+
+%%
+% close all
+FontSize = 16;
+figure
+subplot(2,1,1)
+hold all
+plot(out.Simout_PhaseCurrents_abc.M1_Ia,'LineWidth',2);
+plot(out.Simout_PhaseCurrents_abc.M1_Ib,'LineWidth',2);
+plot(out.Simout_PhaseCurrents_abc.M1_Ic,'LineWidth',2);
+hold off
+xlabel('Time (sec)','FontSize',FontSize,'FontWeight','bold');
+ylabel('Current (A)','FontSize',FontSize,'FontWeight','bold');
+title('Iabc M1')
+legend('Ia1','Ib1','Ic1')
+set(gca,'FontSize',FontSize,'FontWeight','bold')
+xlim([0.47 0.53])
+ylim([-10 10])
+grid on
+subplot(2,1,2)
+hold all
+plot(out.Simout_PhaseCurrents_abc.M2_Ia,'LineWidth',2);
+plot(out.Simout_PhaseCurrents_abc.M2_Ib,'LineWidth',2);
+plot(out.Simout_PhaseCurrents_abc.M2_Ic,'LineWidth',2);
+hold off
+xlabel('Time (sec)','FontSize',FontSize,'FontWeight','bold');
+ylabel('Current (A)','FontSize',FontSize,'FontWeight','bold');
+title('Iabc M2')
+legend('Ia2','Ib2','Ic2')
+set(gca,'FontSize',FontSize,'FontWeight','bold')
+xlim([0.45 0.55])
+ylim([-10 10])
+grid on

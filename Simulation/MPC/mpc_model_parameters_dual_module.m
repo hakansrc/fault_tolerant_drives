@@ -102,3 +102,4 @@ Tload1 = 20; %Nm
 Tload2 = 20;
 TloadUpdateTime = 2;
 M1_FaultTime = 0.5;
+M2_FaultTime = 10;

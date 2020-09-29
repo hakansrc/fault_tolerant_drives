@@ -1,44 +1,30 @@
 #include <F2837xD_Device.h>
 #include <F2837xD_Examples.h>
+#include "CustomTypeDefs.h"
+#include <math.h>
 
-#define P_COEFFICIENT       12.5    /*these values are random for now*/
-#define I_COEFFICIENT       12.5    /*these values are random for now*/
-#define PI_TS_COEFFICIENT   12.5    /*these values are random for now*/
+using namespace std;
+
+
 
 volatile uint64_t    ui64_timemeas_execution_beginning = 0;
 volatile uint64_t    ui64_timemeas_execution_total = 0;
 volatile uint64_t    ui64PI_execution_beginning = 0;
 volatile uint64_t    ui64PI_execution_total = 0;
+volatile uint64_t    ui64ParkTransform_execution_beginning = 0;
+volatile uint64_t    ui64ParkTransform_execution_total = 0;
 
-typedef struct{
-    float P_coeff;
-    float I_coeff;
-    float Ts;
-    float *fptrOutput;
-    float *fptrOutput_prev;
-    float *fptrInput;
-    float *fptrInput_prev;
-}PID_Parameters;
-typedef struct{
-    float   *fptrPhaseA;
-    float   *fptrPhaseB;
-    float   *fptrPhaseC;
-    float   *angleRad;
-    float   *fptrDvalue;
-    float   *fptrQvalue;
-}ParkTransformValues;
+
 
 
 
 volatile PID_Parameters PI_iq;
-float fPI_Input = 25.2;
-float fPI_Input_prev = 32.5;
-float fPI_Output = 22.22;
-float fPI_Output_prev = 33.33;
+volatile ModuleParameters Module1Parameters;
 
 
 
-inline void Run_PI_Controller(volatile PID_Parameters *pidparams);
+inline void Run_PI_Controller(volatile PID_Parameters &pidparams);
+inline void CalculateParkTransform(volatile ModuleParameters& moduleparameters);
 
 __interrupt void cpu_timer0_isr(void);  /*prototype of the ISR functions*/
 __interrupt void cpu_timer1_isr(void);  /*prototype of the ISR functions*/
@@ -112,10 +98,10 @@ int main(void)
     PI_iq.I_coeff   = I_COEFFICIENT;
     PI_iq.P_coeff   = P_COEFFICIENT;
     PI_iq.Ts        = PI_TS_COEFFICIENT;
-    PI_iq.fptrInput = &fPI_Input;
-    PI_iq.fptrInput_prev = &fPI_Input_prev;
-    PI_iq.fptrOutput = &fPI_Output;
-    PI_iq.fptrOutput_prev = &fPI_Output_prev;
+    PI_iq.Input = 22.1;
+    PI_iq.Input_prev = 21.5;
+    PI_iq.Output = 56.234;
+    PI_iq.Output_prev = 234.234;
 
 
 
@@ -145,12 +131,32 @@ __interrupt void cpu_timer2_isr(void)
     ui64_timemeas_execution_total = (IpcRegs.IPCCOUNTERL + IpcRegs.IPCCOUNTERH) - ui64_timemeas_execution_beginning;
 
     ui64PI_execution_beginning =  IpcRegs.IPCCOUNTERL + IpcRegs.IPCCOUNTERH;
-    Run_PI_Controller(&PI_iq);  /*execution of this PI controller takes around 29 clock cycles (may be reduced even further when declared as macro)*/
+    Run_PI_Controller(PI_iq);  /*execution of this PI controller takes around 29 clock cycles (may be reduced even further when declared as macro)*/
     ui64PI_execution_total = (IpcRegs.IPCCOUNTERL + IpcRegs.IPCCOUNTERH) - ui64PI_execution_beginning;
 
+    ui64ParkTransform_execution_beginning =  IpcRegs.IPCCOUNTERL + IpcRegs.IPCCOUNTERH;
+    CalculateParkTransform(Module1Parameters);  /*execution of this parktransform controller takes around 58 clock cycles (may be reduced even further when declared as macro)*/
+    ui64ParkTransform_execution_total = (IpcRegs.IPCCOUNTERL + IpcRegs.IPCCOUNTERH) - ui64ParkTransform_execution_beginning;
 }
 
-inline void  Run_PI_Controller(volatile PID_Parameters *pidparams)
+inline void Run_PI_Controller(volatile PID_Parameters &pidparams)
 {
-    *(pidparams->fptrOutput) = *(pidparams->fptrOutput_prev) + pidparams->P_coeff*(*(pidparams->fptrInput)-*(pidparams->fptrInput_prev))+ (pidparams->Ts)/2.0*((pidparams->I_coeff))*(*(pidparams->fptrInput)+*(pidparams->fptrInput_prev));
+    pidparams.Output = pidparams.Output_prev + pidparams.P_coeff*(pidparams.Input-pidparams.Input_prev)+ (pidparams.Ts)/2.0*pidparams.I_coeff*(pidparams.Input+pidparams.Input_prev);
+}
+inline void CalculateParkTransform(volatile ModuleParameters& moduleparameters)
+{
+    moduleparameters.PhaseCurrent.transformed.Dvalue = 0.66667*(moduleparameters.PhaseCurrent.PhaseA*sinf(moduleparameters.Angle.Electrical)\
+            +moduleparameters.PhaseCurrent.PhaseB*sinf(moduleparameters.Angle.Electrical-0.66667*PI/*2*PI/3*/)\
+            +moduleparameters.PhaseCurrent.PhaseC*sinf(moduleparameters.Angle.Electrical+0.66667*PI/*2*PI/3*/));
+    moduleparameters.PhaseCurrent.transformed.Qvalue = 0.66667*(moduleparameters.PhaseCurrent.PhaseA*cosf(moduleparameters.Angle.Electrical)\
+            +moduleparameters.PhaseCurrent.PhaseB*cosf(moduleparameters.Angle.Electrical-0.66667*PI/*2*PI/3*/)\
+            +moduleparameters.PhaseCurrent.PhaseC*cosf(moduleparameters.Angle.Electrical+0.66667*PI/*2*PI/3*/));
+#if 0
+    moduleparameters.PhaseCurrent.ZeroValue = 0.66667*0.5*(moduleparameters.PhaseCurrent.PhaseA\
+            +moduleparameters.PhaseCurrent.PhaseB\
+            +moduleparameters.PhaseCurrent.PhaseC);
+#endif
+    //ids = 2/3*(ias*sin(ref_frame_position)+ibs*sin(ref_frame_position-2*pi/3)+ics*sin(ref_frame_position+2*pi/3));
+    //iqs =  2/3*(ias*cos(ref_frame_position)+ibs*cos(ref_frame_position-2*pi/3)+ics*cos(ref_frame_position+2*pi/3));
+    //i0 = 2/3*1/2*(ias+ibs+ics);
 }

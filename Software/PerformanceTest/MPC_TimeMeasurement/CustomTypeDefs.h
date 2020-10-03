@@ -15,6 +15,18 @@
 #define PI                  3.1415926
 #define TWO_PI_OVER_THREE   2.09439510
 
+#define NUMBEROFMPCLOOPS    40
+#define OPT_FSW_MAX         40000
+#define OPT_FSW_MIN         1000
+#define OPT_FSW_STEP        1000
+
+#define IQRIPPLECOEFF       10000.0
+#define IDREFCOEFF          10000.0
+#define IQREFCOEFF          15.0
+#define FSWCOEFF            1500.0
+
+
+
 typedef struct{
     float Dvalue;
     float Qvalue;
@@ -22,10 +34,25 @@ typedef struct{
 }Transformed;
 
 typedef struct{
+    float Vdc;
+}VoltageMeasured;
+
+typedef struct{
     float PhaseA;
     float PhaseB;
     float PhaseC;
     Transformed transformed;
+}CurrentMeasured;
+
+typedef struct{
+#if 0
+    float PhaseA;               /*remove*/
+    float PhaseB;               /*remove*/
+    float PhaseC;               /*remove*/
+    Transformed transformed;    /*remove*/
+#endif
+    VoltageMeasured Voltage;
+    CurrentMeasured Current;
 }MeasuredParams;
 
 typedef struct{
@@ -42,6 +69,7 @@ typedef struct{
     float   Valfa;
     float   Vbeta;
     float   VoltageVectorAngleRad;
+    float   VoltageVectorAngleRad_Mod;
     float   Magnitude;
     float   ma;
     float   SvpwmT1;
@@ -51,6 +79,9 @@ typedef struct{
     float   VoltageDuring_SvpwmT2;
     float   VoltageDuring_SvpwmT0;
     float   Iq_Ripple_Prediction;
+    float   Iq_Delta_DuringT1;
+    float   Iq_Delta_DuringT2;
+    float   Iq_Delta_DuringT0;
     float   IdPrediction;
     float   IqPrediction;
     float   TePrediction;
@@ -63,9 +94,17 @@ typedef struct{
 typedef Angle AngularSpeed;
 
 typedef struct{
-    MeasuredParams          PhaseCurrent;
-    PredictionParameters    FirstHorizon;
-    PredictionParameters    SecondHorizon;
+    float   Iq;
+    float   Id;
+}ReferenceValues;
+
+typedef struct{
+    MeasuredParams          Measured;
+    PredictionParameters    FirstHorizon[NUMBEROFMPCLOOPS];
+    PredictionParameters    SecondHorizon[NUMBEROFMPCLOOPS];
+    float                   OptimizationFsw[NUMBEROFMPCLOOPS];
+    float                   Cost[NUMBEROFMPCLOOPS];
+    ReferenceValues         Reference;
     Angle                   Angle;
     AngularSpeed            AngularSpeed;
 }ModuleParameters;

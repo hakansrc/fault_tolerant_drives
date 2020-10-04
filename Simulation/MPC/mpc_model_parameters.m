@@ -72,7 +72,7 @@ MeanLd = (1/12)*(Module1Phase_A_Ld+Module1Phase_B_Ld+Module1Phase_C_Ld+...
 
 %% Inverter parameters
 DCLINK_Cap = 1000e-12;
-Vdc = 270;
+Vdc = 50;
 ma = 0.9;
 sw_frequency = 40000;
 intangle1 = 0;
@@ -89,7 +89,7 @@ SpeedRef1 = 50; % RPM
 SpeedRef2 = 100;
 SpeedRefUpdateTime = 0.25;
 Tload1 = 5; %Nm
-Tload2 = 5;
+Tload2 = 10;
 TloadUpdateTime = 0.5;
 FaultTime = 50;
 PmaxPerModule = 2000;

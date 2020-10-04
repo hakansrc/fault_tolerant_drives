@@ -8,22 +8,19 @@
 #ifndef CUSTOMTYPEDEFS_H_
 #define CUSTOMTYPEDEFS_H_
 
-#define P_COEFFICIENT       12.5    /*these values are random for now*/
-#define I_COEFFICIENT       12.5    /*these values are random for now*/
-#define PI_TS_COEFFICIENT   12.5    /*these values are random for now*/
 
-#define PI                  3.1415926
-#define TWO_PI_OVER_THREE   2.09439510
 
-#define NUMBEROFMPCLOOPS    40
-#define OPT_FSW_MAX         40000
+
+
+#define NUMBEROFMPCLOOPS    10
+#define OPT_FSW_MAX         10000
 #define OPT_FSW_MIN         1000
 #define OPT_FSW_STEP        1000
 
-#define IQRIPPLECOEFF       10000.0
-#define IDREFCOEFF          10000.0
-#define IQREFCOEFF          15.0
-#define FSWCOEFF            1500.0
+#define IQRIPPLECOEFF       100000.0
+#define IQREFCOEFF          10000.0
+#define IDREFCOEFF          15.0
+#define FSWCOEFF            1250.0
 
 
 
@@ -102,6 +99,8 @@ typedef struct{
     MeasuredParams          Measured;
     PredictionParameters    FirstHorizon[NUMBEROFMPCLOOPS];
     PredictionParameters    SecondHorizon[NUMBEROFMPCLOOPS];
+    unsigned int            MinimumCostIndex;
+    float                   MinimumCostValue;
     float                   OptimizationFsw[NUMBEROFMPCLOOPS];
     float                   Cost[NUMBEROFMPCLOOPS];
     ReferenceValues         Reference;
@@ -117,6 +116,8 @@ typedef struct{
     float Output_prev;
     float Input;
     float Input_prev;
+    float SaturationMax;
+    float SaturationMin;
 }PID_Parameters;
 
 #endif /* CUSTOMTYPEDEFS_H_ */

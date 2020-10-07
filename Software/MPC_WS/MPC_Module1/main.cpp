@@ -110,6 +110,49 @@ void InitializeEpwm1Registers(void)
 {
     /*TODO, make sync operation of the PWM modules*/
     /*TODO use shadow registers on both CMPA and PRDLD*/
+    /*TODO check which one of these protected with EALLOW EDIS*/
+    EPwm1Regs.TBCTL.bit.FREE_SOFT = 0b10;
+    EPwm1Regs.TBCTL.bit.PHSDIR = TB_UP;
+    EPwm1Regs.TBCTL.bit.CLKDIV = TB_DIV1;
+    EPwm1Regs.TBCTL.bit.HSPCLKDIV = TB_DIV1;
+    EPwm1Regs.TBCTL.bit.SWFSYNC = 0;
+    EPwm1Regs.TBCTL.bit.SYNCOSEL = TB_CTR_ZERO;
+    EPwm1Regs.TBCTL.bit.PRDLD = TB_SHADOW;
+    EPwm1Regs.TBCTL.bit.PHSEN = TB_ENABLE;
+    EPwm1Regs.TBCTL.bit.CTRMODE = TB_COUNT_UPDOWN;
+
+    EPwm1Regs.TBCTL2.bit.PRDLDSYNC = 0; /*the period will be loaded from shadow to active after TBCTR = 0*/
+    EPwm1Regs.TBCTL2.bit.SYNCOSELX = 0; /*this is unnecessary*/
+    EPwm1Regs.TBCTL2.bit.OSHTSYNC = 0;  /*this is unnecessary*/
+    EPwm1Regs.TBCTL2.bit.OSHTSYNCMODE = 0; /*one shot sync is disabled*/
+
+    EPwm1Regs.TBCTR = 0;
+
+    EPwm1Regs.TBSTS.bit.CTRMAX = 0; /*this is unnecessary*/
+    EPwm1Regs.TBSTS.bit.SYNCI = 0;  /*this is unnecessary*/
+    EPwm1Regs.TBSTS.bit.CTRDIR = 0;  /*this is unnecessary*/
+
+    EPwm1Regs.CMPCTL.bit.LOADBSYNC = 0; /*Shadow to Active Load of CMPB:CMPBHR occurs according to LOADBMODE */
+    EPwm1Regs.CMPCTL.bit.LOADASYNC = 0; /*Shadow to Active Load of CMPA:CMPAHR occurs according to LOADAMODE */
+    //EPwm1Regs.CMPCTL.bit.SHDWBFULL = 0; /*you can check if the shadow register is filled or not*/
+    //EPwm1Regs.CMPCTL.bit.SHDWAFULL = 0; /*you can check if the shadow register is filled or not*/
+    EPwm1Regs.CMPCTL.bit.SHDWBMODE = CC_SHADOW;
+    EPwm1Regs.CMPCTL.bit.SHDWAMODE = CC_SHADOW;
+    EPwm1Regs.CMPCTL.bit.LOADBMODE = CC_CTR_ZERO;
+    EPwm1Regs.CMPCTL.bit.LOADAMODE = CC_CTR_ZERO;
+#if 0   /*CMPC or CMPD will not be used, therefore they left uninitialized*/
+    EPwm1Regs.CMPCTL2.bit.LOADDSYNC = 0; /*Shadow to Active Load of CMPB:CMPBHR occurs according to LOADBMODE */
+    EPwm1Regs.CMPCTL2.bit.LOADCSYNC = 0; /*Shadow to Active Load of CMPA:CMPAHR occurs according to LOADAMODE */
+    //EPwm1Regs.CMPCTL.bit.SHDWBFULL = 0; /*you can check if the shadow register is filled or not*/
+    //EPwm1Regs.CMPCTL.bit.SHDWAFULL = 0; /*you can check if the shadow register is filled or not*/
+    EPwm1Regs.CMPCTL2.bit.SHDWDMODE = CC_SHADOW;
+    EPwm1Regs.CMPCTL2.bit.SHDWCMODE = CC_SHADOW;
+    EPwm1Regs.CMPCTL2.bit.LOADDMODE = CC_CTR_ZERO;
+    EPwm1Regs.CMPCTL2.bit.LOADCMODE = CC_CTR_ZERO;
+#endif
+
+
+#if 0
     EPwm1Regs.TBCTL.all = 0x00;
     EPwm1Regs.TBCTL.bit.CTRMODE = TB_COUNT_UPDOWN;  // Set counter to be up-down
     EPwm1Regs.TBCTL.bit.PHSDIR = TB_UP;
@@ -138,7 +181,7 @@ void InitializeEpwm1Registers(void)
     EPwm1Regs.ETSEL.bit.INTEN = 1;  // Enable INT
     EPwm1Regs.ETPS.all = 0x00;
     EPwm1Regs.ETPS.bit.INTPRD = 1;  // Generate INT on first event
-
+#endif
 
 
 }

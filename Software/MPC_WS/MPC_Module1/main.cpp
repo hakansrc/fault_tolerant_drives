@@ -7,8 +7,7 @@
 #include "ConstantParameters.h"
 #include "ControllerParameters.h"
 
-#define SYSCLKFREQUENCY 200000000   /*Hz*/
-#define INITIALPWMFREQ  5000        /*Hz*/
+
 
 __interrupt void cpu_timer0_isr(void);  /*prototype of the ISR functions*/
 __interrupt void cpu_timer1_isr(void);  /*prototype of the ISR functions*/
@@ -151,37 +150,47 @@ void InitializeEpwm1Registers(void)
     EPwm1Regs.CMPCTL2.bit.LOADCMODE = CC_CTR_ZERO;
 #endif
 
+    /*TODO check those deadtimes with an oscilloscope*/
+    /*TODO check how do we apply the duty cycles*/
+    EPwm1Regs.DBCTL.all = 0;
+    EPwm1Regs.DBCTL.bit.OUT_MODE = DB_FULL_ENABLE;          /*deadband is set for both fed and red*/
+    EPwm1Regs.DBCTL.bit.POLSEL = DB_ACTV_HIC;               /*EPWmxB is inverted*/
+    EPwm1Regs.DBFED.bit.DBFED = DEADBAND_FED/SYSCLKPERIOD;
+    EPwm1Regs.DBRED.bit.DBRED = DEADBAND_RED/SYSCLKPERIOD;
+    EPwm1Regs.DBCTL2.all = 0;                               /*has no useful setting*/
 
-#if 0
-    EPwm1Regs.TBCTL.all = 0x00;
-    EPwm1Regs.TBCTL.bit.CTRMODE = TB_COUNT_UPDOWN;  // Set counter to be up-down
-    EPwm1Regs.TBCTL.bit.PHSDIR = TB_UP;
-    EPwm1Regs.TBCTL.bit.CLKDIV = 0;
-    EPwm1Regs.TBCTL.bit.HSPCLKDIV = 0;
+    /*action qualifier settings will be set once, therefore shadowing is unnecessary.*/
+    EPwm1Regs.AQCTL.all = 0;
 
-    EPwm1Regs.TBPRD = SYSCLKFREQUENCY / (INITIALPWMFREQ * 2);
-    EPwm1Regs.TBCTR = 0;
-    /*These bits select the time base clock pre-scale value (TBCLK = EPWMCLK/(HSPCLKDIV * CLKDIV):*/
-    EPwm1Regs.TBCTL.bit.CLKDIV = TB_DIV1;
-    EPwm1Regs.TBCTL.bit.HSPCLKDIV = TB_DIV1;
+    /*No trip zone is set for now*/
+    EPwm1Regs.AQTSRCSEL.all = 0;
+
+    /*NO chopping is needed*/
+    EPwm1Regs.PCCTL.all = 0;
+
+    /*HRPWM will not be used*/
+    EPwm1Regs.HRCNFG.all = 0;
+    EPwm1Regs.HRCNFG2.all = 0;
+    EPwm1Regs.HRPWR.bit.CALPWRON = 0;
+    EPwm1Regs.HRPCTL.all = 0;
+
+    EPwm1Regs.AQCTLA.all = 0;
+    EPwm1Regs.AQCTLA.bit.CAU = AQ_SET;
+    EPwm1Regs.AQCTLA.bit.CAD = AQ_CLEAR;
+
+    EPwm1Regs.TBPHS.bit.TBPHS = 0;
+
+    EPwm1Regs.TBPRD = SYSCLKFREQUENCY/ (INITIALPWMFREQ*2);
+    EPwm1Regs.CMPA.bit.CMPA = EPwm1Regs.TBPRD / 2;
+
+    /*TODO how to do tripzone?, how are we going to do the protection?
+     * consider when the inverter arrives*/
+    EPwm1Regs.ETSEL.bit.SOCAEN = 1; /*enable EPWMxSOCA signal*/
+    EPwm1Regs.ETSEL.bit.SOCASEL = 1;
+    EPwm1Regs.ETSEL.bit.INTEN = 1;  /*enable pwm interrupt*/
+    EPwm1Regs.ETSEL.bit.INTSEL = 1; /*interrupt occurs when TBCTR = 0*/
 
 
-
-    EPwm1Regs.CMPCTL.all = 0x00;
-    EPwm1Regs.CMPCTL.bit.SHDWAMODE = 1;         //only active registers are used
-
-    EPwm1Regs.AQCTLA.all = 0x00;
-    EPwm1Regs.AQCTLA.bit.CAU = AQ_SET;      //set high
-    EPwm1Regs.AQCTLA.bit.CAD = AQ_CLEAR;    //set low
-
-    EPwm1Regs.CMPA.bit.CMPA = EPwm1Regs.TBPRD / 2;    // Set compare A value
-
-    EPwm1Regs.ETSEL.all = 0x00;
-    EPwm1Regs.ETSEL.bit.INTSEL = 1; // When TBCTR == 0
-    EPwm1Regs.ETSEL.bit.INTEN = 1;  // Enable INT
-    EPwm1Regs.ETPS.all = 0x00;
-    EPwm1Regs.ETPS.bit.INTPRD = 1;  // Generate INT on first event
-#endif
 
 
 }

@@ -12,6 +12,8 @@
 #define I_COEFFICIENT       12.5    /*these values are random for now*/
 #define PI_TS_COEFFICIENT   12.5    /*these values are random for now*/
 
+#define IDREF               0.0
+
 
 
 #endif /* CONTROLLERPARAMETERS_H_ */

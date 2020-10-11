@@ -42,12 +42,6 @@ typedef struct{
 }CurrentMeasured;
 
 typedef struct{
-#if 0
-    float PhaseA;               /*remove*/
-    float PhaseB;               /*remove*/
-    float PhaseC;               /*remove*/
-    Transformed transformed;    /*remove*/
-#endif
     VoltageMeasured Voltage;
     CurrentMeasured Current;
 }MeasuredParams;

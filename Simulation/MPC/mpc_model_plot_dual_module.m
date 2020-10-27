@@ -342,8 +342,8 @@ grid on
 %%
 FontSize = 16;
 figure
-refs_xlim = [0 2];
-refs_ylim = [-2 5];
+refs_xlim = [1.8 2];
+refs_ylim = [-10 16];
 subplot(2,2,1)
 plot(out.Simout_Reference_Idq.M1_iqref,'LineWidth',2);
 hold on

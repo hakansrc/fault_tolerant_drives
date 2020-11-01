@@ -160,7 +160,7 @@ subplot(2,2,1)
 plot(out.Simout_losses.M1_loss,'LineWidth',2);
 title('M1 loss')
 xlim(loss_xlim)
-ylim([0 180])
+ylim([0 120])
 grid on
 xlabel('Time (sec)','FontSize',FontSize,'FontWeight','bold');
 ylabel('Loss (W)','FontSize',FontSize,'FontWeight','bold');
@@ -169,7 +169,7 @@ subplot(2,2,2)
 plot(out.Simout_losses.M2_loss,'LineWidth',2);
 title('M2 loss')
 xlim(loss_xlim)
-ylim([0 180])
+ylim([0 120])
 grid on
 xlabel('Time (sec)','FontSize',FontSize,'FontWeight','bold');
 ylabel('Loss (W)','FontSize',FontSize,'FontWeight','bold');
@@ -178,7 +178,7 @@ subplot(2,2,3)
 plot(out.Simout_losses.Total_loss,'LineWidth',2);
 title('Total loss')
 xlim(loss_xlim)
-ylim([0 180])
+ylim([0 120])
 grid on
 xlabel('Time (sec)','FontSize',FontSize,'FontWeight','bold');
 ylabel('Loss (W)','FontSize',FontSize,'FontWeight','bold');
@@ -187,7 +187,7 @@ subplot(2,2,4)
 plot(out.Simout_losses.Mean_loss,'LineWidth',2);
 title('Mean loss')
 xlim(loss_xlim)
-ylim([0 180])
+ylim([0 120])
 grid on
 xlabel('Time (sec)','FontSize',FontSize,'FontWeight','bold');
 ylabel('Loss (W)','FontSize',FontSize,'FontWeight','bold');

@@ -245,7 +245,7 @@ void InitializeEpwm1Registers(void)
     EPwm1Regs.TBPHS.bit.TBPHS = 0;
 
     EPwm1Regs.TBPRD = SYSCLKFREQUENCY/ (INITIALPWMFREQ*2);
-    EPwm1Regs.CMPA.bit.CMPA = EPwm1Regs.TBPRD / 2;
+    EPwm1Regs.CMPA.bit.CMPA = EPwm1Regs.TBPRD / 5;
 
     /*TODO how to do tripzone?, how are we going to do the protection?
      * consider when the inverter arrives*/
@@ -682,7 +682,6 @@ void InitializationRoutine(void)
     EDIS;
 
 
-#if 0
     GPIO_WritePin(124, 1);  // Enable DRV
     DELAY_US(50000);                        // delay to allow DRV830x supplies to ramp up
     InitDRV8305(&Device1Configuration);
@@ -690,7 +689,6 @@ void InitializationRoutine(void)
     {
         faultcounter++;  // hang on if drv init is faulty
     }
-#endif
     SetupCmpssProtections();
     EQEPSetup();
 }

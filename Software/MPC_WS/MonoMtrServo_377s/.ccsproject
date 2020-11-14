@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<?ccsproject version="1.0"?>
+<projectOptions>
+	<deviceFamily value="C2000"/>
+	<isTargetManual value="true"/>
+	<origin value="C:/ti/controlSUITE/development_kits/TIDM-SERVO-LAUNCHXS/MonoMtrServo_377s_v1_00_00_00"/>
+</projectOptions>

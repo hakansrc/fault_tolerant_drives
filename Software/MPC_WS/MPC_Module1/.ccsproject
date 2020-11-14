@@ -14,4 +14,5 @@
 	<templateProperties value="id=com.ti.common.project.core.emptyProjectWithMainTemplate"/>
 	<filesToOpen value="main.c"/>
 	<origin value="C:/Users/hakan/Documents/GitHub/fault_tolerant_drives/Software/MPC_WS/MPC_Module1"/>
+	<isTargetManual value="false"/>
 </projectOptions>

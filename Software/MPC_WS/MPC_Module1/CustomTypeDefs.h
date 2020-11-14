@@ -24,6 +24,7 @@
 
 
 
+
 typedef struct{
     float Dvalue;
     float Qvalue;
@@ -113,5 +114,23 @@ typedef struct{
     float SaturationMax;
     float SaturationMin;
 }PID_Parameters;
+
+enum {
+	drv8301_gain_10 = 0,
+	drv8301_gain_20 = 1,
+	drv8301_gain_40 = 2,
+	drv8301_gain_80 = 3
+};
+
+struct  DRV830x_SPI_WRITE_WORD_BITS {       // bit    	description
+   Uint16 DATA:11;          				// 10:0		FIFO reset
+   Uint16 ADDRESS:4;        				// 14:11	Enhancement enable
+   Uint16 R_W:1;          					// 15		R/W
+};
+union DRV830x_SPI_WRITE_WORD_REG {
+   Uint16               				all;
+   struct DRV830x_SPI_WRITE_WORD_BITS	bit;
+};
+
 
 #endif /* CUSTOMTYPEDEFS_H_ */

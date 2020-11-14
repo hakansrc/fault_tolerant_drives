@@ -8,6 +8,7 @@
 #include "MachineParameters.h"
 #include "ConstantParameters.h"
 #include "ControllerParameters.h"
+#include "DRV8305_defs.h"
 
 /*      Before starting to using these code, followings must be tested
  * 1-   ADC     readings
@@ -27,6 +28,8 @@ PID_Parameters      PI_iq;
 unsigned int        StartOperation  = 0; /*if this is 0, then no operation will be performed. It will be set inside the debugger*/
 unsigned long int   BlankCounter    = 0;
 unsigned int        OperationMode   = 0;  /*this will be changed */
+DRV8305_Vars        Device1Configuration;
+
 
 
 __interrupt void cpu_timer0_isr(void);  /*prototype of the ISR functions*/
@@ -49,10 +52,19 @@ static inline void ExecuteSecondPrediction(ModuleParameters& moduleparams, unsig
 void GetEncoderReadings(ModuleParameters& moduleparams);
 void GetAdcReadings(ModuleParameters& moduleparams);
 void SetupCmpssProtections(void);
+void InitSpiDrv8305Gpio(void);
+void InitSpiRegs_DRV830x(volatile struct SPI_REGS *s);
+void InitDRV8305Regs(DRV8305_Vars * motor);
+Uint16 DRV8305_SPI_Write(DRV8305_Vars  * deviceptr, Uint16 address);
+Uint16 DRV8305_SPI_Read(DRV8305_Vars  * deviceptr, Uint16 address);
+Uint16 SPI_Driver(volatile struct SPI_REGS *s, Uint16 data);
+void InitDRV8305(DRV8305_Vars * deviceptr);
+
 /**
  * main.c
  */
 Uint32 Epwm1Counter = 0;
+Uint32  faultcounter = 0;
 int main(void)
 {
 
@@ -73,10 +85,27 @@ int main(void)
     CpuSysRegs.PCLKCR0.bit.GTBCLKSYNC = 0;  /*stop the global TimeBase clock for later synchronization*/
     EDIS;
 
+    EALLOW;
+    GpioCtrlRegs.GPAGMUX2.bit.GPIO31 = 0;
+    GpioCtrlRegs.GPAMUX2.bit.GPIO31 = 0;
+    GpioCtrlRegs.GPBGMUX1.bit.GPIO34 = 0;
+    GpioCtrlRegs.GPBMUX1.bit.GPIO34 = 0;
+    GpioCtrlRegs.GPADIR.bit.GPIO31 = 1;
+    GpioCtrlRegs.GPBDIR.bit.GPIO34 = 1;
+    GpioDataRegs.GPASET.bit.GPIO31 = 1;
+    GpioDataRegs.GPBSET.bit.GPIO34 = 1;
+    EDIS;
+
     while(StartOperation==0)
     {
+        if((BlankCounter%10)==0)
+        {
+            GpioDataRegs.GPATOGGLE.bit.GPIO31 = 1;
+            GpioDataRegs.GPBTOGGLE.bit.GPIO34 = 1;
+        }
+
         BlankCounter++;
-        DELAY_US(10);
+        DELAY_US(100000);
     }
 
     /*Initialize cpu timers*/
@@ -484,6 +513,10 @@ void SetupGPIOs(void)
     GpioDataRegs.GPBCLEAR.bit.GPIO34 = 1;
     EDIS;
 
+
+
+
+
 }
 
 inline void Run_PI_Controller(PID_Parameters &pidparams)
@@ -629,16 +662,45 @@ void InitializationRoutine(void)
     InitializeEpwm2Registers();
     InitializeEpwm3Registers();
     InitializeADCs();
+    InitSpiDrv8305Gpio();
+    DELAY_US(100000);
+    InitSpiRegs_DRV830x(&SpiaRegs);
+    InitDRV8305Regs(&Device1Configuration);
+
+    EALLOW; /*configure GPIO124 to be the EN_GATE*/
+    GpioDataRegs.GPDCLEAR.bit.GPIO124 = 1;
+    GpioCtrlRegs.GPDGMUX2.bit.GPIO124 = 0;
+    GpioCtrlRegs.GPDMUX2.bit.GPIO124 = 0;
+    GpioCtrlRegs.GPDDIR.bit.GPIO124 = 1;
+    EDIS;
+
+    EALLOW; /*configure GPIO125 to be the WAKE*/
+    GpioDataRegs.GPDCLEAR.bit.GPIO125 = 1;
+    GpioCtrlRegs.GPDGMUX2.bit.GPIO125 = 0;
+    GpioCtrlRegs.GPDMUX2.bit.GPIO125 = 0;
+    GpioCtrlRegs.GPDDIR.bit.GPIO125 = 1;
+    EDIS;
+
+
+#if 0
+    GPIO_WritePin(124, 1);  // Enable DRV
+    DELAY_US(50000);                        // delay to allow DRV830x supplies to ramp up
+    InitDRV8305(&Device1Configuration);
+    while (Device1Configuration.DRV_fault)
+    {
+        faultcounter++;  // hang on if drv init is faulty
+    }
+#endif
     SetupCmpssProtections();
     EQEPSetup();
 }
 void InitializeADCs(void)
 {
     EALLOW;
-    AdcaRegs.ADCCTL2.bit.PRESCALE = 6;      //ADCCLK = InputClokc/1.0
-    AdcbRegs.ADCCTL2.bit.PRESCALE = 6;      //ADCCLK = InputClokc/1.0
-    AdccRegs.ADCCTL2.bit.PRESCALE = 6;      //ADCCLK = InputClokc/1.0
-    AdcdRegs.ADCCTL2.bit.PRESCALE = 6;      //ADCCLK = InputClokc/1.0
+    AdcaRegs.ADCCTL2.bit.PRESCALE = 6;      //ADCCLK = InputClokc/6.0
+    AdcbRegs.ADCCTL2.bit.PRESCALE = 6;      //ADCCLK = InputClokc/6.0
+    AdccRegs.ADCCTL2.bit.PRESCALE = 6;      //ADCCLK = InputClokc/6.0
+    AdcdRegs.ADCCTL2.bit.PRESCALE = 6;      //ADCCLK = InputClokc/6.0
 
     AdcaRegs.ADCCTL1.all = 0x00;            // ADC Control 1 Register
     AdcaRegs.ADCCTL1.bit.ADCPWDNZ = 1; // All analog circuitry inside the core is powered up
@@ -762,55 +824,60 @@ void InitializeADCs(void)
     AdccRegs.ADCINTSOCSEL2.all = 0x00; // ADC Interrupt SOC Selection 2 Register
     AdcdRegs.ADCINTSOCSEL2.all = 0x00; // ADC Interrupt SOC Selection 2 Register
 
-    /*VDC pin*/
-    AdcaRegs.ADCSOC0CTL.all = 0x00;
-    AdcaRegs.ADCSOC0CTL.bit.TRIGSEL = EPWM1_SOCA_TRG;   /*ePWM1 SocA is the trigger*/
-    AdcaRegs.ADCSOC0CTL.bit.CHSEL = 0xE;                /*This is Vdc pin for TIDA-00909 PCB*/
-    AdcaRegs.ADCSOC0CTL.bit.ACQPS = ACQPS_PERIOD;       /*TODO: This value should be tested*/
 
     /*Va pin*/
-    AdccRegs.ADCSOC0CTL.all = 0x00;
-    AdccRegs.ADCSOC0CTL.bit.TRIGSEL = EPWM1_SOCA_TRG;   /*ePWM1 SocA is the trigger*/    
-    AdccRegs.ADCSOC0CTL.bit.CHSEL = 0x3;                /*This is VA pin for TIDA-00909 PCB*/
-    AdccRegs.ADCSOC0CTL.bit.ACQPS = ACQPS_PERIOD;       /*TODO: This value should be tested*/
-    
+    AdcaRegs.ADCSOC0CTL.all = 0x00;
+    AdcaRegs.ADCSOC0CTL.bit.TRIGSEL = EPWM1_SOCA_TRG;   /*ePWM1 SocA is the trigger*/
+    AdcaRegs.ADCSOC0CTL.bit.CHSEL = 0xE;                /*This is Va pin for TIDA-00909 PCB*/
+    AdcaRegs.ADCSOC0CTL.bit.ACQPS = ACQPS_PERIOD;       /*TODO: This value should be tested*/
+
     /*Vb pin*/
-    AdcbRegs.ADCSOC0CTL.all = 0x00;
-    AdcbRegs.ADCSOC0CTL.bit.TRIGSEL = EPWM1_SOCA_TRG;   /*ePWM1 SocA is the trigger*/    
-    AdcbRegs.ADCSOC0CTL.bit.CHSEL = 0x3;                /*This is VB pin for TIDA-00909 PCB*/
-    AdcbRegs.ADCSOC0CTL.bit.ACQPS = ACQPS_PERIOD;       /*TODO: This value should be tested*/
+    AdccRegs.ADCSOC0CTL.all = 0x00;
+    AdccRegs.ADCSOC0CTL.bit.TRIGSEL = EPWM1_SOCA_TRG;   /*ePWM1 SocA is the trigger*/
+    AdccRegs.ADCSOC0CTL.bit.CHSEL = 0x3;                /*This is Vb pin for TIDA-00909 PCB*/
+    AdccRegs.ADCSOC0CTL.bit.ACQPS = ACQPS_PERIOD;       /*TODO: This value should be tested*/
 
     /*Vc pin*/
+    AdcbRegs.ADCSOC0CTL.all = 0x00;
+    AdcbRegs.ADCSOC0CTL.bit.TRIGSEL = EPWM1_SOCA_TRG;   /*ePWM1 SocA is the trigger*/
+    AdcbRegs.ADCSOC0CTL.bit.CHSEL = 0x3;                /*This is Vc pin for TIDA-00909 PCB*/
+    AdcbRegs.ADCSOC0CTL.bit.ACQPS = ACQPS_PERIOD;       /*TODO: This value should be tested*/
+
+
+    /*Vdc pin*/
     AdcaRegs.ADCSOC1CTL.all = 0x00;
-    AdcaRegs.ADCSOC1CTL.bit.TRIGSEL = EPWM1_SOCA_TRG;   /*ePWM1 SocA is the trigger*/    
-    AdcaRegs.ADCSOC1CTL.bit.CHSEL = 0x3;                /*This is VC pin for TIDA-00909 PCB*/
+    AdcaRegs.ADCSOC1CTL.bit.TRIGSEL = EPWM1_SOCA_TRG;   /*ePWM1 SocA is the trigger*/
+    AdcaRegs.ADCSOC1CTL.bit.CHSEL = 0x3;                /*This is Vdc pin for TIDA-00909 PCB*/
     AdcaRegs.ADCSOC1CTL.bit.ACQPS = ACQPS_PERIOD;       /*TODO: This value should be tested*/
+
 
     /*Ia pin*/
     AdccRegs.ADCSOC1CTL.all = 0x00;
-    AdccRegs.ADCSOC1CTL.bit.TRIGSEL = EPWM1_SOCA_TRG;   /*ePWM1 SocA is the trigger*/    
+    AdccRegs.ADCSOC1CTL.bit.TRIGSEL = EPWM1_SOCA_TRG;   /*ePWM1 SocA is the trigger*/
     AdccRegs.ADCSOC1CTL.bit.CHSEL = 0x2;                /*This is Ia pin for TIDA-00909 PCB*/
     AdccRegs.ADCSOC1CTL.bit.ACQPS = ACQPS_PERIOD;       /*TODO: This value should be tested*/
-    
+
     /*Ib pin*/
     AdcbRegs.ADCSOC1CTL.all = 0x00;
-    AdcbRegs.ADCSOC1CTL.bit.TRIGSEL = EPWM1_SOCA_TRG;   /*ePWM1 SocA is the trigger*/    
+    AdcbRegs.ADCSOC1CTL.bit.TRIGSEL = EPWM1_SOCA_TRG;   /*ePWM1 SocA is the trigger*/
     AdcbRegs.ADCSOC1CTL.bit.CHSEL = 0x2;                /*This is Ib pin for TIDA-00909 PCB*/
     AdcbRegs.ADCSOC1CTL.bit.ACQPS = ACQPS_PERIOD;       /*TODO: This value should be tested*/
 
     /*Ic pin*/
     AdcaRegs.ADCSOC2CTL.all = 0x00;
-    AdcaRegs.ADCSOC2CTL.bit.TRIGSEL = EPWM1_SOCA_TRG;   /*ePWM1 SocA is the trigger*/    
-    AdcaRegs.ADCSOC2CTL.bit.CHSEL = 0x2;                /*This is Ic pin for TIDA-00909 PCB*/
+    AdcaRegs.ADCSOC2CTL.bit.TRIGSEL = EPWM1_SOCA_TRG;   /*ePWM1 SocA is the trigger*/
+    AdcaRegs.ADCSOC2CTL.bit.CHSEL = 0x2;                /*This is Ib pin for TIDA-00909 PCB*/
     AdcaRegs.ADCSOC2CTL.bit.ACQPS = ACQPS_PERIOD;       /*TODO: This value should be tested*/
 
-    /*Vref pin*/
-    AdcaRegs.ADCSOC3CTL.all = 0x00;
-    AdcaRegs.ADCSOC3CTL.bit.TRIGSEL = EPWM1_SOCA_TRG;   /*ePWM1 SocA is the trigger*/    
-    AdcaRegs.ADCSOC3CTL.bit.CHSEL = 0;                  /*This is Vref pin for TIDA-00909 PCB*/
-    AdcaRegs.ADCSOC3CTL.bit.ACQPS = ACQPS_PERIOD;       /*TODO: This value should be tested*/
+    /*aaa pin*/
+    AdccRegs.ADCSOC3CTL.all = 0x00;
+    AdccRegs.ADCSOC3CTL.bit.TRIGSEL = EPWM1_SOCA_TRG;   /*ePWM1 SocA is the trigger*/
+    AdccRegs.ADCSOC3CTL.bit.CHSEL = 0x5;                /*This is Ib pin for TIDA-00909 PCB*/
+    AdccRegs.ADCSOC3CTL.bit.ACQPS = ACQPS_PERIOD;       /*TODO: This value should be tested*/
+
 
     EDIS;
+
 }
 void EQEPSetup(void)
 {
@@ -940,4 +1007,193 @@ void GetAdcReadings(ModuleParameters& moduleparams)
 void SetupCmpssProtections(void)
 {
     /*TODO*/
+}
+
+void InitSpiDrv8305Gpio(void)
+{
+    EALLOW;
+    GpioCtrlRegs.GPBMUX2.bit.GPIO58 = 3;    /*SPISIMOA*/
+    GpioCtrlRegs.GPBGMUX2.bit.GPIO58 = 3;   /*SPISIMOA*/
+    GpioCtrlRegs.GPBMUX2.bit.GPIO59 = 3;    /*SPISOMIA*/
+    GpioCtrlRegs.GPBGMUX2.bit.GPIO59 = 3;   /*SPISOMIA*/
+    GpioCtrlRegs.GPBMUX2.bit.GPIO60 = 3;    /*SPICLKA*/
+    GpioCtrlRegs.GPBGMUX2.bit.GPIO60 = 3;   /*SPICLKA*/
+    GpioCtrlRegs.GPBMUX2.bit.GPIO61 = 3;    /*SPISTEA*/
+    GpioCtrlRegs.GPBGMUX2.bit.GPIO61 = 3;   /*SPISTEA*/
+    EDIS;
+}
+
+// WARNING, why there is a TODO? we may need to fix it later
+// ****************************************************************************
+// ****************************************************************************
+//TODO SPI Configuration
+// ****************************************************************************
+// ****************************************************************************
+void InitSpiRegs_DRV830x(volatile struct SPI_REGS *s)
+{
+    s->SPICCR.bit.SPISWRESET = 0;       // Put SPI in reset state
+    s->SPICCR.bit.SPICHAR = 0xF;        // 16-bit character
+    s->SPICCR.bit.SPILBK = 0;           // loopback off
+    s->SPICCR.bit.CLKPOLARITY = 0;      // Rising edge without delay
+
+    s->SPICTL.bit.SPIINTENA = 0;        // disable SPI interrupt
+    s->SPICTL.bit.TALK = 1;             // enable transmission
+    s->SPICTL.bit.MASTER_SLAVE = 1;     // master
+    s->SPICTL.bit.CLK_PHASE = 0;        // Rising edge without delay
+    s->SPICTL.bit.OVERRUNINTENA = 0;    // disable reciever overrun interrupt
+
+    s->SPIBRR.bit.SPI_BIT_RATE = 19;        // SPICLK = LSPCLK / 4 (max SPICLK)
+
+    s->SPICCR.bit.SPISWRESET=1;         // Enable SPI
+}
+void InitDRV8305Regs(DRV8305_Vars * deviceptr)
+{
+    deviceptr->cntrl5_hs_gd.all = 0;
+    deviceptr->cntrl6_ls_gd.all = 0;
+    deviceptr->cntrl7_gd.all = 0;
+    deviceptr->cntrl9_IC_ops.all = 0;
+    deviceptr->cntrlA_shunt_amp.all = 0;
+    deviceptr->cntrlB_Vreg.all = 0;
+    deviceptr->cntrlC_Vds_SNS.all = 0;
+
+    deviceptr->cntrl5_hs_gd.bit.IDRIVEN_HS = drv8305_idriveN_hs_60mA;
+    deviceptr->cntrl5_hs_gd.bit.IDRIVEP_HS = drv8305_idriveP_hs_50mA;
+    deviceptr->cntrl5_hs_gd.bit.TDRIVEN    = drv8305_tdriveN_250nS;
+
+    deviceptr->cntrl6_ls_gd.bit.IDRIVEN_LS = drv8305_idriveN_ls_60mA;
+    deviceptr->cntrl6_ls_gd.bit.IDRIVEP_LS = drv8305_idriveP_ls_50mA;
+    deviceptr->cntrl6_ls_gd.bit.TDRIVEP    = drv8305_tdriveP_250nS;
+
+    deviceptr->cntrl7_gd.bit.COMM_OPTION = drv8305_comm_diode_FW;
+    deviceptr->cntrl7_gd.bit.PWM_MODE    = drv8305_PWM_mode_3;
+    deviceptr->cntrl7_gd.bit.DEAD_TIME   = drv8305_deadTime_60nS;
+    deviceptr->cntrl7_gd.bit.TBLANK      = drv8305_tblank_2us;
+    deviceptr->cntrl7_gd.bit.TVDS        = drv8305_tblank_4us;
+
+    deviceptr->cntrl9_IC_ops.bit.Flip_OTS        = drv8305_disable_OTS;
+    deviceptr->cntrl9_IC_ops.bit.DIS_VPVDD_UVLO2 = drv8305_enable_PVDD_UVLO2_fault;
+    deviceptr->cntrl9_IC_ops.bit.DIS_GDRV_FAULT  = drv8305_enable_gdrv_fault;
+    deviceptr->cntrl9_IC_ops.bit.EN_SNS_CLAMP    = drv8305_disable_Sns_Clamp;
+    deviceptr->cntrl9_IC_ops.bit.WD_DLY          = drv8305_wd_dly_20mS;
+    deviceptr->cntrl9_IC_ops.bit.DIS_SNS_OCP     = drv8305_enable_SnsOcp;
+    deviceptr->cntrl9_IC_ops.bit.WD_EN           = drv8305_disable_WD;
+    deviceptr->cntrl9_IC_ops.bit.SLEEP           = drv8305_sleep_No;
+    deviceptr->cntrl9_IC_ops.bit.CLR_FLTS        = drv8305_ClrFaults_No;      // fault clearing bit
+    deviceptr->cntrl9_IC_ops.bit.SET_VCPH_UV     = drv8305_set_Vcph_UV_4p9V;
+
+    deviceptr->cntrlA_shunt_amp.bit.GAIN_CS1   = (DRV_GAIN == 10) ? drv8305_gain_CS_10 :
+                                                     (DRV_GAIN == 20) ? drv8301_gain_20 :
+                                                     (DRV_GAIN == 40) ? drv8301_gain_40 : drv8301_gain_80;
+    deviceptr->cntrlA_shunt_amp.bit.GAIN_CS2   = (DRV_GAIN == 10) ? drv8305_gain_CS_10 :
+                                                     (DRV_GAIN == 20) ? drv8301_gain_20 :
+                                                     (DRV_GAIN == 40) ? drv8301_gain_40 : drv8301_gain_80;
+    deviceptr->cntrlA_shunt_amp.bit.GAIN_CS3   = (DRV_GAIN == 10) ? drv8305_gain_CS_10 :
+                                                     (DRV_GAIN == 20) ? drv8301_gain_20 :
+                                                     (DRV_GAIN == 40) ? drv8301_gain_40 : drv8301_gain_80;
+    deviceptr->cntrlA_shunt_amp.bit.CS_BLANK   = drv8305_cs_blank_0ns;
+    deviceptr->cntrlA_shunt_amp.bit.DC_CAL_CH1 = drv8305_dc_cal_off;
+    deviceptr->cntrlA_shunt_amp.bit.DC_CAL_CH2 = drv8305_dc_cal_off;
+    deviceptr->cntrlA_shunt_amp.bit.DC_CAL_CH3 = drv8305_dc_cal_off;
+
+    deviceptr->cntrlB_Vreg.bit.VREF_SCALING   = drv8305_vref_scaling_2;
+    deviceptr->cntrlB_Vreg.bit.SLEEP_DLY      = drv8305_sleep_dly_10uS;
+    deviceptr->cntrlB_Vreg.bit.DIS_VREG_PWRGD = 0;                               // temporary //
+    deviceptr->cntrlB_Vreg.bit.VREG_UV_LEVEL  = drv8305_vreg_UV_level_30percent;
+
+    deviceptr->cntrlC_Vds_SNS.bit.VDS_LEVEL   = drv8305_vds_level_1175mV;
+    deviceptr->cntrlC_Vds_SNS.bit.VDS_MODE    = drv8305_vds_mode_latchedShutDown;
+
+    return;
+}
+void InitDRV8305(DRV8305_Vars * deviceptr)
+{
+    Uint16 tmp1, *ptr1, *ptr2;
+
+    // ===============================================================
+    // write all control regs, ignore the return value of each write
+    // ===============================================================
+//  for (tmp1=5; tmp1<= 0xc; tmp1++)
+//  {
+//      if (tmp1 != 8)
+//          tmp2 = DRV8305_SPI_Write(motor, tmp1);                //write to DRV8305 control reg @ address 'tmp1';
+//  }
+
+    tmp1 = DRV8305_SPI_Write(deviceptr, DRV8305_C5_HS_GATE_DRIVER_CNTRL_ADDR);         //write to DRV8305 control reg 5
+    tmp1 = DRV8305_SPI_Write(deviceptr, DRV8305_C6_LS_GATE_DRIVER_CNTRL_ADDR);         //write to DRV8305 control reg 6
+    tmp1 = DRV8305_SPI_Write(deviceptr, DRV8305_C7_GD_CNTRL_ADDR);                     //write to DRV8305 control reg 7
+    tmp1 = DRV8305_SPI_Write(deviceptr, DRV8305_C9_IC_OPS_ADDR);                       //write to DRV8305 control reg 9
+    tmp1 = DRV8305_SPI_Write(deviceptr, DRV8305_CA_SHUNT_AMP_CNTRL_ADDR);              //write to DRV8305 control reg A
+    tmp1 = DRV8305_SPI_Write(deviceptr, DRV8305_CB_VREG_CNTRL_ADDR);                   //write to DRV8305 control reg B
+    tmp1 = DRV8305_SPI_Write(deviceptr, DRV8305_CC_VDS_SNS_CNTRL_ADDR);                //write to DRV8305 control reg C
+
+    // ===============================================
+    // read all status and control registers
+    // ===============================================
+    deviceptr->status1_wwd.all = DRV8305_SPI_Read(deviceptr, DRV8305_S1_WWD_ADDR) & 0x05ff;               // read DRV8305 status reg 1
+    deviceptr->status2_ov_vds.all = DRV8305_SPI_Read(deviceptr, DRV8305_S2_OV_VDS_FAULTS_ADDR) & 0x07e7;  // read DRV8305 status reg 2
+    deviceptr->status3_IC.all = DRV8305_SPI_Read(deviceptr, DRV8305_S3_IC_FAULTS_ADDR) & 0x0777;          // read DRV8305 status reg 3
+    deviceptr->status4_gd_Vgs.all = DRV8305_SPI_Read(deviceptr, DRV8305_S4_GD_VGS_FAULTS_ADDR) & 0x07e0;  // read DRV8305 status reg 4
+    deviceptr->readCntrl5 = DRV8305_SPI_Write(deviceptr, DRV8305_C5_HS_GATE_DRIVER_CNTRL_ADDR) & 0x03ff;  // read DRV8305 control reg 5
+    deviceptr->readCntrl6 = DRV8305_SPI_Write(deviceptr, DRV8305_C6_LS_GATE_DRIVER_CNTRL_ADDR) & 0x03ff;  // read DRV8305 control reg 6
+    deviceptr->readCntrl7 = DRV8305_SPI_Write(deviceptr, DRV8305_C7_GD_CNTRL_ADDR) & 0x03ff;              // read DRV8305 control reg 7
+    deviceptr->readCntrl9 = DRV8305_SPI_Write(deviceptr, DRV8305_C9_IC_OPS_ADDR) & 0x07ff;                // read DRV8305 control reg 9
+    deviceptr->readCntrlA = DRV8305_SPI_Write(deviceptr, DRV8305_CA_SHUNT_AMP_CNTRL_ADDR) & 0x07ff;       // read DRV8305 control reg A
+    deviceptr->readCntrlB = DRV8305_SPI_Write(deviceptr, DRV8305_CB_VREG_CNTRL_ADDR) & 0x031f;            // read DRV8305 control reg B
+    deviceptr->readCntrlC = DRV8305_SPI_Write(deviceptr, DRV8305_CC_VDS_SNS_CNTRL_ADDR) & 0x00ff;         // read DRV8305 control reg C
+
+    // ===============================================
+    // DRV Fault diagnostics -  and Control regs
+    // ===============================================
+    ptr1 = (Uint16 *) &(deviceptr->Rsvd0);
+    ptr2 = (Uint16 *) &(deviceptr->readCntrl5);
+    deviceptr->DRV_fault = 0;
+
+    // check all Status regs
+    for (tmp1 = 1; tmp1<= 0x4; tmp1++)
+    {
+        if (ptr1[tmp1])
+            deviceptr->DRV_fault |= 1 << tmp1;
+    }
+
+    // check all control regs
+    for (; tmp1<= 0xc; tmp1++)
+    {
+        if (tmp1 != 8)
+            if (ptr1[tmp1] != *ptr2++)
+                deviceptr->DRV_fault |= 1 << tmp1;
+    }
+
+    return;
+}
+Uint16 SPI_Driver(volatile struct SPI_REGS *s, Uint16 data)
+{
+    s->SPITXBUF = data;                     // send out the data
+    while(s->SPISTS.bit.INT_FLAG == 0);     // wait for the packet to complete
+    data = s->SPIRXBUF;                     // data read to clear the INT_FLAG bit
+
+    return(data);
+}
+
+Uint16 DRV8305_SPI_Write(DRV8305_Vars  * deviceptr, Uint16 address)
+{
+    union DRV830x_SPI_WRITE_WORD_REG w;
+    Uint16 * cntrlReg;
+
+    cntrlReg = &(deviceptr->Rsvd0);
+
+    w.bit.R_W = 0;                          // write - 0
+    w.bit.ADDRESS = address;                // load the address
+    w.bit.DATA = cntrlReg[address];         // data to be written
+
+    return(SPI_Driver(&SpiaRegs, w.all));
+}
+Uint16 DRV8305_SPI_Read(DRV8305_Vars  * deviceptr, Uint16 address)
+{
+    union DRV830x_SPI_WRITE_WORD_REG w;
+
+    w.bit.R_W = 1;                          // read - 1
+    w.bit.ADDRESS = address;                // load the address
+    w.bit.DATA = 0;                         // data to be written
+
+    return(SPI_Driver(&SpiaRegs, w.all));
 }

@@ -28,7 +28,7 @@ xlim(SpeedPlot_xlim);
 %% Idq comparison 
 FontSize = 16;
 figure
-IdqPlot_xlim = [2.5 2.6];
+IdqPlot_xlim = [2.8 2.9];
 
 subplot(2,2,1) % M1 Id's are here
 

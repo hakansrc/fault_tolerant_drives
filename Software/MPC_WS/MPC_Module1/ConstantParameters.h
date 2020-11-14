@@ -22,7 +22,7 @@
 #define INITIALPWMFREQ      10000       /*Hz*/
 
 
-#define ACQPS_PERIOD        20          /*clock cycles. TODO test this*/
+#define ACQPS_PERIOD        30          /*clock cycles. TODO test this*/
 #define EPWM1_SOCA_TRG      5
 
 #define ADCRESULT_VDC   AdcaResultRegs.ADCRESULT0

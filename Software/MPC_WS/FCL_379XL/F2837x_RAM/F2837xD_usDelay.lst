@@ -1,0 +1,78 @@
+TMS320C2000 Assembler PC v20.2.1 Wed Nov 18 21:47:51 2020
+
+Copyright (c) 1996-2018 Texas Instruments Incorporated
+C:/ti/controlSUITE/device_support/F2837xD/v210/F2837xD_common/source/F2837xD_usDelay.asm PAGE    1
+
+       1              ;//###########################################################################
+       2              ;//
+       3              ;// FILE: F2837xD_usDelay.asm
+       4              ;//
+       5              ;// TITLE: Simple delay function
+       6              ;//
+       7              ;// DESCRIPTION:
+       8              ;// This is a simple delay function that can be used to insert a specified
+       9              ;// delay into code.
+      10              ;// This function is only accurate if executed from internal zero-waitstate
+      11              ;// SARAM. If it is executed from waitstate memory then the delay will be
+      12              ;// longer then specified.
+      13              ;// To use this function:
+      14              ;//  1 - update the CPU clock speed in the F2837xD_Examples.h
+      15              ;//    file. For example:
+      16              ;//    #define CPU_RATE 6.667L // for a 150MHz CPU clock speed
+      17              ;//  2 - Call this function by using the DELAY_US(A) macro
+      18              ;//    that is defined in the F2837xD_Device.h file.  This macro
+      19              ;//    will convert the number of microseconds specified
+      20              ;//    into a loop count for use with this function.
+      21              ;//    This count will be based on the CPU frequency you specify.
+      22              ;//  3 - For the most accurate delay
+      23              ;//    - Execute this function in 0 waitstate RAM.
+      24              ;//    - Disable interrupts before calling the function
+      25              ;//      If you do not disable interrupts, then think of
+      26              ;//      this as an "at least" delay function as the actual
+      27              ;//      delay may be longer.
+      28              ;//  The C assembly call from the DELAY_US(time) macro will
+      29              ;//  look as follows:
+      30              ;//  extern void Delay(long LoopCount);
+      31              ;//        MOV   AL,#LowLoopCount
+      32              ;//        MOV   AH,#HighLoopCount
+      33              ;//        LCR   _Delay
+      34              ;//  Or as follows (if count is less then 16-bits):
+      35              ;//        MOV   ACC,#LoopCount
+      36              ;//        LCR   _Delay
+      37              ;//
+      38              ;//###########################################################################
+      39              ;// $TI Release: F2837xD Support Library v210 $
+      40              ;// $Release Date: Tue Nov  1 14:46:15 CDT 2016 $
+      41              ;// $Copyright: Copyright (C) 2013-2016 Texas Instruments Incorporated -
+      42              ;//             http://www.ti.com/ ALL RIGHTS RESERVED $
+      43              ;//###########################################################################
+      44              
+      45                     .def _F28x_usDelay
+      46 00000000              .sect ".TI.ramfunc"
+      47              
+      48                      .global  __F28x_usDelay
+      49 00000000       _F28x_usDelay:
+      50 00000000 1901          SUB    ACC,#1
+      51 00000001 56C3          BF     _F28x_usDelay,GEQ    ;; Loop if ACC >= 0
+         00000002 FFFF 
+      52 00000003 0006          LRETR
+      53              
+      54              ;There is a 9/10 cycle overhead and each loop
+TMS320C2000 Assembler PC v20.2.1 Wed Nov 18 21:47:51 2020
+
+Copyright (c) 1996-2018 Texas Instruments Incorporated
+C:/ti/controlSUITE/device_support/F2837xD/v210/F2837xD_common/source/F2837xD_usDelay.asm PAGE    2
+
+      55              ;takes five cycles. The LoopCount is given by
+      56              ;the following formula:
+      57              ;  DELAY_CPU_CYCLES = 9 + 5*LoopCount
+      58              ; LoopCount = (DELAY_CPU_CYCLES - 9) / 5
+      59              ; The macro DELAY_US(A) performs this calculation for you
+      60              ;
+      61              ;
+      62              
+      63              ;//
+      64              ;// End of file
+      65              ;//
+
+No Assembly Errors, No Assembly Warnings

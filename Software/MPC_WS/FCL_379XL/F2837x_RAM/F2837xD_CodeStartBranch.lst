@@ -1,0 +1,91 @@
+TMS320C2000 Assembler PC v20.2.1 Wed Nov 18 21:47:46 2020
+
+Copyright (c) 1996-2018 Texas Instruments Incorporated
+C:/ti/controlSUITE/device_support/F2837xD/v210/F2837xD_common/source/F2837xD_CodeStartBranch.asm PAGE    1
+
+       1              ;//###########################################################################
+       2              ;//
+       3              ;// FILE:  F2837xD_CodeStartBranch.asm
+       4              ;//
+       5              ;// TITLE: Branch for redirecting code execution after boot.
+       6              ;//
+       7              ;// For these examples, code_start is the first code that is executed after
+       8              ;// exiting the boot ROM code.
+       9              ;//
+      10              ;// The codestart section in the linker cmd file is used to physically place
+      11              ;// this code at the correct memory location.  This section should be placed
+      12              ;// at the location the BOOT ROM will re-direct the code to.  For example,
+      13              ;// for boot to FLASH this code will be located at 0x3f7ff6.
+      14              ;//
+      15              ;// In addition, the example F2837xD projects are setup such that the codegen
+      16              ;// entry point is also set to the code_start label.  This is done by linker
+      17              ;// option -e in the project build options.  When the debugger loads the code,
+      18              ;// it will automatically set the PC to the "entry point" address indicated by
+      19              ;// the -e linker option.  In this case the debugger is simply assigning the PC,
+      20              ;// it is not the same as a full reset of the device.
+      21              ;//
+      22              ;// The compiler may warn that the entry point for the project is other then
+      23              ;//  _c_init00.  _c_init00 is the C environment setup and is run before
+      24              ;// main() is entered. The code_start code will re-direct the execution
+      25              ;// to _c_init00 and thus there is no worry and this warning can be ignored.
+      26              ;//
+      27              ;//###########################################################################
+      28              ;// $TI Release: F2837xD Support Library v210 $
+      29              ;// $Release Date: Tue Nov  1 14:46:15 CDT 2016 $
+      30              ;// $Copyright: Copyright (C) 2013-2016 Texas Instruments Incorporated -
+      31              ;//             http://www.ti.com/ ALL RIGHTS RESERVED $
+      32              ;//###########################################################################
+      33              
+      34              ***********************************************************************
+      35              
+      36        0000  WD_DISABLE  .set  0    ;set to 1 to disable WD, else set to 0
+      37              
+      38                  .ref _c_int00
+      39                  .global code_start
+      40              
+      41              ***********************************************************************
+      42              * Function: codestart section
+      43              *
+      44              * Description: Branch to code starting point
+      45              ***********************************************************************
+      46              
+      47 00000000           .sect "codestart"
+      48              
+      49              code_start:
+      50                  .if WD_DISABLE == 1
+      51                      LB wd_disable       ;Branch to watchdog disable code
+      52                  .else
+      53 00000000 0040!         LB _c_int00         ;Branch to start of boot._asm in RTS library
+         00000001 0000 
+      54                  .endif
+TMS320C2000 Assembler PC v20.2.1 Wed Nov 18 21:47:46 2020
+
+Copyright (c) 1996-2018 Texas Instruments Incorporated
+C:/ti/controlSUITE/device_support/F2837xD/v210/F2837xD_common/source/F2837xD_CodeStartBranch.asm PAGE    2
+
+      55              
+      56              ;end codestart section
+      57              
+      58              ***********************************************************************
+      59              * Function: wd_disable
+      60              *
+      61              * Description: Disables the watchdog timer
+      62              ***********************************************************************
+      63                  .if WD_DISABLE == 1
+      64              
+      65                  .text
+      66              wd_disable:
+      67                  SETC OBJMODE        ;Set OBJMODE for 28x object code
+      68                  EALLOW              ;Enable EALLOW protected register access
+      69                  MOVZ DP, #7029h>>6  ;Set data page for WDCR register
+      70                  MOV @7029h, #0068h  ;Set WDDIS bit in WDCR to disable WD
+      71                  EDIS                ;Disable EALLOW protected register access
+      72                  LB _c_int00         ;Branch to start of boot._asm in RTS library
+      73              
+      74                  .endif
+      75              
+      76              ;end wd_disable
+      77              
+      78                  .end
+
+No Assembly Errors, No Assembly Warnings

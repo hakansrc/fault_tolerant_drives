@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ExportImportMemento.1>
+<VarMeta IMemento.internal.id="EnableFlag"/>
+<VarMeta IMemento.internal.id="IsrTicker"/>
+<VarMeta IMemento.internal.id="motor1"/>
+<VarMeta IMemento.internal.id="motor2"/>
+<VarMeta IMemento.internal.id="FCL_CNTLR"/>
+<VarMeta IMemento.internal.id="sfraTestLoop"/>
+<VarMeta IMemento.internal.id="QepCalibSm"/>
+<VarMeta IMemento.internal.id="QepCalFlag"/>
+<VarMeta IMemento.internal.id="QepRecalFlag"/>
+<VarMeta IMemento.internal.id="motor1.lsw"/>
+<VarMeta IMemento.internal.id="motor2.lsw"/>
+<VarMeta IMemento.internal.id="IdRef_start"/>
+<VarMeta IMemento.internal.id="IdRef_run"/>
+<VarMeta IMemento.internal.id="loadMotor"/>
+<VarMeta IMemento.internal.id="motor1.RunMotor"/>
+<VarMeta IMemento.internal.id="motor2.RunMotor"/>
+<VarMeta IMemento.internal.id="motor1.SpeedRef"/>
+<VarMeta IMemento.internal.id="motor1.speed.Speed"/>
+<VarMeta IMemento.internal.id="motor2.SpeedRef"/>
+<VarMeta IMemento.internal.id="motor2.speed.Speed"/>
+<VarMeta IMemento.internal.id="motor1.IqRef"/>
+<VarMeta IMemento.internal.id="motor2.IqRef"/>
+<VarMeta IMemento.internal.id="fcl_ClrCntr"/>
+<VarMeta IMemento.internal.id="fcl_LatencyInMicroSec"/>
+<VarMeta IMemento.internal.id="fcl_cycle_count"/>
+<VarMeta IMemento.internal.id="COMPLEX_PIC"/>
+<VarMeta IMemento.internal.id="FF_COMP"/>
+<VarMeta IMemento.internal.id="curLimit"/>
+<VarMeta IMemento.internal.id="SFRA1"/>
+</ExportImportMemento.1>

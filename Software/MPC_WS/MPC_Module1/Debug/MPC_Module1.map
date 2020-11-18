@@ -1,7 +1,7 @@
 ******************************************************************************
              TMS320C2000 Linker PC v20.2.1                     
 ******************************************************************************
->> Linked Sat Nov 14 18:00:04 2020
+>> Linked Wed Nov 18 20:03:04 2020
 
 OUTPUT FILE NAME:   <MPC_Module1.out>
 ENTRY POINT SYMBOL: "_c_int00"  address: 000088b6
@@ -20,7 +20,7 @@ PAGE 0:
   RAMLS3                00009800   00000800  00000000  00000800  RWIX
   RAMLS4                0000a000   00000800  00000000  00000800  RWIX
   RAMD0                 0000b000   00000800  000007fe  00000002  RWIX
-  RAMGS15               0001b000   00001000  000009f8  00000608  RWIX
+  RAMGS15               0001b000   00001000  00000a3d  000005c3  RWIX
   RESET                 003fffc0   00000002  00000000  00000002  RWIX
 
 PAGE 1:
@@ -674,17 +674,17 @@ CpuSysRegsFile
                   0000b7c3    00000029                       : exit.c.obj (.text)
                   0000b7ec    00000012                       : args_main.c.obj (.text)
 
-.text.5    0    0001b000    000009f8     
-                  0001b000    000009f8     main.obj (.text)
+.text.5    0    0001b000    00000a3d     
+                  0001b000    00000a3d     main.obj (.text)
 
 MODULE SUMMARY
 
        Module                           code   initialized data   uninitialized data
        ------                           ----   ----------------   ------------------
     .\
-       main.obj                         2990   23                 974               
+       main.obj                         3059   23                 974               
     +--+--------------------------------+------+------------------+--------------------+
-       Total:                           2990   23                 974               
+       Total:                           3059   23                 974               
                                                                                     
     .\sources\
        F2837xD_GlobalVariableDefs.obj   0      0                  8759              
@@ -726,7 +726,7 @@ MODULE SUMMARY
                                                                                     
        Stack:                           0      0                  512               
     +--+--------------------------------+------+------------------+--------------------+
-       Grand Total:                     7587   721                10537             
+       Grand Total:                     7656   721                10537             
 
 
 GLOBAL DATA SYMBOLS: SORTED BY DATA PAGE
@@ -1030,6 +1030,7 @@ abs   ffffffff  .text
 1     00005d40  _Cmpss7Regs                              
 1     00005d60  _Cmpss8Regs                              
 0     0000883b  _ConfigCpuTimer                          
+0     0001b9fb  _ConfigureADC__Fv                        
 1     0005d300  _CpuSysRegs                              
 1     0000c41a  _CpuTimer0                               
 1     00000c00  _CpuTimer0Regs                           
@@ -1045,8 +1046,8 @@ abs   ffffffff  .text
 0     0000b3f5  _DMA_CH4_ISR                             
 0     0000b3eb  _DMA_CH5_ISR                             
 0     0000b3e1  _DMA_CH6_ISR                             
-0     0001b406  _DRV8305_SPI_Read__FP12DRV8305_VarsUi    
-0     0001b3f6  _DRV8305_SPI_Write__FP12DRV8305_VarsUi   
+0     0001b413  _DRV8305_SPI_Read__FP12DRV8305_VarsUi    
+0     0001b403  _DRV8305_SPI_Write__FP12DRV8305_VarsUi   
 1     00005c00  _DacaRegs                                
 1     00005c10  _DacbRegs                                
 1     00005c20  _DaccRegs                                
@@ -1119,7 +1120,7 @@ abs   ffffffff  .text
 0     0000b28a  _EQEP1_ISR                               
 0     0000b280  _EQEP2_ISR                               
 0     0000b276  _EQEP3_ISR                               
-0     0001b4d4  _EQEPSetup__Fv                           
+0     0001b4e1  _EQEPSetup__Fv                           
 1     00005100  _EQep1Regs                               
 1     00005140  _EQep2Regs                               
 1     00005180  _EQep3Regs                               
@@ -1151,8 +1152,8 @@ abs   ffffffff  .text
 0     0000027e  _GPIO_SetupXINT4Gpio                     
 0     00000277  _GPIO_SetupXINT5Gpio                     
 0     0000025d  _GPIO_WritePin                           
-0     0001b684  _GetAdcReadings__FR16ModuleParameters    
-0     0001b683  _GetEncoderReadings__FR16ModuleParameters
+0     0001b687  _GetAdcReadings__FR16ModuleParameters    
+0     0001b686  _GetEncoderReadings__FR16ModuleParameters
 1     00007c00  _GpioCtrlRegs                            
 1     00007f00  _GpioDataRegs                            
 0     00008348  _HALT                                    
@@ -1172,21 +1173,21 @@ abs   ffffffff  .text
 0     0000b1fe  _IPC3_ISR                                
 0     0000822a  _InitAuxPll                              
 0     00008800  _InitCpuTimers                           
-0     0001b3cf  _InitDRV8305Regs__FP12DRV8305_Vars       
-0     0001b411  _InitDRV8305__FP12DRV8305_Vars           
+0     0001b3dc  _InitDRV8305Regs__FP12DRV8305_Vars       
+0     0001b41e  _InitDRV8305__FP12DRV8305_Vars           
 0     000001f0  _InitGpio                                
 0     00008121  _InitPeripheralClocks                    
 0     000087ba  _InitPieCtrl                             
 0     0000896f  _InitPieVectTable                        
-0     0001b39b  _InitSpiDrv8305Gpio__Fv                  
-0     0001b3b6  _InitSpiRegs_DRV830x__FPV8SPI_REGS       
+0     0001b3a8  _InitSpiDrv8305Gpio__Fv                  
+0     0001b3c3  _InitSpiRegs_DRV830x__FPV8SPI_REGS       
 0     000081ca  _InitSysCtrl                             
 0     00008055  _InitSysPll                              
-0     0001b524  _InitializationRoutine__Fv               
-0     0001b1e0  _InitializeADCs__Fv                      
-0     0001b06a  _InitializeEpwm1Registers__Fv            
-0     0001b0fe  _InitializeEpwm2Registers__Fv            
-0     0001b16f  _InitializeEpwm3Registers__Fv            
+0     0001b531  _InitializationRoutine__Fv               
+0     0001b000  _InitializeADCs__Fv                      
+0     0001b232  _InitializeEpwm1Registers__Fv            
+0     0001b2c6  _InitializeEpwm2Registers__Fv            
+0     0001b337  _InitializeEpwm3Registers__Fv            
 1     00007900  _InputXbarRegs                           
 1     00050000  _IpcRegs                                 
 1     0000c45c  _MCBSP                                   
@@ -1234,7 +1235,7 @@ abs   ffffffff  .text
 0     0000b10e  _SPIB_TX_ISR                             
 0     0000b104  _SPIC_RX_ISR                             
 0     0000b0fa  _SPIC_TX_ISR                             
-0     0001b3f0  _SPI_Driver__FPV8SPI_REGSUi              
+0     0001b3fd  _SPI_Driver__FPV8SPI_REGSUi              
 0     00008040  _STANDBY                                 
 0     0000b0f0  _SYS_PLL_SLIP_ISR                        
 1     00007200  _SciaRegs                                
@@ -1246,8 +1247,8 @@ abs   ffffffff  .text
 0     0000802e  _SeizeFlashPump                          
 0     00008020  _ServiceDog                              
 0     000003f8  _SetDBGIER                               
-0     0001b4d3  _SetupCmpssProtections__Fv               
-0     0001b000  _SetupGPIOs__Fv                          
+0     0001b4e0  _SetupCmpssProtections__Fv               
+0     0001b1c8  _SetupGPIOs__Fv                          
 1     00006100  _SpiaRegs                                
 1     00006110  _SpibRegs                                
 1     00006120  _SpicRegs                                
@@ -1331,7 +1332,7 @@ abs   ffffffff  ___text__
 1     0003fc80  _g_usPutWriteIndexes                     
 0     0000885e  _ldexp                                   
 0     0000885e  _ldexpf                                  
-0     0001b5b7  _main                                    
+0     0001b5ba  _main                                    
 0     000087e2  _memcpy                                  
 0     00008382  _pow                                     
 0     00008382  _powf                                    
@@ -1571,24 +1572,25 @@ page  address   name
 0     0000b7c3  _abort                                   
 0     0000b7c5  _exit                                    
 0     0000b7ec  __args_main                              
-0     0001b000  _SetupGPIOs__Fv                          
-0     0001b06a  _InitializeEpwm1Registers__Fv            
-0     0001b0fe  _InitializeEpwm2Registers__Fv            
-0     0001b16f  _InitializeEpwm3Registers__Fv            
-0     0001b1e0  _InitializeADCs__Fv                      
-0     0001b39b  _InitSpiDrv8305Gpio__Fv                  
-0     0001b3b6  _InitSpiRegs_DRV830x__FPV8SPI_REGS       
-0     0001b3cf  _InitDRV8305Regs__FP12DRV8305_Vars       
-0     0001b3f0  _SPI_Driver__FPV8SPI_REGSUi              
-0     0001b3f6  _DRV8305_SPI_Write__FP12DRV8305_VarsUi   
-0     0001b406  _DRV8305_SPI_Read__FP12DRV8305_VarsUi    
-0     0001b411  _InitDRV8305__FP12DRV8305_Vars           
-0     0001b4d3  _SetupCmpssProtections__Fv               
-0     0001b4d4  _EQEPSetup__Fv                           
-0     0001b524  _InitializationRoutine__Fv               
-0     0001b5b7  _main                                    
-0     0001b683  _GetEncoderReadings__FR16ModuleParameters
-0     0001b684  _GetAdcReadings__FR16ModuleParameters    
+0     0001b000  _InitializeADCs__Fv                      
+0     0001b1c8  _SetupGPIOs__Fv                          
+0     0001b232  _InitializeEpwm1Registers__Fv            
+0     0001b2c6  _InitializeEpwm2Registers__Fv            
+0     0001b337  _InitializeEpwm3Registers__Fv            
+0     0001b3a8  _InitSpiDrv8305Gpio__Fv                  
+0     0001b3c3  _InitSpiRegs_DRV830x__FPV8SPI_REGS       
+0     0001b3dc  _InitDRV8305Regs__FP12DRV8305_Vars       
+0     0001b3fd  _SPI_Driver__FPV8SPI_REGSUi              
+0     0001b403  _DRV8305_SPI_Write__FP12DRV8305_VarsUi   
+0     0001b413  _DRV8305_SPI_Read__FP12DRV8305_VarsUi    
+0     0001b41e  _InitDRV8305__FP12DRV8305_Vars           
+0     0001b4e0  _SetupCmpssProtections__Fv               
+0     0001b4e1  _EQEPSetup__Fv                           
+0     0001b531  _InitializationRoutine__Fv               
+0     0001b5ba  _main                                    
+0     0001b686  _GetEncoderReadings__FR16ModuleParameters
+0     0001b687  _GetAdcReadings__FR16ModuleParameters    
+0     0001b9fb  _ConfigureADC__Fv                        
 0     0003f800  _g_asIPCCPU2toCPU1Buffers                
 0     0003f880  _g_usGetWriteIndexes                     
 0     0003f884  _g_usPutReadIndexes                      
@@ -1741,4 +1743,4 @@ abs   ffffffff  binit
 abs   ffffffff  etext                                    
 abs   ffffffff  pinit                                    
 
-[387 symbols]
+[388 symbols]

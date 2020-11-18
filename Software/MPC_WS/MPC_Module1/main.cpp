@@ -10,6 +10,8 @@
 #include "ControllerParameters.h"
 #include "DRV8305_defs.h"
 
+
+
 /*      Before starting to using these code, followings must be tested
  * 1-   ADC     readings
  * 2-   Encoder reading
@@ -59,6 +61,7 @@ Uint16 DRV8305_SPI_Write(DRV8305_Vars  * deviceptr, Uint16 address);
 Uint16 DRV8305_SPI_Read(DRV8305_Vars  * deviceptr, Uint16 address);
 Uint16 SPI_Driver(volatile struct SPI_REGS *s, Uint16 data);
 void InitDRV8305(DRV8305_Vars * deviceptr);
+void ConfigureADC(void);
 
 /**
  * main.c
@@ -657,11 +660,11 @@ void InitializationRoutine(void)
     PI_iq.Output_prev   = 234.234;
     PI_iq.SaturationMax = 2.0*IQ_RATED;
     PI_iq.SaturationMax = -2.0*IQ_RATED;
+    InitializeADCs();
     SetupGPIOs();
     InitializeEpwm1Registers();
     InitializeEpwm2Registers();
     InitializeEpwm3Registers();
-    InitializeADCs();
     InitSpiDrv8305Gpio();
     DELAY_US(100000);
     InitSpiRegs_DRV830x(&SpiaRegs);
@@ -685,10 +688,12 @@ void InitializationRoutine(void)
     GPIO_WritePin(124, 1);  // Enable DRV
     DELAY_US(50000);                        // delay to allow DRV830x supplies to ramp up
     InitDRV8305(&Device1Configuration);
+#if 0
     while (Device1Configuration.DRV_fault)
     {
         faultcounter++;  // hang on if drv init is faulty
     }
+#endif
     SetupCmpssProtections();
     EQEPSetup();
 }
@@ -715,6 +720,8 @@ void InitializeADCs(void)
     AdcdRegs.ADCCTL1.all = 0x00;            // ADC Control 1 Register
     AdcdRegs.ADCCTL1.bit.ADCPWDNZ = 1; // All analog circuitry inside the core is powered up
     AdcdRegs.ADCCTL1.bit.INTPULSEPOS = 1;
+
+    DELAY_US(2000);
 
     AdcaRegs.ADCCTL2.bit.SIGNALMODE = 0;    // (Single ended ADC)TODO Verify these
     AdcbRegs.ADCCTL2.bit.SIGNALMODE = 0;    // (Single ended ADC)TODO Verify these
@@ -867,11 +874,7 @@ void InitializeADCs(void)
     AdcaRegs.ADCSOC2CTL.bit.CHSEL = 0x2;                /*This is Ib pin for TIDA-00909 PCB*/
     AdcaRegs.ADCSOC2CTL.bit.ACQPS = ACQPS_PERIOD;       /*TODO: This value should be tested*/
 
-    /*aaa pin*/
-    AdccRegs.ADCSOC3CTL.all = 0x00;
-    AdccRegs.ADCSOC3CTL.bit.TRIGSEL = EPWM1_SOCA_TRG;   /*ePWM1 SocA is the trigger*/
-    AdccRegs.ADCSOC3CTL.bit.CHSEL = 0x5;                /*This is Ib pin for TIDA-00909 PCB*/
-    AdccRegs.ADCSOC3CTL.bit.ACQPS = ACQPS_PERIOD;       /*TODO: This value should be tested*/
+
 
 
     EDIS;
@@ -1194,4 +1197,71 @@ Uint16 DRV8305_SPI_Read(DRV8305_Vars  * deviceptr, Uint16 address)
     w.bit.DATA = 0;                         // data to be written
 
     return(SPI_Driver(&SpiaRegs, w.all));
+}
+// ****************************************************************************
+// ****************************************************************************
+//TODO ADC Configuration
+// ****************************************************************************
+// ****************************************************************************
+void ConfigureADC(void)
+{
+    //Write ADC configurations and power up the ADC for both ADC A
+    Uint16 i;
+
+    EALLOW;
+
+    //write configurations for ADC-A
+    // External REFERENCE must be provided
+    AdcaRegs.ADCCTL2.bit.PRESCALE   = 6; //set ADCCLK divider to /4
+    AdcaRegs.ADCCTL2.bit.RESOLUTION = RESOLUTION_12BIT;
+    AdcaRegs.ADCCTL2.bit.SIGNALMODE = SIGNAL_SINGLE;
+
+    //Set pulse positions to late
+    AdcaRegs.ADCCTL1.bit.INTPULSEPOS = 1;
+
+    //power up the ADC
+    AdcaRegs.ADCCTL1.bit.ADCPWDNZ = 1;
+
+    //write configurations for ADC-B
+    // External REFERENCE must be provided
+    AdcbRegs.ADCCTL2.bit.PRESCALE   = 6; //set ADCCLK divider to /4
+    AdcbRegs.ADCCTL2.bit.RESOLUTION = RESOLUTION_12BIT;
+    AdcbRegs.ADCCTL2.bit.SIGNALMODE = SIGNAL_SINGLE;
+
+    //Set pulse positions to late
+    AdcbRegs.ADCCTL1.bit.INTPULSEPOS = 1;
+
+    //power up the ADC
+    AdcbRegs.ADCCTL1.bit.ADCPWDNZ = 1;
+
+//  //write configurations for ADC-C
+    // External REFERENCE must be provided
+    AdccRegs.ADCCTL2.bit.PRESCALE   = 6; //set ADCCLK divider to /4
+    AdccRegs.ADCCTL2.bit.RESOLUTION = RESOLUTION_12BIT;
+    AdccRegs.ADCCTL2.bit.SIGNALMODE = SIGNAL_SINGLE;
+
+    //Set pulse positions to late
+    AdccRegs.ADCCTL1.bit.INTPULSEPOS = 1;
+
+    //power up the ADC
+    AdccRegs.ADCCTL1.bit.ADCPWDNZ = 1;
+//
+//  //write configurations for ADC-D
+    // External REFERENCE must be provided
+    AdcdRegs.ADCCTL2.bit.PRESCALE   = 6; //set ADCCLK divider to /4
+    AdcdRegs.ADCCTL2.bit.RESOLUTION = RESOLUTION_12BIT;
+    AdcdRegs.ADCCTL2.bit.SIGNALMODE = SIGNAL_SINGLE;
+
+    //Set pulse positions to late
+    AdcdRegs.ADCCTL1.bit.INTPULSEPOS = 1;
+
+    //power up the ADC
+    AdcdRegs.ADCCTL1.bit.ADCPWDNZ = 1;
+
+    //delay for > 1ms to allow ADC time to power up
+    for(i = 0; i < 1000; i++){
+        asm("   RPT#255 || NOP");
+    }
+
+    EDIS;
 }

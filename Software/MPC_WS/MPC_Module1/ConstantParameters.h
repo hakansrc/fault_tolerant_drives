@@ -25,14 +25,15 @@
 #define ACQPS_PERIOD        30          /*clock cycles. TODO test this*/
 #define EPWM1_SOCA_TRG      5
 
-#define ADCRESULT_VDC   AdcaResultRegs.ADCRESULT0
-#define ADCRESULT_VA    AdccResultRegs.ADCRESULT0
-#define ADCRESULT_VB    AdcbResultRegs.ADCRESULT0
-#define ADCRESULT_VC    AdcaResultRegs.ADCRESULT1
-#define ADCRESULT_IA    AdccResultRegs.ADCRESULT1
-#define ADCRESULT_IB    AdcbResultRegs.ADCRESULT1
-#define ADCRESULT_IC    AdcaResultRegs.ADCRESULT2
-#define ADCRESULT_VREF  AdcaResultRegs.ADCRESULT3
+#define M1_ADCRESULT_VA     AdcaResultRegs.ADCRESULT0
+#define M1_ADCRESULT_VB     AdccResultRegs.ADCRESULT0
+#define M1_ADCRESULT_VC     AdcbResultRegs.ADCRESULT0
+#define M1_ADCRESULT_VDC    AdcaResultRegs.ADCRESULT1
+#define M1_ADCRESULT_IA     AdccResultRegs.ADCRESULT1
+#define M1_ADCRESULT_IB     AdcbResultRegs.ADCRESULT1
+#define M1_ADCRESULT_IC     AdcaResultRegs.ADCRESULT2
+
+
 
 
 #endif /* CONSTANTPARAMETERS_H_ */

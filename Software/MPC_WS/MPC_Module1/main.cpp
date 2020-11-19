@@ -37,7 +37,7 @@ DRV8305_Vars        Device1Configuration;
 __interrupt void cpu_timer0_isr(void);  /*prototype of the ISR functions*/
 __interrupt void cpu_timer1_isr(void);  /*prototype of the ISR functions*/
 __interrupt void cpu_timer2_isr(void);  /*prototype of the ISR functions*/
-__interrupt void epwm1_isr(void);       /*prototype of the ISR functions*/
+__interrupt void adca1_isr(void);        /*prototype of the ISR functions*/
 
 void InitializationRoutine(void);       /*all modules and gpios are initialized inside this function.*/
 void InitializeEpwm1Registers(void);
@@ -65,7 +65,7 @@ void InitDRV8305(DRV8305_Vars * deviceptr);
 /**
  * main.c
  */
-Uint32 Epwm1Counter = 0;
+Uint32 ControlISRCounter = 0;
 Uint32  faultcounter = 0;
 int main(void)
 {
@@ -126,15 +126,17 @@ int main(void)
     PieVectTable.TIMER0_INT = &cpu_timer0_isr;  /*specify the interrupt service routine (ISR) address to the PIE table*/
     PieVectTable.TIMER1_INT = &cpu_timer1_isr;  /*specify the interrupt service routine (ISR) address to the PIE table*/
     PieVectTable.TIMER2_INT = &cpu_timer2_isr;  /*specify the interrupt service routine (ISR) address to the PIE table*/
-    PieVectTable.EPWM1_INT = &epwm1_isr;        /*specify the interrupt service routine (ISR) address to the PIE table*/
+    PieVectTable.ADCA1_INT = &adca1_isr;        /*specify the interrupt service routine (ISR) address to the PIE table*/
     EDIS;
-    IER |= M_INT1;  /*Enable the PIE group of Cpu timer 0 interrupt*/
-    IER |= M_INT3;  /*Enable the PIE group of Epwm1 interrupt*/
+
+    IER |= M_INT1;  /*Enable the PIE group of Cpu timer 0 and ADCA1 interrupt*/
     IER |= M_INT13; /*Enable the PIE group of Cpu timer 1 interrupt*/
     IER |= M_INT14; /*Enable the PIE group of Cpu timer 2 interrupt*/
+
+
     PieCtrlRegs.PIECTRL.bit.ENPIE = 1;  // Enable the PIE block
     PieCtrlRegs.PIEIER1.bit.INTx7 = 1;  /*Enable the 7th interrupt of the Group 1, which is for timer 0 interrupt*/
-    PieCtrlRegs.PIEIER3.bit.INTx1 = 1;  /*Enable the 1st interrupt of the Group 3, which is for epwm1 interrupt*/
+    PieCtrlRegs.PIEIER1.bit.INTx1 = 1;  /*Enable the 7th interrupt of the Group 1, which is for ADCA1 interrupt*/
 
     EALLOW;
     CpuSysRegs.PCLKCR0.bit.TBCLKSYNC = 1;   /*start the TimeBase clock */
@@ -418,63 +420,7 @@ void InitializeEpwm3Registers(void)
     EPwm3Regs.TBPRD = SYSCLKFREQUENCY/ (INITIALPWMFREQ*2);
     EPwm3Regs.CMPA.bit.CMPA = EPwm3Regs.TBPRD / 2;
 }
-__interrupt void epwm1_isr(void)
-{
-    /*This will be the main control isr*/
-    /*check ADCBSY register if  it makes here wait*/
-    /*TODO, need to consider alignment scenario*/
-    Epwm1Counter++;
 
-
-
-    GetEncoderReadings(Module1_Parameters);
-
-    GetAdcReadings(Module1_Parameters);
-
-    CalculateParkTransform(Module1_Parameters);
-
-    PI_iq.Input = Module1_Parameters.AngularSpeed.Mechanical;
-    Run_PI_Controller(PI_iq);
-    Module1_Parameters.Reference.Iq = PI_iq.Output;
-    Module1_Parameters.Reference.Id = IDREF;
-
-    if(OperationMode==MODE_RUN)
-    {
-
-    }
-    else if (OperationMode==MODE_ALIGN)
-    {
-
-    }
-
-
-
-    Module1_Parameters.MinimumCostValue = (float)1e35;
-
-    ExecuteFirstPrediction(Module1_Parameters,0);
-    ExecuteSecondPrediction(Module1_Parameters,0);
-    ExecuteFirstPrediction(Module1_Parameters,1);
-    ExecuteSecondPrediction(Module1_Parameters,1);
-    ExecuteFirstPrediction(Module1_Parameters,2);
-    ExecuteSecondPrediction(Module1_Parameters,2);
-    ExecuteFirstPrediction(Module1_Parameters,3);
-    ExecuteSecondPrediction(Module1_Parameters,3);
-    ExecuteFirstPrediction(Module1_Parameters,4);
-    ExecuteSecondPrediction(Module1_Parameters,4);
-    ExecuteFirstPrediction(Module1_Parameters,5);
-    ExecuteSecondPrediction(Module1_Parameters,5);
-    ExecuteFirstPrediction(Module1_Parameters,6);
-    ExecuteSecondPrediction(Module1_Parameters,6);
-    ExecuteFirstPrediction(Module1_Parameters,7);
-    ExecuteSecondPrediction(Module1_Parameters,7);
-    ExecuteFirstPrediction(Module1_Parameters,8);
-    ExecuteSecondPrediction(Module1_Parameters,8);
-    ExecuteFirstPrediction(Module1_Parameters,9);
-    ExecuteSecondPrediction(Module1_Parameters,9);
-
-    EPwm1Regs.ETCLR.bit.INT = 1;
-    PieCtrlRegs.PIEACK.all = PIEACK_GROUP3;
-}
 void SetupGPIOs(void)
 {
     EALLOW;
@@ -752,9 +698,16 @@ void InitializeADCs(void)
     AdcaRegs.ADCINTSEL1N2.bit.INT2CONT = 0; // Continous mode is disabled
     AdcaRegs.ADCINTSEL1N2.bit.INT2E = 0;    // ADCINT2 disabled.
     AdcaRegs.ADCINTSEL1N2.bit.INT2SEL = 0;  // No interrupt selected.
+
+
     AdcaRegs.ADCINTSEL1N2.bit.INT1CONT = 0; // Continous mode is disabled
-    AdcaRegs.ADCINTSEL1N2.bit.INT1E = 0;    // ADCINT1 disabled.
-    AdcaRegs.ADCINTSEL1N2.bit.INT1SEL = 0;  // No interrupt selected.
+    AdcaRegs.ADCINTSEL1N2.bit.INT1E = 1;    // ADCINT1 enable.
+    AdcaRegs.ADCINTSEL1N2.bit.INT1SEL = 0;  // EOC0 is the trigger for ADCINT1
+
+    AdcaRegs.ADCSOCPRICTL.all = 0x00;       // ADC SOC Priority Control Register
+    AdcaRegs.ADCSOCPRICTL.bit.SOCPRIORITY = 0;  // the SOC is handled in round robin arbitration
+    AdcaRegs.ADCSOCPRICTL.bit.RRPOINTER =   0;  // SOC0 is the last RR SOC to convert, SOC1 is the highest round robin priority, this ensures all the values are converted before the ISR.
+
     AdcaRegs.ADCINTSEL3N4.all = 0x00;       // ADC Interrupt 3 and 4 Selection Register
     AdcaRegs.ADCINTSEL3N4.bit.INT4CONT = 0; // Continous mode is disabled
     AdcaRegs.ADCINTSEL3N4.bit.INT4E = 0;    // ADCINT4 disabled.
@@ -762,8 +715,7 @@ void InitializeADCs(void)
     AdcaRegs.ADCINTSEL3N4.bit.INT3CONT = 0; // Continous mode is disabled
     AdcaRegs.ADCINTSEL3N4.bit.INT3E = 0;    // ADCINT3 disabled.
     AdcaRegs.ADCINTSEL3N4.bit.INT3SEL = 0;  // No interrupt selected.
-    AdcaRegs.ADCSOCPRICTL.all = 0x00;       // ADC SOC Priority Control Register
-    AdcaRegs.ADCSOCPRICTL.bit.SOCPRIORITY = 0;  // the SOC is handled in round robin arbitration
+
 
     AdcbRegs.ADCINTSEL1N2.all = 0x00;       // ADC Interrupt 1 and 2 Selection Register
     AdcbRegs.ADCINTSEL1N2.bit.INT2CONT = 0; // Continous mode is disabled
@@ -1199,3 +1151,57 @@ Uint16 DRV8305_SPI_Read(DRV8305_Vars  * deviceptr, Uint16 address)
     return(SPI_Driver(&SpiaRegs, w.all));
 }
 
+__interrupt void adca1_isr(void)
+{
+    /*This will be the main control isr*/
+    /*check ADCBSY register if  it makes here wait*/
+    /*TODO, need to consider alignment scenario*/
+    ControlISRCounter++;
+
+
+
+    GetEncoderReadings(Module1_Parameters);
+
+    GetAdcReadings(Module1_Parameters);
+
+    CalculateParkTransform(Module1_Parameters);
+
+    PI_iq.Input = Module1_Parameters.AngularSpeed.Mechanical;
+    Run_PI_Controller(PI_iq);
+    Module1_Parameters.Reference.Iq = PI_iq.Output;
+    Module1_Parameters.Reference.Id = IDREF;
+
+    if(OperationMode==MODE_RUN)
+    {
+
+    }
+    else if (OperationMode==MODE_ALIGN)
+    {
+
+    }
+
+
+
+    Module1_Parameters.MinimumCostValue = (float)1e35;
+
+    ExecuteFirstPrediction(Module1_Parameters,0);
+    ExecuteSecondPrediction(Module1_Parameters,0);
+    ExecuteFirstPrediction(Module1_Parameters,1);
+    ExecuteSecondPrediction(Module1_Parameters,1);
+    ExecuteFirstPrediction(Module1_Parameters,2);
+    ExecuteSecondPrediction(Module1_Parameters,2);
+    ExecuteFirstPrediction(Module1_Parameters,3);
+    ExecuteSecondPrediction(Module1_Parameters,3);
+    ExecuteFirstPrediction(Module1_Parameters,4);
+    ExecuteSecondPrediction(Module1_Parameters,4);
+    ExecuteFirstPrediction(Module1_Parameters,5);
+    ExecuteSecondPrediction(Module1_Parameters,5);
+    ExecuteFirstPrediction(Module1_Parameters,6);
+    ExecuteSecondPrediction(Module1_Parameters,6);
+    ExecuteFirstPrediction(Module1_Parameters,7);
+    ExecuteSecondPrediction(Module1_Parameters,7);
+    ExecuteFirstPrediction(Module1_Parameters,8);
+    ExecuteSecondPrediction(Module1_Parameters,8);
+    ExecuteFirstPrediction(Module1_Parameters,9);
+    ExecuteSecondPrediction(Module1_Parameters,9);
+}

@@ -33,6 +33,17 @@
 #define M1_ADCRESULT_IB     AdcbResultRegs.ADCRESULT1
 #define M1_ADCRESULT_IC     AdcaResultRegs.ADCRESULT2
 
+#define VREF                        3.3
+#define VREF_SCALE                  2.0
+
+#define VA_TRANSFORMATION_COEFF     VREF*(66.99/4.99)/4095.0
+#define VB_TRANSFORMATION_COEFF     VREF*(66.99/4.99)/4095.0
+#define VC_TRANSFORMATION_COEFF     VREF*(66.99/4.99)/4095.0
+#define VDC_TRANSFORMATION_COEFF    VREF*(66.99/4.99)/4095.0
+
+
+
+#define IA_TRANSFORMATION_COEF
 
 
 

@@ -683,11 +683,11 @@ void InitializationRoutine(void)
     GpioCtrlRegs.GPDDIR.bit.GPIO125 = 1;
     EDIS;
 
+#if 1
 
     GPIO_WritePin(124, 1);  // Enable DRV
     DELAY_US(50000);                        // delay to allow DRV830x supplies to ramp up
     InitDRV8305(&Device1Configuration);
-#if 1
     while (Device1Configuration.DRV_fault)
     {
         faultcounter++;  // hang on if drv init is faulty

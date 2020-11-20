@@ -23,7 +23,10 @@
 #define FSWCOEFF            1250.0
 
 
-
+typedef struct{
+    float Frequency;
+    float ma;
+}OpenLoopOperation;
 
 typedef struct{
     float Dvalue;

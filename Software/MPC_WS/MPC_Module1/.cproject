@@ -46,6 +46,7 @@
 								<option id="com.ti.ccstudio.buildDefinitions.C2000_20.2.compilerID.DIAG_WRAP.322670308" name="Wrap diagnostic messages (--diag_wrap)" superClass="com.ti.ccstudio.buildDefinitions.C2000_20.2.compilerID.DIAG_WRAP" useByScannerDiscovery="false" value="com.ti.ccstudio.buildDefinitions.C2000_20.2.compilerID.DIAG_WRAP.off" valueType="enumerated"/>
 								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="com.ti.ccstudio.buildDefinitions.C2000_20.2.compilerID.INCLUDE_PATH.1654344259" name="Add dir to #include search path (--include_path, -I)" superClass="com.ti.ccstudio.buildDefinitions.C2000_20.2.compilerID.INCLUDE_PATH" valueType="includePath">
 									<listOptionValue builtIn="false" value="${PROJECT_ROOT}"/>
+									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}/Libs}"/>
 									<listOptionValue builtIn="false" value="C:\ti\controlSUITE\device_support\F2837xD\v210\F2837xD_headers\include"/>
 									<listOptionValue builtIn="false" value="C:\ti\controlSUITE\device_support\F2837xD\v210\F2837xD_common\include"/>
 									<listOptionValue builtIn="false" value="${CG_TOOL_ROOT}/include"/>

@@ -20,7 +20,7 @@
 #ifndef _DRV8305_DEFS_H
 #define _DRV8305_DEFS_H
 
-#define DRV_GAIN 40 // TODO investigate this number
+#define DRV_GAIN 10 // TODO investigate this number
 
 
 /*****************************************************************************/

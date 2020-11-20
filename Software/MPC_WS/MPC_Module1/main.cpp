@@ -26,6 +26,7 @@
 
 
 ModuleParameters    Module1_Parameters;
+OpenLoopOperation   RL_Load_Operation = {50.0, 0.8}; // 50hz, 0.8 magnitude
 PID_Parameters      PI_iq;
 unsigned int        StartOperation  = 0; /*if this is 0, then no operation will be performed. It will be set inside the debugger*/
 unsigned long int   BlankCounter    = 0;
@@ -65,8 +66,9 @@ void InitDRV8305(DRV8305_Vars * deviceptr);
 /**
  * main.c
  */
-Uint32 ControlISRCounter = 0;
-Uint32  faultcounter = 0;
+uint32_t    ControlISRCounter = 0;
+float       TimeCounter = 0;
+uint32_t    faultcounter = 0;
 int main(void)
 {
 
@@ -954,7 +956,10 @@ void GetEncoderReadings(ModuleParameters& moduleparams)
 }
 void GetAdcReadings(ModuleParameters& moduleparams)
 {
-    /*TODO*/
+    moduleparams.Measured.Current.PhaseA = IA_CURRENT_FLOAT;
+    moduleparams.Measured.Current.PhaseB = IB_CURRENT_FLOAT;
+    moduleparams.Measured.Current.PhaseC = IC_CURRENT_FLOAT;
+    moduleparams.Measured.Voltage.Vdc = VDC_VOLTAGE_FLOAT;
 }
 void SetupCmpssProtections(void)
 {
@@ -1157,7 +1162,11 @@ __interrupt void adca1_isr(void)
     /*check ADCBSY register if  it makes here wait*/
     /*TODO, need to consider alignment scenario*/
     ControlISRCounter++;
-
+    TimeCounter=+1.0;
+    if(TimeCounter==((float)INITIALPWMFREQ))
+    {
+        TimeCounter=0;
+    }
 
 
     GetEncoderReadings(Module1_Parameters);
@@ -1170,6 +1179,7 @@ __interrupt void adca1_isr(void)
     Run_PI_Controller(PI_iq);
     Module1_Parameters.Reference.Iq = PI_iq.Output;
     Module1_Parameters.Reference.Id = IDREF;
+
 
     if(OperationMode==MODE_RUN)
     {
@@ -1204,4 +1214,13 @@ __interrupt void adca1_isr(void)
     ExecuteSecondPrediction(Module1_Parameters,8);
     ExecuteFirstPrediction(Module1_Parameters,9);
     ExecuteSecondPrediction(Module1_Parameters,9);
+
+#if BUILDMODE==MODE_RL_LOAD
+    EPwm1Regs.CMPA.bit.CMPA = EPwm1Regs.TBPRD*RL_Load_Operation.ma*(sinf(2.0*PI*RL_Load_Operation.Frequency*TimeCounter/((float)INITIALPWMFREQ))*0.5+0.5);
+    EPwm2Regs.CMPA.bit.CMPA = EPwm2Regs.TBPRD*RL_Load_Operation.ma*(sinf(2.0*PI*RL_Load_Operation.Frequency*TimeCounter/((float)INITIALPWMFREQ)+TWO_PI_OVER_THREE)*0.5+0.5);
+    EPwm3Regs.CMPA.bit.CMPA = EPwm3Regs.TBPRD*RL_Load_Operation.ma*(sinf(2.0*PI*RL_Load_Operation.Frequency*TimeCounter/((float)INITIALPWMFREQ)+2.0*TWO_PI_OVER_THREE)*0.5+0.5);
+#endif
+
+    AdcaRegs.ADCINTFLGCLR.bit.ADCINT1 = 1;      // Clears respective flag bit in the ADCINTFLG register
+    PieCtrlRegs.PIEACK.all = PIEACK_GROUP1;     // Acknowledge interrupt to PIE
 }

@@ -43,6 +43,7 @@ ORDERED_OBJS += \
 "./sources/F2837xD_usDelay.obj" \
 "../2837xD_RAM_lnk_cpu1.cmd" \
 "../F2837xD_Headers_nonBIOS_cpu1.cmd" \
+"../Libs/MultipleFloatDataSender.lib" \
 $(GEN_CMDS__FLAG) \
 -llibc.a \
 
@@ -54,8 +55,10 @@ RMDIR := RMDIR /S/Q
 # All of the sources participating in the build are defined here
 -include sources.mk
 -include subdir_vars.mk
+-include Libs/subdir_vars.mk
 -include sources/subdir_vars.mk
 -include subdir_rules.mk
+-include Libs/subdir_rules.mk
 -include sources/subdir_rules.mk
 -include objects.mk
 
@@ -166,11 +169,11 @@ BIN_OUTPUTS__QUOTED += \
 
 
 # All Target
-all: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
+all: $(OBJS) $(CMD_SRCS) $(LIB_SRCS) $(GEN_CMDS)
 	@$(MAKE) --no-print-directory -Onone "MPC_Module1.out"
 
 # Tool invocations
-MPC_Module1.out: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
+MPC_Module1.out: $(OBJS) $(CMD_SRCS) $(LIB_SRCS) $(GEN_CMDS)
 	@echo 'Building target: "$@"'
 	@echo 'Invoking: C2000 Linker'
 	"C:/ti/ccs1010/ccs/tools/compiler/ti-cgt-c2000_20.2.1.LTS/bin/cl2000" -v28 -ml -mt --cla_support=cla1 --float_support=fpu32 --tmu_support=tmu0 --vcu_support=vcu2 -O3 --opt_for_speed=3 --fp_mode=relaxed --define=CPU1 --define=_LAUNCHXL_F28379D -g --diag_warning=225 --diag_wrap=off --display_error_number --abi=coffabi -z -m"MPC_Module1.map" --stack_size=0x200 --warn_sections -i"C:/ti/ccs1010/ccs/tools/compiler/ti-cgt-c2000_20.2.1.LTS/lib" -i"C:/ti/ccs1010/ccs/tools/compiler/ti-cgt-c2000_20.2.1.LTS/include" --reread_libs --diag_wrap=off --display_error_number --xml_link_info="MPC_Module1_linkInfo.xml" --rom_model -o "MPC_Module1.out" $(ORDERED_OBJS)

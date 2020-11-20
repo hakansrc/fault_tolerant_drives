@@ -22,7 +22,7 @@ min(Vo)
 figure
 plot(Vo)
 
-CurrentRetransform = (Vo-Vref/k)/(-DRV_GAIN)/Resistance;
+CurrentRetransform = (Vo-Vref/k)/(DRV_GAIN)/Resistance;
 
 figure
 plot(CurrentRetransform)

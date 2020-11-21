@@ -1,7 +1,7 @@
 clear
 clc
 close all
-load('TestData/TestData070820191128.mat')
+load('TestData/TestData_IABC_CMPA123_211120175955.mat')
 EnablePlotting = 1;
 TheTagValue = zeros(NumberOfFloatsPerPacket,4);
 TheSaveArrayScreened = RawDataArray;
@@ -27,3 +27,5 @@ if(isempty(TheTagIndices)==0)
         grid on
     end   
 end
+figure
+plot(TheDataConvertedValues(1,:)+TheDataConvertedValues(3,:)+TheDataConvertedValues(5,:))

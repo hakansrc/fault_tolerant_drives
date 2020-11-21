@@ -9,7 +9,7 @@
 #include "ConstantParameters.h"
 #include "ControllerParameters.h"
 #include "DRV8305_defs.h"
-
+#include "MultipleFloatDataSender.h"
 
 
 /*      Before starting to using these code, followings must be tested
@@ -26,7 +26,7 @@
 
 
 ModuleParameters    Module1_Parameters;
-OpenLoopOperation   RL_Load_Operation = {50.0, 0.8}; // 50hz, 0.8 magnitude
+OpenLoopOperation   RL_Load_Operation = {25.0, 0.4}; // 50hz, 0.8 magnitude
 PID_Parameters      PI_iq;
 unsigned int        StartOperation  = 0; /*if this is 0, then no operation will be performed. It will be set inside the debugger*/
 unsigned long int   BlankCounter    = 0;
@@ -68,6 +68,8 @@ void InitDRV8305(DRV8305_Vars * deviceptr);
  */
 uint32_t    ControlISRCounter = 0;
 float       TimeCounter = 0;
+float       DataToBeSent[6];
+uint32_t    SendOneInFour = 0;
 uint32_t    faultcounter = 0;
 int main(void)
 {
@@ -152,6 +154,8 @@ int main(void)
 
     while(1)
     {
+        DELAY_US(100);
+        SciaBackgroundTask();
 
     }
     return 0;
@@ -598,6 +602,13 @@ static inline void ExecuteSecondPrediction(ModuleParameters& moduleparams,unsign
 }
 void InitializationRoutine(void)
 {
+    EALLOW;
+    GpioCtrlRegs.GPBGMUX1.bit.GPIO42 = 3;
+    GpioCtrlRegs.GPBMUX1.bit.GPIO42 = 3;
+    GpioCtrlRegs.GPBGMUX1.bit.GPIO43 = 3;
+    GpioCtrlRegs.GPBMUX1.bit.GPIO43 = 3;
+    EDIS;
+    InitializeSciaRegisters(921600.0);
     PI_iq.I_coeff       = I_COEFFICIENT;
     PI_iq.P_coeff       = P_COEFFICIENT;
     PI_iq.Ts            = PI_TS_COEFFICIENT;
@@ -1162,7 +1173,7 @@ __interrupt void adca1_isr(void)
     /*check ADCBSY register if  it makes here wait*/
     /*TODO, need to consider alignment scenario*/
     ControlISRCounter++;
-    TimeCounter=+1.0;
+    TimeCounter = TimeCounter + 1.0;
     if(TimeCounter==((float)INITIALPWMFREQ))
     {
         TimeCounter=0;
@@ -1194,6 +1205,7 @@ __interrupt void adca1_isr(void)
 
     Module1_Parameters.MinimumCostValue = (float)1e35;
 
+#if 0
     ExecuteFirstPrediction(Module1_Parameters,0);
     ExecuteSecondPrediction(Module1_Parameters,0);
     ExecuteFirstPrediction(Module1_Parameters,1);
@@ -1214,12 +1226,27 @@ __interrupt void adca1_isr(void)
     ExecuteSecondPrediction(Module1_Parameters,8);
     ExecuteFirstPrediction(Module1_Parameters,9);
     ExecuteSecondPrediction(Module1_Parameters,9);
-
+#endif
 #if BUILDMODE==MODE_RL_LOAD
     EPwm1Regs.CMPA.bit.CMPA = EPwm1Regs.TBPRD*RL_Load_Operation.ma*(sinf(2.0*PI*RL_Load_Operation.Frequency*TimeCounter/((float)INITIALPWMFREQ))*0.5+0.5);
     EPwm2Regs.CMPA.bit.CMPA = EPwm2Regs.TBPRD*RL_Load_Operation.ma*(sinf(2.0*PI*RL_Load_Operation.Frequency*TimeCounter/((float)INITIALPWMFREQ)+TWO_PI_OVER_THREE)*0.5+0.5);
     EPwm3Regs.CMPA.bit.CMPA = EPwm3Regs.TBPRD*RL_Load_Operation.ma*(sinf(2.0*PI*RL_Load_Operation.Frequency*TimeCounter/((float)INITIALPWMFREQ)+2.0*TWO_PI_OVER_THREE)*0.5+0.5);
 #endif
+
+
+    if(SendOneInFour%4==0)
+    {
+        DataToBeSent[0] = IA_CURRENT_FLOAT;
+        DataToBeSent[1] = EPwm1Regs.CMPA.bit.CMPA;
+        DataToBeSent[2] = IB_CURRENT_FLOAT;
+        DataToBeSent[3] = EPwm2Regs.CMPA.bit.CMPA;
+        DataToBeSent[4] = IC_CURRENT_FLOAT;
+        DataToBeSent[5] = EPwm3Regs.CMPA.bit.CMPA;
+        SciSendMultipleFloatWithTheTag(DataToBeSent,6);
+
+    }
+
+    SendOneInFour++;
 
     AdcaRegs.ADCINTFLGCLR.bit.ADCINT1 = 1;      // Clears respective flag bit in the ADCINTFLG register
     PieCtrlRegs.PIEACK.all = PIEACK_GROUP1;     // Acknowledge interrupt to PIE

@@ -3,14 +3,12 @@
 #include <F2837xD_Device.h>
 #include <F2837xD_Examples.h>
 
-
 #include "CustomTypeDefs.h"
 #include "MachineParameters.h"
 #include "ConstantParameters.h"
 #include "ControllerParameters.h"
 #include "DRV8305_defs.h"
 #include "MultipleFloatDataSender.h"
-
 
 /*      Before starting to using these code, followings must be tested
  * 1-   ADC     readings
@@ -24,71 +22,70 @@
  *
  * */
 
+ModuleParameters Module1_Parameters;
+OpenLoopOperation RL_Load_Operation = {25.0, 0.4}; // 50hz, 0.8 magnitude
+PID_Parameters PI_iq;
+unsigned int StartOperation = 0; /*if this is 0, then no operation will be performed. It will be set inside the debugger*/
+unsigned long int BlankCounter = 0;
+unsigned int OperationMode = 0; /*this will be changed */
+DRV8305_Vars Device1Configuration;
+int16 OffsetCalCounter;
+uint16_t OffsetCalculationIsDone = 0;
+float K1 = (0.998),  // Offset filter coefficient K1: 0.05/(T+0.05);
+    K2 = (0.001999); // Offset filter coefficient K2: T/(T+0.05);
 
-ModuleParameters    Module1_Parameters;
-OpenLoopOperation   RL_Load_Operation = {25.0, 0.4}; // 50hz, 0.8 magnitude
-PID_Parameters      PI_iq;
-unsigned int        StartOperation  = 0; /*if this is 0, then no operation will be performed. It will be set inside the debugger*/
-unsigned long int   BlankCounter    = 0;
-unsigned int        OperationMode   = 0;  /*this will be changed */
-DRV8305_Vars        Device1Configuration;
+__interrupt void cpu_timer0_isr(void); /*prototype of the ISR functions*/
+__interrupt void cpu_timer1_isr(void); /*prototype of the ISR functions*/
+__interrupt void cpu_timer2_isr(void); /*prototype of the ISR functions*/
+__interrupt void adca1_isr(void);      /*prototype of the ISR functions*/
 
-
-
-__interrupt void cpu_timer0_isr(void);  /*prototype of the ISR functions*/
-__interrupt void cpu_timer1_isr(void);  /*prototype of the ISR functions*/
-__interrupt void cpu_timer2_isr(void);  /*prototype of the ISR functions*/
-__interrupt void adca1_isr(void);        /*prototype of the ISR functions*/
-
-void InitializationRoutine(void);       /*all modules and gpios are initialized inside this function.*/
+void InitializationRoutine(void); /*all modules and gpios are initialized inside this function.*/
 void InitializeEpwm1Registers(void);
 void InitializeEpwm2Registers(void);
 void InitializeADCs(void);
 void SetupGPIOs(void);
 void EQEPSetup(void);
 inline void Run_PI_Controller(PID_Parameters &pidparams);
-inline void CalculateParkTransform(ModuleParameters& moduleparams);
-static inline void ExecuteFirstPrediction(ModuleParameters& moduleparams, unsigned int indexcount);
-static inline void ExecuteSecondPrediction(ModuleParameters& moduleparams, unsigned int indexcount);
+inline void CalculateParkTransform(ModuleParameters &moduleparams);
+static inline void ExecuteFirstPrediction(ModuleParameters &moduleparams, unsigned int indexcount);
+static inline void ExecuteSecondPrediction(ModuleParameters &moduleparams, unsigned int indexcount);
 
-
-void GetEncoderReadings(ModuleParameters& moduleparams);
-void GetAdcReadings(ModuleParameters& moduleparams);
+void GetEncoderReadings(ModuleParameters &moduleparams);
+void GetAdcReadings(ModuleParameters &moduleparams);
 void SetupCmpssProtections(void);
 void InitSpiDrv8305Gpio(void);
 void InitSpiRegs_DRV830x(volatile struct SPI_REGS *s);
-void InitDRV8305Regs(DRV8305_Vars * motor);
-Uint16 DRV8305_SPI_Write(DRV8305_Vars  * deviceptr, Uint16 address);
-Uint16 DRV8305_SPI_Read(DRV8305_Vars  * deviceptr, Uint16 address);
+void InitDRV8305Regs(DRV8305_Vars *motor);
+Uint16 DRV8305_SPI_Write(DRV8305_Vars *deviceptr, Uint16 address);
+Uint16 DRV8305_SPI_Read(DRV8305_Vars *deviceptr, Uint16 address);
 Uint16 SPI_Driver(volatile struct SPI_REGS *s, Uint16 data);
-void InitDRV8305(DRV8305_Vars * deviceptr);
-
+void InitDRV8305(DRV8305_Vars *deviceptr);
+void CalculateOffsetValue(void);
 /**
  * main.c
  */
-uint32_t    ControlISRCounter = 0;
-float       TimeCounter = 0;
-float       DataToBeSent[6];
-uint32_t    SendOneInFour = 0;
-uint32_t    faultcounter = 0;
+uint32_t ControlISRCounter = 0;
+float TimeCounter = 0;
+float DataToBeSent[6];
+uint32_t SendOneInFour = 0;
+uint32_t faultcounter = 0;
 int main(void)
 {
 
-
-    InitSysCtrl();  /*initialize the peripheral clocks*/
+    InitSysCtrl(); /*initialize the peripheral clocks*/
 
     EALLOW;
     ClkCfgRegs.PERCLKDIVSEL.bit.EPWMCLKDIV = 0; // EPWM Clock Divide Select: /1 of PLLSYSCLK
     EDIS;
 
-    InitPieCtrl();  /*initialize the PIE table (interrupt related)*/
-    IER = 0x0000;   /*clear the Interrupt Enable Register   (IER)*/
-    IFR = 0x0000;   /*clear the Interrupt Flag Register     (IFR)*/
+    InitPieCtrl(); /*initialize the PIE table (interrupt related)*/
+    IER = 0x0000;  /*clear the Interrupt Enable Register   (IER)*/
+    IFR = 0x0000;  /*clear the Interrupt Flag Register     (IFR)*/
     InitPieVectTable();
 
     EALLOW;
-    CpuSysRegs.PCLKCR0.bit.TBCLKSYNC = 0;   /*stop the TimeBase clock for later synchronization*/
-    CpuSysRegs.PCLKCR0.bit.GTBCLKSYNC = 0;  /*stop the global TimeBase clock for later synchronization*/
+    CpuSysRegs.PCLKCR0.bit.TBCLKSYNC = 0;  /*stop the TimeBase clock for later synchronization*/
+    CpuSysRegs.PCLKCR0.bit.GTBCLKSYNC = 0; /*stop the global TimeBase clock for later synchronization*/
     EDIS;
 
     EALLOW;
@@ -102,9 +99,9 @@ int main(void)
     GpioDataRegs.GPBSET.bit.GPIO34 = 1;
     EDIS;
 
-    while(StartOperation==0)
+    while (StartOperation == 0)
     {
-        if((BlankCounter%10)==0)
+        if ((BlankCounter % 10) == 0)
         {
             GpioDataRegs.GPATOGGLE.bit.GPIO31 = 1;
             GpioDataRegs.GPBTOGGLE.bit.GPIO34 = 1;
@@ -113,50 +110,49 @@ int main(void)
         BlankCounter++;
         DELAY_US(100000);
     }
-
+    DINT;
     /*Initialize cpu timers*/
     InitCpuTimers();
     ConfigCpuTimer(&CpuTimer0, 200, 1000000); //1 seconds
     ConfigCpuTimer(&CpuTimer1, 200, 1000000); //1 seconds
     ConfigCpuTimer(&CpuTimer2, 200, 1000000); //1 seconds
-    CpuTimer0Regs.TCR.all = 0x4000; // enable cpu timer interrupt
-    CpuTimer1Regs.TCR.all = 0x4000; // enable cpu timer interrupt
-    CpuTimer2Regs.TCR.all = 0x4000; // enable cpu timer interrupt
+    CpuTimer0Regs.TCR.all = 0x4000;           // enable cpu timer interrupt
+    CpuTimer1Regs.TCR.all = 0x4000;           // enable cpu timer interrupt
+    CpuTimer2Regs.TCR.all = 0x4000;           // enable cpu timer interrupt
 
     InitializationRoutine();
 
-
     EALLOW;
-    PieVectTable.TIMER0_INT = &cpu_timer0_isr;  /*specify the interrupt service routine (ISR) address to the PIE table*/
-    PieVectTable.TIMER1_INT = &cpu_timer1_isr;  /*specify the interrupt service routine (ISR) address to the PIE table*/
-    PieVectTable.TIMER2_INT = &cpu_timer2_isr;  /*specify the interrupt service routine (ISR) address to the PIE table*/
-    PieVectTable.ADCA1_INT = &adca1_isr;        /*specify the interrupt service routine (ISR) address to the PIE table*/
+    PieVectTable.TIMER0_INT = &cpu_timer0_isr; /*specify the interrupt service routine (ISR) address to the PIE table*/
+    PieVectTable.TIMER1_INT = &cpu_timer1_isr; /*specify the interrupt service routine (ISR) address to the PIE table*/
+    PieVectTable.TIMER2_INT = &cpu_timer2_isr; /*specify the interrupt service routine (ISR) address to the PIE table*/
+    PieVectTable.ADCA1_INT = &adca1_isr;       /*specify the interrupt service routine (ISR) address to the PIE table*/
     EDIS;
 
     IER |= M_INT1;  /*Enable the PIE group of Cpu timer 0 and ADCA1 interrupt*/
     IER |= M_INT13; /*Enable the PIE group of Cpu timer 1 interrupt*/
     IER |= M_INT14; /*Enable the PIE group of Cpu timer 2 interrupt*/
 
-
-    PieCtrlRegs.PIECTRL.bit.ENPIE = 1;  // Enable the PIE block
-    PieCtrlRegs.PIEIER1.bit.INTx7 = 1;  /*Enable the 7th interrupt of the Group 1, which is for timer 0 interrupt*/
-    PieCtrlRegs.PIEIER1.bit.INTx1 = 1;  /*Enable the 7th interrupt of the Group 1, which is for ADCA1 interrupt*/
+    PieCtrlRegs.PIECTRL.bit.ENPIE = 1; // Enable the PIE block
+    PieCtrlRegs.PIEIER1.bit.INTx7 = 1; /*Enable the 7th interrupt of the Group 1, which is for timer 0 interrupt*/
+    PieCtrlRegs.PIEIER1.bit.INTx1 = 1; /*Enable the 7th interrupt of the Group 1, which is for ADCA1 interrupt*/
 
     EALLOW;
-    CpuSysRegs.PCLKCR0.bit.TBCLKSYNC = 1;   /*start the TimeBase clock */
-    CpuSysRegs.PCLKCR0.bit.GTBCLKSYNC = 1;  /*start the global TimeBase clock */
+    CpuSysRegs.PCLKCR0.bit.TBCLKSYNC = 1;  /*start the TimeBase clock */
+    CpuSysRegs.PCLKCR0.bit.GTBCLKSYNC = 1; /*start the global TimeBase clock */
     EDIS;
 
-    EINT;  // Enable Global interrupt INTM
-    ERTM;  // Enable Global realtime interrupt DBGM
+    DELAY_US(50);
+    CalculateOffsetValue();
+    EALLOW;
+    EINT; // Enable Global interrupt INTM
+    ERTM; // Enable Global realtime interrupt DBGM
+    EDIS;
 
-
-
-    while(1)
+    while (1)
     {
         DELAY_US(100);
         SciaBackgroundTask();
-
     }
     return 0;
 }
@@ -177,7 +173,6 @@ __interrupt void cpu_timer1_isr(void)
 __interrupt void cpu_timer2_isr(void)
 {
     CpuTimer2.InterruptCount++;
-
 }
 void InitializeEpwm1Registers(void)
 {
@@ -194,16 +189,16 @@ void InitializeEpwm1Registers(void)
     EPwm1Regs.TBCTL.bit.PHSEN = TB_DISABLE;
     EPwm1Regs.TBCTL.bit.CTRMODE = TB_COUNT_UPDOWN;
 
-    EPwm1Regs.TBCTL2.bit.PRDLDSYNC = 0; /*the period will be loaded from shadow to active after TBCTR = 0*/
-    EPwm1Regs.TBCTL2.bit.SYNCOSELX = 0; /*this is unnecessary*/
-    EPwm1Regs.TBCTL2.bit.OSHTSYNC = 0;  /*this is unnecessary*/
+    EPwm1Regs.TBCTL2.bit.PRDLDSYNC = 0;    /*the period will be loaded from shadow to active after TBCTR = 0*/
+    EPwm1Regs.TBCTL2.bit.SYNCOSELX = 0;    /*this is unnecessary*/
+    EPwm1Regs.TBCTL2.bit.OSHTSYNC = 0;     /*this is unnecessary*/
     EPwm1Regs.TBCTL2.bit.OSHTSYNCMODE = 0; /*one shot sync is disabled*/
 
     EPwm1Regs.TBCTR = 0;
 
     EPwm1Regs.TBSTS.bit.CTRMAX = 0; /*this is unnecessary*/
     EPwm1Regs.TBSTS.bit.SYNCI = 0;  /*this is unnecessary*/
-    EPwm1Regs.TBSTS.bit.CTRDIR = 0;  /*this is unnecessary*/
+    EPwm1Regs.TBSTS.bit.CTRDIR = 0; /*this is unnecessary*/
 
     EPwm1Regs.CMPCTL.bit.LOADBSYNC = 0; /*Shadow to Active Load of CMPB:CMPBHR occurs according to LOADBMODE */
     EPwm1Regs.CMPCTL.bit.LOADASYNC = 0; /*Shadow to Active Load of CMPA:CMPAHR occurs according to LOADAMODE */
@@ -213,7 +208,7 @@ void InitializeEpwm1Registers(void)
     EPwm1Regs.CMPCTL.bit.SHDWAMODE = CC_SHADOW;
     EPwm1Regs.CMPCTL.bit.LOADBMODE = CC_CTR_ZERO;
     EPwm1Regs.CMPCTL.bit.LOADAMODE = CC_CTR_ZERO;
-#if 0   /*CMPC or CMPD will not be used, therefore they left uninitialized*/
+#if 0 /*CMPC or CMPD will not be used, therefore they left uninitialized*/
     EPwm1Regs.CMPCTL2.bit.LOADDSYNC = 0; /*Shadow to Active Load of CMPB:CMPBHR occurs according to LOADBMODE */
     EPwm1Regs.CMPCTL2.bit.LOADCSYNC = 0; /*Shadow to Active Load of CMPA:CMPAHR occurs according to LOADAMODE */
     //EPwm1Regs.CMPCTL.bit.SHDWBFULL = 0; /*you can check if the shadow register is filled or not*/
@@ -227,11 +222,11 @@ void InitializeEpwm1Registers(void)
     /*TODO check those deadtimes with an oscilloscope*/
     /*TODO check how do we apply the duty cycles*/
     EPwm1Regs.DBCTL.all = 0;
-    EPwm1Regs.DBCTL.bit.OUT_MODE = DB_FULL_ENABLE;          /*deadband is set for both fed and red*/
-    EPwm1Regs.DBCTL.bit.POLSEL = DB_ACTV_HIC;               /*EPWmxB is inverted*/
-    EPwm1Regs.DBFED.bit.DBFED = DEADBAND_FED/SYSCLKPERIOD;
-    EPwm1Regs.DBRED.bit.DBRED = DEADBAND_RED/SYSCLKPERIOD;
-    EPwm1Regs.DBCTL2.all = 0;                               /*has no useful setting*/
+    EPwm1Regs.DBCTL.bit.OUT_MODE = DB_FULL_ENABLE; /*deadband is set for both fed and red*/
+    EPwm1Regs.DBCTL.bit.POLSEL = DB_ACTV_HIC;      /*EPWmxB is inverted*/
+    EPwm1Regs.DBFED.bit.DBFED = DEADBAND_FED / SYSCLKPERIOD;
+    EPwm1Regs.DBRED.bit.DBRED = DEADBAND_RED / SYSCLKPERIOD;
+    EPwm1Regs.DBCTL2.all = 0; /*has no useful setting*/
 
     /*action qualifier settings will be set once, therefore shadowing is unnecessary.*/
     EPwm1Regs.AQCTL.all = 0;
@@ -254,7 +249,7 @@ void InitializeEpwm1Registers(void)
 
     EPwm1Regs.TBPHS.bit.TBPHS = 0;
 
-    EPwm1Regs.TBPRD = SYSCLKFREQUENCY/ (INITIALPWMFREQ*2);
+    EPwm1Regs.TBPRD = SYSCLKFREQUENCY / (INITIALPWMFREQ * 2);
     EPwm1Regs.CMPA.bit.CMPA = EPwm1Regs.TBPRD / 5;
 
     /*TODO how to do tripzone?, how are we going to do the protection?
@@ -266,9 +261,7 @@ void InitializeEpwm1Registers(void)
 
     EPwm1Regs.ETPS.all = 0x00;
     EPwm1Regs.ETPS.bit.INTPRD = 1;  // Generate INT on first event
-    EPwm1Regs.ETPS.bit.SOCAPRD = 1;  // Generate SOC on first event
-
-
+    EPwm1Regs.ETPS.bit.SOCAPRD = 1; // Generate SOC on first event
 }
 void InitializeEpwm2Registers(void)
 {
@@ -285,16 +278,16 @@ void InitializeEpwm2Registers(void)
     EPwm2Regs.TBCTL.bit.PHSEN = TB_ENABLE;
     EPwm2Regs.TBCTL.bit.CTRMODE = TB_COUNT_UPDOWN;
 
-    EPwm2Regs.TBCTL2.bit.PRDLDSYNC = 0; /*the period will be loaded from shadow to active after TBCTR = 0*/
-    EPwm2Regs.TBCTL2.bit.SYNCOSELX = 0; /*this is unnecessary*/
-    EPwm2Regs.TBCTL2.bit.OSHTSYNC = 0;  /*this is unnecessary*/
+    EPwm2Regs.TBCTL2.bit.PRDLDSYNC = 0;    /*the period will be loaded from shadow to active after TBCTR = 0*/
+    EPwm2Regs.TBCTL2.bit.SYNCOSELX = 0;    /*this is unnecessary*/
+    EPwm2Regs.TBCTL2.bit.OSHTSYNC = 0;     /*this is unnecessary*/
     EPwm2Regs.TBCTL2.bit.OSHTSYNCMODE = 0; /*one shot sync is disabled*/
 
     EPwm2Regs.TBCTR = 0;
 
     EPwm2Regs.TBSTS.bit.CTRMAX = 0; /*this is unnecessary*/
     EPwm2Regs.TBSTS.bit.SYNCI = 0;  /*this is unnecessary*/
-    EPwm2Regs.TBSTS.bit.CTRDIR = 0;  /*this is unnecessary*/
+    EPwm2Regs.TBSTS.bit.CTRDIR = 0; /*this is unnecessary*/
 
     EPwm2Regs.CMPCTL.bit.LOADBSYNC = 0; /*Shadow to Active Load of CMPB:CMPBHR occurs according to LOADBMODE */
     EPwm2Regs.CMPCTL.bit.LOADASYNC = 0; /*Shadow to Active Load of CMPA:CMPAHR occurs according to LOADAMODE */
@@ -304,7 +297,7 @@ void InitializeEpwm2Registers(void)
     EPwm2Regs.CMPCTL.bit.SHDWAMODE = CC_SHADOW;
     EPwm2Regs.CMPCTL.bit.LOADBMODE = CC_CTR_ZERO;
     EPwm2Regs.CMPCTL.bit.LOADAMODE = CC_CTR_ZERO;
-#if 0   /*CMPC or CMPD will not be used, therefore they left uninitialized*/
+#if 0 /*CMPC or CMPD will not be used, therefore they left uninitialized*/
     EPwm2Regs.CMPCTL2.bit.LOADDSYNC = 0; /*Shadow to Active Load of CMPB:CMPBHR occurs according to LOADBMODE */
     EPwm2Regs.CMPCTL2.bit.LOADCSYNC = 0; /*Shadow to Active Load of CMPA:CMPAHR occurs according to LOADAMODE */
     //EPwm2Regs.CMPCTL.bit.SHDWBFULL = 0; /*you can check if the shadow register is filled or not*/
@@ -318,11 +311,11 @@ void InitializeEpwm2Registers(void)
     /*TODO check those deadtimes with an oscilloscope*/
     /*TODO check how do we apply the duty cycles*/
     EPwm2Regs.DBCTL.all = 0;
-    EPwm2Regs.DBCTL.bit.OUT_MODE = DB_FULL_ENABLE;          /*deadband is set for both fed and red*/
-    EPwm2Regs.DBCTL.bit.POLSEL = DB_ACTV_HIC;               /*EPWmxB is inverted*/
-    EPwm2Regs.DBFED.bit.DBFED = DEADBAND_FED/SYSCLKPERIOD;
-    EPwm2Regs.DBRED.bit.DBRED = DEADBAND_RED/SYSCLKPERIOD;
-    EPwm2Regs.DBCTL2.all = 0;                               /*has no useful setting*/
+    EPwm2Regs.DBCTL.bit.OUT_MODE = DB_FULL_ENABLE; /*deadband is set for both fed and red*/
+    EPwm2Regs.DBCTL.bit.POLSEL = DB_ACTV_HIC;      /*EPWmxB is inverted*/
+    EPwm2Regs.DBFED.bit.DBFED = DEADBAND_FED / SYSCLKPERIOD;
+    EPwm2Regs.DBRED.bit.DBRED = DEADBAND_RED / SYSCLKPERIOD;
+    EPwm2Regs.DBCTL2.all = 0; /*has no useful setting*/
 
     /*action qualifier settings will be set once, therefore shadowing is unnecessary.*/
     EPwm2Regs.AQCTL.all = 0;
@@ -345,7 +338,7 @@ void InitializeEpwm2Registers(void)
 
     EPwm2Regs.TBPHS.bit.TBPHS = 0;
 
-    EPwm2Regs.TBPRD = SYSCLKFREQUENCY/ (INITIALPWMFREQ*2);
+    EPwm2Regs.TBPRD = SYSCLKFREQUENCY / (INITIALPWMFREQ * 2);
     EPwm2Regs.CMPA.bit.CMPA = EPwm2Regs.TBPRD / 2;
 }
 void InitializeEpwm3Registers(void)
@@ -363,16 +356,16 @@ void InitializeEpwm3Registers(void)
     EPwm3Regs.TBCTL.bit.PHSEN = TB_ENABLE;
     EPwm3Regs.TBCTL.bit.CTRMODE = TB_COUNT_UPDOWN;
 
-    EPwm3Regs.TBCTL2.bit.PRDLDSYNC = 0; /*the period will be loaded from shadow to active after TBCTR = 0*/
-    EPwm3Regs.TBCTL2.bit.SYNCOSELX = 0; /*this is unnecessary*/
-    EPwm3Regs.TBCTL2.bit.OSHTSYNC = 0;  /*this is unnecessary*/
+    EPwm3Regs.TBCTL2.bit.PRDLDSYNC = 0;    /*the period will be loaded from shadow to active after TBCTR = 0*/
+    EPwm3Regs.TBCTL2.bit.SYNCOSELX = 0;    /*this is unnecessary*/
+    EPwm3Regs.TBCTL2.bit.OSHTSYNC = 0;     /*this is unnecessary*/
     EPwm3Regs.TBCTL2.bit.OSHTSYNCMODE = 0; /*one shot sync is disabled*/
 
     EPwm3Regs.TBCTR = 0;
 
     EPwm3Regs.TBSTS.bit.CTRMAX = 0; /*this is unnecessary*/
     EPwm3Regs.TBSTS.bit.SYNCI = 0;  /*this is unnecessary*/
-    EPwm3Regs.TBSTS.bit.CTRDIR = 0;  /*this is unnecessary*/
+    EPwm3Regs.TBSTS.bit.CTRDIR = 0; /*this is unnecessary*/
 
     EPwm3Regs.CMPCTL.bit.LOADBSYNC = 0; /*Shadow to Active Load of CMPB:CMPBHR occurs according to LOADBMODE */
     EPwm3Regs.CMPCTL.bit.LOADASYNC = 0; /*Shadow to Active Load of CMPA:CMPAHR occurs according to LOADAMODE */
@@ -382,7 +375,7 @@ void InitializeEpwm3Registers(void)
     EPwm3Regs.CMPCTL.bit.SHDWAMODE = CC_SHADOW;
     EPwm3Regs.CMPCTL.bit.LOADBMODE = CC_CTR_ZERO;
     EPwm3Regs.CMPCTL.bit.LOADAMODE = CC_CTR_ZERO;
-#if 0   /*CMPC or CMPD will not be used, therefore they left uninitialized*/
+#if 0 /*CMPC or CMPD will not be used, therefore they left uninitialized*/
     EPwm3Regs.CMPCTL2.bit.LOADDSYNC = 0; /*Shadow to Active Load of CMPB:CMPBHR occurs according to LOADBMODE */
     EPwm3Regs.CMPCTL2.bit.LOADCSYNC = 0; /*Shadow to Active Load of CMPA:CMPAHR occurs according to LOADAMODE */
     //EPwm3Regs.CMPCTL.bit.SHDWBFULL = 0; /*you can check if the shadow register is filled or not*/
@@ -396,11 +389,11 @@ void InitializeEpwm3Registers(void)
     /*TODO check those deadtimes with an oscilloscope*/
     /*TODO check how do we apply the duty cycles*/
     EPwm3Regs.DBCTL.all = 0;
-    EPwm3Regs.DBCTL.bit.OUT_MODE = DB_FULL_ENABLE;          /*deadband is set for both fed and red*/
-    EPwm3Regs.DBCTL.bit.POLSEL = DB_ACTV_HIC;               /*EPWmxB is inverted*/
-    EPwm3Regs.DBFED.bit.DBFED = DEADBAND_FED/SYSCLKPERIOD;
-    EPwm3Regs.DBRED.bit.DBRED = DEADBAND_RED/SYSCLKPERIOD;
-    EPwm3Regs.DBCTL2.all = 0;                               /*has no useful setting*/
+    EPwm3Regs.DBCTL.bit.OUT_MODE = DB_FULL_ENABLE; /*deadband is set for both fed and red*/
+    EPwm3Regs.DBCTL.bit.POLSEL = DB_ACTV_HIC;      /*EPWmxB is inverted*/
+    EPwm3Regs.DBFED.bit.DBFED = DEADBAND_FED / SYSCLKPERIOD;
+    EPwm3Regs.DBRED.bit.DBRED = DEADBAND_RED / SYSCLKPERIOD;
+    EPwm3Regs.DBCTL2.all = 0; /*has no useful setting*/
 
     /*action qualifier settings will be set once, therefore shadowing is unnecessary.*/
     EPwm3Regs.AQCTL.all = 0;
@@ -423,37 +416,37 @@ void InitializeEpwm3Registers(void)
 
     EPwm3Regs.TBPHS.bit.TBPHS = 0;
 
-    EPwm3Regs.TBPRD = SYSCLKFREQUENCY/ (INITIALPWMFREQ*2);
+    EPwm3Regs.TBPRD = SYSCLKFREQUENCY / (INITIALPWMFREQ * 2);
     EPwm3Regs.CMPA.bit.CMPA = EPwm3Regs.TBPRD / 2;
 }
 
 void SetupGPIOs(void)
 {
     EALLOW;
-    GpioCtrlRegs.GPAPUD.bit.GPIO0 = 1;    // Disable pull-up on GPIO0 (EPWM1A)
-    GpioCtrlRegs.GPAPUD.bit.GPIO1 = 1;    // Disable pull-up on GPIO1 (EPWM1B)
-    GpioCtrlRegs.GPAGMUX1.bit.GPIO0 = 0;  // Configure GPIO0 as EPWM1A
-    GpioCtrlRegs.GPAGMUX1.bit.GPIO1 = 0;  // Configure GPIO1 as EPWM1B
-    GpioCtrlRegs.GPAMUX1.bit.GPIO0 = 1;   // Configure GPIO0 as EPWM1A
-    GpioCtrlRegs.GPAMUX1.bit.GPIO1 = 1;   // Configure GPIO1 as EPWM1B
+    GpioCtrlRegs.GPAPUD.bit.GPIO0 = 1;   // Disable pull-up on GPIO0 (EPWM1A)
+    GpioCtrlRegs.GPAPUD.bit.GPIO1 = 1;   // Disable pull-up on GPIO1 (EPWM1B)
+    GpioCtrlRegs.GPAGMUX1.bit.GPIO0 = 0; // Configure GPIO0 as EPWM1A
+    GpioCtrlRegs.GPAGMUX1.bit.GPIO1 = 0; // Configure GPIO1 as EPWM1B
+    GpioCtrlRegs.GPAMUX1.bit.GPIO0 = 1;  // Configure GPIO0 as EPWM1A
+    GpioCtrlRegs.GPAMUX1.bit.GPIO1 = 1;  // Configure GPIO1 as EPWM1B
     EDIS;
 
     EALLOW;
-    GpioCtrlRegs.GPAPUD.bit.GPIO2 = 1;    // Disable pull-up on GPIO2 (EPWM2A)
-    GpioCtrlRegs.GPAPUD.bit.GPIO3 = 1;    // Disable pull-up on GPIO3 (EPWM2B)
-    GpioCtrlRegs.GPAGMUX1.bit.GPIO2 = 0;  // Configure GPIO2 as EPWM2A
-    GpioCtrlRegs.GPAGMUX1.bit.GPIO3 = 0;  // Configure GPIO3 as EPWM2B
-    GpioCtrlRegs.GPAMUX1.bit.GPIO2 = 1;   // Configure GPIO2 as EPWM2A
-    GpioCtrlRegs.GPAMUX1.bit.GPIO3 = 1;   // Configure GPIO3 as EPWM2B
+    GpioCtrlRegs.GPAPUD.bit.GPIO2 = 1;   // Disable pull-up on GPIO2 (EPWM2A)
+    GpioCtrlRegs.GPAPUD.bit.GPIO3 = 1;   // Disable pull-up on GPIO3 (EPWM2B)
+    GpioCtrlRegs.GPAGMUX1.bit.GPIO2 = 0; // Configure GPIO2 as EPWM2A
+    GpioCtrlRegs.GPAGMUX1.bit.GPIO3 = 0; // Configure GPIO3 as EPWM2B
+    GpioCtrlRegs.GPAMUX1.bit.GPIO2 = 1;  // Configure GPIO2 as EPWM2A
+    GpioCtrlRegs.GPAMUX1.bit.GPIO3 = 1;  // Configure GPIO3 as EPWM2B
     EDIS;
 
     EALLOW;
-    GpioCtrlRegs.GPAPUD.bit.GPIO4 = 1;    // Disable pull-up on GPIO4 (EPWM3A)
-    GpioCtrlRegs.GPAPUD.bit.GPIO5 = 1;    // Disable pull-up on GPIO5 (EPWM3B)
-    GpioCtrlRegs.GPAGMUX1.bit.GPIO4 = 0;  // Configure GPIO4 as EPWM3A
-    GpioCtrlRegs.GPAGMUX1.bit.GPIO5 = 0;  // Configure GPIO5 as EPWM3B
-    GpioCtrlRegs.GPAMUX1.bit.GPIO4 = 1;   // Configure GPIO4 as EPWM3A
-    GpioCtrlRegs.GPAMUX1.bit.GPIO5 = 1;   // Configure GPIO5 as EPWM3B
+    GpioCtrlRegs.GPAPUD.bit.GPIO4 = 1;   // Disable pull-up on GPIO4 (EPWM3A)
+    GpioCtrlRegs.GPAPUD.bit.GPIO5 = 1;   // Disable pull-up on GPIO5 (EPWM3B)
+    GpioCtrlRegs.GPAGMUX1.bit.GPIO4 = 0; // Configure GPIO4 as EPWM3A
+    GpioCtrlRegs.GPAGMUX1.bit.GPIO5 = 0; // Configure GPIO5 as EPWM3B
+    GpioCtrlRegs.GPAMUX1.bit.GPIO4 = 1;  // Configure GPIO4 as EPWM3A
+    GpioCtrlRegs.GPAMUX1.bit.GPIO5 = 1;  // Configure GPIO5 as EPWM3B
     EDIS;
 
     EALLOW;
@@ -466,36 +459,27 @@ void SetupGPIOs(void)
     GpioDataRegs.GPASET.bit.GPIO31 = 1;
     GpioDataRegs.GPBCLEAR.bit.GPIO34 = 1;
     EDIS;
-
-
-
-
-
 }
 
 inline void Run_PI_Controller(PID_Parameters &pidparams)
 {
-    pidparams.Output = pidparams.Output_prev + pidparams.P_coeff*(pidparams.Input-pidparams.Input_prev)+ (pidparams.Ts)/2.0*pidparams.I_coeff*(pidparams.Input+pidparams.Input_prev);
-    if(pidparams.Output>pidparams.SaturationMax)
+    pidparams.Output = pidparams.Output_prev + pidparams.P_coeff * (pidparams.Input - pidparams.Input_prev) + (pidparams.Ts) / 2.0 * pidparams.I_coeff * (pidparams.Input + pidparams.Input_prev);
+    if (pidparams.Output > pidparams.SaturationMax)
     {
         pidparams.Output = pidparams.SaturationMax;
     }
-    if(pidparams.Output<pidparams.SaturationMin)
+    if (pidparams.Output < pidparams.SaturationMin)
     {
         pidparams.Output = pidparams.SaturationMin;
     }
     pidparams.Output_prev = pidparams.Output;
     pidparams.Input_prev = pidparams.Input;
 }
-inline void CalculateParkTransform(ModuleParameters& moduleparams)
+inline void CalculateParkTransform(ModuleParameters &moduleparams)
 {
 
-    moduleparams.Measured.Current.transformed.Dvalue = 0.66667*(moduleparams.Measured.Current.PhaseA*sinf(moduleparams.Angle.Electrical)\
-            +moduleparams.Measured.Current.PhaseB*sinf(moduleparams.Angle.Electrical-0.66667*PI/*2*PI/3*/)\
-            +moduleparams.Measured.Current.PhaseC*sinf(moduleparams.Angle.Electrical+0.66667*PI/*2*PI/3*/));
-    moduleparams.Measured.Current.transformed.Qvalue = 0.66667*(moduleparams.Measured.Current.PhaseA*cosf(moduleparams.Angle.Electrical)\
-            +moduleparams.Measured.Current.PhaseB*cosf(moduleparams.Angle.Electrical-0.66667*PI/*2*PI/3*/)\
-            +moduleparams.Measured.Current.PhaseC*cosf(moduleparams.Angle.Electrical+0.66667*PI/*2*PI/3*/));
+    moduleparams.Measured.Current.transformed.Dvalue = 0.66667 * (moduleparams.Measured.Current.PhaseA * sinf(moduleparams.Angle.Electrical) + moduleparams.Measured.Current.PhaseB * sinf(moduleparams.Angle.Electrical - 0.66667 * PI /*2*PI/3*/) + moduleparams.Measured.Current.PhaseC * sinf(moduleparams.Angle.Electrical + 0.66667 * PI /*2*PI/3*/));
+    moduleparams.Measured.Current.transformed.Qvalue = 0.66667 * (moduleparams.Measured.Current.PhaseA * cosf(moduleparams.Angle.Electrical) + moduleparams.Measured.Current.PhaseB * cosf(moduleparams.Angle.Electrical - 0.66667 * PI /*2*PI/3*/) + moduleparams.Measured.Current.PhaseC * cosf(moduleparams.Angle.Electrical + 0.66667 * PI /*2*PI/3*/));
 #if 0
     moduleparams.PhaseCurrent.ZeroValue = 0.66667*0.5*(moduleparams.Measured.Current.PhaseA\
             +moduleparams.Measured.Current.PhaseB\
@@ -505,16 +489,12 @@ inline void CalculateParkTransform(ModuleParameters& moduleparams)
     //iqs =  2/3*(ias*cos(ref_frame_position)+ibs*cos(ref_frame_position-2*pi/3)+ics*cos(ref_frame_position+2*pi/3));
     //i0 = 2/3*1/2*(ias+ibs+ics);
 }
-static inline void ExecuteFirstPrediction(ModuleParameters& moduleparams,unsigned int indexcount)
+static inline void ExecuteFirstPrediction(ModuleParameters &moduleparams, unsigned int indexcount)
 {
 
-    moduleparams.FirstHorizon[indexcount].Vd = RS_VALUE*moduleparams.Measured.Current.transformed.Dvalue \
-            + LS_VALUE*moduleparams.OptimizationFsw[indexcount]*(moduleparams.Reference.Id-moduleparams.Measured.Current.transformed.Dvalue) \
-            - POLEPAIRS*moduleparams.AngularSpeed.Mechanical*LS_VALUE*moduleparams.Measured.Current.transformed.Qvalue;
-    moduleparams.FirstHorizon[indexcount].Vq = RS_VALUE*moduleparams.Measured.Current.transformed.Qvalue \
-            + LS_VALUE*moduleparams.OptimizationFsw[indexcount]*(moduleparams.Reference.Iq-moduleparams.Measured.Current.transformed.Qvalue) \
-            + POLEPAIRS*moduleparams.AngularSpeed.Mechanical*(LS_VALUE*moduleparams.Measured.Current.transformed.Dvalue+FLUX_VALUE);
-#if 0   /*ripple prediction is unnecessary for the first horizon*/
+    moduleparams.FirstHorizon[indexcount].Vd = RS_VALUE * moduleparams.Measured.Current.transformed.Dvalue + LS_VALUE * moduleparams.OptimizationFsw[indexcount] * (moduleparams.Reference.Id - moduleparams.Measured.Current.transformed.Dvalue) - POLEPAIRS * moduleparams.AngularSpeed.Mechanical * LS_VALUE * moduleparams.Measured.Current.transformed.Qvalue;
+    moduleparams.FirstHorizon[indexcount].Vq = RS_VALUE * moduleparams.Measured.Current.transformed.Qvalue + LS_VALUE * moduleparams.OptimizationFsw[indexcount] * (moduleparams.Reference.Iq - moduleparams.Measured.Current.transformed.Qvalue) + POLEPAIRS * moduleparams.AngularSpeed.Mechanical * (LS_VALUE * moduleparams.Measured.Current.transformed.Dvalue + FLUX_VALUE);
+#if 0 /*ripple prediction is unnecessary for the first horizon*/
     moduleparams.FirstHorizon[indexcount].Magnitude = sqrtf(moduleparams.FirstHorizon[indexcount].Vd*moduleparams.FirstHorizon[indexcount].Vd\
                                                           + moduleparams.FirstHorizon[indexcount].Vq*moduleparams.FirstHorizon[indexcount].Vq);
 
@@ -543,58 +523,44 @@ static inline void ExecuteFirstPrediction(ModuleParameters& moduleparams,unsigne
     moduleparams.FirstHorizon[indexcount].Iq_Ripple_Prediction = moduleparams.FirstHorizon[indexcount].Iq_Delta_DuringT1+moduleparams.FirstHorizon[indexcount].Iq_Delta_DuringT2+moduleparams.FirstHorizon[indexcount].Iq_Delta_DuringT0;
 
 #endif
-    moduleparams.FirstHorizon[indexcount].IqPrediction = moduleparams.Measured.Current.transformed.Dvalue + (1.0/moduleparams.OptimizationFsw[indexcount])*(moduleparams.FirstHorizon[indexcount].Vd/LS_VALUE - RS_VALUE/LS_VALUE*moduleparams.Measured.Current.transformed.Dvalue+LS_VALUE/LS_VALUE*POLEPAIRS*moduleparams.AngularSpeed.Mechanical*moduleparams.Measured.Current.transformed.Qvalue);
-    moduleparams.FirstHorizon[indexcount].IdPrediction = moduleparams.Measured.Current.transformed.Qvalue + (1.0/moduleparams.OptimizationFsw[indexcount])*(moduleparams.FirstHorizon[indexcount].Vq/LS_VALUE - RS_VALUE/LS_VALUE*moduleparams.Measured.Current.transformed.Qvalue+LS_VALUE/LS_VALUE*POLEPAIRS*moduleparams.AngularSpeed.Mechanical*moduleparams.Measured.Current.transformed.Dvalue-FLUX_VALUE*POLEPAIRS*moduleparams.AngularSpeed.Mechanical/LS_VALUE);
-
-
-
+    moduleparams.FirstHorizon[indexcount].IqPrediction = moduleparams.Measured.Current.transformed.Dvalue + (1.0 / moduleparams.OptimizationFsw[indexcount]) * (moduleparams.FirstHorizon[indexcount].Vd / LS_VALUE - RS_VALUE / LS_VALUE * moduleparams.Measured.Current.transformed.Dvalue + LS_VALUE / LS_VALUE * POLEPAIRS * moduleparams.AngularSpeed.Mechanical * moduleparams.Measured.Current.transformed.Qvalue);
+    moduleparams.FirstHorizon[indexcount].IdPrediction = moduleparams.Measured.Current.transformed.Qvalue + (1.0 / moduleparams.OptimizationFsw[indexcount]) * (moduleparams.FirstHorizon[indexcount].Vq / LS_VALUE - RS_VALUE / LS_VALUE * moduleparams.Measured.Current.transformed.Qvalue + LS_VALUE / LS_VALUE * POLEPAIRS * moduleparams.AngularSpeed.Mechanical * moduleparams.Measured.Current.transformed.Dvalue - FLUX_VALUE * POLEPAIRS * moduleparams.AngularSpeed.Mechanical / LS_VALUE);
 }
-static inline void ExecuteSecondPrediction(ModuleParameters& moduleparams,unsigned int indexcount)
+static inline void ExecuteSecondPrediction(ModuleParameters &moduleparams, unsigned int indexcount)
 {
-    moduleparams.SecondHorizon[indexcount].Vd = RS_VALUE*moduleparams.Measured.Current.transformed.Dvalue \
-            + LS_VALUE*moduleparams.OptimizationFsw[indexcount]*(moduleparams.Reference.Id-moduleparams.Measured.Current.transformed.Dvalue) \
-            - POLEPAIRS*moduleparams.AngularSpeed.Mechanical*LS_VALUE*moduleparams.Measured.Current.transformed.Qvalue;
-    moduleparams.SecondHorizon[indexcount].Vq = RS_VALUE*moduleparams.Measured.Current.transformed.Qvalue \
-            + LS_VALUE*moduleparams.OptimizationFsw[indexcount]*(moduleparams.Reference.Iq-moduleparams.Measured.Current.transformed.Qvalue) \
-            + POLEPAIRS*moduleparams.AngularSpeed.Mechanical*(LS_VALUE*moduleparams.Measured.Current.transformed.Dvalue+FLUX_VALUE);
+    moduleparams.SecondHorizon[indexcount].Vd = RS_VALUE * moduleparams.Measured.Current.transformed.Dvalue + LS_VALUE * moduleparams.OptimizationFsw[indexcount] * (moduleparams.Reference.Id - moduleparams.Measured.Current.transformed.Dvalue) - POLEPAIRS * moduleparams.AngularSpeed.Mechanical * LS_VALUE * moduleparams.Measured.Current.transformed.Qvalue;
+    moduleparams.SecondHorizon[indexcount].Vq = RS_VALUE * moduleparams.Measured.Current.transformed.Qvalue + LS_VALUE * moduleparams.OptimizationFsw[indexcount] * (moduleparams.Reference.Iq - moduleparams.Measured.Current.transformed.Qvalue) + POLEPAIRS * moduleparams.AngularSpeed.Mechanical * (LS_VALUE * moduleparams.Measured.Current.transformed.Dvalue + FLUX_VALUE);
 
-    moduleparams.SecondHorizon[indexcount].Magnitude = sqrtf(moduleparams.SecondHorizon[indexcount].Vd*moduleparams.SecondHorizon[indexcount].Vd\
-                                                          + moduleparams.SecondHorizon[indexcount].Vq*moduleparams.SecondHorizon[indexcount].Vq);
+    moduleparams.SecondHorizon[indexcount].Magnitude = sqrtf(moduleparams.SecondHorizon[indexcount].Vd * moduleparams.SecondHorizon[indexcount].Vd + moduleparams.SecondHorizon[indexcount].Vq * moduleparams.SecondHorizon[indexcount].Vq);
 
-    moduleparams.SecondHorizon[indexcount].Valfa = sinf(moduleparams.Angle.Electrical)*moduleparams.SecondHorizon[indexcount].Vd+cosf(moduleparams.Angle.Electrical)*moduleparams.SecondHorizon[indexcount].Vq;
-    moduleparams.SecondHorizon[indexcount].Vbeta =-cosf(moduleparams.Angle.Electrical)*moduleparams.SecondHorizon[indexcount].Vd+sinf(moduleparams.Angle.Electrical)*moduleparams.SecondHorizon[indexcount].Vq;
+    moduleparams.SecondHorizon[indexcount].Valfa = sinf(moduleparams.Angle.Electrical) * moduleparams.SecondHorizon[indexcount].Vd + cosf(moduleparams.Angle.Electrical) * moduleparams.SecondHorizon[indexcount].Vq;
+    moduleparams.SecondHorizon[indexcount].Vbeta = -cosf(moduleparams.Angle.Electrical) * moduleparams.SecondHorizon[indexcount].Vd + sinf(moduleparams.Angle.Electrical) * moduleparams.SecondHorizon[indexcount].Vq;
 
-    moduleparams.SecondHorizon[indexcount].VoltageVectorAngleRad = atan2f(moduleparams.SecondHorizon[indexcount].Vbeta,moduleparams.SecondHorizon[indexcount].Valfa);
-    moduleparams.SecondHorizon[indexcount].VoltageVectorAngleRad_Mod = fmodf(moduleparams.SecondHorizon[indexcount].VoltageVectorAngleRad,PI/3.0);
+    moduleparams.SecondHorizon[indexcount].VoltageVectorAngleRad = atan2f(moduleparams.SecondHorizon[indexcount].Vbeta, moduleparams.SecondHorizon[indexcount].Valfa);
+    moduleparams.SecondHorizon[indexcount].VoltageVectorAngleRad_Mod = fmodf(moduleparams.SecondHorizon[indexcount].VoltageVectorAngleRad, PI / 3.0);
 
-    moduleparams.SecondHorizon[indexcount].ma = moduleparams.SecondHorizon[indexcount].Magnitude/(moduleparams.Measured.Voltage.Vdc/sqrtf(3));
+    moduleparams.SecondHorizon[indexcount].ma = moduleparams.SecondHorizon[indexcount].Magnitude / (moduleparams.Measured.Voltage.Vdc / sqrtf(3));
 
+    moduleparams.SecondHorizon[indexcount].SvpwmT1 = (1.0 / moduleparams.OptimizationFsw[indexcount]) * moduleparams.SecondHorizon[indexcount].ma * sinf(PI / 3.0 - moduleparams.SecondHorizon[indexcount].VoltageVectorAngleRad_Mod);
+    moduleparams.SecondHorizon[indexcount].SvpwmT2 = (1.0 / moduleparams.OptimizationFsw[indexcount]) * moduleparams.SecondHorizon[indexcount].ma * sinf(moduleparams.SecondHorizon[indexcount].VoltageVectorAngleRad_Mod);
+    moduleparams.SecondHorizon[indexcount].SvpwmT0 = (1.0 / moduleparams.OptimizationFsw[indexcount]) - moduleparams.SecondHorizon[indexcount].SvpwmT1 - moduleparams.SecondHorizon[indexcount].SvpwmT2;
 
-    moduleparams.SecondHorizon[indexcount].SvpwmT1 = (1.0/moduleparams.OptimizationFsw[indexcount])*moduleparams.SecondHorizon[indexcount].ma*sinf(PI/3.0-moduleparams.SecondHorizon[indexcount].VoltageVectorAngleRad_Mod);
-    moduleparams.SecondHorizon[indexcount].SvpwmT2 = (1.0/moduleparams.OptimizationFsw[indexcount])*moduleparams.SecondHorizon[indexcount].ma*sinf(moduleparams.SecondHorizon[indexcount].VoltageVectorAngleRad_Mod);
-    moduleparams.SecondHorizon[indexcount].SvpwmT0 = (1.0/moduleparams.OptimizationFsw[indexcount]) -moduleparams.SecondHorizon[indexcount].SvpwmT1-moduleparams.SecondHorizon[indexcount].SvpwmT2;
+    moduleparams.SecondHorizon[indexcount].VoltageDuring_SvpwmT1 = 0.66667 * moduleparams.Measured.Voltage.Vdc - moduleparams.SecondHorizon[indexcount].Magnitude;
+    moduleparams.SecondHorizon[indexcount].VoltageDuring_SvpwmT2 = 0.66667 * moduleparams.Measured.Voltage.Vdc - moduleparams.SecondHorizon[indexcount].Magnitude;
+    moduleparams.SecondHorizon[indexcount].VoltageDuring_SvpwmT0 = -moduleparams.SecondHorizon[indexcount].Magnitude;
 
-    moduleparams.SecondHorizon[indexcount].VoltageDuring_SvpwmT1 = 0.66667*moduleparams.Measured.Voltage.Vdc - moduleparams.SecondHorizon[indexcount].Magnitude;
-    moduleparams.SecondHorizon[indexcount].VoltageDuring_SvpwmT2 = 0.66667*moduleparams.Measured.Voltage.Vdc - moduleparams.SecondHorizon[indexcount].Magnitude;
-    moduleparams.SecondHorizon[indexcount].VoltageDuring_SvpwmT0 = - moduleparams.SecondHorizon[indexcount].Magnitude;
+    moduleparams.SecondHorizon[indexcount].Iq_Delta_DuringT1 = moduleparams.SecondHorizon[indexcount].VoltageDuring_SvpwmT1 * moduleparams.SecondHorizon[indexcount].SvpwmT1 / LS_VALUE;
+    moduleparams.SecondHorizon[indexcount].Iq_Delta_DuringT2 = moduleparams.SecondHorizon[indexcount].VoltageDuring_SvpwmT2 * moduleparams.SecondHorizon[indexcount].SvpwmT2 / LS_VALUE;
+    moduleparams.SecondHorizon[indexcount].Iq_Delta_DuringT0 = -moduleparams.SecondHorizon[indexcount].VoltageDuring_SvpwmT0 * moduleparams.SecondHorizon[indexcount].SvpwmT0 / LS_VALUE;
 
-    moduleparams.SecondHorizon[indexcount].Iq_Delta_DuringT1 = moduleparams.SecondHorizon[indexcount].VoltageDuring_SvpwmT1*moduleparams.SecondHorizon[indexcount].SvpwmT1/LS_VALUE;
-    moduleparams.SecondHorizon[indexcount].Iq_Delta_DuringT2 = moduleparams.SecondHorizon[indexcount].VoltageDuring_SvpwmT2*moduleparams.SecondHorizon[indexcount].SvpwmT2/LS_VALUE;
-    moduleparams.SecondHorizon[indexcount].Iq_Delta_DuringT0 = -moduleparams.SecondHorizon[indexcount].VoltageDuring_SvpwmT0*moduleparams.SecondHorizon[indexcount].SvpwmT0/LS_VALUE;
+    moduleparams.SecondHorizon[indexcount].Iq_Ripple_Prediction = moduleparams.SecondHorizon[indexcount].Iq_Delta_DuringT1 + moduleparams.SecondHorizon[indexcount].Iq_Delta_DuringT2 + moduleparams.SecondHorizon[indexcount].Iq_Delta_DuringT0;
 
-
-    moduleparams.SecondHorizon[indexcount].Iq_Ripple_Prediction = moduleparams.SecondHorizon[indexcount].Iq_Delta_DuringT1+moduleparams.SecondHorizon[indexcount].Iq_Delta_DuringT2+moduleparams.SecondHorizon[indexcount].Iq_Delta_DuringT0;
-
-
-    moduleparams.SecondHorizon[indexcount].IqPrediction = moduleparams.Measured.Current.transformed.Dvalue + (1.0/moduleparams.OptimizationFsw[indexcount])*(moduleparams.SecondHorizon[indexcount].Vd/LS_VALUE - RS_VALUE/LS_VALUE*moduleparams.Measured.Current.transformed.Dvalue+LS_VALUE/LS_VALUE*POLEPAIRS*moduleparams.AngularSpeed.Mechanical*moduleparams.Measured.Current.transformed.Qvalue);
-    moduleparams.SecondHorizon[indexcount].IdPrediction = moduleparams.Measured.Current.transformed.Qvalue + (1.0/moduleparams.OptimizationFsw[indexcount])*(moduleparams.SecondHorizon[indexcount].Vq/LS_VALUE - RS_VALUE/LS_VALUE*moduleparams.Measured.Current.transformed.Qvalue+LS_VALUE/LS_VALUE*POLEPAIRS*moduleparams.AngularSpeed.Mechanical*moduleparams.Measured.Current.transformed.Dvalue-FLUX_VALUE*POLEPAIRS*moduleparams.AngularSpeed.Mechanical/LS_VALUE);
+    moduleparams.SecondHorizon[indexcount].IqPrediction = moduleparams.Measured.Current.transformed.Dvalue + (1.0 / moduleparams.OptimizationFsw[indexcount]) * (moduleparams.SecondHorizon[indexcount].Vd / LS_VALUE - RS_VALUE / LS_VALUE * moduleparams.Measured.Current.transformed.Dvalue + LS_VALUE / LS_VALUE * POLEPAIRS * moduleparams.AngularSpeed.Mechanical * moduleparams.Measured.Current.transformed.Qvalue);
+    moduleparams.SecondHorizon[indexcount].IdPrediction = moduleparams.Measured.Current.transformed.Qvalue + (1.0 / moduleparams.OptimizationFsw[indexcount]) * (moduleparams.SecondHorizon[indexcount].Vq / LS_VALUE - RS_VALUE / LS_VALUE * moduleparams.Measured.Current.transformed.Qvalue + LS_VALUE / LS_VALUE * POLEPAIRS * moduleparams.AngularSpeed.Mechanical * moduleparams.Measured.Current.transformed.Dvalue - FLUX_VALUE * POLEPAIRS * moduleparams.AngularSpeed.Mechanical / LS_VALUE);
 
     /*TODO add protection to cost*/
-    moduleparams.Cost[indexcount] = IQRIPPLECOEFF*powf(moduleparams.SecondHorizon[indexcount].Iq_Ripple_Prediction/IQ_RATED,2)\
-            + IQREFCOEFF*powf((moduleparams.Reference.Iq-moduleparams.SecondHorizon[indexcount].IqPrediction)/IQ_RATED,2)\
-            + IDREFCOEFF*powf((moduleparams.Reference.Id-moduleparams.SecondHorizon[indexcount].IdPrediction),2)\
-            + FSWCOEFF*moduleparams.OptimizationFsw[indexcount]/OPT_FSW_MAX;
-    if(moduleparams.Cost[indexcount]<moduleparams.MinimumCostValue)
+    moduleparams.Cost[indexcount] = IQRIPPLECOEFF * powf(moduleparams.SecondHorizon[indexcount].Iq_Ripple_Prediction / IQ_RATED, 2) + IQREFCOEFF * powf((moduleparams.Reference.Iq - moduleparams.SecondHorizon[indexcount].IqPrediction) / IQ_RATED, 2) + IDREFCOEFF * powf((moduleparams.Reference.Id - moduleparams.SecondHorizon[indexcount].IdPrediction), 2) + FSWCOEFF * moduleparams.OptimizationFsw[indexcount] / OPT_FSW_MAX;
+    if (moduleparams.Cost[indexcount] < moduleparams.MinimumCostValue)
     {
         moduleparams.MinimumCostValue = moduleparams.Cost[indexcount];
         moduleparams.MinimumCostIndex = indexcount;
@@ -609,15 +575,15 @@ void InitializationRoutine(void)
     GpioCtrlRegs.GPBMUX1.bit.GPIO43 = 3;
     EDIS;
     InitializeSciaRegisters(921600.0);
-    PI_iq.I_coeff       = I_COEFFICIENT;
-    PI_iq.P_coeff       = P_COEFFICIENT;
-    PI_iq.Ts            = PI_TS_COEFFICIENT;
-    PI_iq.Input         = 22.1;
-    PI_iq.Input_prev    = 21.5;
-    PI_iq.Output        = 56.234;
-    PI_iq.Output_prev   = 234.234;
-    PI_iq.SaturationMax = 2.0*IQ_RATED;
-    PI_iq.SaturationMax = -2.0*IQ_RATED;
+    PI_iq.I_coeff = I_COEFFICIENT;
+    PI_iq.P_coeff = P_COEFFICIENT;
+    PI_iq.Ts = PI_TS_COEFFICIENT;
+    PI_iq.Input = 22.1;
+    PI_iq.Input_prev = 21.5;
+    PI_iq.Output = 56.234;
+    PI_iq.Output_prev = 234.234;
+    PI_iq.SaturationMax = 2.0 * IQ_RATED;
+    PI_iq.SaturationMax = -2.0 * IQ_RATED;
     InitializeADCs();
     SetupGPIOs();
     InitializeEpwm1Registers();
@@ -644,12 +610,12 @@ void InitializationRoutine(void)
 
 #if 1
 
-    GPIO_WritePin(124, 1);  // Enable DRV
-    DELAY_US(50000);                        // delay to allow DRV830x supplies to ramp up
+    GPIO_WritePin(124, 1); // Enable DRV
+    DELAY_US(50000);       // delay to allow DRV830x supplies to ramp up
     InitDRV8305(&Device1Configuration);
     while (Device1Configuration.DRV_fault)
     {
-        faultcounter++;  // hang on if drv init is faulty
+        faultcounter++; // hang on if drv init is faulty
     }
 #endif
     SetupCmpssProtections();
@@ -657,69 +623,70 @@ void InitializationRoutine(void)
 }
 void InitializeADCs(void)
 {
+    /*
+    TODOS for ADC absurd measurements
+    - Try continous ADC mode
+    - PPB block of the ADC will be used
+*/
     EALLOW;
-    AdcaRegs.ADCCTL2.bit.PRESCALE = 6;      //ADCCLK = InputClokc/6.0
-    AdcbRegs.ADCCTL2.bit.PRESCALE = 6;      //ADCCLK = InputClokc/6.0
-    AdccRegs.ADCCTL2.bit.PRESCALE = 6;      //ADCCLK = InputClokc/6.0
-    AdcdRegs.ADCCTL2.bit.PRESCALE = 6;      //ADCCLK = InputClokc/6.0
+    AdcaRegs.ADCCTL2.bit.PRESCALE = 6; //ADCCLK = InputClokc/4.0
+    AdcbRegs.ADCCTL2.bit.PRESCALE = 6; //ADCCLK = InputClokc/4.0
+    AdccRegs.ADCCTL2.bit.PRESCALE = 6; //ADCCLK = InputClokc/4.0
+    AdcdRegs.ADCCTL2.bit.PRESCALE = 6; //ADCCLK = InputClokc/4.0
 
-    AdcaRegs.ADCCTL1.all = 0x00;            // ADC Control 1 Register
+    AdcaRegs.ADCCTL1.all = 0x00;       // ADC Control 1 Register
     AdcaRegs.ADCCTL1.bit.ADCPWDNZ = 1; // All analog circuitry inside the core is powered up
     AdcaRegs.ADCCTL1.bit.INTPULSEPOS = 1;
 
-    AdcbRegs.ADCCTL1.all = 0x00;            // ADC Control 1 Register
+    AdcbRegs.ADCCTL1.all = 0x00;       // ADC Control 1 Register
     AdcbRegs.ADCCTL1.bit.ADCPWDNZ = 1; // All analog circuitry inside the core is powered up
     AdcbRegs.ADCCTL1.bit.INTPULSEPOS = 1;
 
-    AdccRegs.ADCCTL1.all = 0x00;            // ADC Control 1 Register
+    AdccRegs.ADCCTL1.all = 0x00;       // ADC Control 1 Register
     AdccRegs.ADCCTL1.bit.ADCPWDNZ = 1; // All analog circuitry inside the core is powered up
     AdccRegs.ADCCTL1.bit.INTPULSEPOS = 1;
 
-    AdcdRegs.ADCCTL1.all = 0x00;            // ADC Control 1 Register
+    AdcdRegs.ADCCTL1.all = 0x00;       // ADC Control 1 Register
     AdcdRegs.ADCCTL1.bit.ADCPWDNZ = 1; // All analog circuitry inside the core is powered up
     AdcdRegs.ADCCTL1.bit.INTPULSEPOS = 1;
 
     DELAY_US(2000);
 
-    AdcaRegs.ADCCTL2.bit.SIGNALMODE = 0;    // (Single ended ADC)TODO Verify these
-    AdcbRegs.ADCCTL2.bit.SIGNALMODE = 0;    // (Single ended ADC)TODO Verify these
-    AdccRegs.ADCCTL2.bit.SIGNALMODE = 0;    // (Single ended ADC)TODO Verify these
-    AdcdRegs.ADCCTL2.bit.SIGNALMODE = 0;    // (Single ended ADC)TODO Verify these
+    AdcaRegs.ADCCTL2.bit.SIGNALMODE = 0; // (Single ended ADC)TODO Verify these
+    AdcbRegs.ADCCTL2.bit.SIGNALMODE = 0; // (Single ended ADC)TODO Verify these
+    AdccRegs.ADCCTL2.bit.SIGNALMODE = 0; // (Single ended ADC)TODO Verify these
+    AdcdRegs.ADCCTL2.bit.SIGNALMODE = 0; // (Single ended ADC)TODO Verify these
     /*TODO, adcsetmode might be used?*/
 
-    AdcaRegs.ADCCTL2.bit.RESOLUTION = 0;    // 12 bit ADC results (TODO Verify these)
-    AdcbRegs.ADCCTL2.bit.RESOLUTION = 0;    // 12 bit ADC results (TODO Verify these)    
-    AdccRegs.ADCCTL2.bit.RESOLUTION = 0;    // 12 bit ADC results (TODO Verify these)
-    AdcdRegs.ADCCTL2.bit.RESOLUTION = 0;    // 12 bit ADC results (TODO Verify these)
+    AdcaRegs.ADCCTL2.bit.RESOLUTION = 0; // 12 bit ADC results (TODO Verify these)
+    AdcbRegs.ADCCTL2.bit.RESOLUTION = 0; // 12 bit ADC results (TODO Verify these)
+    AdccRegs.ADCCTL2.bit.RESOLUTION = 0; // 12 bit ADC results (TODO Verify these)
+    AdcdRegs.ADCCTL2.bit.RESOLUTION = 0; // 12 bit ADC results (TODO Verify these)
 
+    AdcaRegs.ADCBURSTCTL.all = 0x00;      // ADC Burst Control Register
+    AdcaRegs.ADCBURSTCTL.bit.BURSTEN = 0; // Burst mode is disabled
 
+    AdcbRegs.ADCBURSTCTL.all = 0x00;      // ADC Burst Control Register
+    AdcbRegs.ADCBURSTCTL.bit.BURSTEN = 0; // Burst mode is disabled
 
-    AdcaRegs.ADCBURSTCTL.all = 0x00;        // ADC Burst Control Register
-    AdcaRegs.ADCBURSTCTL.bit.BURSTEN = 0;   // Burst mode is disabled
+    AdccRegs.ADCBURSTCTL.all = 0x00;      // ADC Burst Control Register
+    AdccRegs.ADCBURSTCTL.bit.BURSTEN = 0; // Burst mode is disabled
 
-    AdcbRegs.ADCBURSTCTL.all = 0x00;        // ADC Burst Control Register
-    AdcbRegs.ADCBURSTCTL.bit.BURSTEN = 0;   // Burst mode is disabled
-
-    AdccRegs.ADCBURSTCTL.all = 0x00;        // ADC Burst Control Register
-    AdccRegs.ADCBURSTCTL.bit.BURSTEN = 0;   // Burst mode is disabled
-
-    AdcdRegs.ADCBURSTCTL.all = 0x00;        // ADC Burst Control Register
-    AdcdRegs.ADCBURSTCTL.bit.BURSTEN = 0;   // Burst mode is disabled
-
+    AdcdRegs.ADCBURSTCTL.all = 0x00;      // ADC Burst Control Register
+    AdcdRegs.ADCBURSTCTL.bit.BURSTEN = 0; // Burst mode is disabled
 
     AdcaRegs.ADCINTSEL1N2.all = 0x00;       // ADC Interrupt 1 and 2 Selection Register
     AdcaRegs.ADCINTSEL1N2.bit.INT2CONT = 0; // Continous mode is disabled
     AdcaRegs.ADCINTSEL1N2.bit.INT2E = 0;    // ADCINT2 disabled.
     AdcaRegs.ADCINTSEL1N2.bit.INT2SEL = 0;  // No interrupt selected.
 
-
     AdcaRegs.ADCINTSEL1N2.bit.INT1CONT = 0; // Continous mode is disabled
     AdcaRegs.ADCINTSEL1N2.bit.INT1E = 1;    // ADCINT1 enable.
     AdcaRegs.ADCINTSEL1N2.bit.INT1SEL = 0;  // EOC0 is the trigger for ADCINT1
 
-    AdcaRegs.ADCSOCPRICTL.all = 0x00;       // ADC SOC Priority Control Register
-    AdcaRegs.ADCSOCPRICTL.bit.SOCPRIORITY = 0;  // the SOC is handled in round robin arbitration
-    AdcaRegs.ADCSOCPRICTL.bit.RRPOINTER =   0;  // SOC0 is the last RR SOC to convert, SOC1 is the highest round robin priority, this ensures all the values are converted before the ISR.
+    AdcaRegs.ADCSOCPRICTL.all = 0x00;          // ADC SOC Priority Control Register
+    AdcaRegs.ADCSOCPRICTL.bit.SOCPRIORITY = 0; // the SOC is handled in round robin arbitration
+    AdcaRegs.ADCSOCPRICTL.bit.RRPOINTER = 0;   // SOC0 is the last RR SOC to convert, SOC1 is the highest round robin priority, this ensures all the values are converted before the ISR.
 
     AdcaRegs.ADCINTSEL3N4.all = 0x00;       // ADC Interrupt 3 and 4 Selection Register
     AdcaRegs.ADCINTSEL3N4.bit.INT4CONT = 0; // Continous mode is disabled
@@ -729,59 +696,56 @@ void InitializeADCs(void)
     AdcaRegs.ADCINTSEL3N4.bit.INT3E = 0;    // ADCINT3 disabled.
     AdcaRegs.ADCINTSEL3N4.bit.INT3SEL = 0;  // No interrupt selected.
 
+    AdcbRegs.ADCINTSEL1N2.all = 0x00;          // ADC Interrupt 1 and 2 Selection Register
+    AdcbRegs.ADCINTSEL1N2.bit.INT2CONT = 0;    // Continous mode is disabled
+    AdcbRegs.ADCINTSEL1N2.bit.INT2E = 0;       // ADCINT2 disabled.
+    AdcbRegs.ADCINTSEL1N2.bit.INT2SEL = 0;     // No interrupt selected.
+    AdcbRegs.ADCINTSEL1N2.bit.INT1CONT = 0;    // Continous mode is disabled
+    AdcbRegs.ADCINTSEL1N2.bit.INT1E = 0;       // ADCINT1 disabled.
+    AdcbRegs.ADCINTSEL1N2.bit.INT1SEL = 0;     // No interrupt selected.
+    AdcbRegs.ADCINTSEL3N4.all = 0x00;          // ADC Interrupt 3 and 4 Selection Register
+    AdcbRegs.ADCINTSEL3N4.bit.INT4CONT = 0;    // Continous mode is disabled
+    AdcbRegs.ADCINTSEL3N4.bit.INT4E = 0;       // ADCINT4 disabled.
+    AdcbRegs.ADCINTSEL3N4.bit.INT4SEL = 0;     // No interrupt selected.
+    AdcbRegs.ADCINTSEL3N4.bit.INT3CONT = 0;    // Continous mode is disabled
+    AdcbRegs.ADCINTSEL3N4.bit.INT3E = 0;       // ADCINT3 disabled.
+    AdcbRegs.ADCINTSEL3N4.bit.INT3SEL = 0;     // No interrupt selected.
+    AdcbRegs.ADCSOCPRICTL.all = 0x00;          // ADC SOC Priority Control Register
+    AdcbRegs.ADCSOCPRICTL.bit.SOCPRIORITY = 0; // the SOC is handled in round robin arbitration
 
-    AdcbRegs.ADCINTSEL1N2.all = 0x00;       // ADC Interrupt 1 and 2 Selection Register
-    AdcbRegs.ADCINTSEL1N2.bit.INT2CONT = 0; // Continous mode is disabled
-    AdcbRegs.ADCINTSEL1N2.bit.INT2E = 0;    // ADCINT2 disabled.
-    AdcbRegs.ADCINTSEL1N2.bit.INT2SEL = 0;  // No interrupt selected.
-    AdcbRegs.ADCINTSEL1N2.bit.INT1CONT = 0; // Continous mode is disabled
-    AdcbRegs.ADCINTSEL1N2.bit.INT1E = 0;    // ADCINT1 disabled.
-    AdcbRegs.ADCINTSEL1N2.bit.INT1SEL = 0;  // No interrupt selected.
-    AdcbRegs.ADCINTSEL3N4.all = 0x00;       // ADC Interrupt 3 and 4 Selection Register
-    AdcbRegs.ADCINTSEL3N4.bit.INT4CONT = 0; // Continous mode is disabled
-    AdcbRegs.ADCINTSEL3N4.bit.INT4E = 0;    // ADCINT4 disabled.
-    AdcbRegs.ADCINTSEL3N4.bit.INT4SEL = 0;  // No interrupt selected.
-    AdcbRegs.ADCINTSEL3N4.bit.INT3CONT = 0; // Continous mode is disabled
-    AdcbRegs.ADCINTSEL3N4.bit.INT3E = 0;    // ADCINT3 disabled.
-    AdcbRegs.ADCINTSEL3N4.bit.INT3SEL = 0;  // No interrupt selected.
-    AdcbRegs.ADCSOCPRICTL.all = 0x00;       // ADC SOC Priority Control Register
-    AdcbRegs.ADCSOCPRICTL.bit.SOCPRIORITY = 0;  // the SOC is handled in round robin arbitration
+    AdccRegs.ADCINTSEL1N2.all = 0x00;          // ADC Interrupt 1 and 2 Selection Register
+    AdccRegs.ADCINTSEL1N2.bit.INT2CONT = 0;    // Continous mode is disabled
+    AdccRegs.ADCINTSEL1N2.bit.INT2E = 0;       // ADCINT2 disabled.
+    AdccRegs.ADCINTSEL1N2.bit.INT2SEL = 0;     // No interrupt selected.
+    AdccRegs.ADCINTSEL1N2.bit.INT1CONT = 0;    // Continous mode is disabled
+    AdccRegs.ADCINTSEL1N2.bit.INT1E = 0;       // ADCINT1 disabled.
+    AdccRegs.ADCINTSEL1N2.bit.INT1SEL = 0;     // No interrupt selected.
+    AdccRegs.ADCINTSEL3N4.all = 0x00;          // ADC Interrupt 3 and 4 Selection Register
+    AdccRegs.ADCINTSEL3N4.bit.INT4CONT = 0;    // Continous mode is disabled
+    AdccRegs.ADCINTSEL3N4.bit.INT4E = 0;       // ADCINT4 disabled.
+    AdccRegs.ADCINTSEL3N4.bit.INT4SEL = 0;     // No interrupt selected.
+    AdccRegs.ADCINTSEL3N4.bit.INT3CONT = 0;    // Continous mode is disabled
+    AdccRegs.ADCINTSEL3N4.bit.INT3E = 0;       // ADCINT3 disabled.
+    AdccRegs.ADCINTSEL3N4.bit.INT3SEL = 0;     // No interrupt selected.
+    AdccRegs.ADCSOCPRICTL.all = 0x00;          // ADC SOC Priority Control Register
+    AdccRegs.ADCSOCPRICTL.bit.SOCPRIORITY = 0; // the SOC is handled in round robin arbitration
 
-
-
-    AdccRegs.ADCINTSEL1N2.all = 0x00;       // ADC Interrupt 1 and 2 Selection Register
-    AdccRegs.ADCINTSEL1N2.bit.INT2CONT = 0; // Continous mode is disabled
-    AdccRegs.ADCINTSEL1N2.bit.INT2E = 0;    // ADCINT2 disabled.
-    AdccRegs.ADCINTSEL1N2.bit.INT2SEL = 0;  // No interrupt selected.
-    AdccRegs.ADCINTSEL1N2.bit.INT1CONT = 0; // Continous mode is disabled
-    AdccRegs.ADCINTSEL1N2.bit.INT1E = 0;    // ADCINT1 disabled.
-    AdccRegs.ADCINTSEL1N2.bit.INT1SEL = 0;  // No interrupt selected.
-    AdccRegs.ADCINTSEL3N4.all = 0x00;       // ADC Interrupt 3 and 4 Selection Register
-    AdccRegs.ADCINTSEL3N4.bit.INT4CONT = 0; // Continous mode is disabled
-    AdccRegs.ADCINTSEL3N4.bit.INT4E = 0;    // ADCINT4 disabled.
-    AdccRegs.ADCINTSEL3N4.bit.INT4SEL = 0;  // No interrupt selected.
-    AdccRegs.ADCINTSEL3N4.bit.INT3CONT = 0; // Continous mode is disabled
-    AdccRegs.ADCINTSEL3N4.bit.INT3E = 0;    // ADCINT3 disabled.
-    AdccRegs.ADCINTSEL3N4.bit.INT3SEL = 0;  // No interrupt selected.
-    AdccRegs.ADCSOCPRICTL.all = 0x00;       // ADC SOC Priority Control Register
-    AdccRegs.ADCSOCPRICTL.bit.SOCPRIORITY = 0;  // the SOC is handled in round robin arbitration
-
-    AdcdRegs.ADCINTSEL1N2.all = 0x00;       // ADC Interrupt 1 and 2 Selection Register
-    AdcdRegs.ADCINTSEL1N2.bit.INT2CONT = 0; // Continous mode is disabled
-    AdcdRegs.ADCINTSEL1N2.bit.INT2E = 0;    // ADCINT2 disabled.
-    AdcdRegs.ADCINTSEL1N2.bit.INT2SEL = 0;  // No interrupt selected.
-    AdcdRegs.ADCINTSEL1N2.bit.INT1CONT = 0; // Continous mode is disabled
-    AdcdRegs.ADCINTSEL1N2.bit.INT1E = 0;    // ADCINT1 disabled.
-    AdcdRegs.ADCINTSEL1N2.bit.INT1SEL = 0;  // No interrupt selected.
-    AdcdRegs.ADCINTSEL3N4.all = 0x00;       // ADC Interrupt 3 and 4 Selection Register
-    AdcdRegs.ADCINTSEL3N4.bit.INT4CONT = 0; // Continous mode is disabled
-    AdcdRegs.ADCINTSEL3N4.bit.INT4E = 0;    // ADCINT4 disabled.
-    AdcdRegs.ADCINTSEL3N4.bit.INT4SEL = 0;  // No interrupt selected.
-    AdcdRegs.ADCINTSEL3N4.bit.INT3CONT = 0; // Continous mode is disabled
-    AdcdRegs.ADCINTSEL3N4.bit.INT3E = 0;    // ADCINT3 disabled.
-    AdcdRegs.ADCINTSEL3N4.bit.INT3SEL = 0;  // No interrupt selected.
-    AdcdRegs.ADCSOCPRICTL.all = 0x00;       // ADC SOC Priority Control Register
-    AdcdRegs.ADCSOCPRICTL.bit.SOCPRIORITY = 0;  // the SOC is handled in round robin arbitration
+    AdcdRegs.ADCINTSEL1N2.all = 0x00;          // ADC Interrupt 1 and 2 Selection Register
+    AdcdRegs.ADCINTSEL1N2.bit.INT2CONT = 0;    // Continous mode is disabled
+    AdcdRegs.ADCINTSEL1N2.bit.INT2E = 0;       // ADCINT2 disabled.
+    AdcdRegs.ADCINTSEL1N2.bit.INT2SEL = 0;     // No interrupt selected.
+    AdcdRegs.ADCINTSEL1N2.bit.INT1CONT = 0;    // Continous mode is disabled
+    AdcdRegs.ADCINTSEL1N2.bit.INT1E = 0;       // ADCINT1 disabled.
+    AdcdRegs.ADCINTSEL1N2.bit.INT1SEL = 0;     // No interrupt selected.
+    AdcdRegs.ADCINTSEL3N4.all = 0x00;          // ADC Interrupt 3 and 4 Selection Register
+    AdcdRegs.ADCINTSEL3N4.bit.INT4CONT = 0;    // Continous mode is disabled
+    AdcdRegs.ADCINTSEL3N4.bit.INT4E = 0;       // ADCINT4 disabled.
+    AdcdRegs.ADCINTSEL3N4.bit.INT4SEL = 0;     // No interrupt selected.
+    AdcdRegs.ADCINTSEL3N4.bit.INT3CONT = 0;    // Continous mode is disabled
+    AdcdRegs.ADCINTSEL3N4.bit.INT3E = 0;       // ADCINT3 disabled.
+    AdcdRegs.ADCINTSEL3N4.bit.INT3SEL = 0;     // No interrupt selected.
+    AdcdRegs.ADCSOCPRICTL.all = 0x00;          // ADC SOC Priority Control Register
+    AdcdRegs.ADCSOCPRICTL.bit.SOCPRIORITY = 0; // the SOC is handled in round robin arbitration
 
     /*We will trigger the SOC when EPwm1Regs.TBCTR=0*/
     AdcaRegs.ADCINTSOCSEL1.all = 0x00; // ADC Interrupt SOC Selection 1 Register
@@ -793,119 +757,121 @@ void InitializeADCs(void)
     AdccRegs.ADCINTSOCSEL2.all = 0x00; // ADC Interrupt SOC Selection 2 Register
     AdcdRegs.ADCINTSOCSEL2.all = 0x00; // ADC Interrupt SOC Selection 2 Register
 
-
     /*Va pin*/
     AdcaRegs.ADCSOC0CTL.all = 0x00;
-    AdcaRegs.ADCSOC0CTL.bit.TRIGSEL = EPWM1_SOCA_TRG;   /*ePWM1 SocA is the trigger*/
-    AdcaRegs.ADCSOC0CTL.bit.CHSEL = 0xE;                /*This is Va pin for TIDA-00909 PCB*/
-    AdcaRegs.ADCSOC0CTL.bit.ACQPS = ACQPS_PERIOD;       /*TODO: This value should be tested*/
+    AdcaRegs.ADCSOC0CTL.bit.TRIGSEL = EPWM1_SOCA_TRG; /*ePWM1 SocA is the trigger*/
+    AdcaRegs.ADCSOC0CTL.bit.CHSEL = 0xE;              /*This is Va pin for TIDA-00909 PCB*/
+    AdcaRegs.ADCSOC0CTL.bit.ACQPS = ACQPS_PERIOD;     /*TODO: This value should be tested*/
 
     /*Vb pin*/
     AdccRegs.ADCSOC0CTL.all = 0x00;
-    AdccRegs.ADCSOC0CTL.bit.TRIGSEL = EPWM1_SOCA_TRG;   /*ePWM1 SocA is the trigger*/
-    AdccRegs.ADCSOC0CTL.bit.CHSEL = 0x3;                /*This is Vb pin for TIDA-00909 PCB*/
-    AdccRegs.ADCSOC0CTL.bit.ACQPS = ACQPS_PERIOD;       /*TODO: This value should be tested*/
+    AdccRegs.ADCSOC0CTL.bit.TRIGSEL = EPWM1_SOCA_TRG; /*ePWM1 SocA is the trigger*/
+    AdccRegs.ADCSOC0CTL.bit.CHSEL = 0x3;              /*This is Vb pin for TIDA-00909 PCB*/
+    AdccRegs.ADCSOC0CTL.bit.ACQPS = ACQPS_PERIOD;     /*TODO: This value should be tested*/
 
     /*Vc pin*/
     AdcbRegs.ADCSOC0CTL.all = 0x00;
-    AdcbRegs.ADCSOC0CTL.bit.TRIGSEL = EPWM1_SOCA_TRG;   /*ePWM1 SocA is the trigger*/
-    AdcbRegs.ADCSOC0CTL.bit.CHSEL = 0x3;                /*This is Vc pin for TIDA-00909 PCB*/
-    AdcbRegs.ADCSOC0CTL.bit.ACQPS = ACQPS_PERIOD;       /*TODO: This value should be tested*/
-
+    AdcbRegs.ADCSOC0CTL.bit.TRIGSEL = EPWM1_SOCA_TRG; /*ePWM1 SocA is the trigger*/
+    AdcbRegs.ADCSOC0CTL.bit.CHSEL = 0x3;              /*This is Vc pin for TIDA-00909 PCB*/
+    AdcbRegs.ADCSOC0CTL.bit.ACQPS = ACQPS_PERIOD;     /*TODO: This value should be tested*/
 
     /*Vdc pin*/
     AdcaRegs.ADCSOC1CTL.all = 0x00;
-    AdcaRegs.ADCSOC1CTL.bit.TRIGSEL = EPWM1_SOCA_TRG;   /*ePWM1 SocA is the trigger*/
-    AdcaRegs.ADCSOC1CTL.bit.CHSEL = 0x3;                /*This is Vdc pin for TIDA-00909 PCB*/
-    AdcaRegs.ADCSOC1CTL.bit.ACQPS = ACQPS_PERIOD;       /*TODO: This value should be tested*/
-
+    AdcaRegs.ADCSOC1CTL.bit.TRIGSEL = EPWM1_SOCA_TRG; /*ePWM1 SocA is the trigger*/
+    AdcaRegs.ADCSOC1CTL.bit.CHSEL = 0x3;              /*This is Vdc pin for TIDA-00909 PCB*/
+    AdcaRegs.ADCSOC1CTL.bit.ACQPS = ACQPS_PERIOD;     /*TODO: This value should be tested*/
 
     /*Ia pin*/
     AdccRegs.ADCSOC1CTL.all = 0x00;
-    AdccRegs.ADCSOC1CTL.bit.TRIGSEL = EPWM1_SOCA_TRG;   /*ePWM1 SocA is the trigger*/
-    AdccRegs.ADCSOC1CTL.bit.CHSEL = 0x2;                /*This is Ia pin for TIDA-00909 PCB*/
-    AdccRegs.ADCSOC1CTL.bit.ACQPS = ACQPS_PERIOD;       /*TODO: This value should be tested*/
+    AdccRegs.ADCSOC1CTL.bit.TRIGSEL = EPWM1_SOCA_TRG; /*ePWM1 SocA is the trigger*/
+    AdccRegs.ADCSOC1CTL.bit.CHSEL = 0x2;              /*This is Ia pin for TIDA-00909 PCB*/
+    AdccRegs.ADCSOC1CTL.bit.ACQPS = ACQPS_PERIOD;     /*TODO: This value should be tested*/
+    AdccRegs.ADCPPB1CONFIG.bit.CONFIG = 0;            // PPB is associated with SOC0
+    AdccRegs.ADCPPB1OFFCAL.bit.OFFCAL = 0;            // Write zero to this for now
+    AdccRegs.ADCPPB1OFFREF = 0;                       // THIS VALUE IS TODO
 
     /*Ib pin*/
     AdcbRegs.ADCSOC1CTL.all = 0x00;
-    AdcbRegs.ADCSOC1CTL.bit.TRIGSEL = EPWM1_SOCA_TRG;   /*ePWM1 SocA is the trigger*/
-    AdcbRegs.ADCSOC1CTL.bit.CHSEL = 0x2;                /*This is Ib pin for TIDA-00909 PCB*/
-    AdcbRegs.ADCSOC1CTL.bit.ACQPS = ACQPS_PERIOD;       /*TODO: This value should be tested*/
+    AdcbRegs.ADCSOC1CTL.bit.TRIGSEL = EPWM1_SOCA_TRG; /*ePWM1 SocA is the trigger*/
+    AdcbRegs.ADCSOC1CTL.bit.CHSEL = 0x2;              /*This is Ib pin for TIDA-00909 PCB*/
+    AdcbRegs.ADCSOC1CTL.bit.ACQPS = ACQPS_PERIOD;     /*TODO: This value should be tested*/
+    AdcbRegs.ADCPPB1CONFIG.bit.CONFIG = 0;            // PPB is associated with SOC0
+    AdcbRegs.ADCPPB1OFFCAL.bit.OFFCAL = 0;            // Write zero to this for now
+    AdcbRegs.ADCPPB1OFFREF = 0;                       // THIS VALUE IS TODO
 
     /*Ic pin*/
     AdcaRegs.ADCSOC2CTL.all = 0x00;
-    AdcaRegs.ADCSOC2CTL.bit.TRIGSEL = EPWM1_SOCA_TRG;   /*ePWM1 SocA is the trigger*/
-    AdcaRegs.ADCSOC2CTL.bit.CHSEL = 0x2;                /*This is Ib pin for TIDA-00909 PCB*/
-    AdcaRegs.ADCSOC2CTL.bit.ACQPS = ACQPS_PERIOD;       /*TODO: This value should be tested*/
-
-
-
+    AdcaRegs.ADCSOC2CTL.bit.TRIGSEL = EPWM1_SOCA_TRG; /*ePWM1 SocA is the trigger*/
+    AdcaRegs.ADCSOC2CTL.bit.CHSEL = 0x2;              /*This is Ib pin for TIDA-00909 PCB*/
+    AdcaRegs.ADCSOC2CTL.bit.ACQPS = ACQPS_PERIOD;     /*TODO: This value should be tested*/
+    AdcaRegs.ADCPPB3CONFIG.bit.CONFIG = 0;            // PPB is associated with SOC0
+    AdcaRegs.ADCPPB3OFFCAL.bit.OFFCAL = 0;            // Write zero to this for now
+    AdcaRegs.ADCPPB3OFFREF = 0;                       // THIS VALUE IS TODO
 
     EDIS;
-
 }
 void EQEPSetup(void)
 {
-// ARC-H-50-3600-TTL-6-3M-10-FC
-// ARC: Optik, H: Hollow, 50: 50mm, 3600: Resolution, TTL: 5VDC supply, 6: A, An, B, Bn, Z, Zn
-// 1: A  - Yellow
-// 2: Bn - White
-// 3: +V - Red
-// 4: 0V - Black
-// 5: An - Blue
-// 6: B  - Green
-// 7: Zn - Grey
-// 8: Z  - Pink
-// 9: GND - Shield
+    // ARC-H-50-3600-TTL-6-3M-10-FC
+    // ARC: Optik, H: Hollow, 50: 50mm, 3600: Resolution, TTL: 5VDC supply, 6: A, An, B, Bn, Z, Zn
+    // 1: A  - Yellow
+    // 2: Bn - White
+    // 3: +V - Red
+    // 4: 0V - Black
+    // 5: An - Blue
+    // 6: B  - Green
+    // 7: Zn - Grey
+    // 8: Z  - Pink
+    // 9: GND - Shield
 
-// QEPI: Gated to A and B (zero marker)
-// A leads B, forward direction (quadrature clock mode)
+    // QEPI: Gated to A and B (zero marker)
+    // A leads B, forward direction (quadrature clock mode)
 
     /*the formula will be X/(t(k)-t(k-1)) at low  speeds, can be used with UPEVNT */
     /*the formula will be (x(k)-x(k-1))/T at high speeds, can be used with eqep unit timer or CAPCLK */
 
-    EQep1Regs.QUPRD = 2000000;            // Unit Timer for 100 Hz at 200 MHz
+    EQep1Regs.QUPRD = 2000000; // Unit Timer for 100 Hz at 200 MHz
 
-// Quadrature Decoder Unit (QDU) Registers
-    EQep1Regs.QDECCTL.all = 0x00;     // Quadrature Decoder Control
-    EQep1Regs.QDECCTL.bit.QSRC = 0; // Position-counter source selection: Quadrature count mode (QCLK = iCLK, QDIR = iDIR)
-// hakansrc QSRC=2 girmis -- "0"
-    EQep1Regs.QDECCTL.bit.SOEN = 0;   // Disable position-compare sync output
+    // Quadrature Decoder Unit (QDU) Registers
+    EQep1Regs.QDECCTL.all = 0x00;    // Quadrature Decoder Control
+    EQep1Regs.QDECCTL.bit.QSRC = 0;  // Position-counter source selection: Quadrature count mode (QCLK = iCLK, QDIR = iDIR)
+                                     // hakansrc QSRC=2 girmis -- "0"
+    EQep1Regs.QDECCTL.bit.SOEN = 0;  // Disable position-compare sync output
     EQep1Regs.QDECCTL.bit.SPSEL = 1; // Strobe pin is used for sync output: Don't care
-    EQep1Regs.QDECCTL.bit.XCR = 0; // External Clock Rate: 2x resolution: Count the rising/falling edge
-    EQep1Regs.QDECCTL.bit.SWAP = 1; // CLK/DIR Signal Source for Position Counter: Quadrature-clock inputs are not swapped
-    EQep1Regs.QDECCTL.bit.IGATE = 0;  // Disable gating of Index pulse
-    EQep1Regs.QDECCTL.bit.QAP = 0;    // QEPA input polarity: No effect
-    EQep1Regs.QDECCTL.bit.QBP = 0;    // QEPB input polarity: No effect
-    EQep1Regs.QDECCTL.bit.QIP = 0;    // QEPI input polarity: No effect
-    EQep1Regs.QDECCTL.bit.QSP = 0;    // QEPS input polarity: No effect
+    EQep1Regs.QDECCTL.bit.XCR = 0;   // External Clock Rate: 2x resolution: Count the rising/falling edge
+    EQep1Regs.QDECCTL.bit.SWAP = 1;  // CLK/DIR Signal Source for Position Counter: Quadrature-clock inputs are not swapped
+    EQep1Regs.QDECCTL.bit.IGATE = 0; // Disable gating of Index pulse
+    EQep1Regs.QDECCTL.bit.QAP = 0;   // QEPA input polarity: No effect
+    EQep1Regs.QDECCTL.bit.QBP = 0;   // QEPB input polarity: No effect
+    EQep1Regs.QDECCTL.bit.QIP = 0;   // QEPI input polarity: No effect
+    EQep1Regs.QDECCTL.bit.QSP = 0;   // QEPS input polarity: No effect
 
-// Position Counter and Control Unit (PCCU) Registers
-    EQep1Regs.QEPCTL.all = 0x00;      // QEP Control
+    // Position Counter and Control Unit (PCCU) Registers
+    EQep1Regs.QEPCTL.all = 0x00;        // QEP Control
     EQep1Regs.QEPCTL.bit.FREE_SOFT = 0; // Emulation mode: Position counter stops immediately on emulation suspend
-    EQep1Regs.QEPCTL.bit.PCRM = 1; // Position counter reset on the maximum position
-    EQep1Regs.QEPCTL.bit.IEI = 0; // With 2, initializes the position counter on the rising edge of the QEPI signal
-    EQep1Regs.QEPCTL.bit.IEL = 0; // With 1, Latches position counter on rising edge of the index signal
-    EQep1Regs.QEPCTL.bit.QPEN = 0; // Reset the eQEP peripheral internal operating flags/read-only registers.
-//EQep1Regs.QEPCTL.bit.QCLM = 0; // QEP capture latch mode: Latch on position counter read by CPU
-    EQep1Regs.QEPCTL.bit.QCLM = 1;        // Latch on unit time out
+    EQep1Regs.QEPCTL.bit.PCRM = 1;      // Position counter reset on the maximum position
+    EQep1Regs.QEPCTL.bit.IEI = 0;       // With 2, initializes the position counter on the rising edge of the QEPI signal
+    EQep1Regs.QEPCTL.bit.IEL = 0;       // With 1, Latches position counter on rising edge of the index signal
+    EQep1Regs.QEPCTL.bit.QPEN = 0;      // Reset the eQEP peripheral internal operating flags/read-only registers.
+                                        //EQep1Regs.QEPCTL.bit.QCLM = 0; // QEP capture latch mode: Latch on position counter read by CPU
+    EQep1Regs.QEPCTL.bit.QCLM = 1;      // Latch on unit time out
 
-    EQep1Regs.QEPCTL.bit.UTE = 1;    // QEP unit timer enable: Enable unit timer
-    EQep1Regs.QEPCTL.bit.WDE = 1;     // Enable the eQEP watchdog timer
+    EQep1Regs.QEPCTL.bit.UTE = 1; // QEP unit timer enable: Enable unit timer
+    EQep1Regs.QEPCTL.bit.WDE = 1; // Enable the eQEP watchdog timer
 
-    EQep1Regs.QPOSINIT = 0; // Initial QPOSCNT , QPOSCNT set to zero on index event (or strobe or software if desired)
-    EQep1Regs.QPOSMAX = 14399;       // Max value of QPOSCNT    /*better check this value*/
+    EQep1Regs.QPOSINIT = 0;    // Initial QPOSCNT , QPOSCNT set to zero on index event (or strobe or software if desired)
+    EQep1Regs.QPOSMAX = 14399; // Max value of QPOSCNT    /*better check this value*/
 
-// Quadrature edge-capture unit for low-speed measurement (QCAP)
+    // Quadrature edge-capture unit for low-speed measurement (QCAP)
     EQep1Regs.QCAPCTL.all = 0x00;
-    EQep1Regs.QCAPCTL.bit.CEN = 1;    // eQEP capture unit is enabled
+    EQep1Regs.QCAPCTL.bit.CEN = 1;  // eQEP capture unit is enabled
     EQep1Regs.QCAPCTL.bit.CCPS = 6; // eQEP capture timer clock prescaler: // CAPCLK = SYSCLKOUT/1
     EQep1Regs.QCAPCTL.bit.UPPS = 5; // Unit position event prescaler: UPEVNT = QCLK/1 , QCLK is triggered in every rising or falling edge of A or B
-// UPPS reiz veri important
+                                    // UPPS reiz veri important
 
-// Position Compare Control
-    EQep1Regs.QPOSCTL.all = 0x0000;   // Position Compare Control: Disabled
-// hakansrc enable etmis: PCE=1, PCSPW=0xFFF
+    // Position Compare Control
+    EQep1Regs.QPOSCTL.all = 0x0000; // Position Compare Control: Disabled
+                                    // hakansrc enable etmis: PCE=1, PCSPW=0xFFF
     /*
      EQep1Regs.QPOSCTL.bit.PCSHDW = 0;   // shadow disabled
      EQep1Regs.QPOSCTL.bit.PCLOAD = 0;   // does not matter, shadow already disabled
@@ -914,8 +880,8 @@ void EQEPSetup(void)
      EQep1Regs.QPOSCTL.bit.PCSPW = 0xFFF;// Select-position-compare sync output pulse width, 4096 * 4 * SYSCLKOUT cycles
      */
 
-// QEP Interrupt Control (EQEPxINT)
-// Eleven interrupt events (PCE, PHE, QDC, WTO, PCU, PCO, PCR, PCM, SEL, IEL and UTO) can be generated.
+    // QEP Interrupt Control (EQEPxINT)
+    // Eleven interrupt events (PCE, PHE, QDC, WTO, PCU, PCO, PCR, PCM, SEL, IEL and UTO) can be generated.
     EQep1Regs.QEINT.all = 0x00;
     /*
      EQep1Regs.QEINT.bit.WTO = 1;      // Watchdog time out interrupt enabled
@@ -923,13 +889,13 @@ void EQEPSetup(void)
      EQep1Regs.QEINT.bit.IEL = 1;        // Index event latch interrupt enabled
      */
 
-// added by hakansrc
-    EQep1Regs.QFLG.all = 0;             // Interrupts are flagged here
-    EQep1Regs.QCLR.all = 0;             // QEP Interrupt Clear
+    // added by hakansrc
+    EQep1Regs.QFLG.all = 0; // Interrupts are flagged here
+    EQep1Regs.QCLR.all = 0; // QEP Interrupt Clear
 
-// added by hakansrc
-    EQep1Regs.QCTMR = 0; // This register provides time base for edge capture unit. 16 bit
-    EQep1Regs.QCPRD = 0; // This register holds the period count value between the last successive eQEP position events
+    // added by hakansrc
+    EQep1Regs.QCTMR = 0;    // This register provides time base for edge capture unit. 16 bit
+    EQep1Regs.QCPRD = 0;    // This register holds the period count value between the last successive eQEP position events
     EQep1Regs.QCTMRLAT = 0; // QCTMR latch register, latching can be stopped by clearing QEPCTL[QCLM] register
     EQep1Regs.QCPRDLAT = 0; // QCPRD latch register, latching can be stopped by clearing QEPCTL[QCLM] register
 
@@ -957,15 +923,14 @@ void EQEPSetup(void)
      EQep1Regs.QEPSTS.bit.QDF    // Quadrature direction flag: 1=Clockwise
      */
 
-    EQep1Regs.QEPCTL.bit.QPEN = 1;    // eQEP position counter is enabled
-
+    EQep1Regs.QEPCTL.bit.QPEN = 1; // eQEP position counter is enabled
 }
 
-void GetEncoderReadings(ModuleParameters& moduleparams)
+void GetEncoderReadings(ModuleParameters &moduleparams)
 {
     /*TODO*/
 }
-void GetAdcReadings(ModuleParameters& moduleparams)
+void GetAdcReadings(ModuleParameters &moduleparams)
 {
     moduleparams.Measured.Current.PhaseA = IA_CURRENT_FLOAT;
     moduleparams.Measured.Current.PhaseB = IB_CURRENT_FLOAT;
@@ -980,14 +945,14 @@ void SetupCmpssProtections(void)
 void InitSpiDrv8305Gpio(void)
 {
     EALLOW;
-    GpioCtrlRegs.GPBMUX2.bit.GPIO58 = 3;    /*SPISIMOA*/
-    GpioCtrlRegs.GPBGMUX2.bit.GPIO58 = 3;   /*SPISIMOA*/
-    GpioCtrlRegs.GPBMUX2.bit.GPIO59 = 3;    /*SPISOMIA*/
-    GpioCtrlRegs.GPBGMUX2.bit.GPIO59 = 3;   /*SPISOMIA*/
-    GpioCtrlRegs.GPBMUX2.bit.GPIO60 = 3;    /*SPICLKA*/
-    GpioCtrlRegs.GPBGMUX2.bit.GPIO60 = 3;   /*SPICLKA*/
-    GpioCtrlRegs.GPBMUX2.bit.GPIO61 = 3;    /*SPISTEA*/
-    GpioCtrlRegs.GPBGMUX2.bit.GPIO61 = 3;   /*SPISTEA*/
+    GpioCtrlRegs.GPBMUX2.bit.GPIO58 = 3;  /*SPISIMOA*/
+    GpioCtrlRegs.GPBGMUX2.bit.GPIO58 = 3; /*SPISIMOA*/
+    GpioCtrlRegs.GPBMUX2.bit.GPIO59 = 3;  /*SPISOMIA*/
+    GpioCtrlRegs.GPBGMUX2.bit.GPIO59 = 3; /*SPISOMIA*/
+    GpioCtrlRegs.GPBMUX2.bit.GPIO60 = 3;  /*SPICLKA*/
+    GpioCtrlRegs.GPBGMUX2.bit.GPIO60 = 3; /*SPICLKA*/
+    GpioCtrlRegs.GPBMUX2.bit.GPIO61 = 3;  /*SPISTEA*/
+    GpioCtrlRegs.GPBGMUX2.bit.GPIO61 = 3; /*SPISTEA*/
     EDIS;
 }
 
@@ -999,22 +964,22 @@ void InitSpiDrv8305Gpio(void)
 // ****************************************************************************
 void InitSpiRegs_DRV830x(volatile struct SPI_REGS *s)
 {
-    s->SPICCR.bit.SPISWRESET = 0;       // Put SPI in reset state
-    s->SPICCR.bit.SPICHAR = 0xF;        // 16-bit character
-    s->SPICCR.bit.SPILBK = 0;           // loopback off
-    s->SPICCR.bit.CLKPOLARITY = 0;      // Rising edge without delay
+    s->SPICCR.bit.SPISWRESET = 0;  // Put SPI in reset state
+    s->SPICCR.bit.SPICHAR = 0xF;   // 16-bit character
+    s->SPICCR.bit.SPILBK = 0;      // loopback off
+    s->SPICCR.bit.CLKPOLARITY = 0; // Rising edge without delay
 
-    s->SPICTL.bit.SPIINTENA = 0;        // disable SPI interrupt
-    s->SPICTL.bit.TALK = 1;             // enable transmission
-    s->SPICTL.bit.MASTER_SLAVE = 1;     // master
-    s->SPICTL.bit.CLK_PHASE = 0;        // Rising edge without delay
-    s->SPICTL.bit.OVERRUNINTENA = 0;    // disable reciever overrun interrupt
+    s->SPICTL.bit.SPIINTENA = 0;     // disable SPI interrupt
+    s->SPICTL.bit.TALK = 1;          // enable transmission
+    s->SPICTL.bit.MASTER_SLAVE = 1;  // master
+    s->SPICTL.bit.CLK_PHASE = 0;     // Rising edge without delay
+    s->SPICTL.bit.OVERRUNINTENA = 0; // disable reciever overrun interrupt
 
-    s->SPIBRR.bit.SPI_BIT_RATE = 19;        // SPICLK = LSPCLK / 4 (max SPICLK)
+    s->SPIBRR.bit.SPI_BIT_RATE = 19; // SPICLK = LSPCLK / 4 (max SPICLK)
 
-    s->SPICCR.bit.SPISWRESET=1;         // Enable SPI
+    s->SPICCR.bit.SPISWRESET = 1; // Enable SPI
 }
-void InitDRV8305Regs(DRV8305_Vars * deviceptr)
+void InitDRV8305Regs(DRV8305_Vars *deviceptr)
 {
     deviceptr->cntrl5_hs_gd.all = 0;
     deviceptr->cntrl6_ls_gd.all = 0;
@@ -1026,105 +991,99 @@ void InitDRV8305Regs(DRV8305_Vars * deviceptr)
 
     deviceptr->cntrl5_hs_gd.bit.IDRIVEN_HS = drv8305_idriveN_hs_60mA;
     deviceptr->cntrl5_hs_gd.bit.IDRIVEP_HS = drv8305_idriveP_hs_50mA;
-    deviceptr->cntrl5_hs_gd.bit.TDRIVEN    = drv8305_tdriveN_250nS;
+    deviceptr->cntrl5_hs_gd.bit.TDRIVEN = drv8305_tdriveN_250nS;
 
     deviceptr->cntrl6_ls_gd.bit.IDRIVEN_LS = drv8305_idriveN_ls_60mA;
     deviceptr->cntrl6_ls_gd.bit.IDRIVEP_LS = drv8305_idriveP_ls_50mA;
-    deviceptr->cntrl6_ls_gd.bit.TDRIVEP    = drv8305_tdriveP_250nS;
+    deviceptr->cntrl6_ls_gd.bit.TDRIVEP = drv8305_tdriveP_250nS;
 
     deviceptr->cntrl7_gd.bit.COMM_OPTION = drv8305_comm_diode_FW;
-    deviceptr->cntrl7_gd.bit.PWM_MODE    = drv8305_PWM_mode_3;
-    deviceptr->cntrl7_gd.bit.DEAD_TIME   = drv8305_deadTime_60nS;
-    deviceptr->cntrl7_gd.bit.TBLANK      = drv8305_tblank_2us;
-    deviceptr->cntrl7_gd.bit.TVDS        = drv8305_tblank_4us;
+    deviceptr->cntrl7_gd.bit.PWM_MODE = drv8305_PWM_mode_3;
+    deviceptr->cntrl7_gd.bit.DEAD_TIME = drv8305_deadTime_60nS;
+    deviceptr->cntrl7_gd.bit.TBLANK = drv8305_tblank_2us;
+    deviceptr->cntrl7_gd.bit.TVDS = drv8305_tblank_4us;
 
-    deviceptr->cntrl9_IC_ops.bit.Flip_OTS        = drv8305_disable_OTS;
+    deviceptr->cntrl9_IC_ops.bit.Flip_OTS = drv8305_disable_OTS;
     deviceptr->cntrl9_IC_ops.bit.DIS_VPVDD_UVLO2 = drv8305_enable_PVDD_UVLO2_fault;
-    deviceptr->cntrl9_IC_ops.bit.DIS_GDRV_FAULT  = drv8305_enable_gdrv_fault;
-    deviceptr->cntrl9_IC_ops.bit.EN_SNS_CLAMP    = drv8305_disable_Sns_Clamp;
-    deviceptr->cntrl9_IC_ops.bit.WD_DLY          = drv8305_wd_dly_20mS;
-    deviceptr->cntrl9_IC_ops.bit.DIS_SNS_OCP     = drv8305_enable_SnsOcp;
-    deviceptr->cntrl9_IC_ops.bit.WD_EN           = drv8305_disable_WD;
-    deviceptr->cntrl9_IC_ops.bit.SLEEP           = drv8305_sleep_No;
-    deviceptr->cntrl9_IC_ops.bit.CLR_FLTS        = drv8305_ClrFaults_No;      // fault clearing bit
-    deviceptr->cntrl9_IC_ops.bit.SET_VCPH_UV     = drv8305_set_Vcph_UV_4p9V;
+    deviceptr->cntrl9_IC_ops.bit.DIS_GDRV_FAULT = drv8305_enable_gdrv_fault;
+    deviceptr->cntrl9_IC_ops.bit.EN_SNS_CLAMP = drv8305_disable_Sns_Clamp;
+    deviceptr->cntrl9_IC_ops.bit.WD_DLY = drv8305_wd_dly_20mS;
+    deviceptr->cntrl9_IC_ops.bit.DIS_SNS_OCP = drv8305_enable_SnsOcp;
+    deviceptr->cntrl9_IC_ops.bit.WD_EN = drv8305_disable_WD;
+    deviceptr->cntrl9_IC_ops.bit.SLEEP = drv8305_sleep_No;
+    deviceptr->cntrl9_IC_ops.bit.CLR_FLTS = drv8305_ClrFaults_No; // fault clearing bit
+    deviceptr->cntrl9_IC_ops.bit.SET_VCPH_UV = drv8305_set_Vcph_UV_4p9V;
 
-    deviceptr->cntrlA_shunt_amp.bit.GAIN_CS1   = (DRV_GAIN == 10) ? drv8305_gain_CS_10 :
-                                                     (DRV_GAIN == 20) ? drv8301_gain_20 :
-                                                     (DRV_GAIN == 40) ? drv8301_gain_40 : drv8301_gain_80;
-    deviceptr->cntrlA_shunt_amp.bit.GAIN_CS2   = (DRV_GAIN == 10) ? drv8305_gain_CS_10 :
-                                                     (DRV_GAIN == 20) ? drv8301_gain_20 :
-                                                     (DRV_GAIN == 40) ? drv8301_gain_40 : drv8301_gain_80;
-    deviceptr->cntrlA_shunt_amp.bit.GAIN_CS3   = (DRV_GAIN == 10) ? drv8305_gain_CS_10 :
-                                                     (DRV_GAIN == 20) ? drv8301_gain_20 :
-                                                     (DRV_GAIN == 40) ? drv8301_gain_40 : drv8301_gain_80;
-    deviceptr->cntrlA_shunt_amp.bit.CS_BLANK   = drv8305_cs_blank_0ns;
+    deviceptr->cntrlA_shunt_amp.bit.GAIN_CS1 = (DRV_GAIN == 10) ? drv8305_gain_CS_10 : (DRV_GAIN == 20) ? drv8301_gain_20 : (DRV_GAIN == 40) ? drv8301_gain_40 : drv8301_gain_80;
+    deviceptr->cntrlA_shunt_amp.bit.GAIN_CS2 = (DRV_GAIN == 10) ? drv8305_gain_CS_10 : (DRV_GAIN == 20) ? drv8301_gain_20 : (DRV_GAIN == 40) ? drv8301_gain_40 : drv8301_gain_80;
+    deviceptr->cntrlA_shunt_amp.bit.GAIN_CS3 = (DRV_GAIN == 10) ? drv8305_gain_CS_10 : (DRV_GAIN == 20) ? drv8301_gain_20 : (DRV_GAIN == 40) ? drv8301_gain_40 : drv8301_gain_80;
+    deviceptr->cntrlA_shunt_amp.bit.CS_BLANK = drv8305_cs_blank_0ns;
     deviceptr->cntrlA_shunt_amp.bit.DC_CAL_CH1 = drv8305_dc_cal_off;
     deviceptr->cntrlA_shunt_amp.bit.DC_CAL_CH2 = drv8305_dc_cal_off;
     deviceptr->cntrlA_shunt_amp.bit.DC_CAL_CH3 = drv8305_dc_cal_off;
 
-    deviceptr->cntrlB_Vreg.bit.VREF_SCALING   = drv8305_vref_scaling_2;
-    deviceptr->cntrlB_Vreg.bit.SLEEP_DLY      = drv8305_sleep_dly_10uS;
-    deviceptr->cntrlB_Vreg.bit.DIS_VREG_PWRGD = 0;                               // temporary //
-    deviceptr->cntrlB_Vreg.bit.VREG_UV_LEVEL  = drv8305_vreg_UV_level_30percent;
+    deviceptr->cntrlB_Vreg.bit.VREF_SCALING = drv8305_vref_scaling_2;
+    deviceptr->cntrlB_Vreg.bit.SLEEP_DLY = drv8305_sleep_dly_10uS;
+    deviceptr->cntrlB_Vreg.bit.DIS_VREG_PWRGD = 0; // temporary //
+    deviceptr->cntrlB_Vreg.bit.VREG_UV_LEVEL = drv8305_vreg_UV_level_30percent;
 
-    deviceptr->cntrlC_Vds_SNS.bit.VDS_LEVEL   = drv8305_vds_level_1175mV;
-    deviceptr->cntrlC_Vds_SNS.bit.VDS_MODE    = drv8305_vds_mode_latchedShutDown;
+    deviceptr->cntrlC_Vds_SNS.bit.VDS_LEVEL = drv8305_vds_level_1175mV;
+    deviceptr->cntrlC_Vds_SNS.bit.VDS_MODE = drv8305_vds_mode_latchedShutDown;
 
     return;
 }
-void InitDRV8305(DRV8305_Vars * deviceptr)
+void InitDRV8305(DRV8305_Vars *deviceptr)
 {
     Uint16 tmp1, *ptr1, *ptr2;
 
     // ===============================================================
     // write all control regs, ignore the return value of each write
     // ===============================================================
-//  for (tmp1=5; tmp1<= 0xc; tmp1++)
-//  {
-//      if (tmp1 != 8)
-//          tmp2 = DRV8305_SPI_Write(motor, tmp1);                //write to DRV8305 control reg @ address 'tmp1';
-//  }
+    //  for (tmp1=5; tmp1<= 0xc; tmp1++)
+    //  {
+    //      if (tmp1 != 8)
+    //          tmp2 = DRV8305_SPI_Write(motor, tmp1);                //write to DRV8305 control reg @ address 'tmp1';
+    //  }
 
-    tmp1 = DRV8305_SPI_Write(deviceptr, DRV8305_C5_HS_GATE_DRIVER_CNTRL_ADDR);         //write to DRV8305 control reg 5
-    tmp1 = DRV8305_SPI_Write(deviceptr, DRV8305_C6_LS_GATE_DRIVER_CNTRL_ADDR);         //write to DRV8305 control reg 6
-    tmp1 = DRV8305_SPI_Write(deviceptr, DRV8305_C7_GD_CNTRL_ADDR);                     //write to DRV8305 control reg 7
-    tmp1 = DRV8305_SPI_Write(deviceptr, DRV8305_C9_IC_OPS_ADDR);                       //write to DRV8305 control reg 9
-    tmp1 = DRV8305_SPI_Write(deviceptr, DRV8305_CA_SHUNT_AMP_CNTRL_ADDR);              //write to DRV8305 control reg A
-    tmp1 = DRV8305_SPI_Write(deviceptr, DRV8305_CB_VREG_CNTRL_ADDR);                   //write to DRV8305 control reg B
-    tmp1 = DRV8305_SPI_Write(deviceptr, DRV8305_CC_VDS_SNS_CNTRL_ADDR);                //write to DRV8305 control reg C
+    tmp1 = DRV8305_SPI_Write(deviceptr, DRV8305_C5_HS_GATE_DRIVER_CNTRL_ADDR); //write to DRV8305 control reg 5
+    tmp1 = DRV8305_SPI_Write(deviceptr, DRV8305_C6_LS_GATE_DRIVER_CNTRL_ADDR); //write to DRV8305 control reg 6
+    tmp1 = DRV8305_SPI_Write(deviceptr, DRV8305_C7_GD_CNTRL_ADDR);             //write to DRV8305 control reg 7
+    tmp1 = DRV8305_SPI_Write(deviceptr, DRV8305_C9_IC_OPS_ADDR);               //write to DRV8305 control reg 9
+    tmp1 = DRV8305_SPI_Write(deviceptr, DRV8305_CA_SHUNT_AMP_CNTRL_ADDR);      //write to DRV8305 control reg A
+    tmp1 = DRV8305_SPI_Write(deviceptr, DRV8305_CB_VREG_CNTRL_ADDR);           //write to DRV8305 control reg B
+    tmp1 = DRV8305_SPI_Write(deviceptr, DRV8305_CC_VDS_SNS_CNTRL_ADDR);        //write to DRV8305 control reg C
 
     // ===============================================
     // read all status and control registers
     // ===============================================
-    deviceptr->status1_wwd.all = DRV8305_SPI_Read(deviceptr, DRV8305_S1_WWD_ADDR) & 0x05ff;               // read DRV8305 status reg 1
-    deviceptr->status2_ov_vds.all = DRV8305_SPI_Read(deviceptr, DRV8305_S2_OV_VDS_FAULTS_ADDR) & 0x07e7;  // read DRV8305 status reg 2
-    deviceptr->status3_IC.all = DRV8305_SPI_Read(deviceptr, DRV8305_S3_IC_FAULTS_ADDR) & 0x0777;          // read DRV8305 status reg 3
-    deviceptr->status4_gd_Vgs.all = DRV8305_SPI_Read(deviceptr, DRV8305_S4_GD_VGS_FAULTS_ADDR) & 0x07e0;  // read DRV8305 status reg 4
-    deviceptr->readCntrl5 = DRV8305_SPI_Write(deviceptr, DRV8305_C5_HS_GATE_DRIVER_CNTRL_ADDR) & 0x03ff;  // read DRV8305 control reg 5
-    deviceptr->readCntrl6 = DRV8305_SPI_Write(deviceptr, DRV8305_C6_LS_GATE_DRIVER_CNTRL_ADDR) & 0x03ff;  // read DRV8305 control reg 6
-    deviceptr->readCntrl7 = DRV8305_SPI_Write(deviceptr, DRV8305_C7_GD_CNTRL_ADDR) & 0x03ff;              // read DRV8305 control reg 7
-    deviceptr->readCntrl9 = DRV8305_SPI_Write(deviceptr, DRV8305_C9_IC_OPS_ADDR) & 0x07ff;                // read DRV8305 control reg 9
-    deviceptr->readCntrlA = DRV8305_SPI_Write(deviceptr, DRV8305_CA_SHUNT_AMP_CNTRL_ADDR) & 0x07ff;       // read DRV8305 control reg A
-    deviceptr->readCntrlB = DRV8305_SPI_Write(deviceptr, DRV8305_CB_VREG_CNTRL_ADDR) & 0x031f;            // read DRV8305 control reg B
-    deviceptr->readCntrlC = DRV8305_SPI_Write(deviceptr, DRV8305_CC_VDS_SNS_CNTRL_ADDR) & 0x00ff;         // read DRV8305 control reg C
+    deviceptr->status1_wwd.all = DRV8305_SPI_Read(deviceptr, DRV8305_S1_WWD_ADDR) & 0x05ff;              // read DRV8305 status reg 1
+    deviceptr->status2_ov_vds.all = DRV8305_SPI_Read(deviceptr, DRV8305_S2_OV_VDS_FAULTS_ADDR) & 0x07e7; // read DRV8305 status reg 2
+    deviceptr->status3_IC.all = DRV8305_SPI_Read(deviceptr, DRV8305_S3_IC_FAULTS_ADDR) & 0x0777;         // read DRV8305 status reg 3
+    deviceptr->status4_gd_Vgs.all = DRV8305_SPI_Read(deviceptr, DRV8305_S4_GD_VGS_FAULTS_ADDR) & 0x07e0; // read DRV8305 status reg 4
+    deviceptr->readCntrl5 = DRV8305_SPI_Write(deviceptr, DRV8305_C5_HS_GATE_DRIVER_CNTRL_ADDR) & 0x03ff; // read DRV8305 control reg 5
+    deviceptr->readCntrl6 = DRV8305_SPI_Write(deviceptr, DRV8305_C6_LS_GATE_DRIVER_CNTRL_ADDR) & 0x03ff; // read DRV8305 control reg 6
+    deviceptr->readCntrl7 = DRV8305_SPI_Write(deviceptr, DRV8305_C7_GD_CNTRL_ADDR) & 0x03ff;             // read DRV8305 control reg 7
+    deviceptr->readCntrl9 = DRV8305_SPI_Write(deviceptr, DRV8305_C9_IC_OPS_ADDR) & 0x07ff;               // read DRV8305 control reg 9
+    deviceptr->readCntrlA = DRV8305_SPI_Write(deviceptr, DRV8305_CA_SHUNT_AMP_CNTRL_ADDR) & 0x07ff;      // read DRV8305 control reg A
+    deviceptr->readCntrlB = DRV8305_SPI_Write(deviceptr, DRV8305_CB_VREG_CNTRL_ADDR) & 0x031f;           // read DRV8305 control reg B
+    deviceptr->readCntrlC = DRV8305_SPI_Write(deviceptr, DRV8305_CC_VDS_SNS_CNTRL_ADDR) & 0x00ff;        // read DRV8305 control reg C
 
     // ===============================================
     // DRV Fault diagnostics -  and Control regs
     // ===============================================
-    ptr1 = (Uint16 *) &(deviceptr->Rsvd0);
-    ptr2 = (Uint16 *) &(deviceptr->readCntrl5);
+    ptr1 = (Uint16 *)&(deviceptr->Rsvd0);
+    ptr2 = (Uint16 *)&(deviceptr->readCntrl5);
     deviceptr->DRV_fault = 0;
 
     // check all Status regs
-    for (tmp1 = 1; tmp1<= 0x4; tmp1++)
+    for (tmp1 = 1; tmp1 <= 0x4; tmp1++)
     {
         if (ptr1[tmp1])
             deviceptr->DRV_fault |= 1 << tmp1;
     }
 
     // check all control regs
-    for (; tmp1<= 0xc; tmp1++)
+    for (; tmp1 <= 0xc; tmp1++)
     {
         if (tmp1 != 8)
             if (ptr1[tmp1] != *ptr2++)
@@ -1135,36 +1094,66 @@ void InitDRV8305(DRV8305_Vars * deviceptr)
 }
 Uint16 SPI_Driver(volatile struct SPI_REGS *s, Uint16 data)
 {
-    s->SPITXBUF = data;                     // send out the data
-    while(s->SPISTS.bit.INT_FLAG == 0);     // wait for the packet to complete
-    data = s->SPIRXBUF;                     // data read to clear the INT_FLAG bit
+    s->SPITXBUF = data; // send out the data
+    while (s->SPISTS.bit.INT_FLAG == 0)
+        ;               // wait for the packet to complete
+    data = s->SPIRXBUF; // data read to clear the INT_FLAG bit
 
-    return(data);
+    return (data);
 }
 
-Uint16 DRV8305_SPI_Write(DRV8305_Vars  * deviceptr, Uint16 address)
+Uint16 DRV8305_SPI_Write(DRV8305_Vars *deviceptr, Uint16 address)
 {
     DELAY_US(10);
     union DRV830x_SPI_WRITE_WORD_REG w;
-    Uint16 * cntrlReg;
+    Uint16 *cntrlReg;
 
     cntrlReg = &(deviceptr->Rsvd0);
 
-    w.bit.R_W = 0;                          // write - 0
-    w.bit.ADDRESS = address;                // load the address
-    w.bit.DATA = cntrlReg[address];         // data to be written
+    w.bit.R_W = 0;                  // write - 0
+    w.bit.ADDRESS = address;        // load the address
+    w.bit.DATA = cntrlReg[address]; // data to be written
 
-    return(SPI_Driver(&SpiaRegs, w.all));
+    return (SPI_Driver(&SpiaRegs, w.all));
 }
-Uint16 DRV8305_SPI_Read(DRV8305_Vars  * deviceptr, Uint16 address)
+Uint16 DRV8305_SPI_Read(DRV8305_Vars *deviceptr, Uint16 address)
 {
     union DRV830x_SPI_WRITE_WORD_REG w;
 
-    w.bit.R_W = 1;                          // read - 1
-    w.bit.ADDRESS = address;                // load the address
-    w.bit.DATA = 0;                         // data to be written
+    w.bit.R_W = 1;           // read - 1
+    w.bit.ADDRESS = address; // load the address
+    w.bit.DATA = 0;          // data to be written
 
-    return(SPI_Driver(&SpiaRegs, w.all));
+    return (SPI_Driver(&SpiaRegs, w.all));
+}
+
+void CalculateOffsetValue(void)
+{
+    for (OffsetCalCounter = 0; OffsetCalCounter < 20000;)
+    {
+        if (EPwm1Regs.ETFLG.bit.SOCA == 1)
+        {
+            if (OffsetCalCounter > 1000)
+            {
+                Module1_Parameters.OffsetValue.PhaseA = K1 * Module1_Parameters.OffsetValue.PhaseA + K2 * M1_ADCRESULT_IA * ADC_PU_SCALE_FACTOR; //Module1 : Phase A offset
+                Module1_Parameters.OffsetValue.PhaseB = K1 * Module1_Parameters.OffsetValue.PhaseB + K2 * M1_ADCRESULT_IB * ADC_PU_SCALE_FACTOR; //Module1 : Phase B offset
+                Module1_Parameters.OffsetValue.PhaseC = K1 * Module1_Parameters.OffsetValue.PhaseC + K2 * M1_ADCRESULT_IC * ADC_PU_SCALE_FACTOR; //Module1 : Phase C offset
+#if 0
+                motor1.offset_shntA = K1*motor1.offset_shntA + K2*(IFB_A1)*ADC_PU_SCALE_FACTOR;     //Mtr1 : Phase A offset
+                motor1.offset_shntB = K1*motor1.offset_shntB + K2*(IFB_B1)*ADC_PU_SCALE_FACTOR;     //Mtr1 : Phase B offset
+                motor1.offset_shntC = K1*motor1.offset_shntC + K2*(IFB_C1)*ADC_PU_SCALE_FACTOR;     //Mtr1 : Phase C offset
+#endif
+            }
+            EPwm1Regs.ETCLR.bit.SOCA = 1;
+            OffsetCalCounter++;
+        }
+    }
+    EALLOW;
+    AdccRegs.ADCPPB1OFFREF = Module1_Parameters.OffsetValue.PhaseA * 4096.0;
+    AdcbRegs.ADCPPB1OFFREF = Module1_Parameters.OffsetValue.PhaseB * 4096.0;
+    AdcaRegs.ADCPPB3OFFREF = Module1_Parameters.OffsetValue.PhaseC * 4096.0;
+    EDIS;
+    OffsetCalculationIsDone = 1;
 }
 
 __interrupt void adca1_isr(void)
@@ -1174,11 +1163,16 @@ __interrupt void adca1_isr(void)
     /*TODO, need to consider alignment scenario*/
     ControlISRCounter++;
     TimeCounter = TimeCounter + 1.0;
-    if(TimeCounter==((float)INITIALPWMFREQ))
+    if (TimeCounter == ((float)INITIALPWMFREQ))
     {
-        TimeCounter=0;
+        TimeCounter = 0;
     }
 
+    if (OffsetCalculationIsDone == 0)
+    {
+        AdcaRegs.ADCINTFLGCLR.bit.ADCINT1 = 1;  // Clears respective flag bit in the ADCINTFLG register
+        PieCtrlRegs.PIEACK.all = PIEACK_GROUP1; // Acknowledge interrupt to PIE
+    }
 
     GetEncoderReadings(Module1_Parameters);
 
@@ -1191,17 +1185,12 @@ __interrupt void adca1_isr(void)
     Module1_Parameters.Reference.Iq = PI_iq.Output;
     Module1_Parameters.Reference.Id = IDREF;
 
-
-    if(OperationMode==MODE_RUN)
+    if (OperationMode == MODE_RUN)
     {
-
     }
-    else if (OperationMode==MODE_ALIGN)
+    else if (OperationMode == MODE_ALIGN)
     {
-
     }
-
-
 
     Module1_Parameters.MinimumCostValue = (float)1e35;
 
@@ -1227,14 +1216,13 @@ __interrupt void adca1_isr(void)
     ExecuteFirstPrediction(Module1_Parameters,9);
     ExecuteSecondPrediction(Module1_Parameters,9);
 #endif
-#if BUILDMODE==MODE_RL_LOAD
-    EPwm1Regs.CMPA.bit.CMPA = EPwm1Regs.TBPRD*RL_Load_Operation.ma*(sinf(2.0*PI*RL_Load_Operation.Frequency*TimeCounter/((float)INITIALPWMFREQ))*0.5+0.5);
-    EPwm2Regs.CMPA.bit.CMPA = EPwm2Regs.TBPRD*RL_Load_Operation.ma*(sinf(2.0*PI*RL_Load_Operation.Frequency*TimeCounter/((float)INITIALPWMFREQ)+TWO_PI_OVER_THREE)*0.5+0.5);
-    EPwm3Regs.CMPA.bit.CMPA = EPwm3Regs.TBPRD*RL_Load_Operation.ma*(sinf(2.0*PI*RL_Load_Operation.Frequency*TimeCounter/((float)INITIALPWMFREQ)+2.0*TWO_PI_OVER_THREE)*0.5+0.5);
+#if BUILDMODE == MODE_RL_LOAD
+    EPwm1Regs.CMPA.bit.CMPA = EPwm1Regs.TBPRD * RL_Load_Operation.ma * (sinf(2.0 * PI * RL_Load_Operation.Frequency * TimeCounter / ((float)INITIALPWMFREQ)) * 0.5 + 0.5);
+    EPwm2Regs.CMPA.bit.CMPA = EPwm2Regs.TBPRD * RL_Load_Operation.ma * (sinf(2.0 * PI * RL_Load_Operation.Frequency * TimeCounter / ((float)INITIALPWMFREQ) + TWO_PI_OVER_THREE) * 0.5 + 0.5);
+    EPwm3Regs.CMPA.bit.CMPA = EPwm3Regs.TBPRD * RL_Load_Operation.ma * (sinf(2.0 * PI * RL_Load_Operation.Frequency * TimeCounter / ((float)INITIALPWMFREQ) + 2.0 * TWO_PI_OVER_THREE) * 0.5 + 0.5);
 #endif
 
-
-    if(SendOneInFour%4==0)
+    if (SendOneInFour % 4 == 0)
     {
         DataToBeSent[0] = IA_CURRENT_FLOAT;
         DataToBeSent[1] = EPwm1Regs.CMPA.bit.CMPA;
@@ -1242,12 +1230,11 @@ __interrupt void adca1_isr(void)
         DataToBeSent[3] = EPwm2Regs.CMPA.bit.CMPA;
         DataToBeSent[4] = IC_CURRENT_FLOAT;
         DataToBeSent[5] = EPwm3Regs.CMPA.bit.CMPA;
-        SciSendMultipleFloatWithTheTag(DataToBeSent,6);
-
+        SciSendMultipleFloatWithTheTag(DataToBeSent, 6);
     }
 
     SendOneInFour++;
 
-    AdcaRegs.ADCINTFLGCLR.bit.ADCINT1 = 1;      // Clears respective flag bit in the ADCINTFLG register
-    PieCtrlRegs.PIEACK.all = PIEACK_GROUP1;     // Acknowledge interrupt to PIE
+    AdcaRegs.ADCINTFLGCLR.bit.ADCINT1 = 1;  // Clears respective flag bit in the ADCINTFLG register
+    PieCtrlRegs.PIEACK.all = PIEACK_GROUP1; // Acknowledge interrupt to PIE
 }

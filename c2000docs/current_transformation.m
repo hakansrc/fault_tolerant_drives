@@ -2,16 +2,8 @@ clear
 clc
 close all
 
-
+Current = -20:0.01:20;
 Resistance = 7e-3;
-current_magnitude = 15;
-t = 0:0.0001:0.04;
-
-Current = current_magnitude*sin(2*pi*50*t);
-
-##figure
-##plot(Current)
-
 
 SN_SP_voltage = Current*Resistance;
 
@@ -30,12 +22,9 @@ min(Vo)
 figure
 plot(Vo)
 
-##figure
-##plot(Vo/Vref*4095)
+CurrentRetransform = (Vo-Vref/k)/(-DRV_GAIN)/Resistance;
 
-CurrentRetransform = (Vo-Vref/k)/(DRV_GAIN)/Resistance;
-
-##figure
-##plot(CurrentRetransform)
-##max(CurrentRetransform)
-##min(CurrentRetransform)
+figure
+plot(CurrentRetransform)
+max(CurrentRetransform)
+min(CurrentRetransform)

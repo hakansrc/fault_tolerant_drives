@@ -29,3 +29,8 @@ if(isempty(TheTagIndices)==0)
 end
 figure
 plot(TheDataConvertedValues(1,:)+TheDataConvertedValues(3,:)+TheDataConvertedValues(5,:))
+
+figure 
+plot(-TheDataConvertedValues(1,:)/max(TheDataConvertedValues(1,:)))
+hold on
+plot(2*(TheDataConvertedValues(2,:)-4750)/max(TheDataConvertedValues(2,:)))

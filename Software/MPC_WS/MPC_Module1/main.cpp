@@ -29,7 +29,7 @@ unsigned int StartOperation = 0; /*if this is 0, then no operation will be perfo
 unsigned long int BlankCounter = 0;
 unsigned int OperationMode = 0; /*this will be changed */
 DRV8305_Vars Device1Configuration;
-int16 OffsetCalCounter;
+int32 OffsetCalCounter;
 uint16_t OffsetCalculationIsDone = 0;
 float K1 = (0.998),  // Offset filter coefficient K1: 0.05/(T+0.05);
     K2 = (0.001999); // Offset filter coefficient K2: T/(T+0.05);
@@ -804,9 +804,9 @@ void InitializeADCs(void)
     AdcaRegs.ADCSOC2CTL.bit.TRIGSEL = EPWM1_SOCA_TRG; /*ePWM1 SocA is the trigger*/
     AdcaRegs.ADCSOC2CTL.bit.CHSEL = 0x2;              /*This is Ib pin for TIDA-00909 PCB*/
     AdcaRegs.ADCSOC2CTL.bit.ACQPS = ACQPS_PERIOD;     /*TODO: This value should be tested*/
-    AdcaRegs.ADCPPB3CONFIG.bit.CONFIG = 0;            // PPB is associated with SOC0
-    AdcaRegs.ADCPPB3OFFCAL.bit.OFFCAL = 0;            // Write zero to this for now
-    AdcaRegs.ADCPPB3OFFREF = 0;                       // THIS VALUE IS TODO
+    AdcaRegs.ADCPPB2CONFIG.bit.CONFIG = 0;            // PPB is associated with SOC0
+    AdcaRegs.ADCPPB2OFFCAL.bit.OFFCAL = 0;            // Write zero to this for now
+    AdcaRegs.ADCPPB2OFFREF = 0;                       // THIS VALUE IS TODO
 
     EDIS;
 }
@@ -1129,11 +1129,11 @@ Uint16 DRV8305_SPI_Read(DRV8305_Vars *deviceptr, Uint16 address)
 
 void CalculateOffsetValue(void)
 {
-    for (OffsetCalCounter = 0; OffsetCalCounter < 20000;)
+    for (OffsetCalCounter = 0; OffsetCalCounter < 200000;)
     {
         if (EPwm1Regs.ETFLG.bit.SOCA == 1)
         {
-            if (OffsetCalCounter > 1000)
+            if (OffsetCalCounter > 10000)
             {
                 Module1_Parameters.OffsetValue.PhaseA = K1 * Module1_Parameters.OffsetValue.PhaseA + K2 * M1_ADCRESULT_IA * ADC_PU_SCALE_FACTOR; //Module1 : Phase A offset
                 Module1_Parameters.OffsetValue.PhaseB = K1 * Module1_Parameters.OffsetValue.PhaseB + K2 * M1_ADCRESULT_IB * ADC_PU_SCALE_FACTOR; //Module1 : Phase B offset
@@ -1151,7 +1151,7 @@ void CalculateOffsetValue(void)
     EALLOW;
     AdccRegs.ADCPPB1OFFREF = Module1_Parameters.OffsetValue.PhaseA * 4096.0;
     AdcbRegs.ADCPPB1OFFREF = Module1_Parameters.OffsetValue.PhaseB * 4096.0;
-    AdcaRegs.ADCPPB3OFFREF = Module1_Parameters.OffsetValue.PhaseC * 4096.0;
+    AdcaRegs.ADCPPB2OFFREF = Module1_Parameters.OffsetValue.PhaseC * 4096.0;
     EDIS;
     OffsetCalculationIsDone = 1;
 }
@@ -1225,11 +1225,12 @@ __interrupt void adca1_isr(void)
     if (SendOneInFour % 4 == 0)
     {
         DataToBeSent[0] = IA_CURRENT_FLOAT;
-        DataToBeSent[1] = EPwm1Regs.CMPA.bit.CMPA;
+        DataToBeSent[1] = M1_PPBADCRESULT_IA*ADC_PU_PPB_SCALE_FACTOR;
         DataToBeSent[2] = IB_CURRENT_FLOAT;
-        DataToBeSent[3] = EPwm2Regs.CMPA.bit.CMPA;
+        DataToBeSent[3] = M1_PPBADCRESULT_IB*ADC_PU_PPB_SCALE_FACTOR;
         DataToBeSent[4] = IC_CURRENT_FLOAT;
-        DataToBeSent[5] = EPwm3Regs.CMPA.bit.CMPA;
+        DataToBeSent[5] = M1_PPBADCRESULT_IC*ADC_PU_PPB_SCALE_FACTOR;
+
         SciSendMultipleFloatWithTheTag(DataToBeSent, 6);
     }
 

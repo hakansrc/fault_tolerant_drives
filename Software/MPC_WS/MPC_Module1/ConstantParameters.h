@@ -36,9 +36,9 @@
 #define M1_ADCRESULT_IB AdcbResultRegs.ADCRESULT1
 #define M1_ADCRESULT_IC AdcaResultRegs.ADCRESULT2
 
-#define M1_PPBADCRESULT_IA ((signed int)AdccResultRegs.ADCPP1RESULT1.all)
-#define M1_PPBADCRESULT_IB ((signed int)AdcbResultRegs.ADCPP1RESULT1.all)
-#define M1_PPBADCRESULT_IC ((signed int)AdcaResultRegs.ADCPP1RESULT2.all)
+#define M1_PPBADCRESULT_IA ((signed int)AdccResultRegs.ADCPPB1RESULT.all)
+#define M1_PPBADCRESULT_IB ((signed int)AdcbResultRegs.ADCPPB1RESULT.all)
+#define M1_PPBADCRESULT_IC ((signed int)AdcaResultRegs.ADCPPB2RESULT.all)
 #define ADC_PU_SCALE_FACTOR 0.000244140625     //1/2^12
 #define ADC_PU_PPB_SCALE_FACTOR 0.000488281250 //1/2^11
 

@@ -250,7 +250,7 @@ void InitializeEpwm1Registers(void)
     EPwm1Regs.TBPHS.bit.TBPHS = 0;
 
     EPwm1Regs.TBPRD = SYSCLKFREQUENCY / (INITIALPWMFREQ * 2);
-    EPwm1Regs.CMPA.bit.CMPA = EPwm1Regs.TBPRD / 5;
+    EPwm1Regs.CMPA.bit.CMPA = 0;
 
     /*TODO how to do tripzone?, how are we going to do the protection?
      * consider when the inverter arrives*/
@@ -339,7 +339,7 @@ void InitializeEpwm2Registers(void)
     EPwm2Regs.TBPHS.bit.TBPHS = 0;
 
     EPwm2Regs.TBPRD = SYSCLKFREQUENCY / (INITIALPWMFREQ * 2);
-    EPwm2Regs.CMPA.bit.CMPA = EPwm2Regs.TBPRD / 2;
+    EPwm2Regs.CMPA.bit.CMPA = 0;
 }
 void InitializeEpwm3Registers(void)
 {
@@ -417,7 +417,7 @@ void InitializeEpwm3Registers(void)
     EPwm3Regs.TBPHS.bit.TBPHS = 0;
 
     EPwm3Regs.TBPRD = SYSCLKFREQUENCY / (INITIALPWMFREQ * 2);
-    EPwm3Regs.CMPA.bit.CMPA = EPwm3Regs.TBPRD / 2;
+    EPwm3Regs.CMPA.bit.CMPA = 0;
 }
 
 void SetupGPIOs(void)
@@ -680,7 +680,7 @@ void InitializeADCs(void)
     AdcaRegs.ADCINTSEL1N2.bit.INT2E = 0;    // ADCINT2 disabled.
     AdcaRegs.ADCINTSEL1N2.bit.INT2SEL = 0;  // No interrupt selected.
 
-    AdcaRegs.ADCINTSEL1N2.bit.INT1CONT = 0; // Continous mode is disabled
+    AdcaRegs.ADCINTSEL1N2.bit.INT1CONT = 1; // Continous mode is disabled
     AdcaRegs.ADCINTSEL1N2.bit.INT1E = 1;    // ADCINT1 enable.
     AdcaRegs.ADCINTSEL1N2.bit.INT1SEL = 0;  // EOC0 is the trigger for ADCINT1
 
@@ -1011,7 +1011,7 @@ void InitDRV8305Regs(DRV8305_Vars *deviceptr)
     deviceptr->cntrl9_IC_ops.bit.DIS_SNS_OCP = drv8305_enable_SnsOcp;
     deviceptr->cntrl9_IC_ops.bit.WD_EN = drv8305_disable_WD;
     deviceptr->cntrl9_IC_ops.bit.SLEEP = drv8305_sleep_No;
-    deviceptr->cntrl9_IC_ops.bit.CLR_FLTS = drv8305_ClrFaults_No; // fault clearing bit
+    deviceptr->cntrl9_IC_ops.bit.CLR_FLTS = drv8305_ClrFaults_Yes; // fault clearing bit
     deviceptr->cntrl9_IC_ops.bit.SET_VCPH_UV = drv8305_set_Vcph_UV_4p9V;
 
     deviceptr->cntrlA_shunt_amp.bit.GAIN_CS1 = (DRV_GAIN == 10) ? drv8305_gain_CS_10 : (DRV_GAIN == 20) ? drv8301_gain_20 : (DRV_GAIN == 40) ? drv8301_gain_40 : drv8301_gain_80;
@@ -1225,11 +1225,11 @@ __interrupt void adca1_isr(void)
     if (SendOneInFour % 4 == 0)
     {
         DataToBeSent[0] = IA_CURRENT_FLOAT;
-        DataToBeSent[1] = M1_PPBADCRESULT_IA*ADC_PU_PPB_SCALE_FACTOR;
+        DataToBeSent[1] = M1_PPBADCRESULT_IA;
         DataToBeSent[2] = IB_CURRENT_FLOAT;
-        DataToBeSent[3] = M1_PPBADCRESULT_IB*ADC_PU_PPB_SCALE_FACTOR;
+        DataToBeSent[3] = M1_PPBADCRESULT_IB;
         DataToBeSent[4] = IC_CURRENT_FLOAT;
-        DataToBeSent[5] = M1_PPBADCRESULT_IC*ADC_PU_PPB_SCALE_FACTOR;
+        DataToBeSent[5] = M1_PPBADCRESULT_IC;
 
         SciSendMultipleFloatWithTheTag(DataToBeSent, 6);
     }

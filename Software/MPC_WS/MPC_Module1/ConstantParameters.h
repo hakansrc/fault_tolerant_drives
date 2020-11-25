@@ -19,8 +19,8 @@
 
 #define BUILDMODE MODE_RL_LOAD
 
-#define DEADBAND_FED 150          /*ns*/
-#define DEADBAND_RED 150          /*ns*/
+#define DEADBAND_FED 0          /*ns*/
+#define DEADBAND_RED 0          /*ns*/
 #define SYSCLKFREQUENCY 200000000 /*Hz*/
 #define SYSCLKPERIOD 5            /*ns*/
 #define INITIALPWMFREQ 10000      /*Hz*/

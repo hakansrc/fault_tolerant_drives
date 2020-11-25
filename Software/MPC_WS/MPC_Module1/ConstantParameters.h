@@ -39,6 +39,7 @@
 #define M1_ADCRESULT_IB AdcbResultRegs.ADCRESULT1
 #define M1_ADCRESULT_IC AdcaResultRegs.ADCRESULT2
 
+/*WARNING the -1 multipled values of the followings are the actual current values*/
 #define M1_PPBADCRESULT_IA ((signed int)AdccResultRegs.ADCPPB1RESULT.all)
 #define M1_PPBADCRESULT_IB ((signed int)AdcbResultRegs.ADCPPB1RESULT.all)
 #define M1_PPBADCRESULT_IC ((signed int)AdcaResultRegs.ADCPPB2RESULT.all)

@@ -244,8 +244,8 @@ void InitializeEpwm1Registers(void)
     EPwm1Regs.HRPCTL.all = 0;
 
     EPwm1Regs.AQCTLA.all = 0;
-    EPwm1Regs.AQCTLA.bit.CAU = AQ_SET;
-    EPwm1Regs.AQCTLA.bit.CAD = AQ_CLEAR;
+    EPwm1Regs.AQCTLA.bit.CAD = AQ_SET;
+    EPwm1Regs.AQCTLA.bit.CAU = AQ_CLEAR;
 
     EPwm1Regs.TBPHS.bit.TBPHS = 0;
 
@@ -255,7 +255,7 @@ void InitializeEpwm1Registers(void)
     /*TODO how to do tripzone?, how are we going to do the protection?
      * consider when the inverter arrives*/
     EPwm1Regs.ETSEL.bit.SOCAEN = 1; /*enable EPWMxSOCA signal*/
-    EPwm1Regs.ETSEL.bit.SOCASEL = 1;
+    EPwm1Regs.ETSEL.bit.SOCASEL = 2;    /*this is magic!!!*/
     EPwm1Regs.ETSEL.bit.INTEN = 1;  /*enable pwm interrupt*/
     EPwm1Regs.ETSEL.bit.INTSEL = 1; /*interrupt occurs when TBCTR = 0*/
 
@@ -333,8 +333,8 @@ void InitializeEpwm2Registers(void)
     EPwm2Regs.HRPCTL.all = 0;
 
     EPwm2Regs.AQCTLA.all = 0;
-    EPwm2Regs.AQCTLA.bit.CAU = AQ_SET;
-    EPwm2Regs.AQCTLA.bit.CAD = AQ_CLEAR;
+    EPwm2Regs.AQCTLA.bit.CAD = AQ_SET;
+    EPwm2Regs.AQCTLA.bit.CAU = AQ_CLEAR;
 
     EPwm2Regs.TBPHS.bit.TBPHS = 0;
 
@@ -411,8 +411,8 @@ void InitializeEpwm3Registers(void)
     EPwm3Regs.HRPCTL.all = 0;
 
     EPwm3Regs.AQCTLA.all = 0;
-    EPwm3Regs.AQCTLA.bit.CAU = AQ_SET;
-    EPwm3Regs.AQCTLA.bit.CAD = AQ_CLEAR;
+    EPwm3Regs.AQCTLA.bit.CAD = AQ_SET;
+    EPwm3Regs.AQCTLA.bit.CAU = AQ_CLEAR;
 
     EPwm3Regs.TBPHS.bit.TBPHS = 0;
 
@@ -1224,11 +1224,12 @@ __interrupt void adca1_isr(void)
 
     if (SendOneInFour % 4 == 0)
     {
-        DataToBeSent[0] = M1_ADCRESULT_IA;
+        /*WARNING current measurements are 180 degree phase shifted*/
+        DataToBeSent[0] = EPwm1Regs.CMPA.bit.CMPA;
         DataToBeSent[1] = M1_PPBADCRESULT_IA*ADC_PU_PPB_SCALE_FACTOR*BASE_CURRENT;
-        DataToBeSent[2] = M1_ADCRESULT_IB;
+        DataToBeSent[2] = EPwm2Regs.CMPA.bit.CMPA;
         DataToBeSent[3] = M1_PPBADCRESULT_IB*ADC_PU_PPB_SCALE_FACTOR*BASE_CURRENT;
-        DataToBeSent[4] = M1_ADCRESULT_IC;
+        DataToBeSent[4] = EPwm3Regs.CMPA.bit.CMPA;
         DataToBeSent[5] = M1_PPBADCRESULT_IC*ADC_PU_PPB_SCALE_FACTOR*BASE_CURRENT;
 
         SciSendMultipleFloatWithTheTag(DataToBeSent, 6);

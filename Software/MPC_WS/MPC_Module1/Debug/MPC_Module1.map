@@ -1,7 +1,7 @@
 ******************************************************************************
              TMS320C2000 Linker PC v20.2.1                     
 ******************************************************************************
->> Linked Wed Nov 25 18:43:24 2020
+>> Linked Wed Nov 25 21:59:32 2020
 
 OUTPUT FILE NAME:   <MPC_Module1.out>
 ENTRY POINT SYMBOL: "_c_int00"  address: 00000399
@@ -14,7 +14,7 @@ MEMORY CONFIGURATION
 PAGE 0:
   BEGIN                 00000000   00000002  00000002  00000000  RWIX
   RAMM0                 00000122   000002de  000002de  00000000  RWIX
-  RAMLS0                00008000   00000800  000006a7  00000159  RWIX
+  RAMLS0                00008000   00000800  000006ad  00000153  RWIX
   RAMLS1                00008800   00000800  00000000  00000800  RWIX
   RAMLS2                00009000   00000800  00000000  00000800  RWIX
   RAMLS3                00009800   00000800  00000000  00000800  RWIX
@@ -649,17 +649,17 @@ CpuSysRegsFile
                   00000399    00000056                       : boot28.asm.obj (.text)
                   000003ef    00000011     F2837xD_PieVect.obj (.text)
 
-.text.2    0    00008000    000006a7     
+.text.2    0    00008000    000006ad     
                   00008000    00000382     F2837xD_SysCtrl.obj (.text)
-                  00008382    00000284     main.obj (.text:retain)
-                  00008606    00000028     F2837xD_PieCtrl.obj (.text)
-                  0000862e    00000024     rts2800_fpu32.lib : cpy_tbl.c.obj (.text)
-                  00008652    0000001d                       : memcpy.c.obj (.text)
-                  0000866f    00000018                       : ll_aox28.asm.obj (.text)
-                  00008687    00000012                       : args_main.c.obj (.text)
-                  00008699    00000009                       : _lock.c.obj (.text)
-                  000086a2    00000003     F2837xD_DBGIER.obj (.text)
-                  000086a5    00000002     rts2800_fpu32.lib : pre_init.c.obj (.text)
+                  00008382    0000028a     main.obj (.text:retain)
+                  0000860c    00000028     F2837xD_PieCtrl.obj (.text)
+                  00008634    00000024     rts2800_fpu32.lib : cpy_tbl.c.obj (.text)
+                  00008658    0000001d                       : memcpy.c.obj (.text)
+                  00008675    00000018                       : ll_aox28.asm.obj (.text)
+                  0000868d    00000012                       : args_main.c.obj (.text)
+                  0000869f    00000009                       : _lock.c.obj (.text)
+                  000086a8    00000003     F2837xD_DBGIER.obj (.text)
+                  000086ab    00000002     rts2800_fpu32.lib : pre_init.c.obj (.text)
 
 .text.3    0    0000b000    00000800     
                   0000b000    00000585     F2837xD_DefaultISR.obj (.text:retain)
@@ -676,9 +676,9 @@ MODULE SUMMARY
        Module                           code   initialized data   uninitialized data
        ------                           ----   ----------------   ------------------
     .\
-       main.obj                         2783   54                 992               
+       main.obj                         2789   54                 992               
     +--+--------------------------------+------+------------------+--------------------+
-       Total:                           2783   54                 992               
+       Total:                           2789   54                 992               
                                                                                     
     .\Libs\
        MultipleFloatDataSender.obj      200    21                 288               
@@ -720,7 +720,7 @@ MODULE SUMMARY
                                                                                     
        Stack:                           0      0                  512               
     +--+--------------------------------+------+------------------+--------------------+
-       Grand Total:                     6382   697                10842             
+       Grand Total:                     6388   697                10842             
 
 
 GLOBAL DATA SYMBOLS: SORTED BY DATA PAGE
@@ -971,9 +971,9 @@ page  address   name
 ----  -------   ----                                     
 abs   ffffffff  .text                                    
 0     0000b7d7  C$$EXIT                                  
-0     0000866f  LL$$AND                                  
-0     00008677  LL$$OR                                   
-0     0000867f  LL$$XOR                                  
+0     00008675  LL$$AND                                  
+0     0000867d  LL$$OR                                   
+0     00008685  LL$$XOR                                  
 1     0000c536  _ADC                                     
 0     0000b57b  _ADCA1_ISR                               
 0     0000b571  _ADCA2_ISR                               
@@ -1140,7 +1140,7 @@ abs   ffffffff  .text
 1     00047800  _Emif2Regs                               
 1     00000d01  _EmuBMode                                
 1     00000d00  _EmuKey                                  
-0     00008625  _EnableInterrupts                        
+0     0000862b  _EnableInterrupts                        
 0     00000216  _F28x_usDelay                            
 0     0000b26c  _FLASH_CORRECTABLE_ERROR_ISR             
 0     0000b262  _FPU_OVERFLOW_ISR                        
@@ -1186,7 +1186,7 @@ abs   ffffffff  .text
 0     0001b420  _InitDRV8305__FP12DRV8305_Vars           
 0     0000b586  _InitGpio                                
 0     00008121  _InitPeripheralClocks                    
-0     00008606  _InitPieCtrl                             
+0     0000860c  _InitPieCtrl                             
 0     000003ef  _InitPieVectTable                        
 0     0001b39f  _InitSpiDrv8305Gpio__Fv                  
 0     0001b3ba  _InitSpiRegs_DRV830x__FPV8SPI_REGS       
@@ -1265,7 +1265,7 @@ abs   ffffffff  .text
 0     0000802e  _SeizeFlashPump                          
 1     0000c010  _SendOneInFour                           
 0     00008020  _ServiceDog                              
-0     000086a2  _SetDBGIER                               
+0     000086a8  _SetDBGIER                               
 0     0001b4f2  _SetupCmpssProtections__Fv               
 0     0001b1d7  _SetupGPIOs__Fv                          
 1     00006100  _SpiaRegs                                
@@ -1320,21 +1320,21 @@ abs   ffffffff  ___c_args__
 abs   ffffffff  ___etext__                               
 abs   ffffffff  ___pinit__                               
 abs   ffffffff  ___text__                                
-0     00008687  __args_main                              
+0     0000868d  __args_main                              
 1     0000c596  __lock                                   
-0     000086a1  __nop                                    
-0     0000869d  __register_lock                          
-0     00008699  __register_unlock                        
+0     000086a7  __nop                                    
+0     000086a3  __register_lock                          
+0     0000869f  __register_unlock                        
 1     00000400  __stack                                  
 0     0000b585  __system_post_cinit                      
-0     000086a5  __system_pre_init                        
+0     000086ab  __system_pre_init                        
 1     0000c598  __unlock                                 
 0     0000b7d7  _abort                                   
 0     000083e3  _adca1_isr__Fv                           
 1     0000c400  _cSciaLibDataBuffer                      
 1     0000c500  _cSendMultipleFloatArray                 
 0     00000399  _c_int00                                 
-0     0000862e  _copy_in                                 
+0     00008634  _copy_in                                 
 0     000083aa  _cpu_timer0_isr__Fv                      
 0     00008394  _cpu_timer1_isr__Fv                      
 0     00008382  _cpu_timer2_isr__Fv                      
@@ -1350,7 +1350,7 @@ abs   ffffffff  ___text__
 0     0003f884  _g_usPutReadIndexes                      
 1     0003fc80  _g_usPutWriteIndexes                     
 0     0001b68e  _main                                    
-0     00008652  _memcpy                                  
+0     00008658  _memcpy                                  
 0     0000b79e  _round                                   
 0     0000b79e  _roundf                                  
 1     0000c578  _tempSensor_scaleFactor                  
@@ -1410,19 +1410,19 @@ page  address   name
 0     00008394  _cpu_timer1_isr__Fv                      
 0     000083aa  _cpu_timer0_isr__Fv                      
 0     000083e3  _adca1_isr__Fv                           
-0     00008606  _InitPieCtrl                             
-0     00008625  _EnableInterrupts                        
-0     0000862e  _copy_in                                 
-0     00008652  _memcpy                                  
-0     0000866f  LL$$AND                                  
-0     00008677  LL$$OR                                   
-0     0000867f  LL$$XOR                                  
-0     00008687  __args_main                              
-0     00008699  __register_unlock                        
-0     0000869d  __register_lock                          
-0     000086a1  __nop                                    
-0     000086a2  _SetDBGIER                               
-0     000086a5  __system_pre_init                        
+0     0000860c  _InitPieCtrl                             
+0     0000862b  _EnableInterrupts                        
+0     00008634  _copy_in                                 
+0     00008658  _memcpy                                  
+0     00008675  LL$$AND                                  
+0     0000867d  LL$$OR                                   
+0     00008685  LL$$XOR                                  
+0     0000868d  __args_main                              
+0     0000869f  __register_unlock                        
+0     000086a3  __register_lock                          
+0     000086a7  __nop                                    
+0     000086a8  _SetDBGIER                               
+0     000086ab  __system_pre_init                        
 0     0000b000  _XINT5_ISR                               
 0     0000b00a  _XINT4_ISR                               
 0     0000b014  _XINT3_ISR                               

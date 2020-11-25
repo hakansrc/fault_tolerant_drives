@@ -786,7 +786,7 @@ void InitializeADCs(void)
     AdccRegs.ADCSOC1CTL.bit.TRIGSEL = EPWM1_SOCA_TRG; /*ePWM1 SocA is the trigger*/
     AdccRegs.ADCSOC1CTL.bit.CHSEL = 0x2;              /*This is Ia pin for TIDA-00909 PCB*/
     AdccRegs.ADCSOC1CTL.bit.ACQPS = ACQPS_PERIOD;     /*TODO: This value should be tested*/
-    AdccRegs.ADCPPB1CONFIG.bit.CONFIG = 0;            // PPB is associated with SOC0
+    AdccRegs.ADCPPB1CONFIG.bit.CONFIG = 1;            // PPB is associated with SOC0
     AdccRegs.ADCPPB1OFFCAL.bit.OFFCAL = 0;            // Write zero to this for now
     AdccRegs.ADCPPB1OFFREF = 0;                       // THIS VALUE IS TODO
 
@@ -795,7 +795,7 @@ void InitializeADCs(void)
     AdcbRegs.ADCSOC1CTL.bit.TRIGSEL = EPWM1_SOCA_TRG; /*ePWM1 SocA is the trigger*/
     AdcbRegs.ADCSOC1CTL.bit.CHSEL = 0x2;              /*This is Ib pin for TIDA-00909 PCB*/
     AdcbRegs.ADCSOC1CTL.bit.ACQPS = ACQPS_PERIOD;     /*TODO: This value should be tested*/
-    AdcbRegs.ADCPPB1CONFIG.bit.CONFIG = 0;            // PPB is associated with SOC0
+    AdcbRegs.ADCPPB1CONFIG.bit.CONFIG = 1;            // PPB is associated with SOC0
     AdcbRegs.ADCPPB1OFFCAL.bit.OFFCAL = 0;            // Write zero to this for now
     AdcbRegs.ADCPPB1OFFREF = 0;                       // THIS VALUE IS TODO
 
@@ -804,7 +804,7 @@ void InitializeADCs(void)
     AdcaRegs.ADCSOC2CTL.bit.TRIGSEL = EPWM1_SOCA_TRG; /*ePWM1 SocA is the trigger*/
     AdcaRegs.ADCSOC2CTL.bit.CHSEL = 0x2;              /*This is Ib pin for TIDA-00909 PCB*/
     AdcaRegs.ADCSOC2CTL.bit.ACQPS = ACQPS_PERIOD;     /*TODO: This value should be tested*/
-    AdcaRegs.ADCPPB2CONFIG.bit.CONFIG = 0;            // PPB is associated with SOC0
+    AdcaRegs.ADCPPB2CONFIG.bit.CONFIG = 2;            // PPB is associated with SOC0
     AdcaRegs.ADCPPB2OFFCAL.bit.OFFCAL = 0;            // Write zero to this for now
     AdcaRegs.ADCPPB2OFFREF = 0;                       // THIS VALUE IS TODO
 
@@ -1011,7 +1011,7 @@ void InitDRV8305Regs(DRV8305_Vars *deviceptr)
     deviceptr->cntrl9_IC_ops.bit.DIS_SNS_OCP = drv8305_enable_SnsOcp;
     deviceptr->cntrl9_IC_ops.bit.WD_EN = drv8305_disable_WD;
     deviceptr->cntrl9_IC_ops.bit.SLEEP = drv8305_sleep_No;
-    deviceptr->cntrl9_IC_ops.bit.CLR_FLTS = drv8305_ClrFaults_Yes; // fault clearing bit
+    deviceptr->cntrl9_IC_ops.bit.CLR_FLTS = drv8305_ClrFaults_No; // fault clearing bit
     deviceptr->cntrl9_IC_ops.bit.SET_VCPH_UV = drv8305_set_Vcph_UV_4p9V;
 
     deviceptr->cntrlA_shunt_amp.bit.GAIN_CS1 = (DRV_GAIN == 10) ? drv8305_gain_CS_10 : (DRV_GAIN == 20) ? drv8301_gain_20 : (DRV_GAIN == 40) ? drv8301_gain_40 : drv8301_gain_80;
@@ -1129,11 +1129,11 @@ Uint16 DRV8305_SPI_Read(DRV8305_Vars *deviceptr, Uint16 address)
 
 void CalculateOffsetValue(void)
 {
-    for (OffsetCalCounter = 0; OffsetCalCounter < 200000;)
+    for (OffsetCalCounter = 0; OffsetCalCounter < 20000;)
     {
         if (EPwm1Regs.ETFLG.bit.SOCA == 1)
         {
-            if (OffsetCalCounter > 10000)
+            if (OffsetCalCounter > 1000)
             {
                 Module1_Parameters.OffsetValue.PhaseA = K1 * Module1_Parameters.OffsetValue.PhaseA + K2 * M1_ADCRESULT_IA * ADC_PU_SCALE_FACTOR; //Module1 : Phase A offset
                 Module1_Parameters.OffsetValue.PhaseB = K1 * Module1_Parameters.OffsetValue.PhaseB + K2 * M1_ADCRESULT_IB * ADC_PU_SCALE_FACTOR; //Module1 : Phase B offset
@@ -1224,12 +1224,12 @@ __interrupt void adca1_isr(void)
 
     if (SendOneInFour % 4 == 0)
     {
-        DataToBeSent[0] = IA_CURRENT_FLOAT;
-        DataToBeSent[1] = M1_PPBADCRESULT_IA;
-        DataToBeSent[2] = IB_CURRENT_FLOAT;
-        DataToBeSent[3] = M1_PPBADCRESULT_IB;
-        DataToBeSent[4] = IC_CURRENT_FLOAT;
-        DataToBeSent[5] = M1_PPBADCRESULT_IC;
+        DataToBeSent[0] = M1_ADCRESULT_IA;
+        DataToBeSent[1] = M1_PPBADCRESULT_IA*ADC_PU_PPB_SCALE_FACTOR*BASE_CURRENT;
+        DataToBeSent[2] = M1_ADCRESULT_IB;
+        DataToBeSent[3] = M1_PPBADCRESULT_IB*ADC_PU_PPB_SCALE_FACTOR*BASE_CURRENT;
+        DataToBeSent[4] = M1_ADCRESULT_IC;
+        DataToBeSent[5] = M1_PPBADCRESULT_IC*ADC_PU_PPB_SCALE_FACTOR*BASE_CURRENT;
 
         SciSendMultipleFloatWithTheTag(DataToBeSent, 6);
     }

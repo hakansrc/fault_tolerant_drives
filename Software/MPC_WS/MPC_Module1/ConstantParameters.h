@@ -19,6 +19,9 @@
 
 #define BUILDMODE MODE_RL_LOAD
 
+#define BASE_CURRENT 20.625 // Base current (with DRV830x gain set to 40)
+
+
 #define DEADBAND_FED 0          /*ns*/
 #define DEADBAND_RED 0          /*ns*/
 #define SYSCLKFREQUENCY 200000000 /*Hz*/

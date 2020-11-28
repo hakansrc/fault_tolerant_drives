@@ -23,7 +23,7 @@
  * */
 
 ModuleParameters Module1_Parameters;
-OpenLoopOperation RL_Load_Operation = {25.0, 0.4}; // 50hz, 0.8 magnitude
+OpenLoopOperation RL_Load_Operation = {25.0, 0.95}; // 50hz, 0.8 magnitude
 PID_Parameters PI_iq;
 unsigned int StartOperation = 0; /*if this is 0, then no operation will be performed. It will be set inside the debugger*/
 unsigned long int BlankCounter = 0;
@@ -610,11 +610,11 @@ void InitializationRoutine(void)
     GpioCtrlRegs.GPDDIR.bit.GPIO125 = 1;
     EDIS;
 
-#if 1
 
     GPIO_WritePin(124, 1); // Enable DRV
     DELAY_US(50000);       // delay to allow DRV830x supplies to ramp up
     InitDRV8305(&Device1Configuration);
+#if 0
     while (Device1Configuration.DRV_fault)
     {
         faultcounter++; // hang on if drv init is faulty
@@ -1131,11 +1131,11 @@ Uint16 DRV8305_SPI_Read(DRV8305_Vars *deviceptr, Uint16 address)
 
 void CalculateOffsetValue(void)
 {
-    for (OffsetCalCounter = 0; OffsetCalCounter < 20000;)
+    for (OffsetCalCounter = 0; OffsetCalCounter < 50000;)
     {
         if (EPwm1Regs.ETFLG.bit.SOCA == 1)
         {
-            if (OffsetCalCounter > 1000)
+            if (OffsetCalCounter > 2500)
             {
                 Module1_Parameters.OffsetValue.PhaseA = K1 * Module1_Parameters.OffsetValue.PhaseA + K2 * M1_ADCRESULT_IA * ADC_PU_SCALE_FACTOR; //Module1 : Phase A offset
                 Module1_Parameters.OffsetValue.PhaseB = K1 * Module1_Parameters.OffsetValue.PhaseB + K2 * M1_ADCRESULT_IB * ADC_PU_SCALE_FACTOR; //Module1 : Phase B offset

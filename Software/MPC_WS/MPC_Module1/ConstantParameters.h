@@ -39,6 +39,16 @@
 #define M1_ADCRESULT_IB AdcbResultRegs.ADCRESULT1
 #define M1_ADCRESULT_IC AdcaResultRegs.ADCRESULT2
 
+
+#define M1_IA_FAULTFLAG Cmpss6Regs.COMPSTS.bit.COMPHSTS
+#define M1_IB_FAULTFLAG Cmpss3Regs.COMPSTS.bit.COMPHSTS
+#define M1_IC_FAULTFLAG Cmpss1Regs.COMPSTS.bit.COMPHSTS
+
+#define M1_IA_FAULTFLAG_LATCH Cmpss6Regs.COMPSTS.bit.COMPHLATCH
+#define M1_IB_FAULTFLAG_LATCH Cmpss3Regs.COMPSTS.bit.COMPHLATCH
+#define M1_IC_FAULTFLAG_LATCH Cmpss1Regs.COMPSTS.bit.COMPHLATCH
+
+
 /*WARNING the -1 multipled values of the followings are the actual current values*/
 #define M1_PPBADCRESULT_IA ((signed int)AdccResultRegs.ADCPPB1RESULT.all)
 #define M1_PPBADCRESULT_IB ((signed int)AdcbResultRegs.ADCPPB1RESULT.all)

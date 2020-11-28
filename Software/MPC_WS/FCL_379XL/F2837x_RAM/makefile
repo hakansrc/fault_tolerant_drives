@@ -4,7 +4,7 @@
 
 SHELL = cmd.exe
 
-CG_TOOL_ROOT := C:/ti/ccs1011/ccs/tools/compiler/ti-cgt-c2000_20.2.1.LTS
+CG_TOOL_ROOT := C:/ti/ccs1010/ccs/tools/compiler/ti-cgt-c2000_20.2.1.LTS
 
 GEN_OPTS__FLAG := 
 GEN_CMDS__FLAG := 
@@ -169,14 +169,14 @@ all: FCL_379XL.out
 FCL_379XL.out: $(OBJS) $(CMD_SRCS) $(LIB_SRCS) $(GEN_CMDS)
 	@echo 'Building target: "$@"'
 	@echo 'Invoking: C2000 Linker'
-	"C:/ti/ccs1011/ccs/tools/compiler/ti-cgt-c2000_20.2.1.LTS/bin/cl2000" -v28 -ml -mt --cla_support=cla0 --float_support=fpu32 --tmu_support=tmu0 --vcu_support=vcu2 -O4 --opt_for_speed=5 --fp_mode=relaxed --define="_DEBUG" --define="CPU1" --define="_LAUNCHXL_F28379D" --define="LARGE_MODEL" -g --diag_warning=225 --quiet -k --asm_listing -z -m"FCL_379XL.map" --stack_size=0x380 --warn_sections -i"C:/ti/ccs1011/ccs/tools/compiler/ti-cgt-c2000_20.2.1.LTS/lib" -i"C:/ti/controlSUITE/libs/app_libs/motor_control/libs/FCL_SFRA/v01_00_00_00/lib" -i"C:/ti/controlSUITE/libs/dsp/VCU/v2_10_00_00/lib" -i"C:/ti/controlsuite/libs/math/IQmath/v160/lib" -i"C:/ti/ccs1011/ccs/tools/compiler/ti-cgt-c2000_20.2.1.LTS/include" -i"C:/Users/admin/Documents/GitHub/fault_tolerant_drives/Software/MPC_WS/FCL_379XL" --reread_libs --xml_link_info="HVPM_Sensorless_linkInfo.xml" --rom_model -o "FCL_379XL.out" $(ORDERED_OBJS)
+	"C:/ti/ccs1010/ccs/tools/compiler/ti-cgt-c2000_20.2.1.LTS/bin/cl2000" -v28 -ml -mt --cla_support=cla0 --float_support=fpu32 --tmu_support=tmu0 --vcu_support=vcu2 -O4 --opt_for_speed=5 --fp_mode=relaxed --define="_DEBUG" --define="CPU1" --define="_LAUNCHXL_F28379D" --define="LARGE_MODEL" -g --diag_warning=225 --quiet -k --asm_listing -z -m"FCL_379XL.map" --stack_size=0x380 --warn_sections -i"C:/ti/ccs1010/ccs/tools/compiler/ti-cgt-c2000_20.2.1.LTS/lib" -i"C:/ti/controlSUITE/libs/app_libs/motor_control/libs/FCL_SFRA/v01_00_00_00/lib" -i"C:/ti/controlSUITE/libs/dsp/VCU/v2_10_00_00/lib" -i"C:/ti/controlsuite/libs/math/IQmath/v160/lib" -i"C:/ti/ccs1010/ccs/tools/compiler/ti-cgt-c2000_20.2.1.LTS/include" -i"C:/Users/hakan/OneDrive/Belgeler/GitHub/fault_tolerant_drives/Software/MPC_WS/FCL_379XL" --reread_libs --xml_link_info="HVPM_Sensorless_linkInfo.xml" --rom_model -o "FCL_379XL.out" $(ORDERED_OBJS)
 	@echo 'Finished building target: "$@"'
 	@echo ' '
 
 FCL_379XL.hex: $(EXE_OUTPUTS)
 	@echo 'Building files: $(strip $(EXE_OUTPUTS__QUOTED))'
 	@echo 'Invoking: C2000 Hex Utility'
-	"C:/ti/ccs1011/ccs/tools/compiler/ti-cgt-c2000_20.2.1.LTS/bin/hex2000"  -o "FCL_379XL.hex" $(EXE_OUTPUTS__QUOTED)
+	"C:/ti/ccs1010/ccs/tools/compiler/ti-cgt-c2000_20.2.1.LTS/bin/hex2000"  -o "FCL_379XL.hex" $(EXE_OUTPUTS__QUOTED)
 	@echo 'Finished building: $(strip $(EXE_OUTPUTS__QUOTED))'
 	@echo ' '
 

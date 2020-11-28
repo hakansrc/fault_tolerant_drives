@@ -39,6 +39,7 @@ __interrupt void cpu_timer1_isr(void);  /*prototype of the ISR functions*/
 __interrupt void cpu_timer2_isr(void);  /*prototype of the ISR functions*/
 
 __interrupt void epwm1_isr(void);       /*prototype of the ISR functions*/
+__interrupt void xint1_isr(void);       /*prototype of the ISR functions*/
 
 void InitializationRoutine(void); /*all modules and gpios are initialized inside this function.*/
 void InitializeEpwm1Registers(void);
@@ -70,6 +71,7 @@ float TimeCounter = 0;
 float DataToBeSent[6];
 uint32_t SendOneInFour = 0;
 uint32_t faultcounter = 0;
+volatile Uint32 Xint1Count = 0;
 int main(void)
 {
 
@@ -100,6 +102,7 @@ int main(void)
     GpioDataRegs.GPBSET.bit.GPIO34 = 1;
     EDIS;
 
+
     while (StartOperation == 0)
     {
         if ((BlankCounter % 10) == 0)
@@ -129,6 +132,22 @@ int main(void)
     PieVectTable.TIMER2_INT = &cpu_timer2_isr;  /*specify the interrupt service routine (ISR) address to the PIE table*/
     PieVectTable.EPWM1_INT = &epwm1_isr;        /*specify the interrupt service routine (ISR) address to the PIE table*/
     EDIS;
+
+#if 1
+    EALLOW;
+    PieVectTable.XINT1_INT = &xint1_isr;
+    EDIS;
+    PieCtrlRegs.PIEIER1.bit.INTx4 = 1;          // Enable PIE Group 1 INT4
+
+    EALLOW;
+    GpioCtrlRegs.GPAMUX1.bit.GPIO6 = 0;         // GPIO
+    GpioCtrlRegs.GPADIR.bit.GPIO6 = 0;          // input
+    GpioCtrlRegs.GPAQSEL1.bit.GPIO6 = 0;        // XINT1 Synch to SYSCLKOUT only
+    EDIS;
+    GPIO_SetupXINT1Gpio(6);
+    XintRegs.XINT1CR.bit.POLARITY = 0;          // Falling edge interrupt
+    XintRegs.XINT1CR.bit.ENABLE = 1;            // Enable XINT1
+#endif
 
     IER |= M_INT1;  /*Enable the PIE group of Cpu timer 0 and ADCA1 interrupt*/
     IER |= M_INT3;  /*Enable the PIE group of Epwm1 interrupt*/
@@ -954,49 +973,73 @@ void SetupCmpssProtections(void)
     Cmpss6Regs.DACHVALA.bit.DACVAL = 2048;
     Cmpss6Regs.COMPCTL.bit.CTRIPHSEL = 0;    // Configure CTRIPOUT path
     Cmpss6Regs.COMPCTL.bit.CTRIPOUTHSEL = 0; // Asynch output feeds CTRIPH and CTRIPOUTH
+    Cmpss6Regs.COMPSTSCLR.bit.HLATCHCLR = 1;
+
+    Cmpss3Regs.COMPCTL.bit.COMPDACE = 1;
+    Cmpss3Regs.COMPCTL.bit.COMPHSOURCE = 0; // DAC is the source for the inverting input of the comparator
+    Cmpss3Regs.COMPDACCTL.bit.DACSOURCE = 0;
+    Cmpss3Regs.COMPDACCTL.bit.SELREF = 0;  //Use VDDA as the reference for DAC
+    Cmpss3Regs.DACHVALS.bit.DACVAL = 2048;
+    Cmpss3Regs.DACHVALA.bit.DACVAL = 2048;
+    Cmpss3Regs.COMPCTL.bit.CTRIPHSEL = 0;    // Configure CTRIPOUT path
+    Cmpss3Regs.COMPCTL.bit.CTRIPOUTHSEL = 0; // Asynch output feeds CTRIPH and CTRIPOUTH
+    Cmpss3Regs.COMPSTSCLR.bit.HLATCHCLR = 1;
+
+    Cmpss1Regs.COMPCTL.bit.COMPDACE = 1;
+    Cmpss1Regs.COMPCTL.bit.COMPHSOURCE = 0; // DAC is the source for the inverting input of the comparator
+    Cmpss1Regs.COMPDACCTL.bit.DACSOURCE = 0;
+    Cmpss1Regs.COMPDACCTL.bit.SELREF = 0;  //Use VDDA as the reference for DAC
+    Cmpss1Regs.DACHVALS.bit.DACVAL = 2048;
+    Cmpss1Regs.DACHVALA.bit.DACVAL = 2048;
+    Cmpss1Regs.COMPCTL.bit.CTRIPHSEL = 0;    // Configure CTRIPOUT path
+    Cmpss1Regs.COMPCTL.bit.CTRIPOUTHSEL = 0; // Asynch output feeds CTRIPH and CTRIPOUTH
+    Cmpss1Regs.COMPSTSCLR.bit.HLATCHCLR = 1;
 
     EPwmXbarRegs.TRIP4MUXENABLE.bit.MUX10 = 1;
     EPwmXbarRegs.TRIP4MUX0TO15CFG.bit.MUX10 = 0;
 
+    EPwmXbarRegs.TRIP5MUXENABLE.bit.MUX4 = 1;
+    EPwmXbarRegs.TRIP5MUX0TO15CFG.bit.MUX4 = 0;
+
+    EPwmXbarRegs.TRIP7MUXENABLE.bit.MUX0 = 1;
+    EPwmXbarRegs.TRIP7MUX0TO15CFG.bit.MUX0 = 0;
+
+
+    EPwm1Regs.TZDCSEL.bit.DCAEVT1 = 2;
     EPwm1Regs.TZSEL.bit.DCAEVT1 = 1;
     EPwm1Regs.TZCTL.bit.TZA = TZ_FORCE_LO;
     EPwm1Regs.TZCTL.bit.TZB = TZ_FORCE_LO;
-
     EPwm1Regs.DCTRIPSEL.bit.DCAHCOMPSEL = 15; // all inputs are ORed
     EPwm1Regs.DCAHTRIPSEL.bit.TRIPINPUT4 = 1;
-
+    EPwm1Regs.DCAHTRIPSEL.bit.TRIPINPUT5 = 1;
+    EPwm1Regs.DCAHTRIPSEL.bit.TRIPINPUT7 = 1;
     EPwm1Regs.DCACTL.bit.EVT1SRCSEL = 0;
     EPwm1Regs.DCACTL.bit.EVT1FRCSYNCSEL = 0;
 
-    EDIS;
-#if 0
-    EALLOW;
-    Cmpss6Regs.COMPCTL.bit.COMPDACE = 1;
-    Cmpss6Regs.COMPCTL.bit.COMPHSOURCE = 0; // DAC is the source for the inverting input of the comparator
-    Cmpss6Regs.COMPDACCTL.bit.DACSOURCE = 0;
+    EPwm2Regs.TZDCSEL.bit.DCAEVT1 = 2;
+    EPwm2Regs.TZSEL.bit.DCAEVT1 = 1;
+    EPwm2Regs.TZCTL.bit.TZA = TZ_FORCE_LO;
+    EPwm2Regs.TZCTL.bit.TZB = TZ_FORCE_LO;
+    EPwm2Regs.DCTRIPSEL.bit.DCAHCOMPSEL = 15; // all inputs are ORed
+    EPwm2Regs.DCAHTRIPSEL.bit.TRIPINPUT4 = 1;
+    EPwm2Regs.DCAHTRIPSEL.bit.TRIPINPUT5 = 1;
+    EPwm2Regs.DCAHTRIPSEL.bit.TRIPINPUT7 = 1;
+    EPwm2Regs.DCACTL.bit.EVT1SRCSEL = 0;
+    EPwm2Regs.DCACTL.bit.EVT1FRCSYNCSEL = 0;
 
-    Cmpss6Regs.COMPDACCTL.bit.SELREF = 0;  //Use VDDA as the reference for DAC
-
-    Cmpss6Regs.DACHVALS.bit.DACVAL = 2048;
-    Cmpss6Regs.DACHVALA.bit.DACVAL = 2048;
-
-    Cmpss6Regs.COMPCTL.bit.CTRIPHSEL = 0;    // Configure CTRIPOUT path
-    Cmpss6Regs.COMPCTL.bit.CTRIPOUTHSEL = 0; // Asynch output feeds CTRIPH and CTRIPOUTH
-
-    EPwmXbarRegs.TRIP4MUXENABLE.bit.MUX10 = 1;
-    EPwmXbarRegs.TRIP4MUX0TO15CFG.bit.MUX10 = 0;
-
-
-    EPwm1Regs.TZSEL.bit.OSHT4 = 1;
-    EPwm1Regs.TZCTL.bit.TZA = TZ_FORCE_LO;
-    EPwm1Regs.TZCTL.bit.TZB = TZ_FORCE_LO;
-    EPwm1Regs.DCTRIPSEL.bit.DCAHCOMPSEL = 15; // all inputs are ORed
-    EPwm1Regs.DCAHTRIPSEL.bit.TRIPINPUT4 = 1;
-
-    EPwm1Regs.DCACTL.bit.EVT1FRCSYNCSEL = 0;
+    EPwm3Regs.TZDCSEL.bit.DCAEVT1 = 2;
+    EPwm3Regs.TZSEL.bit.DCAEVT1 = 1;
+    EPwm3Regs.TZCTL.bit.TZA = TZ_FORCE_LO;
+    EPwm3Regs.TZCTL.bit.TZB = TZ_FORCE_LO;
+    EPwm3Regs.DCTRIPSEL.bit.DCAHCOMPSEL = 15; // all inputs are ORed
+    EPwm3Regs.DCAHTRIPSEL.bit.TRIPINPUT4 = 1;
+    EPwm3Regs.DCAHTRIPSEL.bit.TRIPINPUT5 = 1;
+    EPwm3Regs.DCAHTRIPSEL.bit.TRIPINPUT7 = 1;
+    EPwm3Regs.DCACTL.bit.EVT1SRCSEL = 0;
+    EPwm3Regs.DCACTL.bit.EVT1FRCSYNCSEL = 0;
 
     EDIS;
-#endif
+
 
 }
 
@@ -1301,4 +1344,14 @@ __interrupt void epwm1_isr(void)
     EPwm1Regs.ETCLR.bit.INT = 1;
     // Acknowledge this interrupt to receive more interrupts from group 3
     PieCtrlRegs.PIEACK.all = PIEACK_GROUP3;
+}
+interrupt void xint1_isr(void)
+{
+    GpioDataRegs.GPBCLEAR.all = 0x4;   // GPIO34 is low
+    Xint1Count++;
+
+    //
+    // Acknowledge this interrupt to get more from group 1
+    //
+    PieCtrlRegs.PIEACK.all = PIEACK_GROUP1;
 }

@@ -1,7 +1,7 @@
 ******************************************************************************
              TMS320C2000 Linker PC v20.2.1                     
 ******************************************************************************
->> Linked Wed Nov 25 21:59:32 2020
+>> Linked Sat Nov 28 08:39:28 2020
 
 OUTPUT FILE NAME:   <MPC_Module1.out>
 ENTRY POINT SYMBOL: "_c_int00"  address: 00000399
@@ -14,13 +14,13 @@ MEMORY CONFIGURATION
 PAGE 0:
   BEGIN                 00000000   00000002  00000002  00000000  RWIX
   RAMM0                 00000122   000002de  000002de  00000000  RWIX
-  RAMLS0                00008000   00000800  000006ad  00000153  RWIX
+  RAMLS0                00008000   00000800  000006c2  0000013e  RWIX
   RAMLS1                00008800   00000800  00000000  00000800  RWIX
   RAMLS2                00009000   00000800  00000000  00000800  RWIX
   RAMLS3                00009800   00000800  00000000  00000800  RWIX
   RAMLS4                0000a000   00000800  00000000  00000800  RWIX
   RAMD0                 0000b000   00000800  00000800  00000000  RWIX
-  RAMGS15               0001b000   00001000  0000085b  000007a5  RWIX
+  RAMGS15               0001b000   00001000  00000862  0000079e  RWIX
   RESET                 003fffc0   00000002  00000000  00000002  RWIX
 
 PAGE 1:
@@ -649,17 +649,17 @@ CpuSysRegsFile
                   00000399    00000056                       : boot28.asm.obj (.text)
                   000003ef    00000011     F2837xD_PieVect.obj (.text)
 
-.text.2    0    00008000    000006ad     
+.text.2    0    00008000    000006c2     
                   00008000    00000382     F2837xD_SysCtrl.obj (.text)
-                  00008382    0000028a     main.obj (.text:retain)
-                  0000860c    00000028     F2837xD_PieCtrl.obj (.text)
-                  00008634    00000024     rts2800_fpu32.lib : cpy_tbl.c.obj (.text)
-                  00008658    0000001d                       : memcpy.c.obj (.text)
-                  00008675    00000018                       : ll_aox28.asm.obj (.text)
-                  0000868d    00000012                       : args_main.c.obj (.text)
-                  0000869f    00000009                       : _lock.c.obj (.text)
-                  000086a8    00000003     F2837xD_DBGIER.obj (.text)
-                  000086ab    00000002     rts2800_fpu32.lib : pre_init.c.obj (.text)
+                  00008382    0000029f     main.obj (.text:retain)
+                  00008621    00000028     F2837xD_PieCtrl.obj (.text)
+                  00008649    00000024     rts2800_fpu32.lib : cpy_tbl.c.obj (.text)
+                  0000866d    0000001d                       : memcpy.c.obj (.text)
+                  0000868a    00000018                       : ll_aox28.asm.obj (.text)
+                  000086a2    00000012                       : args_main.c.obj (.text)
+                  000086b4    00000009                       : _lock.c.obj (.text)
+                  000086bd    00000003     F2837xD_DBGIER.obj (.text)
+                  000086c0    00000002     rts2800_fpu32.lib : pre_init.c.obj (.text)
 
 .text.3    0    0000b000    00000800     
                   0000b000    00000585     F2837xD_DefaultISR.obj (.text:retain)
@@ -668,17 +668,17 @@ CpuSysRegsFile
                   0000b79e    00000039     rts2800_fpu32.lib : s_roundf.c.obj (.text)
                   0000b7d7    00000029                       : exit.c.obj (.text)
 
-.text.4    0    0001b000    0000085b     
-                  0001b000    0000085b     main.obj (.text)
+.text.4    0    0001b000    00000862     
+                  0001b000    00000862     main.obj (.text)
 
 MODULE SUMMARY
 
        Module                           code   initialized data   uninitialized data
        ------                           ----   ----------------   ------------------
     .\
-       main.obj                         2789   54                 992               
+       main.obj                         2817   54                 992               
     +--+--------------------------------+------+------------------+--------------------+
-       Total:                           2789   54                 992               
+       Total:                           2817   54                 992               
                                                                                     
     .\Libs\
        MultipleFloatDataSender.obj      200    21                 288               
@@ -703,7 +703,7 @@ MODULE SUMMARY
     +--+--------------------------------+------+------------------+--------------------+
        Total:                           3007   596                9040              
                                                                                     
-    C:\ti\ccs1011\ccs\tools\compiler\ti-cgt-c2000_20.2.1.LTS\lib\rts2800_fpu32.lib
+    C:\ti\ccs1010\ccs\tools\compiler\ti-cgt-c2000_20.2.1.LTS\lib\rts2800_fpu32.lib
        s_floorf.c.obj                   89     2                  0                 
        boot28.asm.obj                   86     0                  0                 
        exit.c.obj                       41     14                 6                 
@@ -720,7 +720,7 @@ MODULE SUMMARY
                                                                                     
        Stack:                           0      0                  512               
     +--+--------------------------------+------+------------------+--------------------+
-       Grand Total:                     6388   697                10842             
+       Grand Total:                     6416   697                10842             
 
 
 GLOBAL DATA SYMBOLS: SORTED BY DATA PAGE
@@ -971,9 +971,9 @@ page  address   name
 ----  -------   ----                                     
 abs   ffffffff  .text                                    
 0     0000b7d7  C$$EXIT                                  
-0     00008675  LL$$AND                                  
-0     0000867d  LL$$OR                                   
-0     00008685  LL$$XOR                                  
+0     0000868a  LL$$AND                                  
+0     00008692  LL$$OR                                   
+0     0000869a  LL$$XOR                                  
 1     0000c536  _ADC                                     
 0     0000b57b  _ADCA1_ISR                               
 0     0000b571  _ADCA2_ISR                               
@@ -1140,7 +1140,7 @@ abs   ffffffff  .text
 1     00047800  _Emif2Regs                               
 1     00000d01  _EmuBMode                                
 1     00000d00  _EmuKey                                  
-0     0000862b  _EnableInterrupts                        
+0     00008640  _EnableInterrupts                        
 0     00000216  _F28x_usDelay                            
 0     0000b26c  _FLASH_CORRECTABLE_ERROR_ISR             
 0     0000b262  _FPU_OVERFLOW_ISR                        
@@ -1161,8 +1161,8 @@ abs   ffffffff  .text
 0     0000b624  _GPIO_SetupXINT4Gpio                     
 0     0000b61d  _GPIO_SetupXINT5Gpio                     
 0     0000b603  _GPIO_WritePin                           
-0     0001b76d  _GetAdcReadings__FR16ModuleParameters    
-0     0001b85a  _GetEncoderReadings__FR16ModuleParameters
+0     0001b774  _GetAdcReadings__FR16ModuleParameters    
+0     0001b861  _GetEncoderReadings__FR16ModuleParameters
 1     00007c00  _GpioCtrlRegs                            
 1     00007f00  _GpioDataRegs                            
 0     00008348  _HALT                                    
@@ -1186,7 +1186,7 @@ abs   ffffffff  .text
 0     0001b420  _InitDRV8305__FP12DRV8305_Vars           
 0     0000b586  _InitGpio                                
 0     00008121  _InitPeripheralClocks                    
-0     0000860c  _InitPieCtrl                             
+0     00008621  _InitPieCtrl                             
 0     000003ef  _InitPieVectTable                        
 0     0001b39f  _InitSpiDrv8305Gpio__Fv                  
 0     0001b3ba  _InitSpiRegs_DRV830x__FPV8SPI_REGS       
@@ -1265,7 +1265,7 @@ abs   ffffffff  .text
 0     0000802e  _SeizeFlashPump                          
 1     0000c010  _SendOneInFour                           
 0     00008020  _ServiceDog                              
-0     000086a8  _SetDBGIER                               
+0     000086bd  _SetDBGIER                               
 0     0001b4f2  _SetupCmpssProtections__Fv               
 0     0001b1d7  _SetupGPIOs__Fv                          
 1     00006100  _SpiaRegs                                
@@ -1320,25 +1320,26 @@ abs   ffffffff  ___c_args__
 abs   ffffffff  ___etext__                               
 abs   ffffffff  ___pinit__                               
 abs   ffffffff  ___text__                                
-0     0000868d  __args_main                              
+0     000086a2  __args_main                              
 1     0000c596  __lock                                   
-0     000086a7  __nop                                    
-0     000086a3  __register_lock                          
-0     0000869f  __register_unlock                        
+0     000086bc  __nop                                    
+0     000086b8  __register_lock                          
+0     000086b4  __register_unlock                        
 1     00000400  __stack                                  
 0     0000b585  __system_post_cinit                      
-0     000086ab  __system_pre_init                        
+0     000086c0  __system_pre_init                        
 1     0000c598  __unlock                                 
 0     0000b7d7  _abort                                   
-0     000083e3  _adca1_isr__Fv                           
+0     0000860c  _adca1_isr__Fv                           
 1     0000c400  _cSciaLibDataBuffer                      
 1     0000c500  _cSendMultipleFloatArray                 
 0     00000399  _c_int00                                 
-0     00008634  _copy_in                                 
-0     000083aa  _cpu_timer0_isr__Fv                      
-0     00008394  _cpu_timer1_isr__Fv                      
-0     00008382  _cpu_timer2_isr__Fv                      
+0     00008649  _copy_in                                 
+0     000085d3  _cpu_timer0_isr__Fv                      
+0     000085bd  _cpu_timer1_isr__Fv                      
+0     000085ab  _cpu_timer2_isr__Fv                      
 1     0000c59a  _deviceOpen                              
+0     00008382  _epwm1_isr__Fv                           
 0     0000b7d9  _exit                                    
 1     0000c012  _faultcounter                            
 0     00000340  _floor                                   
@@ -1350,7 +1351,7 @@ abs   ffffffff  ___text__
 0     0003f884  _g_usPutReadIndexes                      
 1     0003fc80  _g_usPutWriteIndexes                     
 0     0001b68e  _main                                    
-0     00008658  _memcpy                                  
+0     0000866d  _memcpy                                  
 0     0000b79e  _round                                   
 0     0000b79e  _roundf                                  
 1     0000c578  _tempSensor_scaleFactor                  
@@ -1406,23 +1407,24 @@ page  address   name
 0     00008329  _HIB                                     
 0     00008348  _HALT                                    
 0     00008361  _CsmUnlock                               
-0     00008382  _cpu_timer2_isr__Fv                      
-0     00008394  _cpu_timer1_isr__Fv                      
-0     000083aa  _cpu_timer0_isr__Fv                      
-0     000083e3  _adca1_isr__Fv                           
-0     0000860c  _InitPieCtrl                             
-0     0000862b  _EnableInterrupts                        
-0     00008634  _copy_in                                 
-0     00008658  _memcpy                                  
-0     00008675  LL$$AND                                  
-0     0000867d  LL$$OR                                   
-0     00008685  LL$$XOR                                  
-0     0000868d  __args_main                              
-0     0000869f  __register_unlock                        
-0     000086a3  __register_lock                          
-0     000086a7  __nop                                    
-0     000086a8  _SetDBGIER                               
-0     000086ab  __system_pre_init                        
+0     00008382  _epwm1_isr__Fv                           
+0     000085ab  _cpu_timer2_isr__Fv                      
+0     000085bd  _cpu_timer1_isr__Fv                      
+0     000085d3  _cpu_timer0_isr__Fv                      
+0     0000860c  _adca1_isr__Fv                           
+0     00008621  _InitPieCtrl                             
+0     00008640  _EnableInterrupts                        
+0     00008649  _copy_in                                 
+0     0000866d  _memcpy                                  
+0     0000868a  LL$$AND                                  
+0     00008692  LL$$OR                                   
+0     0000869a  LL$$XOR                                  
+0     000086a2  __args_main                              
+0     000086b4  __register_unlock                        
+0     000086b8  __register_lock                          
+0     000086bc  __nop                                    
+0     000086bd  _SetDBGIER                               
+0     000086c0  __system_pre_init                        
 0     0000b000  _XINT5_ISR                               
 0     0000b00a  _XINT4_ISR                               
 0     0000b014  _XINT3_ISR                               
@@ -1601,8 +1603,8 @@ page  address   name
 0     0001b543  _InitializationRoutine__Fv               
 0     0001b5ed  _CalculateOffsetValue__Fv                
 0     0001b68e  _main                                    
-0     0001b76d  _GetAdcReadings__FR16ModuleParameters    
-0     0001b85a  _GetEncoderReadings__FR16ModuleParameters
+0     0001b774  _GetAdcReadings__FR16ModuleParameters    
+0     0001b861  _GetEncoderReadings__FR16ModuleParameters
 0     0003f800  _g_asIPCCPU2toCPU1Buffers                
 0     0003f880  _g_usGetWriteIndexes                     
 0     0003f884  _g_usPutReadIndexes                      
@@ -1768,4 +1770,4 @@ abs   ffffffff  binit
 abs   ffffffff  etext                                    
 abs   ffffffff  pinit                                    
 
-[396 symbols]
+[397 symbols]

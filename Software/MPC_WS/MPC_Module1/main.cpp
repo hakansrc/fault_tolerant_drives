@@ -34,10 +34,11 @@ uint16_t OffsetCalculationIsDone = 0;
 float K1 = (0.998),  // Offset filter coefficient K1: 0.05/(T+0.05);
     K2 = (0.001999); // Offset filter coefficient K2: T/(T+0.05);
 
-__interrupt void cpu_timer0_isr(void); /*prototype of the ISR functions*/
-__interrupt void cpu_timer1_isr(void); /*prototype of the ISR functions*/
-__interrupt void cpu_timer2_isr(void); /*prototype of the ISR functions*/
-__interrupt void adca1_isr(void);      /*prototype of the ISR functions*/
+__interrupt void cpu_timer0_isr(void);  /*prototype of the ISR functions*/
+__interrupt void cpu_timer1_isr(void);  /*prototype of the ISR functions*/
+__interrupt void cpu_timer2_isr(void);  /*prototype of the ISR functions*/
+
+__interrupt void epwm1_isr(void);       /*prototype of the ISR functions*/
 
 void InitializationRoutine(void); /*all modules and gpios are initialized inside this function.*/
 void InitializeEpwm1Registers(void);
@@ -123,19 +124,20 @@ int main(void)
     InitializationRoutine();
 
     EALLOW;
-    PieVectTable.TIMER0_INT = &cpu_timer0_isr; /*specify the interrupt service routine (ISR) address to the PIE table*/
-    PieVectTable.TIMER1_INT = &cpu_timer1_isr; /*specify the interrupt service routine (ISR) address to the PIE table*/
-    PieVectTable.TIMER2_INT = &cpu_timer2_isr; /*specify the interrupt service routine (ISR) address to the PIE table*/
-    PieVectTable.ADCA1_INT = &adca1_isr;       /*specify the interrupt service routine (ISR) address to the PIE table*/
+    PieVectTable.TIMER0_INT = &cpu_timer0_isr;  /*specify the interrupt service routine (ISR) address to the PIE table*/
+    PieVectTable.TIMER1_INT = &cpu_timer1_isr;  /*specify the interrupt service routine (ISR) address to the PIE table*/
+    PieVectTable.TIMER2_INT = &cpu_timer2_isr;  /*specify the interrupt service routine (ISR) address to the PIE table*/
+    PieVectTable.EPWM1_INT = &epwm1_isr;        /*specify the interrupt service routine (ISR) address to the PIE table*/
     EDIS;
 
     IER |= M_INT1;  /*Enable the PIE group of Cpu timer 0 and ADCA1 interrupt*/
+    IER |= M_INT3;  /*Enable the PIE group of Epwm1 interrupt*/
     IER |= M_INT13; /*Enable the PIE group of Cpu timer 1 interrupt*/
     IER |= M_INT14; /*Enable the PIE group of Cpu timer 2 interrupt*/
 
     PieCtrlRegs.PIECTRL.bit.ENPIE = 1; // Enable the PIE block
     PieCtrlRegs.PIEIER1.bit.INTx7 = 1; /*Enable the 7th interrupt of the Group 1, which is for timer 0 interrupt*/
-    PieCtrlRegs.PIEIER1.bit.INTx1 = 1; /*Enable the 7th interrupt of the Group 1, which is for ADCA1 interrupt*/
+    PieCtrlRegs.PIEIER3.bit.INTx1 = 1;  /*Enable the 1st interrupt of the Group 3, which is for epwm1 interrupt*/
 
     EALLOW;
     CpuSysRegs.PCLKCR0.bit.TBCLKSYNC = 1;  /*start the TimeBase clock */
@@ -255,7 +257,7 @@ void InitializeEpwm1Registers(void)
     /*TODO how to do tripzone?, how are we going to do the protection?
      * consider when the inverter arrives*/
     EPwm1Regs.ETSEL.bit.SOCAEN = 1; /*enable EPWMxSOCA signal*/
-    EPwm1Regs.ETSEL.bit.SOCASEL = 2;    /*this is magic!!!*/
+    EPwm1Regs.ETSEL.bit.SOCASEL = 2;    /*ADC sampling is done when TBCTR==TBPRD*/
     EPwm1Regs.ETSEL.bit.INTEN = 1;  /*enable pwm interrupt*/
     EPwm1Regs.ETSEL.bit.INTSEL = 1; /*interrupt occurs when TBCTR = 0*/
 
@@ -680,8 +682,8 @@ void InitializeADCs(void)
     AdcaRegs.ADCINTSEL1N2.bit.INT2E = 0;    // ADCINT2 disabled.
     AdcaRegs.ADCINTSEL1N2.bit.INT2SEL = 0;  // No interrupt selected.
 
-    AdcaRegs.ADCINTSEL1N2.bit.INT1CONT = 1; // Continous mode is disabled
-    AdcaRegs.ADCINTSEL1N2.bit.INT1E = 1;    // ADCINT1 enable.
+    AdcaRegs.ADCINTSEL1N2.bit.INT1CONT = 1; // Continous mode is enabled
+    AdcaRegs.ADCINTSEL1N2.bit.INT1E = 0;    // ADCINT1 is disabled.
     AdcaRegs.ADCINTSEL1N2.bit.INT1SEL = 0;  // EOC0 is the trigger for ADCINT1
 
     AdcaRegs.ADCSOCPRICTL.all = 0x00;          // ADC SOC Priority Control Register
@@ -1156,7 +1158,8 @@ void CalculateOffsetValue(void)
     OffsetCalculationIsDone = 1;
 }
 
-__interrupt void adca1_isr(void)
+
+__interrupt void epwm1_isr(void)
 {
     /*This will be the main control isr*/
     /*check ADCBSY register if  it makes here wait*/
@@ -1170,8 +1173,8 @@ __interrupt void adca1_isr(void)
 
     if (OffsetCalculationIsDone == 0)
     {
-        AdcaRegs.ADCINTFLGCLR.bit.ADCINT1 = 1;  // Clears respective flag bit in the ADCINTFLG register
-        PieCtrlRegs.PIEACK.all = PIEACK_GROUP1; // Acknowledge interrupt to PIE
+        EPwm1Regs.ETCLR.bit.INT = 1;
+        PieCtrlRegs.PIEACK.all = PIEACK_GROUP3;
     }
 
     GetEncoderReadings(Module1_Parameters);
@@ -1237,6 +1240,9 @@ __interrupt void adca1_isr(void)
 
     SendOneInFour++;
 
-    AdcaRegs.ADCINTFLGCLR.bit.ADCINT1 = 1;  // Clears respective flag bit in the ADCINTFLG register
-    PieCtrlRegs.PIEACK.all = PIEACK_GROUP1; // Acknowledge interrupt to PIE
+
+
+    EPwm1Regs.ETCLR.bit.INT = 1;
+    // Acknowledge this interrupt to receive more interrupts from group 3
+    PieCtrlRegs.PIEACK.all = PIEACK_GROUP3;
 }

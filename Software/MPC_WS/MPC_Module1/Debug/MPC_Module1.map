@@ -1,7 +1,7 @@
 ******************************************************************************
              TMS320C2000 Linker PC v20.2.1                     
 ******************************************************************************
->> Linked Sat Nov 28 11:53:40 2020
+>> Linked Sat Nov 28 13:30:10 2020
 
 OUTPUT FILE NAME:   <MPC_Module1.out>
 ENTRY POINT SYMBOL: "_c_int00"  address: 00000399
@@ -20,7 +20,7 @@ PAGE 0:
   RAMLS3                00009800   00000800  00000000  00000800  RWIX
   RAMLS4                0000a000   00000800  00000000  00000800  RWIX
   RAMD0                 0000b000   00000800  00000800  00000000  RWIX
-  RAMGS15               0001b000   00001000  00000851  000007af  RWIX
+  RAMGS15               0001b000   00001000  0000089d  00000763  RWIX
   RESET                 003fffc0   00000002  00000000  00000002  RWIX
 
 PAGE 1:
@@ -668,17 +668,17 @@ CpuSysRegsFile
                   0000b79e    00000039     rts2800_fpu32.lib : s_roundf.c.obj (.text)
                   0000b7d7    00000029                       : exit.c.obj (.text)
 
-.text.4    0    0001b000    00000851     
-                  0001b000    00000851     main.obj (.text)
+.text.4    0    0001b000    0000089d     
+                  0001b000    0000089d     main.obj (.text)
 
 MODULE SUMMARY
 
        Module                           code   initialized data   uninitialized data
        ------                           ----   ----------------   ------------------
     .\
-       main.obj                         2779   54                 992               
+       main.obj                         2855   54                 992               
     +--+--------------------------------+------+------------------+--------------------+
-       Total:                           2779   54                 992               
+       Total:                           2855   54                 992               
                                                                                     
     .\Libs\
        MultipleFloatDataSender.obj      200    21                 288               
@@ -720,7 +720,7 @@ MODULE SUMMARY
                                                                                     
        Stack:                           0      0                  512               
     +--+--------------------------------+------+------------------+--------------------+
-       Grand Total:                     6378   697                10842             
+       Grand Total:                     6454   697                10842             
 
 
 GLOBAL DATA SYMBOLS: SORTED BY DATA PAGE
@@ -1024,7 +1024,7 @@ abs   ffffffff  .text
 0     0000b43b  _CLA1_8_ISR                              
 0     0000b431  _CLA_OVERFLOW_ISR                        
 0     0000b427  _CLA_UNDERFLOW_ISR                       
-0     0001b5e3  _CalculateOffsetValue__Fv                
+0     0001b62f  _CalculateOffsetValue__Fv                
 1     00048000  _CanaRegs                                
 1     0004a000  _CanbRegs                                
 1     00001400  _Cla1Regs                                
@@ -1130,7 +1130,7 @@ abs   ffffffff  .text
 0     0000b28a  _EQEP1_ISR                               
 0     0000b280  _EQEP2_ISR                               
 0     0000b276  _EQEP3_ISR                               
-0     0001b4f3  _EQEPSetup__Fv                           
+0     0001b53d  _EQEPSetup__Fv                           
 1     00005100  _EQep1Regs                               
 1     00005140  _EQep2Regs                               
 1     00005180  _EQep3Regs                               
@@ -1161,8 +1161,8 @@ abs   ffffffff  .text
 0     0000b624  _GPIO_SetupXINT4Gpio                     
 0     0000b61d  _GPIO_SetupXINT5Gpio                     
 0     0000b603  _GPIO_WritePin                           
-0     0001b763  _GetAdcReadings__FR16ModuleParameters    
-0     0001b850  _GetEncoderReadings__FR16ModuleParameters
+0     0001b7af  _GetAdcReadings__FR16ModuleParameters    
+0     0001b89c  _GetEncoderReadings__FR16ModuleParameters
 1     00007c00  _GpioCtrlRegs                            
 1     00007f00  _GpioDataRegs                            
 0     00008348  _HALT                                    
@@ -1192,7 +1192,7 @@ abs   ffffffff  .text
 0     0001b3ba  _InitSpiRegs_DRV830x__FPV8SPI_REGS       
 0     000081ca  _InitSysCtrl                             
 0     00008055  _InitSysPll                              
-0     0001b543  _InitializationRoutine__Fv               
+0     0001b58d  _InitializationRoutine__Fv               
 0     0001b000  _InitializeADCs__Fv                      
 0     0001b241  _InitializeEpwm1Registers__Fv            
 0     0001b2cb  _InitializeEpwm2Registers__Fv            
@@ -1349,7 +1349,7 @@ abs   ffffffff  ___text__
 0     0003f880  _g_usGetWriteIndexes                     
 0     0003f884  _g_usPutReadIndexes                      
 1     0003fc80  _g_usPutWriteIndexes                     
-0     0001b684  _main                                    
+0     0001b6d0  _main                                    
 0     00008658  _memcpy                                  
 0     0000b79e  _round                                   
 0     0000b79e  _roundf                                  
@@ -1597,12 +1597,12 @@ page  address   name
 0     0001b415  _DRV8305_SPI_Read__FP12DRV8305_VarsUi    
 0     0001b420  _InitDRV8305__FP12DRV8305_Vars           
 0     0001b4f2  _SetupCmpssProtections__Fv               
-0     0001b4f3  _EQEPSetup__Fv                           
-0     0001b543  _InitializationRoutine__Fv               
-0     0001b5e3  _CalculateOffsetValue__Fv                
-0     0001b684  _main                                    
-0     0001b763  _GetAdcReadings__FR16ModuleParameters    
-0     0001b850  _GetEncoderReadings__FR16ModuleParameters
+0     0001b53d  _EQEPSetup__Fv                           
+0     0001b58d  _InitializationRoutine__Fv               
+0     0001b62f  _CalculateOffsetValue__Fv                
+0     0001b6d0  _main                                    
+0     0001b7af  _GetAdcReadings__FR16ModuleParameters    
+0     0001b89c  _GetEncoderReadings__FR16ModuleParameters
 0     0003f800  _g_asIPCCPU2toCPU1Buffers                
 0     0003f880  _g_usGetWriteIndexes                     
 0     0003f884  _g_usPutReadIndexes                      

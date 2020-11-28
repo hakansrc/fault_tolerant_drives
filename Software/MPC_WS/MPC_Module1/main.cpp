@@ -941,7 +941,63 @@ void GetAdcReadings(ModuleParameters &moduleparams)
 }
 void SetupCmpssProtections(void)
 {
-    /*TODO*/
+    /* For module 1
+     * Ia pin is connected to ADCINC2 and CMPIN6P
+     * Ib pin is connected to ADCINB2 and CMPIN3P
+     * Ic pin is connected to ADCINA2 and CMPIN1P   */
+    EALLOW;
+    Cmpss6Regs.COMPCTL.bit.COMPDACE = 1;
+    Cmpss6Regs.COMPCTL.bit.COMPHSOURCE = 0; // DAC is the source for the inverting input of the comparator
+    Cmpss6Regs.COMPDACCTL.bit.DACSOURCE = 0;
+    Cmpss6Regs.COMPDACCTL.bit.SELREF = 0;  //Use VDDA as the reference for DAC
+    Cmpss6Regs.DACHVALS.bit.DACVAL = 2048;
+    Cmpss6Regs.DACHVALA.bit.DACVAL = 2048;
+    Cmpss6Regs.COMPCTL.bit.CTRIPHSEL = 0;    // Configure CTRIPOUT path
+    Cmpss6Regs.COMPCTL.bit.CTRIPOUTHSEL = 0; // Asynch output feeds CTRIPH and CTRIPOUTH
+
+    EPwmXbarRegs.TRIP4MUXENABLE.bit.MUX10 = 1;
+    EPwmXbarRegs.TRIP4MUX0TO15CFG.bit.MUX10 = 0;
+
+    EPwm1Regs.TZSEL.bit.DCAEVT1 = 1;
+    EPwm1Regs.TZCTL.bit.TZA = TZ_FORCE_LO;
+    EPwm1Regs.TZCTL.bit.TZB = TZ_FORCE_LO;
+
+    EPwm1Regs.DCTRIPSEL.bit.DCAHCOMPSEL = 15; // all inputs are ORed
+    EPwm1Regs.DCAHTRIPSEL.bit.TRIPINPUT4 = 1;
+
+    EPwm1Regs.DCACTL.bit.EVT1SRCSEL = 0;
+    EPwm1Regs.DCACTL.bit.EVT1FRCSYNCSEL = 0;
+
+    EDIS;
+#if 0
+    EALLOW;
+    Cmpss6Regs.COMPCTL.bit.COMPDACE = 1;
+    Cmpss6Regs.COMPCTL.bit.COMPHSOURCE = 0; // DAC is the source for the inverting input of the comparator
+    Cmpss6Regs.COMPDACCTL.bit.DACSOURCE = 0;
+
+    Cmpss6Regs.COMPDACCTL.bit.SELREF = 0;  //Use VDDA as the reference for DAC
+
+    Cmpss6Regs.DACHVALS.bit.DACVAL = 2048;
+    Cmpss6Regs.DACHVALA.bit.DACVAL = 2048;
+
+    Cmpss6Regs.COMPCTL.bit.CTRIPHSEL = 0;    // Configure CTRIPOUT path
+    Cmpss6Regs.COMPCTL.bit.CTRIPOUTHSEL = 0; // Asynch output feeds CTRIPH and CTRIPOUTH
+
+    EPwmXbarRegs.TRIP4MUXENABLE.bit.MUX10 = 1;
+    EPwmXbarRegs.TRIP4MUX0TO15CFG.bit.MUX10 = 0;
+
+
+    EPwm1Regs.TZSEL.bit.OSHT4 = 1;
+    EPwm1Regs.TZCTL.bit.TZA = TZ_FORCE_LO;
+    EPwm1Regs.TZCTL.bit.TZB = TZ_FORCE_LO;
+    EPwm1Regs.DCTRIPSEL.bit.DCAHCOMPSEL = 15; // all inputs are ORed
+    EPwm1Regs.DCAHTRIPSEL.bit.TRIPINPUT4 = 1;
+
+    EPwm1Regs.DCACTL.bit.EVT1FRCSYNCSEL = 0;
+
+    EDIS;
+#endif
+
 }
 
 void InitSpiDrv8305Gpio(void)

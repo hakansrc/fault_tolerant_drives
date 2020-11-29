@@ -967,42 +967,69 @@ void SetupCmpssProtections(void)
     EALLOW;
     Cmpss6Regs.COMPCTL.bit.COMPDACE = 1;
     Cmpss6Regs.COMPCTL.bit.COMPHSOURCE = 0; // DAC is the source for the inverting input of the comparator
+    Cmpss6Regs.COMPCTL.bit.COMPLSOURCE = 0; // DAC is the source for the inverting input of the comparator
+    Cmpss6Regs.COMPCTL.bit.COMPLINV = 1;
     Cmpss6Regs.COMPDACCTL.bit.DACSOURCE = 0;
     Cmpss6Regs.COMPDACCTL.bit.SELREF = 0;  //Use VDDA as the reference for DAC
     Cmpss6Regs.DACHVALS.bit.DACVAL = 2048;
     Cmpss6Regs.DACHVALA.bit.DACVAL = 2048;
+    Cmpss6Regs.DACLVALS.bit.DACVAL = 0;
+    Cmpss6Regs.DACLVALA.bit.DACVAL = 0;
     Cmpss6Regs.COMPCTL.bit.CTRIPHSEL = 0;    // Configure CTRIPOUT path
     Cmpss6Regs.COMPCTL.bit.CTRIPOUTHSEL = 0; // Asynch output feeds CTRIPH and CTRIPOUTH
     Cmpss6Regs.COMPSTSCLR.bit.HLATCHCLR = 1;
+    Cmpss6Regs.COMPCTL.bit.CTRIPLSEL = 0;    // Configure CTRIPOUT path
+    Cmpss6Regs.COMPCTL.bit.CTRIPOUTLSEL = 0; // Asynch output feeds CTRIPH and CTRIPOUTH
+    Cmpss6Regs.COMPSTSCLR.bit.LLATCHCLR = 1;
 
     Cmpss3Regs.COMPCTL.bit.COMPDACE = 1;
     Cmpss3Regs.COMPCTL.bit.COMPHSOURCE = 0; // DAC is the source for the inverting input of the comparator
+    Cmpss3Regs.COMPCTL.bit.COMPLSOURCE = 0; // DAC is the source for the inverting input of the comparator
+    Cmpss3Regs.COMPCTL.bit.COMPLINV = 1;
     Cmpss3Regs.COMPDACCTL.bit.DACSOURCE = 0;
     Cmpss3Regs.COMPDACCTL.bit.SELREF = 0;  //Use VDDA as the reference for DAC
     Cmpss3Regs.DACHVALS.bit.DACVAL = 2048;
     Cmpss3Regs.DACHVALA.bit.DACVAL = 2048;
+    Cmpss3Regs.DACLVALS.bit.DACVAL = 0;
+    Cmpss3Regs.DACLVALA.bit.DACVAL = 0;
     Cmpss3Regs.COMPCTL.bit.CTRIPHSEL = 0;    // Configure CTRIPOUT path
     Cmpss3Regs.COMPCTL.bit.CTRIPOUTHSEL = 0; // Asynch output feeds CTRIPH and CTRIPOUTH
     Cmpss3Regs.COMPSTSCLR.bit.HLATCHCLR = 1;
+    Cmpss3Regs.COMPCTL.bit.CTRIPLSEL = 0;    // Configure CTRIPOUT path
+    Cmpss3Regs.COMPCTL.bit.CTRIPOUTLSEL = 0; // Asynch output feeds CTRIPH and CTRIPOUTH
+    Cmpss3Regs.COMPSTSCLR.bit.LLATCHCLR = 1;
 
     Cmpss1Regs.COMPCTL.bit.COMPDACE = 1;
     Cmpss1Regs.COMPCTL.bit.COMPHSOURCE = 0; // DAC is the source for the inverting input of the comparator
+    Cmpss1Regs.COMPCTL.bit.COMPLSOURCE = 0; // DAC is the source for the inverting input of the comparator
+    Cmpss1Regs.COMPCTL.bit.COMPLINV = 1;
     Cmpss1Regs.COMPDACCTL.bit.DACSOURCE = 0;
     Cmpss1Regs.COMPDACCTL.bit.SELREF = 0;  //Use VDDA as the reference for DAC
     Cmpss1Regs.DACHVALS.bit.DACVAL = 2048;
     Cmpss1Regs.DACHVALA.bit.DACVAL = 2048;
+    Cmpss1Regs.DACLVALS.bit.DACVAL = 0;
+    Cmpss1Regs.DACLVALA.bit.DACVAL = 0;
     Cmpss1Regs.COMPCTL.bit.CTRIPHSEL = 0;    // Configure CTRIPOUT path
     Cmpss1Regs.COMPCTL.bit.CTRIPOUTHSEL = 0; // Asynch output feeds CTRIPH and CTRIPOUTH
     Cmpss1Regs.COMPSTSCLR.bit.HLATCHCLR = 1;
+    Cmpss1Regs.COMPCTL.bit.CTRIPLSEL = 0;    // Configure CTRIPOUT path
+    Cmpss1Regs.COMPCTL.bit.CTRIPOUTLSEL = 0; // Asynch output feeds CTRIPH and CTRIPOUTH
+    Cmpss1Regs.COMPSTSCLR.bit.LLATCHCLR = 1;
 
     EPwmXbarRegs.TRIP4MUXENABLE.bit.MUX10 = 1;
     EPwmXbarRegs.TRIP4MUX0TO15CFG.bit.MUX10 = 0;
+    //EPwmXbarRegs.TRIP4MUXENABLE.bit.MUX11 = 1;
+    //EPwmXbarRegs.TRIP4MUX0TO15CFG.bit.MUX11 = 0;
 
     EPwmXbarRegs.TRIP5MUXENABLE.bit.MUX4 = 1;
     EPwmXbarRegs.TRIP5MUX0TO15CFG.bit.MUX4 = 0;
+    //EPwmXbarRegs.TRIP5MUXENABLE.bit.MUX5 = 1;
+    //EPwmXbarRegs.TRIP5MUX0TO15CFG.bit.MUX5 = 0;
 
     EPwmXbarRegs.TRIP7MUXENABLE.bit.MUX0 = 1;
     EPwmXbarRegs.TRIP7MUX0TO15CFG.bit.MUX0 = 0;
+    //EPwmXbarRegs.TRIP7MUXENABLE.bit.MUX1 = 1;
+    //EPwmXbarRegs.TRIP7MUX0TO15CFG.bit.MUX1 = 0;
 
 
     EPwm1Regs.TZDCSEL.bit.DCAEVT1 = 2;
@@ -1010,9 +1037,13 @@ void SetupCmpssProtections(void)
     EPwm1Regs.TZCTL.bit.TZA = TZ_FORCE_LO;
     EPwm1Regs.TZCTL.bit.TZB = TZ_FORCE_LO;
     EPwm1Regs.DCTRIPSEL.bit.DCAHCOMPSEL = 15; // all inputs are ORed
+    EPwm1Regs.DCTRIPSEL.bit.DCALCOMPSEL = 15; // all inputs are ORed
     EPwm1Regs.DCAHTRIPSEL.bit.TRIPINPUT4 = 1;
+    EPwm1Regs.DCALTRIPSEL.bit.TRIPINPUT4 = 1;
     EPwm1Regs.DCAHTRIPSEL.bit.TRIPINPUT5 = 1;
+    EPwm1Regs.DCALTRIPSEL.bit.TRIPINPUT5 = 1;
     EPwm1Regs.DCAHTRIPSEL.bit.TRIPINPUT7 = 1;
+    EPwm1Regs.DCALTRIPSEL.bit.TRIPINPUT7 = 1;
     EPwm1Regs.DCACTL.bit.EVT1SRCSEL = 0;
     EPwm1Regs.DCACTL.bit.EVT1FRCSYNCSEL = 0;
 
@@ -1021,9 +1052,13 @@ void SetupCmpssProtections(void)
     EPwm2Regs.TZCTL.bit.TZA = TZ_FORCE_LO;
     EPwm2Regs.TZCTL.bit.TZB = TZ_FORCE_LO;
     EPwm2Regs.DCTRIPSEL.bit.DCAHCOMPSEL = 15; // all inputs are ORed
+    EPwm2Regs.DCTRIPSEL.bit.DCALCOMPSEL = 15; // all inputs are ORed
     EPwm2Regs.DCAHTRIPSEL.bit.TRIPINPUT4 = 1;
+    EPwm2Regs.DCALTRIPSEL.bit.TRIPINPUT4 = 1;
     EPwm2Regs.DCAHTRIPSEL.bit.TRIPINPUT5 = 1;
+    EPwm2Regs.DCALTRIPSEL.bit.TRIPINPUT5 = 1;
     EPwm2Regs.DCAHTRIPSEL.bit.TRIPINPUT7 = 1;
+    EPwm2Regs.DCALTRIPSEL.bit.TRIPINPUT7 = 1;
     EPwm2Regs.DCACTL.bit.EVT1SRCSEL = 0;
     EPwm2Regs.DCACTL.bit.EVT1FRCSYNCSEL = 0;
 
@@ -1032,9 +1067,13 @@ void SetupCmpssProtections(void)
     EPwm3Regs.TZCTL.bit.TZA = TZ_FORCE_LO;
     EPwm3Regs.TZCTL.bit.TZB = TZ_FORCE_LO;
     EPwm3Regs.DCTRIPSEL.bit.DCAHCOMPSEL = 15; // all inputs are ORed
+    EPwm3Regs.DCTRIPSEL.bit.DCALCOMPSEL = 15; // all inputs are ORed
     EPwm3Regs.DCAHTRIPSEL.bit.TRIPINPUT4 = 1;
+    EPwm3Regs.DCALTRIPSEL.bit.TRIPINPUT4 = 1;
     EPwm3Regs.DCAHTRIPSEL.bit.TRIPINPUT5 = 1;
+    EPwm3Regs.DCALTRIPSEL.bit.TRIPINPUT5 = 1;
     EPwm3Regs.DCAHTRIPSEL.bit.TRIPINPUT7 = 1;
+    EPwm3Regs.DCALTRIPSEL.bit.TRIPINPUT7 = 1;
     EPwm3Regs.DCACTL.bit.EVT1SRCSEL = 0;
     EPwm3Regs.DCACTL.bit.EVT1FRCSYNCSEL = 0;
 

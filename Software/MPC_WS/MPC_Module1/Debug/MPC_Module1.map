@@ -1,7 +1,7 @@
 ******************************************************************************
              TMS320C2000 Linker PC v20.2.1                     
 ******************************************************************************
->> Linked Sun Nov 29 11:39:53 2020
+>> Linked Sun Nov 29 12:04:24 2020
 
 OUTPUT FILE NAME:   <MPC_Module1.out>
 ENTRY POINT SYMBOL: "_c_int00"  address: 0000039f
@@ -14,13 +14,13 @@ MEMORY CONFIGURATION
 PAGE 0:
   BEGIN                 00000000   00000002  00000002  00000000  RWIX
   RAMM0                 00000122   000002de  000002dd  00000001  RWIX
-  RAMLS0                00008000   00000800  000006e5  0000011b  RWIX
+  RAMLS0                00008000   00000800  000006c9  00000137  RWIX
   RAMLS1                00008800   00000800  00000000  00000800  RWIX
   RAMLS2                00009000   00000800  00000000  00000800  RWIX
   RAMLS3                00009800   00000800  00000000  00000800  RWIX
   RAMLS4                0000a000   00000800  00000000  00000800  RWIX
   RAMD0                 0000b000   00000800  00000800  00000000  RWIX
-  RAMGS15               0001b000   00001000  000009c6  0000063a  RWIX
+  RAMGS15               0001b000   00001000  00000916  000006ea  RWIX
   RESET                 003fffc0   00000002  00000000  00000002  RWIX
 
 PAGE 1:
@@ -650,16 +650,16 @@ CpuSysRegsFile
                   000003f5    00000009                       : _lock.c.obj (.text)
                   000003fe    00000002                       : pre_init.c.obj (.text)
 
-.text.2    0    00008000    000006e5     
+.text.2    0    00008000    000006c9     
                   00008000    00000382     F2837xD_SysCtrl.obj (.text)
-                  00008382    000002bc     main.obj (.text:retain)
-                  0000863e    00000028     F2837xD_PieCtrl.obj (.text)
-                  00008666    00000024     rts2800_fpu32.lib : cpy_tbl.c.obj (.text)
-                  0000868a    0000001d                       : memcpy.c.obj (.text)
-                  000086a7    00000018                       : ll_aox28.asm.obj (.text)
-                  000086bf    00000012                       : args_main.c.obj (.text)
-                  000086d1    00000011     F2837xD_PieVect.obj (.text)
-                  000086e2    00000003     F2837xD_DBGIER.obj (.text)
+                  00008382    000002a0     main.obj (.text:retain)
+                  00008622    00000028     F2837xD_PieCtrl.obj (.text)
+                  0000864a    00000024     rts2800_fpu32.lib : cpy_tbl.c.obj (.text)
+                  0000866e    0000001d                       : memcpy.c.obj (.text)
+                  0000868b    00000018                       : ll_aox28.asm.obj (.text)
+                  000086a3    00000012                       : args_main.c.obj (.text)
+                  000086b5    00000011     F2837xD_PieVect.obj (.text)
+                  000086c6    00000003     F2837xD_DBGIER.obj (.text)
 
 .text.3    0    0000b000    00000800     
                   0000b000    00000585     F2837xD_DefaultISR.obj (.text:retain)
@@ -668,17 +668,17 @@ CpuSysRegsFile
                   0000b79e    00000039     rts2800_fpu32.lib : s_roundf.c.obj (.text)
                   0000b7d7    00000029                       : exit.c.obj (.text)
 
-.text.4    0    0001b000    000009c6     
-                  0001b000    000009c6     main.obj (.text)
+.text.4    0    0001b000    00000916     
+                  0001b000    00000916     main.obj (.text)
 
 MODULE SUMMARY
 
        Module                           code   initialized data   uninitialized data
        ------                           ----   ----------------   ------------------
     .\
-       main.obj                         3202   59                 1056              
+       main.obj                         2998   59                 1056              
     +--+--------------------------------+------+------------------+--------------------+
-       Total:                           3202   59                 1056              
+       Total:                           2998   59                 1056              
                                                                                     
     .\Libs\
        MultipleFloatDataSender.obj      200    21                 288               
@@ -720,7 +720,7 @@ MODULE SUMMARY
                                                                                     
        Stack:                           0      0                  512               
     +--+--------------------------------+------+------------------+--------------------+
-       Grand Total:                     6801   702                10906             
+       Grand Total:                     6597   702                10906             
 
 
 GLOBAL DATA SYMBOLS: SORTED BY DATA PAGE
@@ -973,9 +973,9 @@ page  address   name
 ----  -------   ----                                     
 abs   ffffffff  .text                                    
 0     0000b7d7  C$$EXIT                                  
-0     000086a7  LL$$AND                                  
-0     000086af  LL$$OR                                   
-0     000086b7  LL$$XOR                                  
+0     0000868b  LL$$AND                                  
+0     00008693  LL$$OR                                   
+0     0000869b  LL$$XOR                                  
 1     0000c576  _ADC                                     
 0     0000b57b  _ADCA1_ISR                               
 0     0000b571  _ADCA2_ISR                               
@@ -1026,7 +1026,7 @@ abs   ffffffff  .text
 0     0000b43b  _CLA1_8_ISR                              
 0     0000b431  _CLA_OVERFLOW_ISR                        
 0     0000b427  _CLA_UNDERFLOW_ISR                       
-0     0001b735  _CalculateOffsetValue__Fv                
+0     0001b723  _CalculateOffsetValue__Fv                
 1     00048000  _CanaRegs                                
 1     0004a000  _CanbRegs                                
 1     00001400  _Cla1Regs                                
@@ -1132,7 +1132,7 @@ abs   ffffffff  .text
 0     0000b28a  _EQEP1_ISR                               
 0     0000b280  _EQEP2_ISR                               
 0     0000b276  _EQEP3_ISR                               
-0     0001b643  _EQEPSetup__Fv                           
+0     0001b631  _EQEPSetup__Fv                           
 1     00005100  _EQep1Regs                               
 1     00005140  _EQep2Regs                               
 1     00005180  _EQep3Regs                               
@@ -1142,7 +1142,7 @@ abs   ffffffff  .text
 1     00047800  _Emif2Regs                               
 1     00000d01  _EmuBMode                                
 1     00000d00  _EmuKey                                  
-0     0000865d  _EnableInterrupts                        
+0     00008641  _EnableInterrupts                        
 0     0000021b  _F28x_usDelay                            
 0     0000b26c  _FLASH_CORRECTABLE_ERROR_ISR             
 0     0000b262  _FPU_OVERFLOW_ISR                        
@@ -1163,8 +1163,8 @@ abs   ffffffff  .text
 0     0000b624  _GPIO_SetupXINT4Gpio                     
 0     0000b61d  _GPIO_SetupXINT5Gpio                     
 0     0000b603  _GPIO_WritePin                           
-0     0001b8d8  _GetAdcReadings__FR16ModuleParameters    
-0     0001b9c5  _GetEncoderReadings__FR16ModuleParameters
+0     0001b8c6  _GetAdcReadings__FR16ModuleParameters    
+0     0001b915  _GetEncoderReadings__FR16ModuleParameters
 1     00007c00  _GpioCtrlRegs                            
 1     00007f00  _GpioDataRegs                            
 0     00008348  _HALT                                    
@@ -1188,13 +1188,13 @@ abs   ffffffff  .text
 0     0001b420  _InitDRV8305__FP12DRV8305_Vars           
 0     0000b586  _InitGpio                                
 0     00008121  _InitPeripheralClocks                    
-0     0000863e  _InitPieCtrl                             
-0     000086d1  _InitPieVectTable                        
+0     00008622  _InitPieCtrl                             
+0     000086b5  _InitPieVectTable                        
 0     0001b39f  _InitSpiDrv8305Gpio__Fv                  
 0     0001b3ba  _InitSpiRegs_DRV830x__FPV8SPI_REGS       
 0     000081ca  _InitSysCtrl                             
 0     00008055  _InitSysPll                              
-0     0001b693  _InitializationRoutine__Fv               
+0     0001b681  _InitializationRoutine__Fv               
 0     0001b000  _InitializeADCs__Fv                      
 0     0001b241  _InitializeEpwm1Registers__Fv            
 0     0001b2cb  _InitializeEpwm2Registers__Fv            
@@ -1233,6 +1233,7 @@ abs   ffffffff  .text
 0     0000804b  _ReleaseFlashPump                        
 1     0005e608  _RomPrefetchRegs                         
 1     0005f540  _RomWaitStateRegs                        
+0     0001b90b  _RunTimeProtectionControl__Fv            
 1     0000c5d2  _SCI                                     
 0     0000b190  _SCIA_RX_ISR                             
 0     0000b186  _SCIA_TX_ISR                             
@@ -1267,7 +1268,7 @@ abs   ffffffff  .text
 0     0000802e  _SeizeFlashPump                          
 1     0000c010  _SendOneInFour                           
 0     00008020  _ServiceDog                              
-0     000086e2  _SetDBGIER                               
+0     000086c6  _SetDBGIER                               
 0     0001b4f2  _SetupCmpssProtections__Fv               
 0     0001b1d7  _SetupGPIOs__Fv                          
 1     00006100  _SpiaRegs                                
@@ -1323,7 +1324,7 @@ abs   ffffffff  ___c_args__
 abs   ffffffff  ___etext__                               
 abs   ffffffff  ___pinit__                               
 abs   ffffffff  ___text__                                
-0     000086bf  __args_main                              
+0     000086a3  __args_main                              
 1     0000c5d6  __lock                                   
 0     000003fd  __nop                                    
 0     000003f9  __register_lock                          
@@ -1336,12 +1337,12 @@ abs   ffffffff  ___text__
 1     0000c440  _cSciaLibDataBuffer                      
 1     0000c540  _cSendMultipleFloatArray                 
 0     0000039f  _c_int00                                 
-0     00008666  _copy_in                                 
-0     00008605  _cpu_timer0_isr__Fv                      
-0     000085ef  _cpu_timer1_isr__Fv                      
-0     000085dd  _cpu_timer2_isr__Fv                      
+0     0000864a  _copy_in                                 
+0     000085e9  _cpu_timer0_isr__Fv                      
+0     000085d3  _cpu_timer1_isr__Fv                      
+0     000085c1  _cpu_timer2_isr__Fv                      
 1     0000c5da  _deviceOpen                              
-0     000083b4  _epwm1_isr__Fv                           
+0     00008398  _epwm1_isr__Fv                           
 0     0000b7d9  _exit                                    
 1     0000c012  _faultcounter                            
 0     00000346  _floor                                   
@@ -1352,8 +1353,8 @@ abs   ffffffff  ___text__
 0     0003f880  _g_usGetWriteIndexes                     
 0     0003f884  _g_usPutReadIndexes                      
 1     0003fc80  _g_usPutWriteIndexes                     
-0     0001b7d6  _main                                    
-0     0000868a  _memcpy                                  
+0     0001b7c4  _main                                    
+0     0000866e  _memcpy                                  
 0     0000b79e  _round                                   
 0     0000b79e  _roundf                                  
 1     0000c5b8  _tempSensor_scaleFactor                  
@@ -1414,20 +1415,20 @@ page  address   name
 0     00008348  _HALT                                    
 0     00008361  _CsmUnlock                               
 0     00008382  _xint1_isr__Fv                           
-0     000083b4  _epwm1_isr__Fv                           
-0     000085dd  _cpu_timer2_isr__Fv                      
-0     000085ef  _cpu_timer1_isr__Fv                      
-0     00008605  _cpu_timer0_isr__Fv                      
-0     0000863e  _InitPieCtrl                             
-0     0000865d  _EnableInterrupts                        
-0     00008666  _copy_in                                 
-0     0000868a  _memcpy                                  
-0     000086a7  LL$$AND                                  
-0     000086af  LL$$OR                                   
-0     000086b7  LL$$XOR                                  
-0     000086bf  __args_main                              
-0     000086d1  _InitPieVectTable                        
-0     000086e2  _SetDBGIER                               
+0     00008398  _epwm1_isr__Fv                           
+0     000085c1  _cpu_timer2_isr__Fv                      
+0     000085d3  _cpu_timer1_isr__Fv                      
+0     000085e9  _cpu_timer0_isr__Fv                      
+0     00008622  _InitPieCtrl                             
+0     00008641  _EnableInterrupts                        
+0     0000864a  _copy_in                                 
+0     0000866e  _memcpy                                  
+0     0000868b  LL$$AND                                  
+0     00008693  LL$$OR                                   
+0     0000869b  LL$$XOR                                  
+0     000086a3  __args_main                              
+0     000086b5  _InitPieVectTable                        
+0     000086c6  _SetDBGIER                               
 0     0000b000  _XINT5_ISR                               
 0     0000b00a  _XINT4_ISR                               
 0     0000b014  _XINT3_ISR                               
@@ -1602,12 +1603,13 @@ page  address   name
 0     0001b415  _DRV8305_SPI_Read__FP12DRV8305_VarsUi    
 0     0001b420  _InitDRV8305__FP12DRV8305_Vars           
 0     0001b4f2  _SetupCmpssProtections__Fv               
-0     0001b643  _EQEPSetup__Fv                           
-0     0001b693  _InitializationRoutine__Fv               
-0     0001b735  _CalculateOffsetValue__Fv                
-0     0001b7d6  _main                                    
-0     0001b8d8  _GetAdcReadings__FR16ModuleParameters    
-0     0001b9c5  _GetEncoderReadings__FR16ModuleParameters
+0     0001b631  _EQEPSetup__Fv                           
+0     0001b681  _InitializationRoutine__Fv               
+0     0001b723  _CalculateOffsetValue__Fv                
+0     0001b7c4  _main                                    
+0     0001b8c6  _GetAdcReadings__FR16ModuleParameters    
+0     0001b90b  _RunTimeProtectionControl__Fv            
+0     0001b915  _GetEncoderReadings__FR16ModuleParameters
 0     0003f800  _g_asIPCCPU2toCPU1Buffers                
 0     0003f880  _g_usGetWriteIndexes                     
 0     0003f884  _g_usPutReadIndexes                      
@@ -1774,4 +1776,4 @@ abs   ffffffff  binit
 abs   ffffffff  etext                                    
 abs   ffffffff  pinit                                    
 
-[398 symbols]
+[399 symbols]

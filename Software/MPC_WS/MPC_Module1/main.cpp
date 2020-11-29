@@ -63,6 +63,7 @@ Uint16 DRV8305_SPI_Read(DRV8305_Vars *deviceptr, Uint16 address);
 Uint16 SPI_Driver(volatile struct SPI_REGS *s, Uint16 data);
 void InitDRV8305(DRV8305_Vars *deviceptr);
 void CalculateOffsetValue(void);
+void RunTimeProtectionControl(void);
 /**
  * main.c
  */
@@ -953,10 +954,10 @@ void GetEncoderReadings(ModuleParameters &moduleparams)
 }
 void GetAdcReadings(ModuleParameters &moduleparams)
 {
-    moduleparams.Measured.Current.PhaseA = IA_CURRENT_FLOAT;
-    moduleparams.Measured.Current.PhaseB = IB_CURRENT_FLOAT;
-    moduleparams.Measured.Current.PhaseC = IC_CURRENT_FLOAT;
-    moduleparams.Measured.Voltage.Vdc = VDC_VOLTAGE_FLOAT;
+    moduleparams.Measured.Current.PhaseA = M1_IA_CURRENT_FLOAT;
+    moduleparams.Measured.Current.PhaseB = M1_IB_CURRENT_FLOAT;
+    moduleparams.Measured.Current.PhaseC = M1_IC_CURRENT_FLOAT;
+    moduleparams.Measured.Voltage.Vdc = M1_VDC_VOLTAGE_FLOAT;
 }
 void SetupCmpssProtections(void)
 {
@@ -971,10 +972,10 @@ void SetupCmpssProtections(void)
     Cmpss6Regs.COMPCTL.bit.COMPLINV = 1;
     Cmpss6Regs.COMPDACCTL.bit.DACSOURCE = 0;
     Cmpss6Regs.COMPDACCTL.bit.SELREF = 0;  //Use VDDA as the reference for DAC
-    Cmpss6Regs.DACHVALS.bit.DACVAL = 2048;
-    Cmpss6Regs.DACHVALA.bit.DACVAL = 2048;
-    Cmpss6Regs.DACLVALS.bit.DACVAL = 0;
-    Cmpss6Regs.DACLVALA.bit.DACVAL = 0;
+    Cmpss6Regs.DACHVALS.bit.DACVAL = M1_IA_UPPERBOUND_PROTECTION_ADC_VALUE_12BIT;
+    Cmpss6Regs.DACHVALA.bit.DACVAL = M1_IA_UPPERBOUND_PROTECTION_ADC_VALUE_12BIT;
+    Cmpss6Regs.DACLVALS.bit.DACVAL = M1_IA_LOWERBOUND_PROTECTION_ADC_VALUE_12BIT;
+    Cmpss6Regs.DACLVALA.bit.DACVAL = M1_IA_LOWERBOUND_PROTECTION_ADC_VALUE_12BIT;
     Cmpss6Regs.COMPCTL.bit.CTRIPHSEL = 0;    // Configure CTRIPOUT path
     Cmpss6Regs.COMPCTL.bit.CTRIPOUTHSEL = 0; // Asynch output feeds CTRIPH and CTRIPOUTH
     Cmpss6Regs.COMPSTSCLR.bit.HLATCHCLR = 1;
@@ -988,10 +989,10 @@ void SetupCmpssProtections(void)
     Cmpss3Regs.COMPCTL.bit.COMPLINV = 1;
     Cmpss3Regs.COMPDACCTL.bit.DACSOURCE = 0;
     Cmpss3Regs.COMPDACCTL.bit.SELREF = 0;  //Use VDDA as the reference for DAC
-    Cmpss3Regs.DACHVALS.bit.DACVAL = 2048;
-    Cmpss3Regs.DACHVALA.bit.DACVAL = 2048;
-    Cmpss3Regs.DACLVALS.bit.DACVAL = 0;
-    Cmpss3Regs.DACLVALA.bit.DACVAL = 0;
+    Cmpss3Regs.DACHVALS.bit.DACVAL = M1_IB_UPPERBOUND_PROTECTION_ADC_VALUE_12BIT;
+    Cmpss3Regs.DACHVALA.bit.DACVAL = M1_IB_UPPERBOUND_PROTECTION_ADC_VALUE_12BIT;
+    Cmpss3Regs.DACLVALS.bit.DACVAL = M1_IB_LOWERBOUND_PROTECTION_ADC_VALUE_12BIT;
+    Cmpss3Regs.DACLVALA.bit.DACVAL = M1_IB_LOWERBOUND_PROTECTION_ADC_VALUE_12BIT;
     Cmpss3Regs.COMPCTL.bit.CTRIPHSEL = 0;    // Configure CTRIPOUT path
     Cmpss3Regs.COMPCTL.bit.CTRIPOUTHSEL = 0; // Asynch output feeds CTRIPH and CTRIPOUTH
     Cmpss3Regs.COMPSTSCLR.bit.HLATCHCLR = 1;
@@ -1005,10 +1006,10 @@ void SetupCmpssProtections(void)
     Cmpss1Regs.COMPCTL.bit.COMPLINV = 1;
     Cmpss1Regs.COMPDACCTL.bit.DACSOURCE = 0;
     Cmpss1Regs.COMPDACCTL.bit.SELREF = 0;  //Use VDDA as the reference for DAC
-    Cmpss1Regs.DACHVALS.bit.DACVAL = 2048;
-    Cmpss1Regs.DACHVALA.bit.DACVAL = 2048;
-    Cmpss1Regs.DACLVALS.bit.DACVAL = 0;
-    Cmpss1Regs.DACLVALA.bit.DACVAL = 0;
+    Cmpss1Regs.DACHVALS.bit.DACVAL = M1_IC_UPPERBOUND_PROTECTION_ADC_VALUE_12BIT;
+    Cmpss1Regs.DACHVALA.bit.DACVAL = M1_IC_UPPERBOUND_PROTECTION_ADC_VALUE_12BIT;
+    Cmpss1Regs.DACLVALS.bit.DACVAL = M1_IC_LOWERBOUND_PROTECTION_ADC_VALUE_12BIT;
+    Cmpss1Regs.DACLVALA.bit.DACVAL = M1_IC_LOWERBOUND_PROTECTION_ADC_VALUE_12BIT;
     Cmpss1Regs.COMPCTL.bit.CTRIPHSEL = 0;    // Configure CTRIPOUT path
     Cmpss1Regs.COMPCTL.bit.CTRIPOUTHSEL = 0; // Asynch output feeds CTRIPH and CTRIPOUTH
     Cmpss1Regs.COMPSTSCLR.bit.HLATCHCLR = 1;
@@ -1016,20 +1017,32 @@ void SetupCmpssProtections(void)
     Cmpss1Regs.COMPCTL.bit.CTRIPOUTLSEL = 0; // Asynch output feeds CTRIPH and CTRIPOUTH
     Cmpss1Regs.COMPSTSCLR.bit.LLATCHCLR = 1;
 
+#if M1_IA_POS_CMPSS_PROTECTION == MPC_ENABLE
     EPwmXbarRegs.TRIP4MUXENABLE.bit.MUX10 = 1;
     EPwmXbarRegs.TRIP4MUX0TO15CFG.bit.MUX10 = 0;
-    //EPwmXbarRegs.TRIP4MUXENABLE.bit.MUX11 = 1;
-    //EPwmXbarRegs.TRIP4MUX0TO15CFG.bit.MUX11 = 0;
+#endif
+#if M1_IA_NEG_CMPSS_PROTECTION == MPC_ENABLE
+    EPwmXbarRegs.TRIP4MUXENABLE.bit.MUX11 = 1;
+    EPwmXbarRegs.TRIP4MUX0TO15CFG.bit.MUX11 = 0;
+#endif
 
+#if M1_IB_POS_CMPSS_PROTECTION == MPC_ENABLE
     EPwmXbarRegs.TRIP5MUXENABLE.bit.MUX4 = 1;
     EPwmXbarRegs.TRIP5MUX0TO15CFG.bit.MUX4 = 0;
-    //EPwmXbarRegs.TRIP5MUXENABLE.bit.MUX5 = 1;
-    //EPwmXbarRegs.TRIP5MUX0TO15CFG.bit.MUX5 = 0;
+#endif
+#if M1_IB_NEG_CMPSS_PROTECTION == MPC_ENABLE
+    EPwmXbarRegs.TRIP5MUXENABLE.bit.MUX5 = 1;
+    EPwmXbarRegs.TRIP5MUX0TO15CFG.bit.MUX5 = 0;
+#endif
 
+#if M1_IC_POS_CMPSS_PROTECTION == MPC_ENABLE
     EPwmXbarRegs.TRIP7MUXENABLE.bit.MUX0 = 1;
     EPwmXbarRegs.TRIP7MUX0TO15CFG.bit.MUX0 = 0;
-    //EPwmXbarRegs.TRIP7MUXENABLE.bit.MUX1 = 1;
-    //EPwmXbarRegs.TRIP7MUX0TO15CFG.bit.MUX1 = 0;
+#endif
+#if M1_IC_NEG_CMPSS_PROTECTION == MPC_ENABLE
+    EPwmXbarRegs.TRIP7MUXENABLE.bit.MUX1 = 1;
+    EPwmXbarRegs.TRIP7MUX0TO15CFG.bit.MUX1 = 0;
+#endif
 
 
     EPwm1Regs.TZDCSEL.bit.DCAEVT1 = 2;
@@ -1299,6 +1312,7 @@ void CalculateOffsetValue(void)
 
 __interrupt void epwm1_isr(void)
 {
+    RunTimeProtectionControl();
     /*This will be the main control isr*/
     /*check ADCBSY register if  it makes here wait*/
     /*TODO, need to consider alignment scenario*/
@@ -1365,7 +1379,6 @@ __interrupt void epwm1_isr(void)
 
     if (SendOneInFour % 4 == 0)
     {
-        /*WARNING current measurements are 180 degree phase shifted*/
         DataToBeSent[0] = EPwm1Regs.CMPA.bit.CMPA;
         DataToBeSent[1] = M1_PPBADCRESULT_IA*ADC_PU_PPB_SCALE_FACTOR*BASE_CURRENT;
         DataToBeSent[2] = EPwm2Regs.CMPA.bit.CMPA;
@@ -1386,11 +1399,19 @@ __interrupt void epwm1_isr(void)
 }
 interrupt void xint1_isr(void)
 {
-    GpioDataRegs.GPBCLEAR.all = 0x4;   // GPIO34 is low
     Xint1Count++;
 
     //
     // Acknowledge this interrupt to get more from group 1
     //
     PieCtrlRegs.PIEACK.all = PIEACK_GROUP1;
+}
+void RunTimeProtectionControl(void)
+{
+    if((M1_IA_CURRENT_FLOAT>M1_IA_RUNTIME_PROTECTION_VALUE)||(M1_IB_CURRENT_FLOAT>M1_IB_RUNTIME_PROTECTION_VALUE)||(M1_IC_CURRENT_FLOAT>M1_IC_RUNTIME_PROTECTION_VALUE))
+    {
+        EPwm1Regs.TZFRC.bit.DCAEVT1 = 1;
+        EPwm1Regs.TZFRC.bit.DCAEVT1 = 1;
+        EPwm1Regs.TZFRC.bit.DCAEVT1 = 1;
+    }
 }

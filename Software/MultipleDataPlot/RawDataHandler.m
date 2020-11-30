@@ -1,7 +1,8 @@
 clear
 clc
 close all
-load('TestData/TestData_IABC_CMPA123_211120175955.mat')
+% load('TestData/TestData301120212502.mat')
+load('TestData/TestData301120212556.mat')
 EnablePlotting = 1;
 TheTagValue = zeros(NumberOfFloatsPerPacket,4);
 TheSaveArrayScreened = RawDataArray;

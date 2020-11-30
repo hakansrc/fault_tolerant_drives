@@ -509,8 +509,8 @@ inline void Run_PI_Controller(PID_Parameters &pidparams)
 inline void CalculateParkTransform(ModuleParameters &moduleparams)
 {
 
-    moduleparams.Measured.Current.transformed.Dvalue = 0.66667 * (moduleparams.Measured.Current.PhaseA * sinf(moduleparams.Angle.Electrical) + moduleparams.Measured.Current.PhaseB * sinf(moduleparams.Angle.Electrical - 0.66667 * PI /*2*PI/3*/) + moduleparams.Measured.Current.PhaseC * sinf(moduleparams.Angle.Electrical + 0.66667 * PI /*2*PI/3*/));
-    moduleparams.Measured.Current.transformed.Qvalue = 0.66667 * (moduleparams.Measured.Current.PhaseA * cosf(moduleparams.Angle.Electrical) + moduleparams.Measured.Current.PhaseB * cosf(moduleparams.Angle.Electrical - 0.66667 * PI /*2*PI/3*/) + moduleparams.Measured.Current.PhaseC * cosf(moduleparams.Angle.Electrical + 0.66667 * PI /*2*PI/3*/));
+    moduleparams.Measured.Current.transformed.Dvalue = 0.66667 * (moduleparams.Measured.Current.PhaseA * sinf(moduleparams.AngleRad.Electrical) + moduleparams.Measured.Current.PhaseB * sinf(moduleparams.AngleRad.Electrical - 0.66667 * PI /*2*PI/3*/) + moduleparams.Measured.Current.PhaseC * sinf(moduleparams.AngleRad.Electrical + 0.66667 * PI /*2*PI/3*/));
+    moduleparams.Measured.Current.transformed.Qvalue = 0.66667 * (moduleparams.Measured.Current.PhaseA * cosf(moduleparams.AngleRad.Electrical) + moduleparams.Measured.Current.PhaseB * cosf(moduleparams.AngleRad.Electrical - 0.66667 * PI /*2*PI/3*/) + moduleparams.Measured.Current.PhaseC * cosf(moduleparams.AngleRad.Electrical + 0.66667 * PI /*2*PI/3*/));
 #if 0
     moduleparams.PhaseCurrent.ZeroValue = 0.66667*0.5*(moduleparams.Measured.Current.PhaseA\
             +moduleparams.Measured.Current.PhaseB\
@@ -523,14 +523,14 @@ inline void CalculateParkTransform(ModuleParameters &moduleparams)
 static inline void ExecuteFirstPrediction(ModuleParameters &moduleparams, unsigned int indexcount)
 {
 
-    moduleparams.FirstHorizon[indexcount].Vd = RS_VALUE * moduleparams.Measured.Current.transformed.Dvalue + LS_VALUE * moduleparams.OptimizationFsw[indexcount] * (moduleparams.Reference.Id - moduleparams.Measured.Current.transformed.Dvalue) - POLEPAIRS * moduleparams.AngularSpeed.Mechanical * LS_VALUE * moduleparams.Measured.Current.transformed.Qvalue;
-    moduleparams.FirstHorizon[indexcount].Vq = RS_VALUE * moduleparams.Measured.Current.transformed.Qvalue + LS_VALUE * moduleparams.OptimizationFsw[indexcount] * (moduleparams.Reference.Iq - moduleparams.Measured.Current.transformed.Qvalue) + POLEPAIRS * moduleparams.AngularSpeed.Mechanical * (LS_VALUE * moduleparams.Measured.Current.transformed.Dvalue + FLUX_VALUE);
+    moduleparams.FirstHorizon[indexcount].Vd = RS_VALUE * moduleparams.Measured.Current.transformed.Dvalue + LS_VALUE * moduleparams.OptimizationFsw[indexcount] * (moduleparams.Reference.Id - moduleparams.Measured.Current.transformed.Dvalue) - POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical * LS_VALUE * moduleparams.Measured.Current.transformed.Qvalue;
+    moduleparams.FirstHorizon[indexcount].Vq = RS_VALUE * moduleparams.Measured.Current.transformed.Qvalue + LS_VALUE * moduleparams.OptimizationFsw[indexcount] * (moduleparams.Reference.Iq - moduleparams.Measured.Current.transformed.Qvalue) + POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical * (LS_VALUE * moduleparams.Measured.Current.transformed.Dvalue + FLUX_VALUE);
 #if 0 /*ripple prediction is unnecessary for the first horizon*/
     moduleparams.FirstHorizon[indexcount].Magnitude = sqrtf(moduleparams.FirstHorizon[indexcount].Vd*moduleparams.FirstHorizon[indexcount].Vd\
                                                           + moduleparams.FirstHorizon[indexcount].Vq*moduleparams.FirstHorizon[indexcount].Vq);
 
-    moduleparams.FirstHorizon[indexcount].Valfa = sinf(moduleparams.Angle.Electrical)*moduleparams.FirstHorizon[indexcount].Vd+cosf(moduleparams.Angle.Electrical)*moduleparams.FirstHorizon[indexcount].Vq;
-    moduleparams.FirstHorizon[indexcount].Vbeta =-cosf(moduleparams.Angle.Electrical)*moduleparams.FirstHorizon[indexcount].Vd+sinf(moduleparams.Angle.Electrical)*moduleparams.FirstHorizon[indexcount].Vq;
+    moduleparams.FirstHorizon[indexcount].Valfa = sinf(moduleparams.AngleRad.Electrical)*moduleparams.FirstHorizon[indexcount].Vd+cosf(moduleparams.AngleRad.Electrical)*moduleparams.FirstHorizon[indexcount].Vq;
+    moduleparams.FirstHorizon[indexcount].Vbeta =-cosf(moduleparams.AngleRad.Electrical)*moduleparams.FirstHorizon[indexcount].Vd+sinf(moduleparams.AngleRad.Electrical)*moduleparams.FirstHorizon[indexcount].Vq;
 
     moduleparams.FirstHorizon[indexcount].VoltageVectorAngleRad = atan2f(moduleparams.FirstHorizon[indexcount].Vbeta,moduleparams.FirstHorizon[indexcount].Valfa);
     moduleparams.FirstHorizon[indexcount].VoltageVectorAngleRad_Mod = fmodf(moduleparams.FirstHorizon[indexcount].VoltageVectorAngleRad,PI/3.0);
@@ -554,18 +554,18 @@ static inline void ExecuteFirstPrediction(ModuleParameters &moduleparams, unsign
     moduleparams.FirstHorizon[indexcount].Iq_Ripple_Prediction = moduleparams.FirstHorizon[indexcount].Iq_Delta_DuringT1+moduleparams.FirstHorizon[indexcount].Iq_Delta_DuringT2+moduleparams.FirstHorizon[indexcount].Iq_Delta_DuringT0;
 
 #endif
-    moduleparams.FirstHorizon[indexcount].IqPrediction = moduleparams.Measured.Current.transformed.Dvalue + (1.0 / moduleparams.OptimizationFsw[indexcount]) * (moduleparams.FirstHorizon[indexcount].Vd / LS_VALUE - RS_VALUE / LS_VALUE * moduleparams.Measured.Current.transformed.Dvalue + LS_VALUE / LS_VALUE * POLEPAIRS * moduleparams.AngularSpeed.Mechanical * moduleparams.Measured.Current.transformed.Qvalue);
-    moduleparams.FirstHorizon[indexcount].IdPrediction = moduleparams.Measured.Current.transformed.Qvalue + (1.0 / moduleparams.OptimizationFsw[indexcount]) * (moduleparams.FirstHorizon[indexcount].Vq / LS_VALUE - RS_VALUE / LS_VALUE * moduleparams.Measured.Current.transformed.Qvalue + LS_VALUE / LS_VALUE * POLEPAIRS * moduleparams.AngularSpeed.Mechanical * moduleparams.Measured.Current.transformed.Dvalue - FLUX_VALUE * POLEPAIRS * moduleparams.AngularSpeed.Mechanical / LS_VALUE);
+    moduleparams.FirstHorizon[indexcount].IqPrediction = moduleparams.Measured.Current.transformed.Dvalue + (1.0 / moduleparams.OptimizationFsw[indexcount]) * (moduleparams.FirstHorizon[indexcount].Vd / LS_VALUE - RS_VALUE / LS_VALUE * moduleparams.Measured.Current.transformed.Dvalue + LS_VALUE / LS_VALUE * POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical * moduleparams.Measured.Current.transformed.Qvalue);
+    moduleparams.FirstHorizon[indexcount].IdPrediction = moduleparams.Measured.Current.transformed.Qvalue + (1.0 / moduleparams.OptimizationFsw[indexcount]) * (moduleparams.FirstHorizon[indexcount].Vq / LS_VALUE - RS_VALUE / LS_VALUE * moduleparams.Measured.Current.transformed.Qvalue + LS_VALUE / LS_VALUE * POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical * moduleparams.Measured.Current.transformed.Dvalue - FLUX_VALUE * POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical / LS_VALUE);
 }
 static inline void ExecuteSecondPrediction(ModuleParameters &moduleparams, unsigned int indexcount)
 {
-    moduleparams.SecondHorizon[indexcount].Vd = RS_VALUE * moduleparams.Measured.Current.transformed.Dvalue + LS_VALUE * moduleparams.OptimizationFsw[indexcount] * (moduleparams.Reference.Id - moduleparams.Measured.Current.transformed.Dvalue) - POLEPAIRS * moduleparams.AngularSpeed.Mechanical * LS_VALUE * moduleparams.Measured.Current.transformed.Qvalue;
-    moduleparams.SecondHorizon[indexcount].Vq = RS_VALUE * moduleparams.Measured.Current.transformed.Qvalue + LS_VALUE * moduleparams.OptimizationFsw[indexcount] * (moduleparams.Reference.Iq - moduleparams.Measured.Current.transformed.Qvalue) + POLEPAIRS * moduleparams.AngularSpeed.Mechanical * (LS_VALUE * moduleparams.Measured.Current.transformed.Dvalue + FLUX_VALUE);
+    moduleparams.SecondHorizon[indexcount].Vd = RS_VALUE * moduleparams.Measured.Current.transformed.Dvalue + LS_VALUE * moduleparams.OptimizationFsw[indexcount] * (moduleparams.Reference.Id - moduleparams.Measured.Current.transformed.Dvalue) - POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical * LS_VALUE * moduleparams.Measured.Current.transformed.Qvalue;
+    moduleparams.SecondHorizon[indexcount].Vq = RS_VALUE * moduleparams.Measured.Current.transformed.Qvalue + LS_VALUE * moduleparams.OptimizationFsw[indexcount] * (moduleparams.Reference.Iq - moduleparams.Measured.Current.transformed.Qvalue) + POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical * (LS_VALUE * moduleparams.Measured.Current.transformed.Dvalue + FLUX_VALUE);
 
     moduleparams.SecondHorizon[indexcount].Magnitude = sqrtf(moduleparams.SecondHorizon[indexcount].Vd * moduleparams.SecondHorizon[indexcount].Vd + moduleparams.SecondHorizon[indexcount].Vq * moduleparams.SecondHorizon[indexcount].Vq);
 
-    moduleparams.SecondHorizon[indexcount].Valfa = sinf(moduleparams.Angle.Electrical) * moduleparams.SecondHorizon[indexcount].Vd + cosf(moduleparams.Angle.Electrical) * moduleparams.SecondHorizon[indexcount].Vq;
-    moduleparams.SecondHorizon[indexcount].Vbeta = -cosf(moduleparams.Angle.Electrical) * moduleparams.SecondHorizon[indexcount].Vd + sinf(moduleparams.Angle.Electrical) * moduleparams.SecondHorizon[indexcount].Vq;
+    moduleparams.SecondHorizon[indexcount].Valfa = sinf(moduleparams.AngleRad.Electrical) * moduleparams.SecondHorizon[indexcount].Vd + cosf(moduleparams.AngleRad.Electrical) * moduleparams.SecondHorizon[indexcount].Vq;
+    moduleparams.SecondHorizon[indexcount].Vbeta = -cosf(moduleparams.AngleRad.Electrical) * moduleparams.SecondHorizon[indexcount].Vd + sinf(moduleparams.AngleRad.Electrical) * moduleparams.SecondHorizon[indexcount].Vq;
 
     moduleparams.SecondHorizon[indexcount].VoltageVectorAngleRad = atan2f(moduleparams.SecondHorizon[indexcount].Vbeta, moduleparams.SecondHorizon[indexcount].Valfa);
     moduleparams.SecondHorizon[indexcount].VoltageVectorAngleRad_Mod = fmodf(moduleparams.SecondHorizon[indexcount].VoltageVectorAngleRad, PI / 3.0);
@@ -586,8 +586,8 @@ static inline void ExecuteSecondPrediction(ModuleParameters &moduleparams, unsig
 
     moduleparams.SecondHorizon[indexcount].Iq_Ripple_Prediction = moduleparams.SecondHorizon[indexcount].Iq_Delta_DuringT1 + moduleparams.SecondHorizon[indexcount].Iq_Delta_DuringT2 + moduleparams.SecondHorizon[indexcount].Iq_Delta_DuringT0;
 
-    moduleparams.SecondHorizon[indexcount].IqPrediction = moduleparams.Measured.Current.transformed.Dvalue + (1.0 / moduleparams.OptimizationFsw[indexcount]) * (moduleparams.SecondHorizon[indexcount].Vd / LS_VALUE - RS_VALUE / LS_VALUE * moduleparams.Measured.Current.transformed.Dvalue + LS_VALUE / LS_VALUE * POLEPAIRS * moduleparams.AngularSpeed.Mechanical * moduleparams.Measured.Current.transformed.Qvalue);
-    moduleparams.SecondHorizon[indexcount].IdPrediction = moduleparams.Measured.Current.transformed.Qvalue + (1.0 / moduleparams.OptimizationFsw[indexcount]) * (moduleparams.SecondHorizon[indexcount].Vq / LS_VALUE - RS_VALUE / LS_VALUE * moduleparams.Measured.Current.transformed.Qvalue + LS_VALUE / LS_VALUE * POLEPAIRS * moduleparams.AngularSpeed.Mechanical * moduleparams.Measured.Current.transformed.Dvalue - FLUX_VALUE * POLEPAIRS * moduleparams.AngularSpeed.Mechanical / LS_VALUE);
+    moduleparams.SecondHorizon[indexcount].IqPrediction = moduleparams.Measured.Current.transformed.Dvalue + (1.0 / moduleparams.OptimizationFsw[indexcount]) * (moduleparams.SecondHorizon[indexcount].Vd / LS_VALUE - RS_VALUE / LS_VALUE * moduleparams.Measured.Current.transformed.Dvalue + LS_VALUE / LS_VALUE * POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical * moduleparams.Measured.Current.transformed.Qvalue);
+    moduleparams.SecondHorizon[indexcount].IdPrediction = moduleparams.Measured.Current.transformed.Qvalue + (1.0 / moduleparams.OptimizationFsw[indexcount]) * (moduleparams.SecondHorizon[indexcount].Vq / LS_VALUE - RS_VALUE / LS_VALUE * moduleparams.Measured.Current.transformed.Qvalue + LS_VALUE / LS_VALUE * POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical * moduleparams.Measured.Current.transformed.Dvalue - FLUX_VALUE * POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical / LS_VALUE);
 
     /*TODO add protection to cost*/
     moduleparams.Cost[indexcount] = IQRIPPLECOEFF * powf(moduleparams.SecondHorizon[indexcount].Iq_Ripple_Prediction / IQ_RATED, 2) + IQREFCOEFF * powf((moduleparams.Reference.Iq - moduleparams.SecondHorizon[indexcount].IqPrediction) / IQ_RATED, 2) + IDREFCOEFF * powf((moduleparams.Reference.Id - moduleparams.SecondHorizon[indexcount].IdPrediction), 2) + FSWCOEFF * moduleparams.OptimizationFsw[indexcount] / OPT_FSW_MAX;
@@ -960,8 +960,47 @@ void EQEPSetup(void)
 void GetEncoderReadings(ModuleParameters &moduleparams)
 {
     /*TODO*/
-    moduleparams.Angle.Mechanical = ((float)EQep1Regs.QPOSCNT)/ENCODERMAXTICKCOUNT* 2 * PI;
-    moduleparams.Angle.Electrical =  moduleparams.Angle.Mechanical*POLEPAIRS;
+    /*TODO put RPM speeds?*/
+    moduleparams.AngleRad.Mechanical = ((float)EQep1Regs.QPOSCNT)/((float)ENCODERMAXTICKCOUNT)* 2.0 * PI;
+    moduleparams.AngleRad.Electrical =  moduleparams.AngleRad.Mechanical*POLEPAIRS;
+
+    /*Speed measurement*/
+    if (EQep1Regs.QFLG.bit.UTO == 1) // If unit timeout (one 100 Hz period)
+    {
+        //fAngularMechanicalPosition_UTO = (float) EQep1Regs.QPOSLAT / (float) ENCODERMAXTICKCOUNT * 2.0 * PI;
+        //fAngularMechanicalPositionDegrees_UTO = fAngularMechanicalPosition_UTO / (2.0 * PI) * 360.0;
+        if (EQep1Regs.QEPSTS.bit.QDF == 0)            // POSCNT is counting down
+        {
+            if (moduleparams.AngleRad.Mechanical > moduleparams.AngleRadPrev.Mechanical)
+            {
+                //get the position difference
+                moduleparams.AngleRadTemp.Mechanical = -(2.0 * PI - moduleparams.AngleRad.Mechanical  + moduleparams.AngleRadPrev.Mechanical ); // x2-x1 should be negative
+            }
+            else
+            {
+                //get the position difference
+                moduleparams.AngleRadTemp.Mechanical = moduleparams.AngleRad.Mechanical - moduleparams.AngleRadPrev.Mechanical;
+            }
+        }
+        else if (EQep1Regs.QEPSTS.bit.QDF == 1)         // POSCNT is counting up
+        {
+            if (moduleparams.AngleRad.Mechanical < moduleparams.AngleRadPrev.Mechanical)
+            {
+                //get the position difference
+                moduleparams.AngleRadTemp.Mechanical = 2.0 * PI + moduleparams.AngleRad.Mechanical - moduleparams.AngleRadPrev.Mechanical;
+            }
+            else
+            {
+                //get the position difference
+                moduleparams.AngleRadTemp.Mechanical = moduleparams.AngleRad.Mechanical - moduleparams.AngleRadPrev.Mechanical; // x2-x1 should be positive
+            }
+        }
+        moduleparams.AngularSpeedRadSec.Mechanical = moduleparams.AngleRadTemp.Mechanical * (float) SYSCLKFREQUENCY / (float) EQep1Regs.QUPRD;
+        moduleparams.AngularSpeedRadSec.Electrical = moduleparams.AngularSpeedRadSec.Mechanical*POLEPAIRS;
+        moduleparams.AngularSpeedRPM.Mechanical = moduleparams.AngularSpeedRadSec.Mechanical*60.0/(2.0*PI);
+        moduleparams.AngleRadPrev.Mechanical =  moduleparams.AngleRad.Mechanical;
+        EQep1Regs.QCLR.bit.UTO = 1;                // Clear __interrupt flag
+    }
 }
 void GetAdcReadings(ModuleParameters &moduleparams)
 {
@@ -1346,7 +1385,7 @@ __interrupt void epwm1_isr(void)
 
     CalculateParkTransform(Module1_Parameters);
 
-    PI_iq.Input = Module1_Parameters.AngularSpeed.Mechanical;
+    PI_iq.Input = Module1_Parameters.AngularSpeedRadSec.Mechanical;
     Run_PI_Controller(PI_iq);
     Module1_Parameters.Reference.Iq = PI_iq.Output;
     Module1_Parameters.Reference.Id = IDREF;
@@ -1390,9 +1429,9 @@ __interrupt void epwm1_isr(void)
 
     if (SendOneInFour % 4 == 0)
     {
-        DataToBeSent[0] = EPwm1Regs.CMPA.bit.CMPA;
+        DataToBeSent[0] = Module1_Parameters.AngularSpeedRPM.Mechanical;
         DataToBeSent[1] = M1_PPBADCRESULT_IA*ADC_PU_PPB_SCALE_FACTOR*BASE_CURRENT;
-        DataToBeSent[2] = EPwm2Regs.CMPA.bit.CMPA;
+        DataToBeSent[2] = Module1_Parameters.AngleRad.Mechanical*180.0/PI;
         DataToBeSent[3] = M1_PPBADCRESULT_IB*ADC_PU_PPB_SCALE_FACTOR*BASE_CURRENT;
         DataToBeSent[4] = EPwm3Regs.CMPA.bit.CMPA;
         DataToBeSent[5] = M1_PPBADCRESULT_IC*ADC_PU_PPB_SCALE_FACTOR*BASE_CURRENT;

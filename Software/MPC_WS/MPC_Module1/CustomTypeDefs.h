@@ -113,8 +113,11 @@ typedef struct
     float OptimizationFsw[NUMBEROFMPCLOOPS];
     float Cost[NUMBEROFMPCLOOPS];
     ReferenceValues Reference;
-    Angle Angle;
-    AngularSpeed AngularSpeed;
+    Angle AngleRad;
+    Angle AngleRadPrev;
+    Angle AngleRadTemp;
+    AngularSpeed AngularSpeedRadSec;
+    AngularSpeed AngularSpeedRPM;
     Offset OffsetValue;
 } ModuleParameters;
 

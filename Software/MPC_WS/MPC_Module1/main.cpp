@@ -481,6 +481,15 @@ void SetupGPIOs(void)
     GpioDataRegs.GPASET.bit.GPIO31 = 1;
     GpioDataRegs.GPBCLEAR.bit.GPIO34 = 1;
     EDIS;
+
+    EALLOW;
+    GpioCtrlRegs.GPAGMUX2.bit.GPIO20 = 0;
+    GpioCtrlRegs.GPAMUX2.bit.GPIO20 = 1;    //set this as EQEP1A pin
+    GpioCtrlRegs.GPAGMUX2.bit.GPIO21 = 0;
+    GpioCtrlRegs.GPAMUX2.bit.GPIO21 = 1;    //set this as EQEP1B pin
+    GpioCtrlRegs.GPDGMUX1.bit.GPIO99 = 1;
+    GpioCtrlRegs.GPDMUX1.bit.GPIO99 = 1;    //set this as EQEP1I pin
+    EDIS;
 }
 
 inline void Run_PI_Controller(PID_Parameters &pidparams)
@@ -882,7 +891,7 @@ void EQEPSetup(void)
     EQep1Regs.QEPCTL.bit.WDE = 1; // Enable the eQEP watchdog timer
 
     EQep1Regs.QPOSINIT = 0;    // Initial QPOSCNT , QPOSCNT set to zero on index event (or strobe or software if desired)
-    EQep1Regs.QPOSMAX = 14399; // Max value of QPOSCNT    /*better check this value*/
+    EQep1Regs.QPOSMAX = ENCODERMAXTICKCOUNT; // Max value of QPOSCNT    /*better check this value*/
 
     // Quadrature edge-capture unit for low-speed measurement (QCAP)
     EQep1Regs.QCAPCTL.all = 0x00;
@@ -951,6 +960,8 @@ void EQEPSetup(void)
 void GetEncoderReadings(ModuleParameters &moduleparams)
 {
     /*TODO*/
+    moduleparams.Angle.Mechanical = ((float)EQep1Regs.QPOSCNT)/ENCODERMAXTICKCOUNT* 2 * PI;
+    moduleparams.Angle.Electrical =  moduleparams.Angle.Mechanical*POLEPAIRS;
 }
 void GetAdcReadings(ModuleParameters &moduleparams)
 {

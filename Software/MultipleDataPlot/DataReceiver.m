@@ -1,6 +1,6 @@
 clc
 clear
-% fclose(instrfind) % call this command for stopping callback function
+fclose(instrfind) % call this command for stopping callback function
 %% GLOBAL VARIABLES
 % global variables are used for communication between the main function and
 % the callback function

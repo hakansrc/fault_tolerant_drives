@@ -1,11 +1,11 @@
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE    1
 
        1              ;***************************************************************
        2              ;* TMS320C2000 G3 C/C++ Codegen                               PC v20.2.1.LTS *
-       3              ;* Date/Time created: Wed Oct  7 22:14:27 2020                 *
+       3              ;* Date/Time created: Mon Dec  7 23:59:49 2020                 *
        4              ;***************************************************************
        5                      .compiler_opts --abi=coffabi --cla_support=cla0 --float_support=fpu32 --hll_source=on --mem_model:cod
        6                      .asg    XAR2, FP
@@ -14,7 +14,7 @@ resolver.asm                                                         PAGE    1
        9                      .dwattr $C$DW$CU, DW_AT_name("../resolver.c")
       10                      .dwattr $C$DW$CU, DW_AT_producer("TI TMS320C2000 G3 C/C++ Codegen PC v20.2.1.LTS Copyright (c) 1996-2
       11                      .dwattr $C$DW$CU, DW_AT_TI_version(0x01)
-      12                      .dwattr $C$DW$CU, DW_AT_comp_dir("C:\Users\hakan\workspace_v10\IDDK_PM_Servo_F2837x-v2\F2837x_RAM")
+      12                      .dwattr $C$DW$CU, DW_AT_comp_dir("C:\Users\hakan\OneDrive\Belgeler\GitHub\fault_tolerant_drives\Softw
       13              ;**************************************************************
       14              ;* CINIT RECORDS                                              *
       15              ;**************************************************************
@@ -58,7 +58,7 @@ resolver.asm                                                         PAGE    1
       45 00000015 0012-         .field          _testAngleMax+0,32
          00000016 0000 
       46 00000017 CCCD          .xfloat $strtod("0x1.99999ap-1")                ; _testAngleMax @ 0
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE    2
@@ -118,7 +118,7 @@ resolver.asm                                                         PAGE    2
       87 00000035 0000          .bits           0,32
          00000036 0000 
       88                                      ; _PLL_ERROR @ 0
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE    3
@@ -178,7 +178,7 @@ resolver.asm                                                         PAGE    3
      130 00000003 0800          .bits           0x800,32
          00000004 0000 
      131                                      ; _SINE_TABLE[0] @ 0
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE    4
@@ -238,7 +238,7 @@ resolver.asm                                                         PAGE    4
          00000002 0000 
      169 00000003 0EF0          .xfloat $strtod("-0x1.541dep-4")                ; _FIR_COEFF[0] @ 0
          00000004 BDAA 
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE    5
@@ -298,7 +298,7 @@ resolver.asm                                                         PAGE    5
      206                      .global _firCoeff
      207 00000002       _firCoeff:      .usect  ".ebss",2,1,1
      208              $C$DW$3 .dwtag  DW_TAG_variable
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE    6
@@ -358,7 +358,7 @@ resolver.asm                                                         PAGE    6
      261 0000000e       _testCntr:      .usect  ".ebss",2,1,1
      262              $C$DW$9 .dwtag  DW_TAG_variable
      263                      .dwattr $C$DW$9, DW_AT_name("testCntr")
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE    7
@@ -418,7 +418,7 @@ resolver.asm                                                         PAGE    7
      316              $C$DW$15        .dwtag  DW_TAG_variable
      317                      .dwattr $C$DW$15, DW_AT_name("DOS_ERROR")
      318                      .dwattr $C$DW$15, DW_AT_TI_symbol_name("_DOS_ERROR")
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE    8
@@ -478,7 +478,7 @@ resolver.asm                                                         PAGE    8
      371                      .dwattr $C$DW$21, DW_AT_name("skipLosCnt")
      372                      .dwattr $C$DW$21, DW_AT_TI_symbol_name("_skipLosCnt")
      373                      .dwattr $C$DW$21, DW_AT_location[DW_OP_addr _skipLosCnt]
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE    9
@@ -538,7 +538,7 @@ resolver.asm                                                         PAGE    9
      426                      .dwattr $C$DW$28, DW_AT_name("PieCtrlRegs")
      427                      .dwattr $C$DW$28, DW_AT_TI_symbol_name("_PieCtrlRegs")
      428                      .dwattr $C$DW$28, DW_AT_type(*$C$DW$T$232)
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE   10
@@ -598,7 +598,7 @@ resolver.asm                                                         PAGE   10
      481                      .dwattr $C$DW$33, DW_AT_TI_symbol_name("_resolver_PostProcess")
      482                      .dwattr $C$DW$33, DW_AT_external
      483                      .dwattr $C$DW$33, DW_AT_TI_begin_file("../resolver.c")
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE   11
@@ -658,7 +658,7 @@ resolver.asm                                                         PAGE   11
      534 00000012 1E1A-         MOVL      @_DOS_ERROR,ACC       ; [CPU_ALU] |164| 
      535 00000013       $C$L3:    
      536                      .dwpsn  file "../resolver.c",line 167,column 5,is_stmt,isa 0
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE   12
@@ -718,7 +718,7 @@ resolver.asm                                                         PAGE   12
      584                      .dwpsn  file "../resolver.c",line 181,column 6,is_stmt,isa 0
      585 00000035 D500          MOVB      XAR5,#0               ; [CPU_ALU] |181| 
      586                      .dwpsn  file "../resolver.c",line 182,column 6,is_stmt,isa 0
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE   13
@@ -778,7 +778,7 @@ resolver.asm                                                         PAGE   13
      639              ;***************************************************************
      640              ;* FNAME: _derivParamsCal               FR SIZE:   4           *
      641              ;*                                                             *
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE   14
@@ -838,7 +838,7 @@ resolver.asm                                                         PAGE   14
      684 00000056 E700          MPYF32    R1H,R5H,R1H           ; [CPU_FPU] |137| 
          00000057 0069 
      685                      .dwpsn  file "../resolver.c",line 139,column 2,is_stmt,isa 0
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE   15
@@ -898,7 +898,7 @@ resolver.asm                                                         PAGE   15
      726                      .dwattr $C$DW$35, DW_AT_TI_end_column(0x01)
      727                      .dwendentry
      728                      .dwendtag $C$DW$35
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE   16
@@ -958,7 +958,7 @@ resolver.asm                                                         PAGE   16
      774                      .dwcfi  cfa_offset, -6
      775                      .dwpsn  file "../resolver.c",line 118,column 2,is_stmt,isa 0
      776 00000080 E80D          MOVXI     R0H,#46871            ; [CPU_FPU] |118| 
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE   17
@@ -1018,7 +1018,7 @@ resolver.asm                                                         PAGE   17
      813                      .dwcfi  cfa_offset, -2
      814                      .dwcfi  restore_reg, 59
      815              $C$DW$39        .dwtag  DW_TAG_TI_branch
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE   18
@@ -1078,7 +1078,7 @@ resolver.asm                                                         PAGE   18
      868                      .dwcfi  save_reg_to_mem, 21, 6
      869                      .dwcfi  save_reg_to_mem, 22, 7
      870                      .dwcfi  cfa_offset, -8
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE   19
@@ -1138,7 +1138,7 @@ resolver.asm                                                         PAGE   19
      915 00000020 9CFF          ADDB      AL,#-1                ; [CPU_ALU] |201| 
      916 00000021 761F-         MOVW      DP,#_rslvrOut+32      ; [CPU_ARAU] 
          00000022 0001 
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE   20
@@ -1198,7 +1198,7 @@ resolver.asm                                                         PAGE   20
          0000004a 0000 
      953                      ; call occurs [#_resolver_algo_Float] ; [] |209| 
      954 0000004b 5200          CMPB      AL,#0                 ; [CPU_ALU] |209| 
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE   21
@@ -1258,7 +1258,7 @@ resolver.asm                                                         PAGE   21
      998                      ; branch occurs ; [] |222| 
      999 0000006c       $C$L10:    
     1000                      .dwpsn  file "../resolver.c",line 228,column 7,is_stmt,isa 0
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE   22
@@ -1318,7 +1318,7 @@ resolver.asm                                                         PAGE   22
     1043                      .dwcfi  restore_reg, 12
     1044 00000085 87BE          MOVL      XT,*--SP              ; [CPU_ALU] 
     1045                      .dwcfi  cfa_offset, -6
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE   23
@@ -1378,7 +1378,7 @@ resolver.asm                                                         PAGE   23
     1098              
     1099              $C$DW$47        .dwtag  DW_TAG_member
     1100                      .dwattr $C$DW$47, DW_AT_type(*$C$DW$T$19)
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE   24
@@ -1438,7 +1438,7 @@ resolver.asm                                                         PAGE   24
     1153                      .dwattr $C$DW$54, DW_AT_accessibility(DW_ACCESS_public)
     1154              
     1155              $C$DW$55        .dwtag  DW_TAG_member
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE   25
@@ -1498,7 +1498,7 @@ resolver.asm                                                         PAGE   25
     1208                      .dwattr $C$DW$61, DW_AT_type(*$C$DW$T$16)
     1209                      .dwattr $C$DW$61, DW_AT_name("errorNew")
     1210                      .dwattr $C$DW$61, DW_AT_TI_symbol_name("_errorNew")
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE   26
@@ -1558,7 +1558,7 @@ resolver.asm                                                         PAGE   26
     1263              $C$DW$69        .dwtag  DW_TAG_member
     1264                      .dwattr $C$DW$69, DW_AT_type(*$C$DW$T$21)
     1265                      .dwattr $C$DW$69, DW_AT_name("errorNew20")
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE   27
@@ -1618,7 +1618,7 @@ resolver.asm                                                         PAGE   27
     1318              $C$DW$75        .dwtag  DW_TAG_member
     1319                      .dwattr $C$DW$75, DW_AT_type(*$C$DW$T$19)
     1320                      .dwattr $C$DW$75, DW_AT_name("rsvd1")
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE   28
@@ -1678,7 +1678,7 @@ resolver.asm                                                         PAGE   28
     1373              
     1374                      .dwendtag $C$DW$T$24
     1375              
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE   29
@@ -1738,7 +1738,7 @@ resolver.asm                                                         PAGE   29
     1428                      .dwattr $C$DW$85, DW_AT_bit_offset(0x0e)
     1429                      .dwattr $C$DW$85, DW_AT_bit_size(0x02)
     1430                      .dwattr $C$DW$85, DW_AT_data_member_location[DW_OP_plus_uconst 0x0]
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE   30
@@ -1798,7 +1798,7 @@ resolver.asm                                                         PAGE   30
     1483                      .dwattr $C$DW$91, DW_AT_bit_size(0x01)
     1484                      .dwattr $C$DW$91, DW_AT_data_member_location[DW_OP_plus_uconst 0x0]
     1485                      .dwattr $C$DW$91, DW_AT_accessibility(DW_ACCESS_public)
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE   31
@@ -1858,7 +1858,7 @@ resolver.asm                                                         PAGE   31
     1538                      .dwattr $C$DW$96, DW_AT_accessibility(DW_ACCESS_public)
     1539              
     1540              $C$DW$97        .dwtag  DW_TAG_member
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE   32
@@ -1918,7 +1918,7 @@ resolver.asm                                                         PAGE   32
     1593                      .dwattr $C$DW$102, DW_AT_data_member_location[DW_OP_plus_uconst 0x0]
     1594                      .dwattr $C$DW$102, DW_AT_accessibility(DW_ACCESS_public)
     1595              
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE   33
@@ -1978,7 +1978,7 @@ resolver.asm                                                         PAGE   33
     1648                      .dwattr $C$DW$108, DW_AT_type(*$C$DW$T$19)
     1649                      .dwattr $C$DW$108, DW_AT_name("PPB2TRIPLO")
     1650                      .dwattr $C$DW$108, DW_AT_TI_symbol_name("_PPB2TRIPLO")
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE   34
@@ -2038,7 +2038,7 @@ resolver.asm                                                         PAGE   34
     1703                      .dwattr $C$DW$114, DW_AT_name("rsvd3")
     1704                      .dwattr $C$DW$114, DW_AT_TI_symbol_name("_rsvd3")
     1705                      .dwattr $C$DW$114, DW_AT_bit_offset(0x04)
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE   35
@@ -2098,7 +2098,7 @@ resolver.asm                                                         PAGE   35
     1758              
     1759              $C$DW$120       .dwtag  DW_TAG_member
     1760                      .dwattr $C$DW$120, DW_AT_type(*$C$DW$T$31)
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE   36
@@ -2158,7 +2158,7 @@ resolver.asm                                                         PAGE   36
     1813                      .dwattr $C$DW$125, DW_AT_bit_size(0x01)
     1814                      .dwattr $C$DW$125, DW_AT_data_member_location[DW_OP_plus_uconst 0x0]
     1815                      .dwattr $C$DW$125, DW_AT_accessibility(DW_ACCESS_public)
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE   37
@@ -2218,7 +2218,7 @@ resolver.asm                                                         PAGE   37
     1868                      .dwattr $C$DW$131, DW_AT_data_member_location[DW_OP_plus_uconst 0x0]
     1869                      .dwattr $C$DW$131, DW_AT_accessibility(DW_ACCESS_public)
     1870              
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE   38
@@ -2278,7 +2278,7 @@ resolver.asm                                                         PAGE   38
     1923                      .dwattr $C$DW$137, DW_AT_type(*$C$DW$T$19)
     1924                      .dwattr $C$DW$137, DW_AT_name("all")
     1925                      .dwattr $C$DW$137, DW_AT_TI_symbol_name("_all")
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE   39
@@ -2338,7 +2338,7 @@ resolver.asm                                                         PAGE   39
     1978              $C$DW$143       .dwtag  DW_TAG_member
     1979                      .dwattr $C$DW$143, DW_AT_type(*$C$DW$T$19)
     1980                      .dwattr $C$DW$143, DW_AT_name("PPB2TRIPHI")
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE   40
@@ -2398,7 +2398,7 @@ resolver.asm                                                         PAGE   40
     2033                      .dwattr $C$DW$149, DW_AT_type(*$C$DW$T$19)
     2034                      .dwattr $C$DW$149, DW_AT_name("PPB3ZERO")
     2035                      .dwattr $C$DW$149, DW_AT_TI_symbol_name("_PPB3ZERO")
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE   41
@@ -2458,7 +2458,7 @@ resolver.asm                                                         PAGE   41
     2088              
     2089              $C$DW$T$36      .dwtag  DW_TAG_union_type
     2090                      .dwattr $C$DW$T$36, DW_AT_name("ADCEVTSEL_REG")
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE   42
@@ -2518,7 +2518,7 @@ resolver.asm                                                         PAGE   42
     2143                      .dwattr $C$DW$160, DW_AT_bit_offset(0x0c)
     2144                      .dwattr $C$DW$160, DW_AT_bit_size(0x01)
     2145                      .dwattr $C$DW$160, DW_AT_data_member_location[DW_OP_plus_uconst 0x0]
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE   43
@@ -2578,7 +2578,7 @@ resolver.asm                                                         PAGE   43
     2198                      .dwattr $C$DW$166, DW_AT_bit_size(0x01)
     2199                      .dwattr $C$DW$166, DW_AT_data_member_location[DW_OP_plus_uconst 0x0]
     2200                      .dwattr $C$DW$166, DW_AT_accessibility(DW_ACCESS_public)
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE   44
@@ -2638,7 +2638,7 @@ resolver.asm                                                         PAGE   44
     2253                      .dwattr $C$DW$172, DW_AT_data_member_location[DW_OP_plus_uconst 0x0]
     2254                      .dwattr $C$DW$172, DW_AT_accessibility(DW_ACCESS_public)
     2255              
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE   45
@@ -2698,7 +2698,7 @@ resolver.asm                                                         PAGE   45
     2308              
     2309              $C$DW$178       .dwtag  DW_TAG_member
     2310                      .dwattr $C$DW$178, DW_AT_type(*$C$DW$T$19)
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE   46
@@ -2758,7 +2758,7 @@ resolver.asm                                                         PAGE   46
     2363                      .dwattr $C$DW$183, DW_AT_type(*$C$DW$T$19)
     2364                      .dwattr $C$DW$183, DW_AT_name("ADCINT2")
     2365                      .dwattr $C$DW$183, DW_AT_TI_symbol_name("_ADCINT2")
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE   47
@@ -2818,7 +2818,7 @@ resolver.asm                                                         PAGE   47
     2418                      .dwendtag $C$DW$T$42
     2419              
     2420              
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE   48
@@ -2878,7 +2878,7 @@ resolver.asm                                                         PAGE   48
     2473                      .dwattr $C$DW$T$44, DW_AT_name("ADCINTOVFCLR_REG")
     2474                      .dwattr $C$DW$T$44, DW_AT_byte_size(0x01)
     2475              $C$DW$194       .dwtag  DW_TAG_member
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE   49
@@ -2938,7 +2938,7 @@ resolver.asm                                                         PAGE   49
     2528                      .dwattr $C$DW$199, DW_AT_data_member_location[DW_OP_plus_uconst 0x0]
     2529                      .dwattr $C$DW$199, DW_AT_accessibility(DW_ACCESS_public)
     2530              
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE   50
@@ -2998,7 +2998,7 @@ resolver.asm                                                         PAGE   50
     2583              
     2584              $C$DW$205       .dwtag  DW_TAG_member
     2585                      .dwattr $C$DW$205, DW_AT_type(*$C$DW$T$19)
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE   51
@@ -3058,7 +3058,7 @@ resolver.asm                                                         PAGE   51
     2638              $C$DW$211       .dwtag  DW_TAG_member
     2639                      .dwattr $C$DW$211, DW_AT_type(*$C$DW$T$19)
     2640                      .dwattr $C$DW$211, DW_AT_name("INT2CONT")
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE   52
@@ -3118,7 +3118,7 @@ resolver.asm                                                         PAGE   52
     2693                      .dwattr $C$DW$216, DW_AT_name("rsvd1")
     2694                      .dwattr $C$DW$216, DW_AT_TI_symbol_name("_rsvd1")
     2695                      .dwattr $C$DW$216, DW_AT_bit_offset(0x0b)
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE   53
@@ -3178,7 +3178,7 @@ resolver.asm                                                         PAGE   53
     2748                      .dwattr $C$DW$222, DW_AT_TI_symbol_name("_INT4E")
     2749                      .dwattr $C$DW$222, DW_AT_bit_offset(0x02)
     2750                      .dwattr $C$DW$222, DW_AT_bit_size(0x01)
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE   54
@@ -3238,7 +3238,7 @@ resolver.asm                                                         PAGE   54
     2803                      .dwattr $C$DW$227, DW_AT_bit_size(0x02)
     2804                      .dwattr $C$DW$227, DW_AT_data_member_location[DW_OP_plus_uconst 0x0]
     2805                      .dwattr $C$DW$227, DW_AT_accessibility(DW_ACCESS_public)
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE   55
@@ -3298,7 +3298,7 @@ resolver.asm                                                         PAGE   55
     2858                      .dwattr $C$DW$233, DW_AT_data_member_location[DW_OP_plus_uconst 0x0]
     2859                      .dwattr $C$DW$233, DW_AT_accessibility(DW_ACCESS_public)
     2860              
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE   56
@@ -3358,7 +3358,7 @@ resolver.asm                                                         PAGE   56
     2913              
     2914              $C$DW$239       .dwtag  DW_TAG_member
     2915                      .dwattr $C$DW$239, DW_AT_type(*$C$DW$T$19)
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE   57
@@ -3418,7 +3418,7 @@ resolver.asm                                                         PAGE   57
     2968                      .dwendtag $C$DW$T$53
     2969              
     2970              
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE   58
@@ -3478,7 +3478,7 @@ resolver.asm                                                         PAGE   58
     3023                      .dwattr $C$DW$249, DW_AT_accessibility(DW_ACCESS_public)
     3024              
     3025              $C$DW$250       .dwtag  DW_TAG_member
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE   59
@@ -3538,7 +3538,7 @@ resolver.asm                                                         PAGE   59
     3078              $C$DW$255       .dwtag  DW_TAG_member
     3079                      .dwattr $C$DW$255, DW_AT_type(*$C$DW$T$57)
     3080                      .dwattr $C$DW$255, DW_AT_name("bit")
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE   60
@@ -3598,7 +3598,7 @@ resolver.asm                                                         PAGE   60
     3133                      .dwattr $C$DW$T$61, DW_AT_name("ADCPPB1RESULT_BITS")
     3134                      .dwattr $C$DW$T$61, DW_AT_byte_size(0x02)
     3135              $C$DW$260       .dwtag  DW_TAG_member
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE   61
@@ -3658,7 +3658,7 @@ resolver.asm                                                         PAGE   61
     3188              $C$DW$265       .dwtag  DW_TAG_member
     3189                      .dwattr $C$DW$265, DW_AT_type(*$C$DW$T$19)
     3190                      .dwattr $C$DW$265, DW_AT_name("rsvd1")
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE   62
@@ -3718,7 +3718,7 @@ resolver.asm                                                         PAGE   62
     3243                      .dwattr $C$DW$270, DW_AT_name("rsvd1")
     3244                      .dwattr $C$DW$270, DW_AT_TI_symbol_name("_rsvd1")
     3245                      .dwattr $C$DW$270, DW_AT_bit_offset(0x00)
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE   63
@@ -3778,7 +3778,7 @@ resolver.asm                                                         PAGE   63
     3298                      .dwattr $C$DW$275, DW_AT_bit_offset(0x0c)
     3299                      .dwattr $C$DW$275, DW_AT_bit_size(0x03)
     3300                      .dwattr $C$DW$275, DW_AT_data_member_location[DW_OP_plus_uconst 0x1]
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE   64
@@ -3838,7 +3838,7 @@ resolver.asm                                                         PAGE   64
     3353                      .dwattr $C$DW$280, DW_AT_data_member_location[DW_OP_plus_uconst 0x0]
     3354                      .dwattr $C$DW$280, DW_AT_accessibility(DW_ACCESS_public)
     3355              
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE   65
@@ -3898,7 +3898,7 @@ resolver.asm                                                         PAGE   65
     3408              
     3409                      .dwendtag $C$DW$T$72
     3410              
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE   66
@@ -3958,7 +3958,7 @@ resolver.asm                                                         PAGE   66
     3463                      .dwattr $C$DW$290, DW_AT_data_member_location[DW_OP_plus_uconst 0x0]
     3464                      .dwattr $C$DW$290, DW_AT_accessibility(DW_ACCESS_public)
     3465              
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE   67
@@ -4018,7 +4018,7 @@ resolver.asm                                                         PAGE   67
     3518              
     3519              
     3520              $C$DW$T$78      .dwtag  DW_TAG_structure_type
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE   68
@@ -4078,7 +4078,7 @@ resolver.asm                                                         PAGE   68
     3573              $C$DW$T$80      .dwtag  DW_TAG_structure_type
     3574                      .dwattr $C$DW$T$80, DW_AT_name("ADCPPB2TRIPLO_BITS")
     3575                      .dwattr $C$DW$T$80, DW_AT_byte_size(0x02)
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE   69
@@ -4138,7 +4138,7 @@ resolver.asm                                                         PAGE   69
     3628                      .dwattr $C$DW$306, DW_AT_TI_symbol_name("_bit")
     3629                      .dwattr $C$DW$306, DW_AT_data_member_location[DW_OP_plus_uconst 0x0]
     3630                      .dwattr $C$DW$306, DW_AT_accessibility(DW_ACCESS_public)
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE   70
@@ -4198,7 +4198,7 @@ resolver.asm                                                         PAGE   70
     3683                      .dwattr $C$DW$311, DW_AT_accessibility(DW_ACCESS_public)
     3684              
     3685                      .dwendtag $C$DW$T$83
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE   71
@@ -4258,7 +4258,7 @@ resolver.asm                                                         PAGE   71
     3738                      .dwattr $C$DW$316, DW_AT_TI_symbol_name("_PPBRESULT")
     3739                      .dwattr $C$DW$316, DW_AT_bit_offset(0x00)
     3740                      .dwattr $C$DW$316, DW_AT_bit_size(0x10)
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE   72
@@ -4318,7 +4318,7 @@ resolver.asm                                                         PAGE   72
     3793                      .dwattr $C$DW$321, DW_AT_bit_size(0x04)
     3794                      .dwattr $C$DW$321, DW_AT_data_member_location[DW_OP_plus_uconst 0x0]
     3795                      .dwattr $C$DW$321, DW_AT_accessibility(DW_ACCESS_public)
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE   73
@@ -4378,7 +4378,7 @@ resolver.asm                                                         PAGE   73
     3848                      .dwattr $C$DW$326, DW_AT_accessibility(DW_ACCESS_public)
     3849              
     3850                      .dwendtag $C$DW$T$90
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE   74
@@ -4438,7 +4438,7 @@ resolver.asm                                                         PAGE   74
     3903              $C$DW$332       .dwtag  DW_TAG_member
     3904                      .dwattr $C$DW$332, DW_AT_type(*$C$DW$T$19)
     3905                      .dwattr $C$DW$332, DW_AT_name("REQSTAMP")
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE   75
@@ -4498,7 +4498,7 @@ resolver.asm                                                         PAGE   75
     3958                      .dwattr $C$DW$337, DW_AT_name("rsvd1")
     3959                      .dwattr $C$DW$337, DW_AT_TI_symbol_name("_rsvd1")
     3960                      .dwattr $C$DW$337, DW_AT_bit_offset(0x00)
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE   76
@@ -4558,7 +4558,7 @@ resolver.asm                                                         PAGE   76
     4013                      .dwattr $C$DW$T$97, DW_AT_name("ADCPPB4OFFCAL_REG")
     4014                      .dwattr $C$DW$T$97, DW_AT_byte_size(0x01)
     4015              $C$DW$342       .dwtag  DW_TAG_member
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE   77
@@ -4618,7 +4618,7 @@ resolver.asm                                                         PAGE   77
     4068                      .dwattr $C$DW$347, DW_AT_name("bit")
     4069                      .dwattr $C$DW$347, DW_AT_TI_symbol_name("_bit")
     4070                      .dwattr $C$DW$347, DW_AT_data_member_location[DW_OP_plus_uconst 0x0]
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE   78
@@ -4678,7 +4678,7 @@ resolver.asm                                                         PAGE   78
     4123              $C$DW$352       .dwtag  DW_TAG_member
     4124                      .dwattr $C$DW$352, DW_AT_type(*$C$DW$T$19)
     4125                      .dwattr $C$DW$352, DW_AT_name("LIMITHI")
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE   79
@@ -4738,7 +4738,7 @@ resolver.asm                                                         PAGE   79
     4178                      .dwattr $C$DW$357, DW_AT_name("LIMITLO")
     4179                      .dwattr $C$DW$357, DW_AT_TI_symbol_name("_LIMITLO")
     4180                      .dwattr $C$DW$357, DW_AT_bit_offset(0x00)
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE   80
@@ -4798,7 +4798,7 @@ resolver.asm                                                         PAGE   80
     4233              
     4234              
     4235              $C$DW$T$106     .dwtag  DW_TAG_structure_type
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE   81
@@ -4858,7 +4858,7 @@ resolver.asm                                                         PAGE   81
     4288                      .dwattr $C$DW$367, DW_AT_data_member_location[DW_OP_plus_uconst 0x0]
     4289                      .dwattr $C$DW$367, DW_AT_accessibility(DW_ACCESS_public)
     4290              
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE   82
@@ -4918,7 +4918,7 @@ resolver.asm                                                         PAGE   82
     4343                      .dwattr $C$DW$373, DW_AT_type(*$C$DW$T$62)
     4344                      .dwattr $C$DW$373, DW_AT_name("all")
     4345                      .dwattr $C$DW$373, DW_AT_TI_symbol_name("_all")
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE   83
@@ -4978,7 +4978,7 @@ resolver.asm                                                         PAGE   83
     4398              $C$DW$379       .dwtag  DW_TAG_member
     4399                      .dwattr $C$DW$379, DW_AT_type(*$C$DW$T$19)
     4400                      .dwattr $C$DW$379, DW_AT_name("TRIGSEL")
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE   84
@@ -5038,7 +5038,7 @@ resolver.asm                                                         PAGE   84
     4453                      .dwattr $C$DW$384, DW_AT_name("rsvd1")
     4454                      .dwattr $C$DW$384, DW_AT_TI_symbol_name("_rsvd1")
     4455                      .dwattr $C$DW$384, DW_AT_bit_offset(0x01)
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE   85
@@ -5098,7 +5098,7 @@ resolver.asm                                                         PAGE   85
     4508              
     4509              $C$DW$390       .dwtag  DW_TAG_member
     4510                      .dwattr $C$DW$390, DW_AT_type(*$C$DW$T$112)
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE   86
@@ -5158,7 +5158,7 @@ resolver.asm                                                         PAGE   86
     4563                      .dwattr $C$DW$395, DW_AT_bit_size(0x05)
     4564                      .dwattr $C$DW$395, DW_AT_data_member_location[DW_OP_plus_uconst 0x1]
     4565                      .dwattr $C$DW$395, DW_AT_accessibility(DW_ACCESS_public)
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE   87
@@ -5218,7 +5218,7 @@ resolver.asm                                                         PAGE   87
     4618                      .dwattr $C$DW$400, DW_AT_accessibility(DW_ACCESS_public)
     4619              
     4620              $C$DW$401       .dwtag  DW_TAG_member
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE   88
@@ -5278,7 +5278,7 @@ resolver.asm                                                         PAGE   88
     4673                      .dwattr $C$DW$406, DW_AT_data_member_location[DW_OP_plus_uconst 0x0]
     4674                      .dwattr $C$DW$406, DW_AT_accessibility(DW_ACCESS_public)
     4675              
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE   89
@@ -5338,7 +5338,7 @@ resolver.asm                                                         PAGE   89
     4728                      .dwattr $C$DW$412, DW_AT_type(*$C$DW$T$19)
     4729                      .dwattr $C$DW$412, DW_AT_name("rsvd3")
     4730                      .dwattr $C$DW$412, DW_AT_TI_symbol_name("_rsvd3")
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE   90
@@ -5398,7 +5398,7 @@ resolver.asm                                                         PAGE   90
     4783                      .dwattr $C$DW$417, DW_AT_TI_symbol_name("_CHSEL")
     4784                      .dwattr $C$DW$417, DW_AT_bit_offset(0x0d)
     4785                      .dwattr $C$DW$417, DW_AT_bit_size(0x04)
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE   91
@@ -5458,7 +5458,7 @@ resolver.asm                                                         PAGE   91
     4838              
     4839              $C$DW$T$122     .dwtag  DW_TAG_structure_type
     4840                      .dwattr $C$DW$T$122, DW_AT_name("ADCSOC1CTL_BITS")
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE   92
@@ -5518,7 +5518,7 @@ resolver.asm                                                         PAGE   92
     4893                      .dwattr $C$DW$428, DW_AT_data_member_location[DW_OP_plus_uconst 0x1]
     4894                      .dwattr $C$DW$428, DW_AT_accessibility(DW_ACCESS_public)
     4895              
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE   93
@@ -5578,7 +5578,7 @@ resolver.asm                                                         PAGE   93
     4948              
     4949              $C$DW$434       .dwtag  DW_TAG_member
     4950                      .dwattr $C$DW$434, DW_AT_type(*$C$DW$T$19)
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE   94
@@ -5638,7 +5638,7 @@ resolver.asm                                                         PAGE   94
     5003                      .dwattr $C$DW$439, DW_AT_type(*$C$DW$T$19)
     5004                      .dwattr $C$DW$439, DW_AT_name("ACQPS")
     5005                      .dwattr $C$DW$439, DW_AT_TI_symbol_name("_ACQPS")
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE   95
@@ -5698,7 +5698,7 @@ resolver.asm                                                         PAGE   95
     5058              
     5059              $C$DW$T$127     .dwtag  DW_TAG_union_type
     5060                      .dwattr $C$DW$T$127, DW_AT_name("ADCSOC3CTL_REG")
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE   96
@@ -5758,7 +5758,7 @@ resolver.asm                                                         PAGE   96
     5113                      .dwattr $C$DW$450, DW_AT_bit_offset(0x0c)
     5114                      .dwattr $C$DW$450, DW_AT_bit_size(0x01)
     5115                      .dwattr $C$DW$450, DW_AT_data_member_location[DW_OP_plus_uconst 0x1]
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE   97
@@ -5818,7 +5818,7 @@ resolver.asm                                                         PAGE   97
     5168                      .dwattr $C$DW$455, DW_AT_data_member_location[DW_OP_plus_uconst 0x0]
     5169                      .dwattr $C$DW$455, DW_AT_accessibility(DW_ACCESS_public)
     5170              
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE   98
@@ -5878,7 +5878,7 @@ resolver.asm                                                         PAGE   98
     5223                      .dwattr $C$DW$461, DW_AT_type(*$C$DW$T$62)
     5224                      .dwattr $C$DW$461, DW_AT_name("all")
     5225                      .dwattr $C$DW$461, DW_AT_TI_symbol_name("_all")
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE   99
@@ -5938,7 +5938,7 @@ resolver.asm                                                         PAGE   99
     5278              $C$DW$467       .dwtag  DW_TAG_member
     5279                      .dwattr $C$DW$467, DW_AT_type(*$C$DW$T$19)
     5280                      .dwattr $C$DW$467, DW_AT_name("TRIGSEL")
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  100
@@ -5998,7 +5998,7 @@ resolver.asm                                                         PAGE  100
     5333                      .dwattr $C$DW$472, DW_AT_name("rsvd1")
     5334                      .dwattr $C$DW$472, DW_AT_TI_symbol_name("_rsvd1")
     5335                      .dwattr $C$DW$472, DW_AT_bit_offset(0x01)
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  101
@@ -6058,7 +6058,7 @@ resolver.asm                                                         PAGE  101
     5388              
     5389              $C$DW$478       .dwtag  DW_TAG_member
     5390                      .dwattr $C$DW$478, DW_AT_type(*$C$DW$T$134)
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  102
@@ -6118,7 +6118,7 @@ resolver.asm                                                         PAGE  102
     5443                      .dwattr $C$DW$483, DW_AT_bit_size(0x05)
     5444                      .dwattr $C$DW$483, DW_AT_data_member_location[DW_OP_plus_uconst 0x1]
     5445                      .dwattr $C$DW$483, DW_AT_accessibility(DW_ACCESS_public)
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  103
@@ -6178,7 +6178,7 @@ resolver.asm                                                         PAGE  103
     5498                      .dwattr $C$DW$488, DW_AT_accessibility(DW_ACCESS_public)
     5499              
     5500              $C$DW$489       .dwtag  DW_TAG_member
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  104
@@ -6238,7 +6238,7 @@ resolver.asm                                                         PAGE  104
     5553                      .dwattr $C$DW$494, DW_AT_data_member_location[DW_OP_plus_uconst 0x0]
     5554                      .dwattr $C$DW$494, DW_AT_accessibility(DW_ACCESS_public)
     5555              
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  105
@@ -6298,7 +6298,7 @@ resolver.asm                                                         PAGE  105
     5608                      .dwattr $C$DW$500, DW_AT_type(*$C$DW$T$19)
     5609                      .dwattr $C$DW$500, DW_AT_name("SOC5")
     5610                      .dwattr $C$DW$500, DW_AT_TI_symbol_name("_SOC5")
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  106
@@ -6358,7 +6358,7 @@ resolver.asm                                                         PAGE  106
     5663                      .dwattr $C$DW$506, DW_AT_name("SOC11")
     5664                      .dwattr $C$DW$506, DW_AT_TI_symbol_name("_SOC11")
     5665                      .dwattr $C$DW$506, DW_AT_bit_offset(0x04)
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  107
@@ -6418,7 +6418,7 @@ resolver.asm                                                         PAGE  107
     5718              
     5719              $C$DW$512       .dwtag  DW_TAG_member
     5720                      .dwattr $C$DW$512, DW_AT_type(*$C$DW$T$140)
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  108
@@ -6478,7 +6478,7 @@ resolver.asm                                                         PAGE  108
     5773                      .dwattr $C$DW$517, DW_AT_bit_size(0x01)
     5774                      .dwattr $C$DW$517, DW_AT_data_member_location[DW_OP_plus_uconst 0x0]
     5775                      .dwattr $C$DW$517, DW_AT_accessibility(DW_ACCESS_public)
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  109
@@ -6538,7 +6538,7 @@ resolver.asm                                                         PAGE  109
     5828                      .dwattr $C$DW$523, DW_AT_data_member_location[DW_OP_plus_uconst 0x0]
     5829                      .dwattr $C$DW$523, DW_AT_accessibility(DW_ACCESS_public)
     5830              
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  110
@@ -6598,7 +6598,7 @@ resolver.asm                                                         PAGE  110
     5883                      .dwattr $C$DW$529, DW_AT_type(*$C$DW$T$19)
     5884                      .dwattr $C$DW$529, DW_AT_name("all")
     5885                      .dwattr $C$DW$529, DW_AT_TI_symbol_name("_all")
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  111
@@ -6658,7 +6658,7 @@ resolver.asm                                                         PAGE  111
     5938              $C$DW$535       .dwtag  DW_TAG_member
     5939                      .dwattr $C$DW$535, DW_AT_type(*$C$DW$T$19)
     5940                      .dwattr $C$DW$535, DW_AT_name("SOC4")
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  112
@@ -6718,7 +6718,7 @@ resolver.asm                                                         PAGE  112
     5993                      .dwattr $C$DW$541, DW_AT_type(*$C$DW$T$19)
     5994                      .dwattr $C$DW$541, DW_AT_name("SOC10")
     5995                      .dwattr $C$DW$541, DW_AT_TI_symbol_name("_SOC10")
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  113
@@ -6778,7 +6778,7 @@ resolver.asm                                                         PAGE  113
     6048              
     6049              $C$DW$T$145     .dwtag  DW_TAG_union_type
     6050                      .dwattr $C$DW$T$145, DW_AT_name("ADCSOCOVF1_REG")
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  114
@@ -6838,7 +6838,7 @@ resolver.asm                                                         PAGE  114
     6103                      .dwattr $C$DW$552, DW_AT_bit_offset(0x0c)
     6104                      .dwattr $C$DW$552, DW_AT_bit_size(0x01)
     6105                      .dwattr $C$DW$552, DW_AT_data_member_location[DW_OP_plus_uconst 0x0]
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  115
@@ -6898,7 +6898,7 @@ resolver.asm                                                         PAGE  115
     6158                      .dwattr $C$DW$558, DW_AT_bit_size(0x01)
     6159                      .dwattr $C$DW$558, DW_AT_data_member_location[DW_OP_plus_uconst 0x0]
     6160                      .dwattr $C$DW$558, DW_AT_accessibility(DW_ACCESS_public)
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  116
@@ -6958,7 +6958,7 @@ resolver.asm                                                         PAGE  116
     6213                      .dwattr $C$DW$564, DW_AT_data_member_location[DW_OP_plus_uconst 0x0]
     6214                      .dwattr $C$DW$564, DW_AT_accessibility(DW_ACCESS_public)
     6215              
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  117
@@ -7018,7 +7018,7 @@ resolver.asm                                                         PAGE  117
     6268              
     6269                      .dwendtag $C$DW$T$148
     6270              
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  118
@@ -7078,7 +7078,7 @@ resolver.asm                                                         PAGE  118
     6323              $C$DW$576       .dwtag  DW_TAG_member
     6324                      .dwattr $C$DW$576, DW_AT_type(*$C$DW$T$40)
     6325                      .dwattr $C$DW$576, DW_AT_name("ADCINTFLGCLR")
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  119
@@ -7138,7 +7138,7 @@ resolver.asm                                                         PAGE  119
     6378              
     6379              $C$DW$584       .dwtag  DW_TAG_member
     6380                      .dwattr $C$DW$584, DW_AT_type(*$C$DW$T$141)
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  120
@@ -7198,7 +7198,7 @@ resolver.asm                                                         PAGE  120
     6433                      .dwattr $C$DW$591, DW_AT_accessibility(DW_ACCESS_public)
     6434              
     6435              $C$DW$592       .dwtag  DW_TAG_member
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  121
@@ -7258,7 +7258,7 @@ resolver.asm                                                         PAGE  121
     6488                      .dwattr $C$DW$599, DW_AT_data_member_location[DW_OP_plus_uconst 0x26]
     6489                      .dwattr $C$DW$599, DW_AT_accessibility(DW_ACCESS_public)
     6490              
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  122
@@ -7318,7 +7318,7 @@ resolver.asm                                                         PAGE  122
     6543                      .dwattr $C$DW$607, DW_AT_TI_symbol_name("_rsvd2")
     6544                      .dwattr $C$DW$607, DW_AT_data_member_location[DW_OP_plus_uconst 0x33]
     6545                      .dwattr $C$DW$607, DW_AT_accessibility(DW_ACCESS_public)
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  123
@@ -7378,7 +7378,7 @@ resolver.asm                                                         PAGE  123
     6598                      .dwattr $C$DW$615, DW_AT_name("rsvd5")
     6599                      .dwattr $C$DW$615, DW_AT_TI_symbol_name("_rsvd5")
     6600                      .dwattr $C$DW$615, DW_AT_data_member_location[DW_OP_plus_uconst 0x3c]
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  124
@@ -7438,7 +7438,7 @@ resolver.asm                                                         PAGE  124
     6653                      .dwattr $C$DW$623, DW_AT_type(*$C$DW$T$77)
     6654                      .dwattr $C$DW$623, DW_AT_name("ADCPPB2STAMP")
     6655                      .dwattr $C$DW$623, DW_AT_TI_symbol_name("_ADCPPB2STAMP")
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  125
@@ -7498,7 +7498,7 @@ resolver.asm                                                         PAGE  125
     6708              $C$DW$631       .dwtag  DW_TAG_member
     6709                      .dwattr $C$DW$631, DW_AT_type(*$C$DW$T$19)
     6710                      .dwattr $C$DW$631, DW_AT_name("ADCPPB3OFFREF")
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  126
@@ -7558,7 +7558,7 @@ resolver.asm                                                         PAGE  126
     6763              
     6764              $C$DW$639       .dwtag  DW_TAG_member
     6765                      .dwattr $C$DW$639, DW_AT_type(*$C$DW$T$105)
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  127
@@ -7618,7 +7618,7 @@ resolver.asm                                                         PAGE  127
     6818                      .dwattr $C$DW$646, DW_AT_accessibility(DW_ACCESS_public)
     6819              
     6820              $C$DW$647       .dwtag  DW_TAG_member
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  128
@@ -7678,7 +7678,7 @@ resolver.asm                                                         PAGE  128
     6873              
     6874              $C$DW$654       .dwtag  DW_TAG_member
     6875                      .dwattr $C$DW$654, DW_AT_type(*$C$DW$T$19)
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  129
@@ -7738,7 +7738,7 @@ resolver.asm                                                         PAGE  129
     6928                      .dwattr $C$DW$661, DW_AT_accessibility(DW_ACCESS_public)
     6929              
     6930              $C$DW$662       .dwtag  DW_TAG_member
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  130
@@ -7798,7 +7798,7 @@ resolver.asm                                                         PAGE  130
     6983              
     6984              $C$DW$T$228     .dwtag  DW_TAG_volatile_type
     6985                      .dwattr $C$DW$T$228, DW_AT_type(*$C$DW$669)
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  131
@@ -7858,7 +7858,7 @@ resolver.asm                                                         PAGE  131
     7038                      .dwattr $C$DW$675, DW_AT_name("rsvd3")
     7039                      .dwattr $C$DW$675, DW_AT_TI_symbol_name("_rsvd3")
     7040                      .dwattr $C$DW$675, DW_AT_bit_offset(0x00)
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  132
@@ -7918,7 +7918,7 @@ resolver.asm                                                         PAGE  132
     7093                      .dwattr $C$DW$680, DW_AT_bit_offset(0x0d)
     7094                      .dwattr $C$DW$680, DW_AT_bit_size(0x01)
     7095                      .dwattr $C$DW$680, DW_AT_data_member_location[DW_OP_plus_uconst 0x0]
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  133
@@ -7978,7 +7978,7 @@ resolver.asm                                                         PAGE  133
     7148                      .dwattr $C$DW$685, DW_AT_data_member_location[DW_OP_plus_uconst 0x0]
     7149                      .dwattr $C$DW$685, DW_AT_accessibility(DW_ACCESS_public)
     7150              
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  134
@@ -8038,7 +8038,7 @@ resolver.asm                                                         PAGE  134
     7203                      .dwattr $C$DW$690, DW_AT_name("all")
     7204                      .dwattr $C$DW$690, DW_AT_TI_symbol_name("_all")
     7205                      .dwattr $C$DW$690, DW_AT_data_member_location[DW_OP_plus_uconst 0x0]
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  135
@@ -8098,7 +8098,7 @@ resolver.asm                                                         PAGE  135
     7258                      .dwattr $C$DW$695, DW_AT_data_member_location[DW_OP_plus_uconst 0x0]
     7259                      .dwattr $C$DW$695, DW_AT_accessibility(DW_ACCESS_public)
     7260              
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  136
@@ -8158,7 +8158,7 @@ resolver.asm                                                         PAGE  136
     7313              
     7314              
     7315              $C$DW$T$167     .dwtag  DW_TAG_structure_type
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  137
@@ -8218,7 +8218,7 @@ resolver.asm                                                         PAGE  137
     7368              
     7369              $C$DW$706       .dwtag  DW_TAG_member
     7370                      .dwattr $C$DW$706, DW_AT_type(*$C$DW$T$156)
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  138
@@ -8278,7 +8278,7 @@ resolver.asm                                                         PAGE  138
     7423              $C$DW$T$229     .dwtag  DW_TAG_volatile_type
     7424                      .dwattr $C$DW$T$229, DW_AT_type(*$C$DW$713)
     7425              
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  139
@@ -8338,7 +8338,7 @@ resolver.asm                                                         PAGE  139
     7478                      .dwattr $C$DW$719, DW_AT_TI_symbol_name("_ACK6")
     7479                      .dwattr $C$DW$719, DW_AT_bit_offset(0x0a)
     7480                      .dwattr $C$DW$719, DW_AT_bit_size(0x01)
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  140
@@ -8398,7 +8398,7 @@ resolver.asm                                                         PAGE  140
     7533                      .dwattr $C$DW$725, DW_AT_bit_offset(0x04)
     7534                      .dwattr $C$DW$725, DW_AT_bit_size(0x01)
     7535                      .dwattr $C$DW$725, DW_AT_data_member_location[DW_OP_plus_uconst 0x0]
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  141
@@ -8458,7 +8458,7 @@ resolver.asm                                                         PAGE  141
     7588                      .dwattr $C$DW$730, DW_AT_data_member_location[DW_OP_plus_uconst 0x0]
     7589                      .dwattr $C$DW$730, DW_AT_accessibility(DW_ACCESS_public)
     7590              
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  142
@@ -8518,7 +8518,7 @@ resolver.asm                                                         PAGE  142
     7643              
     7644              $C$DW$736       .dwtag  DW_TAG_member
     7645                      .dwattr $C$DW$736, DW_AT_type(*$C$DW$T$19)
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  143
@@ -8578,7 +8578,7 @@ resolver.asm                                                         PAGE  143
     7698              $C$DW$742       .dwtag  DW_TAG_member
     7699                      .dwattr $C$DW$742, DW_AT_type(*$C$DW$T$19)
     7700                      .dwattr $C$DW$742, DW_AT_name("INTx10")
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  144
@@ -8638,7 +8638,7 @@ resolver.asm                                                         PAGE  144
     7753                      .dwattr $C$DW$748, DW_AT_type(*$C$DW$T$19)
     7754                      .dwattr $C$DW$748, DW_AT_name("INTx16")
     7755                      .dwattr $C$DW$748, DW_AT_TI_symbol_name("_INTx16")
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  145
@@ -8698,7 +8698,7 @@ resolver.asm                                                         PAGE  145
     7808                      .dwattr $C$DW$753, DW_AT_TI_symbol_name("_INTx3")
     7809                      .dwattr $C$DW$753, DW_AT_bit_offset(0x0d)
     7810                      .dwattr $C$DW$753, DW_AT_bit_size(0x01)
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  146
@@ -8758,7 +8758,7 @@ resolver.asm                                                         PAGE  146
     7863                      .dwattr $C$DW$759, DW_AT_bit_offset(0x07)
     7864                      .dwattr $C$DW$759, DW_AT_bit_size(0x01)
     7865                      .dwattr $C$DW$759, DW_AT_data_member_location[DW_OP_plus_uconst 0x0]
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  147
@@ -8818,7 +8818,7 @@ resolver.asm                                                         PAGE  147
     7918                      .dwattr $C$DW$765, DW_AT_bit_size(0x01)
     7919                      .dwattr $C$DW$765, DW_AT_data_member_location[DW_OP_plus_uconst 0x0]
     7920                      .dwattr $C$DW$765, DW_AT_accessibility(DW_ACCESS_public)
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  148
@@ -8878,7 +8878,7 @@ resolver.asm                                                         PAGE  148
     7973                      .dwattr $C$DW$770, DW_AT_accessibility(DW_ACCESS_public)
     7974              
     7975              $C$DW$771       .dwtag  DW_TAG_member
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  149
@@ -8938,7 +8938,7 @@ resolver.asm                                                         PAGE  149
     8028              
     8029              $C$DW$777       .dwtag  DW_TAG_member
     8030                      .dwattr $C$DW$777, DW_AT_type(*$C$DW$T$19)
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  150
@@ -8998,7 +8998,7 @@ resolver.asm                                                         PAGE  150
     8083              $C$DW$783       .dwtag  DW_TAG_member
     8084                      .dwattr $C$DW$783, DW_AT_type(*$C$DW$T$19)
     8085                      .dwattr $C$DW$783, DW_AT_name("INTx15")
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  151
@@ -9058,7 +9058,7 @@ resolver.asm                                                         PAGE  151
     8138                      .dwattr $C$DW$788, DW_AT_name("INTx2")
     8139                      .dwattr $C$DW$788, DW_AT_TI_symbol_name("_INTx2")
     8140                      .dwattr $C$DW$788, DW_AT_bit_offset(0x0e)
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  152
@@ -9118,7 +9118,7 @@ resolver.asm                                                         PAGE  152
     8193                      .dwattr $C$DW$794, DW_AT_TI_symbol_name("_INTx8")
     8194                      .dwattr $C$DW$794, DW_AT_bit_offset(0x08)
     8195                      .dwattr $C$DW$794, DW_AT_bit_size(0x01)
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  153
@@ -9178,7 +9178,7 @@ resolver.asm                                                         PAGE  153
     8248                      .dwattr $C$DW$800, DW_AT_bit_offset(0x02)
     8249                      .dwattr $C$DW$800, DW_AT_bit_size(0x01)
     8250                      .dwattr $C$DW$800, DW_AT_data_member_location[DW_OP_plus_uconst 0x0]
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  154
@@ -9238,7 +9238,7 @@ resolver.asm                                                         PAGE  154
     8303                      .dwattr $C$DW$805, DW_AT_data_member_location[DW_OP_plus_uconst 0x0]
     8304                      .dwattr $C$DW$805, DW_AT_accessibility(DW_ACCESS_public)
     8305              
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  155
@@ -9298,7 +9298,7 @@ resolver.asm                                                         PAGE  155
     8358                      .dwattr $C$DW$811, DW_AT_accessibility(DW_ACCESS_public)
     8359              
     8360              $C$DW$812       .dwtag  DW_TAG_member
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  156
@@ -9358,7 +9358,7 @@ resolver.asm                                                         PAGE  156
     8413              
     8414              $C$DW$818       .dwtag  DW_TAG_member
     8415                      .dwattr $C$DW$818, DW_AT_type(*$C$DW$T$19)
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  157
@@ -9418,7 +9418,7 @@ resolver.asm                                                         PAGE  157
     8468                      .dwattr $C$DW$823, DW_AT_type(*$C$DW$T$19)
     8469                      .dwattr $C$DW$823, DW_AT_name("INTx1")
     8470                      .dwattr $C$DW$823, DW_AT_TI_symbol_name("_INTx1")
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  158
@@ -9478,7 +9478,7 @@ resolver.asm                                                         PAGE  158
     8523                      .dwattr $C$DW$829, DW_AT_name("INTx7")
     8524                      .dwattr $C$DW$829, DW_AT_TI_symbol_name("_INTx7")
     8525                      .dwattr $C$DW$829, DW_AT_bit_offset(0x09)
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  159
@@ -9538,7 +9538,7 @@ resolver.asm                                                         PAGE  159
     8578                      .dwattr $C$DW$835, DW_AT_TI_symbol_name("_INTx13")
     8579                      .dwattr $C$DW$835, DW_AT_bit_offset(0x03)
     8580                      .dwattr $C$DW$835, DW_AT_bit_size(0x01)
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  160
@@ -9598,7 +9598,7 @@ resolver.asm                                                         PAGE  160
     8633              
     8634              $C$DW$T$186     .dwtag  DW_TAG_structure_type
     8635                      .dwattr $C$DW$T$186, DW_AT_name("PIEIER4_BITS")
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  161
@@ -9658,7 +9658,7 @@ resolver.asm                                                         PAGE  161
     8688                      .dwattr $C$DW$846, DW_AT_data_member_location[DW_OP_plus_uconst 0x0]
     8689                      .dwattr $C$DW$846, DW_AT_accessibility(DW_ACCESS_public)
     8690              
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  162
@@ -9718,7 +9718,7 @@ resolver.asm                                                         PAGE  162
     8743                      .dwattr $C$DW$852, DW_AT_accessibility(DW_ACCESS_public)
     8744              
     8745              $C$DW$853       .dwtag  DW_TAG_member
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  163
@@ -9778,7 +9778,7 @@ resolver.asm                                                         PAGE  163
     8798                      .dwattr $C$DW$858, DW_AT_data_member_location[DW_OP_plus_uconst 0x0]
     8799                      .dwattr $C$DW$858, DW_AT_accessibility(DW_ACCESS_public)
     8800              
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  164
@@ -9838,7 +9838,7 @@ resolver.asm                                                         PAGE  164
     8853                      .dwattr $C$DW$864, DW_AT_type(*$C$DW$T$19)
     8854                      .dwattr $C$DW$864, DW_AT_name("INTx6")
     8855                      .dwattr $C$DW$864, DW_AT_TI_symbol_name("_INTx6")
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  165
@@ -9898,7 +9898,7 @@ resolver.asm                                                         PAGE  165
     8908                      .dwattr $C$DW$870, DW_AT_name("INTx12")
     8909                      .dwattr $C$DW$870, DW_AT_TI_symbol_name("_INTx12")
     8910                      .dwattr $C$DW$870, DW_AT_bit_offset(0x04)
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  166
@@ -9958,7 +9958,7 @@ resolver.asm                                                         PAGE  166
     8963              
     8964              $C$DW$876       .dwtag  DW_TAG_member
     8965                      .dwattr $C$DW$876, DW_AT_type(*$C$DW$T$188)
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  167
@@ -10018,7 +10018,7 @@ resolver.asm                                                         PAGE  167
     9018                      .dwattr $C$DW$881, DW_AT_bit_size(0x01)
     9019                      .dwattr $C$DW$881, DW_AT_data_member_location[DW_OP_plus_uconst 0x0]
     9020                      .dwattr $C$DW$881, DW_AT_accessibility(DW_ACCESS_public)
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  168
@@ -10078,7 +10078,7 @@ resolver.asm                                                         PAGE  168
     9073                      .dwattr $C$DW$887, DW_AT_data_member_location[DW_OP_plus_uconst 0x0]
     9074                      .dwattr $C$DW$887, DW_AT_accessibility(DW_ACCESS_public)
     9075              
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  169
@@ -10138,7 +10138,7 @@ resolver.asm                                                         PAGE  169
     9128                      .dwattr $C$DW$893, DW_AT_type(*$C$DW$T$19)
     9129                      .dwattr $C$DW$893, DW_AT_name("all")
     9130                      .dwattr $C$DW$893, DW_AT_TI_symbol_name("_all")
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  170
@@ -10198,7 +10198,7 @@ resolver.asm                                                         PAGE  170
     9183              $C$DW$899       .dwtag  DW_TAG_member
     9184                      .dwattr $C$DW$899, DW_AT_type(*$C$DW$T$19)
     9185                      .dwattr $C$DW$899, DW_AT_name("INTx5")
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  171
@@ -10258,7 +10258,7 @@ resolver.asm                                                         PAGE  171
     9238                      .dwattr $C$DW$905, DW_AT_type(*$C$DW$T$19)
     9239                      .dwattr $C$DW$905, DW_AT_name("INTx11")
     9240                      .dwattr $C$DW$905, DW_AT_TI_symbol_name("_INTx11")
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  172
@@ -10318,7 +10318,7 @@ resolver.asm                                                         PAGE  172
     9293              
     9294              $C$DW$T$193     .dwtag  DW_TAG_union_type
     9295                      .dwattr $C$DW$T$193, DW_AT_name("PIEIER7_REG")
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  173
@@ -10378,7 +10378,7 @@ resolver.asm                                                         PAGE  173
     9348                      .dwattr $C$DW$916, DW_AT_bit_offset(0x0c)
     9349                      .dwattr $C$DW$916, DW_AT_bit_size(0x01)
     9350                      .dwattr $C$DW$916, DW_AT_data_member_location[DW_OP_plus_uconst 0x0]
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  174
@@ -10438,7 +10438,7 @@ resolver.asm                                                         PAGE  174
     9403                      .dwattr $C$DW$922, DW_AT_bit_size(0x01)
     9404                      .dwattr $C$DW$922, DW_AT_data_member_location[DW_OP_plus_uconst 0x0]
     9405                      .dwattr $C$DW$922, DW_AT_accessibility(DW_ACCESS_public)
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  175
@@ -10498,7 +10498,7 @@ resolver.asm                                                         PAGE  175
     9458                      .dwattr $C$DW$928, DW_AT_data_member_location[DW_OP_plus_uconst 0x0]
     9459                      .dwattr $C$DW$928, DW_AT_accessibility(DW_ACCESS_public)
     9460              
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  176
@@ -10558,7 +10558,7 @@ resolver.asm                                                         PAGE  176
     9513              
     9514              $C$DW$934       .dwtag  DW_TAG_member
     9515                      .dwattr $C$DW$934, DW_AT_type(*$C$DW$T$19)
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  177
@@ -10618,7 +10618,7 @@ resolver.asm                                                         PAGE  177
     9568              $C$DW$940       .dwtag  DW_TAG_member
     9569                      .dwattr $C$DW$940, DW_AT_type(*$C$DW$T$19)
     9570                      .dwattr $C$DW$940, DW_AT_name("INTx10")
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  178
@@ -10678,7 +10678,7 @@ resolver.asm                                                         PAGE  178
     9623                      .dwattr $C$DW$946, DW_AT_type(*$C$DW$T$19)
     9624                      .dwattr $C$DW$946, DW_AT_name("INTx16")
     9625                      .dwattr $C$DW$946, DW_AT_TI_symbol_name("_INTx16")
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  179
@@ -10738,7 +10738,7 @@ resolver.asm                                                         PAGE  179
     9678                      .dwattr $C$DW$951, DW_AT_TI_symbol_name("_INTx3")
     9679                      .dwattr $C$DW$951, DW_AT_bit_offset(0x0d)
     9680                      .dwattr $C$DW$951, DW_AT_bit_size(0x01)
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  180
@@ -10798,7 +10798,7 @@ resolver.asm                                                         PAGE  180
     9733                      .dwattr $C$DW$957, DW_AT_bit_offset(0x07)
     9734                      .dwattr $C$DW$957, DW_AT_bit_size(0x01)
     9735                      .dwattr $C$DW$957, DW_AT_data_member_location[DW_OP_plus_uconst 0x0]
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  181
@@ -10858,7 +10858,7 @@ resolver.asm                                                         PAGE  181
     9788                      .dwattr $C$DW$963, DW_AT_bit_size(0x01)
     9789                      .dwattr $C$DW$963, DW_AT_data_member_location[DW_OP_plus_uconst 0x0]
     9790                      .dwattr $C$DW$963, DW_AT_accessibility(DW_ACCESS_public)
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  182
@@ -10918,7 +10918,7 @@ resolver.asm                                                         PAGE  182
     9843                      .dwattr $C$DW$968, DW_AT_accessibility(DW_ACCESS_public)
     9844              
     9845              $C$DW$969       .dwtag  DW_TAG_member
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  183
@@ -10978,7 +10978,7 @@ resolver.asm                                                         PAGE  183
     9898              
     9899              $C$DW$975       .dwtag  DW_TAG_member
     9900                      .dwattr $C$DW$975, DW_AT_type(*$C$DW$T$19)
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  184
@@ -11038,7 +11038,7 @@ resolver.asm                                                         PAGE  184
     9953              $C$DW$981       .dwtag  DW_TAG_member
     9954                      .dwattr $C$DW$981, DW_AT_type(*$C$DW$T$19)
     9955                      .dwattr $C$DW$981, DW_AT_name("INTx15")
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  185
@@ -11098,7 +11098,7 @@ resolver.asm                                                         PAGE  185
    10008                      .dwattr $C$DW$986, DW_AT_name("INTx2")
    10009                      .dwattr $C$DW$986, DW_AT_TI_symbol_name("_INTx2")
    10010                      .dwattr $C$DW$986, DW_AT_bit_offset(0x0e)
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  186
@@ -11158,7 +11158,7 @@ resolver.asm                                                         PAGE  186
    10063                      .dwattr $C$DW$992, DW_AT_TI_symbol_name("_INTx8")
    10064                      .dwattr $C$DW$992, DW_AT_bit_offset(0x08)
    10065                      .dwattr $C$DW$992, DW_AT_bit_size(0x01)
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  187
@@ -11218,7 +11218,7 @@ resolver.asm                                                         PAGE  187
    10118                      .dwattr $C$DW$998, DW_AT_bit_offset(0x02)
    10119                      .dwattr $C$DW$998, DW_AT_bit_size(0x01)
    10120                      .dwattr $C$DW$998, DW_AT_data_member_location[DW_OP_plus_uconst 0x0]
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  188
@@ -11278,7 +11278,7 @@ resolver.asm                                                         PAGE  188
    10173                      .dwattr $C$DW$1003, DW_AT_data_member_location[DW_OP_plus_uconst 0x0]
    10174                      .dwattr $C$DW$1003, DW_AT_accessibility(DW_ACCESS_public)
    10175              
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  189
@@ -11338,7 +11338,7 @@ resolver.asm                                                         PAGE  189
    10228                      .dwattr $C$DW$1009, DW_AT_accessibility(DW_ACCESS_public)
    10229              
    10230              $C$DW$1010      .dwtag  DW_TAG_member
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  190
@@ -11398,7 +11398,7 @@ resolver.asm                                                         PAGE  190
    10283              
    10284              $C$DW$1016      .dwtag  DW_TAG_member
    10285                      .dwattr $C$DW$1016, DW_AT_type(*$C$DW$T$19)
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  191
@@ -11458,7 +11458,7 @@ resolver.asm                                                         PAGE  191
    10338                      .dwattr $C$DW$1021, DW_AT_type(*$C$DW$T$19)
    10339                      .dwattr $C$DW$1021, DW_AT_name("INTx1")
    10340                      .dwattr $C$DW$1021, DW_AT_TI_symbol_name("_INTx1")
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  192
@@ -11518,7 +11518,7 @@ resolver.asm                                                         PAGE  192
    10393                      .dwattr $C$DW$1027, DW_AT_name("INTx7")
    10394                      .dwattr $C$DW$1027, DW_AT_TI_symbol_name("_INTx7")
    10395                      .dwattr $C$DW$1027, DW_AT_bit_offset(0x09)
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  193
@@ -11578,7 +11578,7 @@ resolver.asm                                                         PAGE  193
    10448                      .dwattr $C$DW$1033, DW_AT_TI_symbol_name("_INTx13")
    10449                      .dwattr $C$DW$1033, DW_AT_bit_offset(0x03)
    10450                      .dwattr $C$DW$1033, DW_AT_bit_size(0x01)
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  194
@@ -11638,7 +11638,7 @@ resolver.asm                                                         PAGE  194
    10503              
    10504              $C$DW$T$208     .dwtag  DW_TAG_structure_type
    10505                      .dwattr $C$DW$T$208, DW_AT_name("PIEIFR3_BITS")
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  195
@@ -11698,7 +11698,7 @@ resolver.asm                                                         PAGE  195
    10558                      .dwattr $C$DW$1044, DW_AT_data_member_location[DW_OP_plus_uconst 0x0]
    10559                      .dwattr $C$DW$1044, DW_AT_accessibility(DW_ACCESS_public)
    10560              
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  196
@@ -11758,7 +11758,7 @@ resolver.asm                                                         PAGE  196
    10613                      .dwattr $C$DW$1050, DW_AT_accessibility(DW_ACCESS_public)
    10614              
    10615              $C$DW$1051      .dwtag  DW_TAG_member
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  197
@@ -11818,7 +11818,7 @@ resolver.asm                                                         PAGE  197
    10668                      .dwattr $C$DW$1056, DW_AT_data_member_location[DW_OP_plus_uconst 0x0]
    10669                      .dwattr $C$DW$1056, DW_AT_accessibility(DW_ACCESS_public)
    10670              
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  198
@@ -11878,7 +11878,7 @@ resolver.asm                                                         PAGE  198
    10723                      .dwattr $C$DW$1062, DW_AT_type(*$C$DW$T$19)
    10724                      .dwattr $C$DW$1062, DW_AT_name("INTx6")
    10725                      .dwattr $C$DW$1062, DW_AT_TI_symbol_name("_INTx6")
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  199
@@ -11938,7 +11938,7 @@ resolver.asm                                                         PAGE  199
    10778                      .dwattr $C$DW$1068, DW_AT_name("INTx12")
    10779                      .dwattr $C$DW$1068, DW_AT_TI_symbol_name("_INTx12")
    10780                      .dwattr $C$DW$1068, DW_AT_bit_offset(0x04)
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  200
@@ -11998,7 +11998,7 @@ resolver.asm                                                         PAGE  200
    10833              
    10834              $C$DW$1074      .dwtag  DW_TAG_member
    10835                      .dwattr $C$DW$1074, DW_AT_type(*$C$DW$T$210)
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  201
@@ -12058,7 +12058,7 @@ resolver.asm                                                         PAGE  201
    10888                      .dwattr $C$DW$1079, DW_AT_bit_size(0x01)
    10889                      .dwattr $C$DW$1079, DW_AT_data_member_location[DW_OP_plus_uconst 0x0]
    10890                      .dwattr $C$DW$1079, DW_AT_accessibility(DW_ACCESS_public)
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  202
@@ -12118,7 +12118,7 @@ resolver.asm                                                         PAGE  202
    10943                      .dwattr $C$DW$1085, DW_AT_data_member_location[DW_OP_plus_uconst 0x0]
    10944                      .dwattr $C$DW$1085, DW_AT_accessibility(DW_ACCESS_public)
    10945              
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  203
@@ -12178,7 +12178,7 @@ resolver.asm                                                         PAGE  203
    10998                      .dwattr $C$DW$1091, DW_AT_type(*$C$DW$T$19)
    10999                      .dwattr $C$DW$1091, DW_AT_name("all")
    11000                      .dwattr $C$DW$1091, DW_AT_TI_symbol_name("_all")
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  204
@@ -12238,7 +12238,7 @@ resolver.asm                                                         PAGE  204
    11053              $C$DW$1097      .dwtag  DW_TAG_member
    11054                      .dwattr $C$DW$1097, DW_AT_type(*$C$DW$T$19)
    11055                      .dwattr $C$DW$1097, DW_AT_name("INTx5")
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  205
@@ -12298,7 +12298,7 @@ resolver.asm                                                         PAGE  205
    11108                      .dwattr $C$DW$1103, DW_AT_type(*$C$DW$T$19)
    11109                      .dwattr $C$DW$1103, DW_AT_name("INTx11")
    11110                      .dwattr $C$DW$1103, DW_AT_TI_symbol_name("_INTx11")
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  206
@@ -12358,7 +12358,7 @@ resolver.asm                                                         PAGE  206
    11163              
    11164              $C$DW$T$215     .dwtag  DW_TAG_union_type
    11165                      .dwattr $C$DW$T$215, DW_AT_name("PIEIFR6_REG")
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  207
@@ -12418,7 +12418,7 @@ resolver.asm                                                         PAGE  207
    11218                      .dwattr $C$DW$1114, DW_AT_bit_offset(0x0c)
    11219                      .dwattr $C$DW$1114, DW_AT_bit_size(0x01)
    11220                      .dwattr $C$DW$1114, DW_AT_data_member_location[DW_OP_plus_uconst 0x0]
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  208
@@ -12478,7 +12478,7 @@ resolver.asm                                                         PAGE  208
    11273                      .dwattr $C$DW$1120, DW_AT_bit_size(0x01)
    11274                      .dwattr $C$DW$1120, DW_AT_data_member_location[DW_OP_plus_uconst 0x0]
    11275                      .dwattr $C$DW$1120, DW_AT_accessibility(DW_ACCESS_public)
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  209
@@ -12538,7 +12538,7 @@ resolver.asm                                                         PAGE  209
    11328                      .dwattr $C$DW$1126, DW_AT_data_member_location[DW_OP_plus_uconst 0x0]
    11329                      .dwattr $C$DW$1126, DW_AT_accessibility(DW_ACCESS_public)
    11330              
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  210
@@ -12598,7 +12598,7 @@ resolver.asm                                                         PAGE  210
    11383              
    11384              $C$DW$1132      .dwtag  DW_TAG_member
    11385                      .dwattr $C$DW$1132, DW_AT_type(*$C$DW$T$19)
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  211
@@ -12658,7 +12658,7 @@ resolver.asm                                                         PAGE  211
    11438              $C$DW$1138      .dwtag  DW_TAG_member
    11439                      .dwattr $C$DW$1138, DW_AT_type(*$C$DW$T$19)
    11440                      .dwattr $C$DW$1138, DW_AT_name("INTx10")
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  212
@@ -12718,7 +12718,7 @@ resolver.asm                                                         PAGE  212
    11493                      .dwattr $C$DW$1144, DW_AT_type(*$C$DW$T$19)
    11494                      .dwattr $C$DW$1144, DW_AT_name("INTx16")
    11495                      .dwattr $C$DW$1144, DW_AT_TI_symbol_name("_INTx16")
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  213
@@ -12778,7 +12778,7 @@ resolver.asm                                                         PAGE  213
    11548                      .dwattr $C$DW$1149, DW_AT_TI_symbol_name("_INTx3")
    11549                      .dwattr $C$DW$1149, DW_AT_bit_offset(0x0d)
    11550                      .dwattr $C$DW$1149, DW_AT_bit_size(0x01)
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  214
@@ -12838,7 +12838,7 @@ resolver.asm                                                         PAGE  214
    11603                      .dwattr $C$DW$1155, DW_AT_bit_offset(0x07)
    11604                      .dwattr $C$DW$1155, DW_AT_bit_size(0x01)
    11605                      .dwattr $C$DW$1155, DW_AT_data_member_location[DW_OP_plus_uconst 0x0]
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  215
@@ -12898,7 +12898,7 @@ resolver.asm                                                         PAGE  215
    11658                      .dwattr $C$DW$1161, DW_AT_bit_size(0x01)
    11659                      .dwattr $C$DW$1161, DW_AT_data_member_location[DW_OP_plus_uconst 0x0]
    11660                      .dwattr $C$DW$1161, DW_AT_accessibility(DW_ACCESS_public)
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  216
@@ -12958,7 +12958,7 @@ resolver.asm                                                         PAGE  216
    11713                      .dwattr $C$DW$1167, DW_AT_name("PIEIER1")
    11714                      .dwattr $C$DW$1167, DW_AT_TI_symbol_name("_PIEIER1")
    11715                      .dwattr $C$DW$1167, DW_AT_data_member_location[DW_OP_plus_uconst 0x2]
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  217
@@ -13018,7 +13018,7 @@ resolver.asm                                                         PAGE  217
    11768                      .dwattr $C$DW$1175, DW_AT_type(*$C$DW$T$189)
    11769                      .dwattr $C$DW$1175, DW_AT_name("PIEIER5")
    11770                      .dwattr $C$DW$1175, DW_AT_TI_symbol_name("_PIEIER5")
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  218
@@ -13078,7 +13078,7 @@ resolver.asm                                                         PAGE  218
    11823              $C$DW$1183      .dwtag  DW_TAG_member
    11824                      .dwattr $C$DW$1183, DW_AT_type(*$C$DW$T$197)
    11825                      .dwattr $C$DW$1183, DW_AT_name("PIEIER9")
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  219
@@ -13138,7 +13138,7 @@ resolver.asm                                                         PAGE  219
    11878              
    11879                      .dwendtag $C$DW$T$222
    11880              
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  220
@@ -13198,7 +13198,7 @@ resolver.asm                                                         PAGE  220
    11933                      .dwattr $C$DW$T$11, DW_AT_byte_size(0x01)
    11934              
    11935              $C$DW$T$19      .dwtag  DW_TAG_typedef
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  221
@@ -13258,7 +13258,7 @@ resolver.asm                                                         PAGE  221
    11988                      .dwendtag $C$DW$T$242
    11989              
    11990              $C$DW$T$243     .dwtag  DW_TAG_pointer_type
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  222
@@ -13318,7 +13318,7 @@ resolver.asm                                                         PAGE  222
    12043                      .dwattr $C$DW$CU, DW_AT_language(DW_LANG_C)
    12044              
    12045              ;***************************************************************
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  223
@@ -13378,7 +13378,7 @@ resolver.asm                                                         PAGE  223
    12098                      .dwattr $C$DW$1204, DW_AT_name("ST0")
    12099                      .dwattr $C$DW$1204, DW_AT_location[DW_OP_reg23]
    12100              
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  224
@@ -13438,7 +13438,7 @@ resolver.asm                                                         PAGE  224
    12153              $C$DW$1218      .dwtag  DW_TAG_TI_assign_register
    12154                      .dwattr $C$DW$1218, DW_AT_name("IER")
    12155                      .dwattr $C$DW$1218, DW_AT_location[DW_OP_regx 0x25]
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  225
@@ -13498,7 +13498,7 @@ resolver.asm                                                         PAGE  225
    12208              
    12209              $C$DW$1232      .dwtag  DW_TAG_TI_assign_register
    12210                      .dwattr $C$DW$1232, DW_AT_name("AR5")
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  226
@@ -13558,7 +13558,7 @@ resolver.asm                                                         PAGE  226
    12263                      .dwattr $C$DW$1245, DW_AT_location[DW_OP_regx 0x47]
    12264              
    12265              $C$DW$1246      .dwtag  DW_TAG_TI_assign_register
-TMS320C2000 Assembler PC v20.2.1 Wed Oct  7 22:14:27 2020
+TMS320C2000 Assembler PC v20.2.1 Mon Dec  7 23:59:49 2020
 
 Copyright (c) 1996-2018 Texas Instruments Incorporated
 resolver.asm                                                         PAGE  227

@@ -961,44 +961,46 @@ void GetEncoderReadings(ModuleParameters &moduleparams)
 {
     /*TODO*/
     /*TODO put RPM speeds?*/
+    float AngleDifference = 0;
     moduleparams.AngleRad.Mechanical = ((float)EQep1Regs.QPOSCNT)/((float)ENCODERMAXTICKCOUNT)* 2.0 * PI;
     moduleparams.AngleRad.Electrical =  moduleparams.AngleRad.Mechanical*POLEPAIRS;
 
     /*Speed measurement*/
     if (EQep1Regs.QFLG.bit.UTO == 1) // If unit timeout (one 100 Hz period)
     {
+        moduleparams.AngleRadTemp.Mechanical = (float) EQep1Regs.QPOSLAT / (float) ENCODERMAXTICKCOUNT * 2.0 * PI;
         //fAngularMechanicalPosition_UTO = (float) EQep1Regs.QPOSLAT / (float) ENCODERMAXTICKCOUNT * 2.0 * PI;
         //fAngularMechanicalPositionDegrees_UTO = fAngularMechanicalPosition_UTO / (2.0 * PI) * 360.0;
         if (EQep1Regs.QEPSTS.bit.QDF == 0)            // POSCNT is counting down
         {
-            if (moduleparams.AngleRad.Mechanical > moduleparams.AngleRadPrev.Mechanical)
+            if (moduleparams.AngleRadTemp.Mechanical > moduleparams.AngleRadPrev.Mechanical)
             {
                 //get the position difference
-                moduleparams.AngleRadTemp.Mechanical = -(2.0 * PI - moduleparams.AngleRad.Mechanical  + moduleparams.AngleRadPrev.Mechanical ); // x2-x1 should be negative
+               AngleDifference = -(2.0 * PI - moduleparams.AngleRadTemp.Mechanical  + moduleparams.AngleRadPrev.Mechanical ); // x2-x1 should be negative
             }
             else
             {
                 //get the position difference
-                moduleparams.AngleRadTemp.Mechanical = moduleparams.AngleRad.Mechanical - moduleparams.AngleRadPrev.Mechanical;
+               AngleDifference = moduleparams.AngleRadTemp.Mechanical - moduleparams.AngleRadPrev.Mechanical;
             }
         }
         else if (EQep1Regs.QEPSTS.bit.QDF == 1)         // POSCNT is counting up
         {
-            if (moduleparams.AngleRad.Mechanical < moduleparams.AngleRadPrev.Mechanical)
+            if (moduleparams.AngleRadTemp.Mechanical < moduleparams.AngleRadPrev.Mechanical)
             {
                 //get the position difference
-                moduleparams.AngleRadTemp.Mechanical = 2.0 * PI + moduleparams.AngleRad.Mechanical - moduleparams.AngleRadPrev.Mechanical;
+               AngleDifference = 2.0 * PI + moduleparams.AngleRadTemp.Mechanical - moduleparams.AngleRadPrev.Mechanical;
             }
             else
             {
                 //get the position difference
-                moduleparams.AngleRadTemp.Mechanical = moduleparams.AngleRad.Mechanical - moduleparams.AngleRadPrev.Mechanical; // x2-x1 should be positive
+               AngleDifference = moduleparams.AngleRadTemp.Mechanical - moduleparams.AngleRadPrev.Mechanical; // x2-x1 should be positive
             }
         }
-        moduleparams.AngularSpeedRadSec.Mechanical = moduleparams.AngleRadTemp.Mechanical * (float) SYSCLKFREQUENCY / (float) EQep1Regs.QUPRD;
+        moduleparams.AngularSpeedRadSec.Mechanical = AngleDifference * (float) SYSCLKFREQUENCY / (float) EQep1Regs.QUPRD;
         moduleparams.AngularSpeedRadSec.Electrical = moduleparams.AngularSpeedRadSec.Mechanical*POLEPAIRS;
         moduleparams.AngularSpeedRPM.Mechanical = moduleparams.AngularSpeedRadSec.Mechanical*60.0/(2.0*PI);
-        moduleparams.AngleRadPrev.Mechanical =  moduleparams.AngleRad.Mechanical;
+        moduleparams.AngleRadPrev.Mechanical =  moduleparams.AngleRadTemp.Mechanical;
         EQep1Regs.QCLR.bit.UTO = 1;                // Clear __interrupt flag
     }
 }

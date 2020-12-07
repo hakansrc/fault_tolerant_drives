@@ -87,7 +87,7 @@ resolver.obj: C:/ti/controlSUITE/libs/app_libs/motor_control/math_blocks/v4.3/sp
 resolver.obj: C:/ti/controlSUITE/libs/app_libs/motor_control/math_blocks/v4.3/resolver.h
 resolver.obj: C:/ti/controlSUITE/libs/app_libs/motor_control/math_blocks/v4.3/pid_grando.h
 resolver.obj: C:/ti/controlSUITE/libs/app_libs/motor_control/math_blocks/v4.3/pid_reg3.h
-resolver.obj: C:/Users/hakan/workspace_v10/IDDK_PM_Servo_F2837x-v2/utility\ Src\ Files/DLOG_4CH_F.h
+resolver.obj: C:/Users/hakan/OneDrive/Belgeler/GitHub/fault_tolerant_drives/Software/MPC_WS/IDDK_PM_Servo_F2837x-v2/utility\ Src\ Files/DLOG_4CH_F.h
 resolver.obj: C:/ti/controlSUITE/device_support/F2837xD/v170/F2837xD_common/include/F2837xD_sdfm_drivers.h
 resolver.obj: C:/ti/controlSUITE/libs/app_libs/motor_control/libs/resolver/v101/include/Resolver_Float.h
 resolver.obj: ../F2837x_QEP_Module.h
@@ -185,7 +185,7 @@ C:/ti/controlSUITE/libs/app_libs/motor_control/math_blocks/v4.3/speed_fr.h:
 C:/ti/controlSUITE/libs/app_libs/motor_control/math_blocks/v4.3/resolver.h: 
 C:/ti/controlSUITE/libs/app_libs/motor_control/math_blocks/v4.3/pid_grando.h: 
 C:/ti/controlSUITE/libs/app_libs/motor_control/math_blocks/v4.3/pid_reg3.h: 
-C:/Users/hakan/workspace_v10/IDDK_PM_Servo_F2837x-v2/utility\ Src\ Files/DLOG_4CH_F.h: 
+C:/Users/hakan/OneDrive/Belgeler/GitHub/fault_tolerant_drives/Software/MPC_WS/IDDK_PM_Servo_F2837x-v2/utility\ Src\ Files/DLOG_4CH_F.h: 
 C:/ti/controlSUITE/device_support/F2837xD/v170/F2837xD_common/include/F2837xD_sdfm_drivers.h: 
 C:/ti/controlSUITE/libs/app_libs/motor_control/libs/resolver/v101/include/Resolver_Float.h: 
 ../F2837x_QEP_Module.h: 

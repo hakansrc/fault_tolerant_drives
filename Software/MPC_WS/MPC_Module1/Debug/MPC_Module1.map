@@ -1,7 +1,7 @@
 ******************************************************************************
              TMS320C2000 Linker PC v20.2.1                     
 ******************************************************************************
->> Linked Mon Nov 30 21:15:28 2020
+>> Linked Tue Dec  8 00:00:51 2020
 
 OUTPUT FILE NAME:   <MPC_Module1.out>
 ENTRY POINT SYMBOL: "_c_int00"  address: 0000039f
@@ -20,7 +20,7 @@ PAGE 0:
   RAMLS3                00009800   00000800  00000000  00000800  RWIX
   RAMLS4                0000a000   00000800  00000000  00000800  RWIX
   RAMD0                 0000b000   00000800  00000800  00000000  RWIX
-  RAMGS15               0001b000   00001000  00000a5b  000005a5  RWIX
+  RAMGS15               0001b000   00001000  00000a68  00000598  RWIX
   RESET                 003fffc0   00000002  00000000  00000002  RWIX
 
 PAGE 1:
@@ -668,17 +668,17 @@ CpuSysRegsFile
                   0000b79e    00000039     rts2800_fpu32.lib : s_roundf.c.obj (.text)
                   0000b7d7    00000029                       : exit.c.obj (.text)
 
-.text.4    0    0001b000    00000a5b     
-                  0001b000    00000a5b     main.obj (.text)
+.text.4    0    0001b000    00000a68     
+                  0001b000    00000a68     main.obj (.text)
 
 MODULE SUMMARY
 
        Module                           code   initialized data   uninitialized data
        ------                           ----   ----------------   ------------------
     .\
-       main.obj                         3330   59                 1068              
+       main.obj                         3343   59                 1068              
     +--+--------------------------------+------+------------------+--------------------+
-       Total:                           3330   59                 1068              
+       Total:                           3343   59                 1068              
                                                                                     
     .\Libs\
        MultipleFloatDataSender.obj      200    21                 288               
@@ -703,7 +703,7 @@ MODULE SUMMARY
     +--+--------------------------------+------+------------------+--------------------+
        Total:                           3007   596                9040              
                                                                                     
-    C:\ti\ccs1011\ccs\tools\compiler\ti-cgt-c2000_20.2.1.LTS\lib\rts2800_fpu32.lib
+    C:\ti\ccs1010\ccs\tools\compiler\ti-cgt-c2000_20.2.1.LTS\lib\rts2800_fpu32.lib
        s_floorf.c.obj                   89     2                  0                 
        boot28.asm.obj                   86     0                  0                 
        exit.c.obj                       41     14                 6                 
@@ -720,7 +720,7 @@ MODULE SUMMARY
                                                                                     
        Stack:                           0      0                  512               
     +--+--------------------------------+------+------------------+--------------------+
-       Grand Total:                     6929   702                10918             
+       Grand Total:                     6942   702                10918             
 
 
 GLOBAL DATA SYMBOLS: SORTED BY DATA PAGE
@@ -1163,7 +1163,7 @@ abs   ffffffff  .text
 0     0000b624  _GPIO_SetupXINT4Gpio                     
 0     0000b61d  _GPIO_SetupXINT5Gpio                     
 0     0000b603  _GPIO_WritePin                           
-0     0001ba16  _GetAdcReadings__FR16ModuleParameters    
+0     0001ba23  _GetAdcReadings__FR16ModuleParameters    
 0     0001b97e  _GetEncoderReadings__FR16ModuleParameters
 1     00007c00  _GpioCtrlRegs                            
 1     00007f00  _GpioDataRegs                            
@@ -1609,7 +1609,7 @@ page  address   name
 0     0001b7e8  _main                                    
 0     0001b8ea  _RunTimeProtectionControl__Fv            
 0     0001b97e  _GetEncoderReadings__FR16ModuleParameters
-0     0001ba16  _GetAdcReadings__FR16ModuleParameters    
+0     0001ba23  _GetAdcReadings__FR16ModuleParameters    
 0     0003f800  _g_asIPCCPU2toCPU1Buffers                
 0     0003f880  _g_usGetWriteIndexes                     
 0     0003f884  _g_usPutReadIndexes                      

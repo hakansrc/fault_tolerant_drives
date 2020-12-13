@@ -8,9 +8,7 @@
 #ifndef CONSTANTPARAMETERS_H_
 #define CONSTANTPARAMETERS_H_
 
-#define MODE_RUN 1
-#define MODE_ALIGN 2
-#define MODE_RL_LOAD 3
+
 
 #define ENCODERRESOLUTION     3600
 #define NUMBEROFTICKSPERQAB   4
@@ -33,7 +31,6 @@
 #define DEADBAND_RED 0          /*ns*/
 #define SYSCLKFREQUENCY 200000000 /*Hz*/
 #define SYSCLKPERIOD 5            /*ns*/
-#define INITIALPWMFREQ 10000      /*Hz*/
 
 #define ACQPS_PERIOD 30 /*clock cycles. TODO test this*/
 #define EPWM1_SOCA_TRG 5

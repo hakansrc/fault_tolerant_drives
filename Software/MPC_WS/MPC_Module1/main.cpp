@@ -1,14 +1,16 @@
 #include <math.h>
 #include <limits.h>
+#include <stdio.h>
+#include <string.h>
 #include <F2837xD_Device.h>
 #include <F2837xD_Examples.h>
 
-#include "CustomTypeDefs.h"
 #include "MachineParameters.h"
 #include "ConstantParameters.h"
 #include "ControllerParameters.h"
 #include "DRV8305_defs.h"
 #include "MultipleFloatDataSender.h"
+#include "CustomTypeDefs.h"
 
 /*      Before starting to using these code, followings must be tested
  * 1-   ADC     readings
@@ -22,12 +24,14 @@
  *
  * */
 
+AlignmentParameters Alignment = {0,0,0,0,0,0,0,0,0,0,0};
 ModuleParameters Module1_Parameters;
 OpenLoopOperation RL_Load_Operation = {25.0, 0.95}; // 50hz, 0.8 magnitude
 PID_Parameters PI_iq;
+PID_Parameters PI_id;
 unsigned int StartOperation = 0; /*if this is 0, then no operation will be performed. It will be set inside the debugger*/
 unsigned long int BlankCounter = 0;
-unsigned int OperationMode = 0; /*this will be changed */
+unsigned int OperationMode = MODE_NO_OPERATION; /*this will be changed */
 DRV8305_Vars Device1Configuration;
 int32 OffsetCalCounter;
 uint16_t OffsetCalculationIsDone = 0;
@@ -53,6 +57,7 @@ static inline void ExecuteFirstPrediction(ModuleParameters &moduleparams, unsign
 static inline void ExecuteSecondPrediction(ModuleParameters &moduleparams, unsigned int indexcount);
 
 void GetEncoderReadings(ModuleParameters &moduleparams);
+void RunAlignmentScenario(void);
 void GetAdcReadings(ModuleParameters &moduleparams);
 void SetupCmpssProtections(void);
 void InitSpiDrv8305Gpio(void);
@@ -64,15 +69,20 @@ Uint16 SPI_Driver(volatile struct SPI_REGS *s, Uint16 data);
 void InitDRV8305(DRV8305_Vars *deviceptr);
 void CalculateOffsetValue(void);
 void RunTimeProtectionControl(void);
+void GetSvpwmDutyCycles(float T1, float T2, float T0,float Ts,float VectorAngleRad, float &DutyA, float &DutyB, float &DutyC);
+void ZeroiseModule1Parameters(void);
 /**
  * main.c
  */
-uint32_t ControlISRCounter = 0;
+uint32_t    ControlISRCounter = 0;
+uint32_t    AlignmentCounter = 0;
 float TimeCounter = 0;
 float DataToBeSent[6];
 uint32_t SendOneInFour = 0;
 uint32_t faultcounter = 0;
 volatile Uint32 Xint1Count = 0;
+float SpeedRefRPM = 50;
+float SpeedRefRadSec = 0;
 int main(void)
 {
 
@@ -170,6 +180,8 @@ int main(void)
     EINT; // Enable Global interrupt INTM
     ERTM; // Enable Global realtime interrupt DBGM
     EDIS;
+
+    OperationMode = MODE_ALIGNMENT; // start with the selected mode
 
     while (1)
     {
@@ -599,6 +611,7 @@ static inline void ExecuteSecondPrediction(ModuleParameters &moduleparams, unsig
 }
 void InitializationRoutine(void)
 {
+    int i=0;
     EALLOW;
     GpioCtrlRegs.GPBGMUX1.bit.GPIO42 = 3;
     GpioCtrlRegs.GPBMUX1.bit.GPIO42 = 3;
@@ -609,12 +622,27 @@ void InitializationRoutine(void)
     PI_iq.I_coeff = I_COEFFICIENT;
     PI_iq.P_coeff = P_COEFFICIENT;
     PI_iq.Ts = PI_TS_COEFFICIENT;
-    PI_iq.Input = 22.1;
-    PI_iq.Input_prev = 21.5;
-    PI_iq.Output = 56.234;
-    PI_iq.Output_prev = 234.234;
+    PI_iq.Input = 0;
+    PI_iq.Input_prev = 0;
+    PI_iq.Output = 0;
+    PI_iq.Output_prev = 0;
     PI_iq.SaturationMax = 2.0 * IQ_RATED;
     PI_iq.SaturationMax = -2.0 * IQ_RATED;
+    PI_id.I_coeff = I_COEFFICIENT;
+    PI_id.P_coeff = P_COEFFICIENT;
+    PI_id.Ts = PI_TS_COEFFICIENT;
+    PI_id.Input = 0;
+    PI_id.Input_prev = 0;
+    PI_id.Output = 0;
+    PI_id.Output_prev = 0;
+    PI_id.SaturationMax = 2.0 * IQ_RATED;
+    PI_id.SaturationMax = -2.0 * IQ_RATED;
+
+    for(i=0;i<NUMBEROFMPCLOOPS;i++)
+    {
+        Module1_Parameters.OptimizationFsw[i] = (i+1)*1000;
+    }
+
     InitializeADCs();
     SetupGPIOs();
     InitializeEpwm1Registers();
@@ -1004,6 +1032,55 @@ void GetEncoderReadings(ModuleParameters &moduleparams)
         EQep1Regs.QCLR.bit.UTO = 1;                // Clear __interrupt flag
     }
 }
+void RunAlignmentScenario(void)
+{
+    Alignment.ElectricalAngle = 0;
+    PI_iq.Input = IQREF_ALIGNMENT - Module1_Parameters.Measured.Current.transformed.Qvalue; //iq error is the input for the PI_iq
+    Run_PI_Controller(PI_iq);
+    PI_id.Input = IDREF_ALIGNMENT - Module1_Parameters.Measured.Current.transformed.Dvalue; //id error is the input for the PI_id
+    Run_PI_Controller(PI_id);
+
+    Alignment.Vd = RS_VALUE*Module1_Parameters.Measured.Current.transformed.Dvalue + LS_VALUE*((float)INITIALPWMFREQ)*(IDREF_ALIGNMENT-Module1_Parameters.Measured.Current.transformed.Dvalue)-POLEPAIRS*Module1_Parameters.AngularSpeedRadSec.Mechanical*LS_VALUE*Module1_Parameters.Measured.Current.transformed.Qvalue;
+    Alignment.Vq = RS_VALUE*Module1_Parameters.Measured.Current.transformed.Qvalue + LS_VALUE*((float)INITIALPWMFREQ)*(IQREF_ALIGNMENT-Module1_Parameters.Measured.Current.transformed.Qvalue)+POLEPAIRS*Module1_Parameters.AngularSpeedRadSec.Mechanical*(LS_VALUE*Module1_Parameters.Measured.Current.transformed.Dvalue+FLUX_VALUE);
+
+    Alignment.Magnitude = sqrtf(Alignment.Vd*Alignment.Vd +Alignment.Vq*Alignment.Vq);
+
+    Alignment.Valfa = sinf(Alignment.ElectricalAngle)*Alignment.Vd + cosf(Alignment.ElectricalAngle)*Alignment.Vq;
+    Alignment.Vbeta =-cosf(Alignment.ElectricalAngle)*Alignment.Vd + sinf(Alignment.ElectricalAngle)*Alignment.Vq;
+
+    Alignment.VoltageVectorAngleRad = atan2f(Alignment.Vbeta,Alignment.Valfa) + 2.0*PI;
+    Alignment.VoltageVectorAngleRad_Mod = fmodf(Alignment.VoltageVectorAngleRad,PI/3);
+
+    Alignment.ma = Alignment.Magnitude/(Module1_Parameters.Measured.Voltage.Vdc/(sqrtf(3.0)));
+
+    Alignment.SvpwmT1 = (1.0/((float)INITIALPWMFREQ))*Alignment.ma*sinf(PI/3.0-Alignment.VoltageVectorAngleRad_Mod);
+    Alignment.SvpwmT2 = (1.0/((float)INITIALPWMFREQ))*Alignment.ma*sinf(Alignment.VoltageVectorAngleRad_Mod);
+    Alignment.SvpwmT0 = (1.0/((float)INITIALPWMFREQ)) - Alignment.SvpwmT1 - Alignment.SvpwmT2;
+
+    GetSvpwmDutyCycles(Alignment.SvpwmT1, Alignment.SvpwmT2, Alignment.SvpwmT0, (1.0/((float)INITIALPWMFREQ)), Alignment.VoltageVectorAngleRad, Module1_Parameters.PhaseADutyCycle, Module1_Parameters.PhaseBDutyCycle, Module1_Parameters.PhaseCDutyCycle);
+
+    EQep1Regs.QPOSCNT = 0;          // Reset position cnt for QEP
+    EQep1Regs.QCLR.bit.IEL = 1;     // Reset position cnt for QEP
+    EQep1Regs.QCLR.bit.UTO = 1;     // Reset position cnt for QEP
+
+    AlignmentCounter++;
+    if(AlignmentCounter>=ALIGNMENTCOUNTVALUE)
+    {
+        /*should I reset some values?*/
+        PI_iq.Input = 0;
+        PI_iq.Input_prev = 0;
+        PI_iq.Output = 0;
+        PI_iq.Output_prev = 0;
+        PI_id.Input = 0;
+        PI_id.Input_prev = 0;
+        PI_id.Output = 0;
+        PI_id.Output_prev = 0;
+
+        ZeroiseModule1Parameters();
+
+        OperationMode = MODE_MPCCONTROLLER;
+    }
+}
 void GetAdcReadings(ModuleParameters &moduleparams)
 {
     moduleparams.Measured.Current.PhaseA = M1_IA_CURRENT_FLOAT;
@@ -1387,20 +1464,15 @@ __interrupt void epwm1_isr(void)
 
     CalculateParkTransform(Module1_Parameters);
 
-    PI_iq.Input = Module1_Parameters.AngularSpeedRadSec.Mechanical;
-    Run_PI_Controller(PI_iq);
-    Module1_Parameters.Reference.Iq = PI_iq.Output;
-    Module1_Parameters.Reference.Id = IDREF;
 
-    if (OperationMode == MODE_RUN)
+
+    if (OperationMode == MODE_MPCCONTROLLER)
     {
-    }
-    else if (OperationMode == MODE_ALIGN)
-    {
-    }
-
-    Module1_Parameters.MinimumCostValue = (float)1e35;
-
+        SpeedRefRadSec = SpeedRefRPM/60.0*2.0*PI;
+        PI_iq.Input = SpeedRefRadSec - Module1_Parameters.AngularSpeedRadSec.Mechanical;
+        Run_PI_Controller(PI_iq);
+        Module1_Parameters.Reference.Iq = PI_iq.Output;
+        Module1_Parameters.Reference.Id = IDREF;
 #if 0
     ExecuteFirstPrediction(Module1_Parameters,0);
     ExecuteSecondPrediction(Module1_Parameters,0);
@@ -1423,11 +1495,33 @@ __interrupt void epwm1_isr(void)
     ExecuteFirstPrediction(Module1_Parameters,9);
     ExecuteSecondPrediction(Module1_Parameters,9);
 #endif
-#if BUILDMODE == MODE_RL_LOAD
-    EPwm1Regs.CMPA.bit.CMPA = EPwm1Regs.TBPRD * RL_Load_Operation.ma * (sinf(2.0 * PI * RL_Load_Operation.Frequency * TimeCounter / ((float)INITIALPWMFREQ)) * 0.5 + 0.5);
-    EPwm2Regs.CMPA.bit.CMPA = EPwm2Regs.TBPRD * RL_Load_Operation.ma * (sinf(2.0 * PI * RL_Load_Operation.Frequency * TimeCounter / ((float)INITIALPWMFREQ) + TWO_PI_OVER_THREE) * 0.5 + 0.5);
-    EPwm3Regs.CMPA.bit.CMPA = EPwm3Regs.TBPRD * RL_Load_Operation.ma * (sinf(2.0 * PI * RL_Load_Operation.Frequency * TimeCounter / ((float)INITIALPWMFREQ) + 2.0 * TWO_PI_OVER_THREE) * 0.5 + 0.5);
-#endif
+        //GetSvpwmDutyCycles();
+        Module1_Parameters.PhaseADutyCycle = 0;
+        Module1_Parameters.PhaseBDutyCycle = 0;
+        Module1_Parameters.PhaseCDutyCycle = 0;
+    }
+    else if (OperationMode == MODE_ALIGNMENT)
+    {
+        RunAlignmentScenario();
+    }
+    else if (OperationMode == MODE_RLLOAD)
+    {
+        /*TODO test variable frequency*/
+        Module1_Parameters.PhaseADutyCycle = RL_Load_Operation.ma * (sinf(2.0 * PI * RL_Load_Operation.Frequency * TimeCounter / ((float)INITIALPWMFREQ)) * 0.5 + 0.5);
+        Module1_Parameters.PhaseBDutyCycle = RL_Load_Operation.ma * (sinf(2.0 * PI * RL_Load_Operation.Frequency * TimeCounter / ((float)INITIALPWMFREQ) + TWO_PI_OVER_THREE) * 0.5 + 0.5);
+        Module1_Parameters.PhaseCDutyCycle = RL_Load_Operation.ma * (sinf(2.0 * PI * RL_Load_Operation.Frequency * TimeCounter / ((float)INITIALPWMFREQ) + 2.0 * TWO_PI_OVER_THREE) * 0.5 + 0.5);
+    }
+    else if (OperationMode == MODE_NO_OPERATION)
+    {
+    }
+
+    Module1_Parameters.MinimumCostValue = (float)1e35;
+
+
+
+    EPwm1Regs.CMPA.bit.CMPA = Module1_Parameters.PhaseADutyCycle*EPwm1Regs.TBPRD;
+    EPwm2Regs.CMPA.bit.CMPA = Module1_Parameters.PhaseBDutyCycle*EPwm2Regs.TBPRD;
+    EPwm3Regs.CMPA.bit.CMPA = Module1_Parameters.PhaseCDutyCycle*EPwm3Regs.TBPRD;
 
     if (SendOneInFour % 4 == 0)
     {
@@ -1472,4 +1566,80 @@ void RunTimeProtectionControl(void)
         EPwm2Regs.TZFRC.bit.DCAEVT1 = 1;
         EPwm3Regs.TZFRC.bit.DCAEVT1 = 1;
     }
+}
+void GetSvpwmDutyCycles(float T1, float T2, float T0,float Ts,float VectorAngleRad, float &DutyA, float &DutyB, float &DutyC)
+{
+    if ((fmodf(VectorAngleRad,2.0*PI)<=PI/3.0)&&(fmodf(VectorAngleRad,2.0*PI)>=0))
+    {
+        DutyA = (T1+T2+T0/2)/Ts;
+        DutyB = (T2+T0/2)/Ts;
+        DutyC = (T0/2)/Ts;
+        return;
+    }
+
+    if ((fmodf(VectorAngleRad,2.0*PI)<=2*PI/3)&&(fmodf(VectorAngleRad,2.0*PI)>=PI/3.0))
+    {
+        DutyA = (T1+T0/2)/Ts;
+        DutyB = (T1+T2+T0/2)/Ts;
+        DutyC = (T0/2)/Ts;
+        return;
+    }
+
+    if ((fmodf(VectorAngleRad,2.0*PI)<=PI)&&(fmodf(VectorAngleRad,2.0*PI)>=2*PI/3.0))
+    {
+        if(fmodf(VectorAngleRad, PI)==0)
+        {
+            DutyA = (T0/2)/Ts;
+            DutyB = (T1+T0/2)/Ts;
+            DutyC = (T1+T2+T0/2)/Ts;
+        }
+        else
+        {
+            DutyA = (T0/2)/Ts;
+            DutyB = (T1+T2+T0/2)/Ts;
+            DutyC = (T2+T0/2)/Ts;
+        }
+        return;
+    }
+
+    if ((fmodf(VectorAngleRad,2.0*PI)<=4*PI/3.0)&&(fmodf(VectorAngleRad,2.0*PI)>=PI))
+    {
+        DutyA = (T0/2)/Ts;
+        DutyB = (T1+T0/2)/Ts;
+        DutyC = (T1+T2+T0/2)/Ts;
+        return;
+    }
+    if ((fmodf(VectorAngleRad,2.0*PI)<=5*PI/3.0)&&(fmodf(VectorAngleRad,2.0*PI)>=4*PI/3.0))
+    {
+        DutyA = (T2+T0/2)/Ts;
+        DutyB = (T0/2)/Ts;
+        DutyC = (T1+T2+T0/2)/Ts;
+        return;
+    }
+    if ((fmodf(VectorAngleRad,2.0*PI)<=2*PI)&&(fmodf(VectorAngleRad,2.0*PI)>=5*PI/3.0))
+    {
+        DutyA = (T1+T2+T0/2)/Ts;
+        DutyB = (T0/2)/Ts;
+        DutyC = (T1+T0/2)/Ts;
+        return;
+    }
+
+}
+void ZeroiseModule1Parameters(void)
+{
+    memset(&Module1_Parameters.Measured, 0, sizeof(MeasuredParams));
+    memset(&Module1_Parameters.FirstHorizon, 0, sizeof(PredictionParameters));
+    memset(&Module1_Parameters.SecondHorizon, 0, sizeof(PredictionParameters));
+    Module1_Parameters.MinimumCostIndex = 0;
+    Module1_Parameters.MinimumCostValue = 0;
+    memset(&Module1_Parameters.Cost,0,sizeof(float)*NUMBEROFMPCLOOPS);
+    memset(&Module1_Parameters.AngleRad,0,sizeof(Angle));
+    memset(&Module1_Parameters.AngleRadPrev,0,sizeof(Angle));
+    memset(&Module1_Parameters.AngleRadTemp,0,sizeof(Angle));
+    memset(&Module1_Parameters.AngularSpeedRadSec,0,sizeof(AngularSpeed));
+    memset(&Module1_Parameters.AngularSpeedRPM,0,sizeof(AngularSpeed));
+    memset(&Module1_Parameters.OffsetValue,0,sizeof(Offset));
+    Module1_Parameters.PhaseADutyCycle = 0;
+    Module1_Parameters.PhaseBDutyCycle = 0;
+    Module1_Parameters.PhaseCDutyCycle = 0;
 }

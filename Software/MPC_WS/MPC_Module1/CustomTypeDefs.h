@@ -8,15 +8,6 @@
 #ifndef CUSTOMTYPEDEFS_H_
 #define CUSTOMTYPEDEFS_H_
 
-#define NUMBEROFMPCLOOPS 10
-#define OPT_FSW_MAX 10000
-#define OPT_FSW_MIN 1000
-#define OPT_FSW_STEP 1000
-
-#define IQRIPPLECOEFF 100000.0
-#define IQREFCOEFF 10000.0
-#define IDREFCOEFF 15.0
-#define FSWCOEFF 1250.0
 
 typedef struct
 {
@@ -82,6 +73,21 @@ typedef struct
     float IqPrediction;
     float TePrediction;
 } PredictionParameters;
+typedef struct
+{
+    float Vd;
+    float Vq;
+    float Valfa;
+    float Vbeta;
+    float VoltageVectorAngleRad;
+    float VoltageVectorAngleRad_Mod;
+    float Magnitude;
+    float SvpwmT1;
+    float SvpwmT2;
+    float SvpwmT0;
+    float ElectricalAngle;
+    float ma;
+}AlignmentParameters;
 
 typedef struct
 {
@@ -119,6 +125,9 @@ typedef struct
     AngularSpeed AngularSpeedRadSec;
     AngularSpeed AngularSpeedRPM;
     Offset OffsetValue;
+    float PhaseADutyCycle;
+    float PhaseBDutyCycle;
+    float PhaseCDutyCycle;
 } ModuleParameters;
 
 typedef struct

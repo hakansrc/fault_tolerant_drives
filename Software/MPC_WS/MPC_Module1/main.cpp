@@ -26,7 +26,7 @@
 
 AlignmentParameters Alignment = {0,0,0,0,0,0,0,0,0,0,0};
 ModuleParameters Module1_Parameters;
-OpenLoopOperation RL_Load_Operation = {25.0, 0.95}; // 50hz, 0.8 magnitude
+OpenLoopOperation RL_Load_Operation = {0, 0}; // 0 hz, 0 magnitude
 PID_Parameters PI_iq;
 PID_Parameters PI_id;
 unsigned int StartOperation = 0; /*if this is 0, then no operation will be performed. It will be set inside the debugger*/
@@ -71,6 +71,8 @@ void CalculateOffsetValue(void);
 void RunTimeProtectionControl(void);
 void GetSvpwmDutyCycles(float T1, float T2, float T0,float Ts,float VectorAngleRad, float &DutyA, float &DutyB, float &DutyC);
 void ZeroiseModule1Parameters(void);
+float ramper(float in, float out, float rampDelta);
+
 /**
  * main.c
  */
@@ -188,7 +190,6 @@ int main(void)
         DELAY_US(100);
         SciaBackgroundTask();
     }
-    return 0;
 }
 __interrupt void cpu_timer0_isr(void)
 {
@@ -1441,11 +1442,14 @@ void CalculateOffsetValue(void)
 
 __interrupt void epwm1_isr(void)
 {
-    RunTimeProtectionControl();
     /*This will be the main control isr*/
     /*check ADCBSY register if  it makes here wait*/
     /*TODO, need to consider alignment scenario*/
+
+    RunTimeProtectionControl();
+
     ControlISRCounter++;
+
     TimeCounter = TimeCounter + 1.0;
     if (TimeCounter == ((float)INITIALPWMFREQ))
     {
@@ -1464,41 +1468,54 @@ __interrupt void epwm1_isr(void)
 
     CalculateParkTransform(Module1_Parameters);
 
-
-
     if (OperationMode == MODE_MPCCONTROLLER)
     {
-        SpeedRefRadSec = SpeedRefRPM/60.0*2.0*PI;
+        SpeedRefRadSec =  ramper(SpeedRefRadSec, SpeedRefRPM/60.0*2.0*PI, 0.1); // rate transition is around approximately 1 RPM per second
+
         PI_iq.Input = SpeedRefRadSec - Module1_Parameters.AngularSpeedRadSec.Mechanical;
         Run_PI_Controller(PI_iq);
+
         Module1_Parameters.Reference.Iq = PI_iq.Output;
         Module1_Parameters.Reference.Id = IDREF;
-#if 0
-    ExecuteFirstPrediction(Module1_Parameters,0);
-    ExecuteSecondPrediction(Module1_Parameters,0);
-    ExecuteFirstPrediction(Module1_Parameters,1);
-    ExecuteSecondPrediction(Module1_Parameters,1);
-    ExecuteFirstPrediction(Module1_Parameters,2);
-    ExecuteSecondPrediction(Module1_Parameters,2);
-    ExecuteFirstPrediction(Module1_Parameters,3);
-    ExecuteSecondPrediction(Module1_Parameters,3);
-    ExecuteFirstPrediction(Module1_Parameters,4);
-    ExecuteSecondPrediction(Module1_Parameters,4);
-    ExecuteFirstPrediction(Module1_Parameters,5);
-    ExecuteSecondPrediction(Module1_Parameters,5);
-    ExecuteFirstPrediction(Module1_Parameters,6);
-    ExecuteSecondPrediction(Module1_Parameters,6);
-    ExecuteFirstPrediction(Module1_Parameters,7);
-    ExecuteSecondPrediction(Module1_Parameters,7);
-    ExecuteFirstPrediction(Module1_Parameters,8);
-    ExecuteSecondPrediction(Module1_Parameters,8);
-    ExecuteFirstPrediction(Module1_Parameters,9);
-    ExecuteSecondPrediction(Module1_Parameters,9);
-#endif
-        //GetSvpwmDutyCycles();
+
+        Module1_Parameters.MinimumCostValue = (float)1e35;
+
+        ExecuteFirstPrediction(Module1_Parameters,0);
+        ExecuteSecondPrediction(Module1_Parameters,0);
+        ExecuteFirstPrediction(Module1_Parameters,1);
+        ExecuteSecondPrediction(Module1_Parameters,1);
+        ExecuteFirstPrediction(Module1_Parameters,2);
+        ExecuteSecondPrediction(Module1_Parameters,2);
+        ExecuteFirstPrediction(Module1_Parameters,3);
+        ExecuteSecondPrediction(Module1_Parameters,3);
+        ExecuteFirstPrediction(Module1_Parameters,4);
+        ExecuteSecondPrediction(Module1_Parameters,4);
+        ExecuteFirstPrediction(Module1_Parameters,5);
+        ExecuteSecondPrediction(Module1_Parameters,5);
+        ExecuteFirstPrediction(Module1_Parameters,6);
+        ExecuteSecondPrediction(Module1_Parameters,6);
+        ExecuteFirstPrediction(Module1_Parameters,7);
+        ExecuteSecondPrediction(Module1_Parameters,7);
+        ExecuteFirstPrediction(Module1_Parameters,8);
+        ExecuteSecondPrediction(Module1_Parameters,8);
+        ExecuteFirstPrediction(Module1_Parameters,9);
+        ExecuteSecondPrediction(Module1_Parameters,9);
+
+        GetSvpwmDutyCycles(Module1_Parameters.SecondHorizon[Module1_Parameters.MinimumCostIndex].SvpwmT1,\
+                           Module1_Parameters.SecondHorizon[Module1_Parameters.MinimumCostIndex].SvpwmT2,\
+                           Module1_Parameters.SecondHorizon[Module1_Parameters.MinimumCostIndex].SvpwmT0,\
+                           (1.0/((float)Module1_Parameters.OptimizationFsw[Module1_Parameters.MinimumCostIndex])),\
+                           Module1_Parameters.AngleRad.Electrical,\
+                           Module1_Parameters.PhaseADutyCycle,\
+                           Module1_Parameters.PhaseBDutyCycle,\
+                           Module1_Parameters.PhaseCDutyCycle);
+
+#if ENABLE_MPC!=1
         Module1_Parameters.PhaseADutyCycle = 0;
         Module1_Parameters.PhaseBDutyCycle = 0;
         Module1_Parameters.PhaseCDutyCycle = 0;
+#endif
+
     }
     else if (OperationMode == MODE_ALIGNMENT)
     {
@@ -1515,13 +1532,28 @@ __interrupt void epwm1_isr(void)
     {
     }
 
-    Module1_Parameters.MinimumCostValue = (float)1e35;
 
 
+#if ENABLE_MPC==1
+    if(OperationMode == MODE_MPCCONTROLLER)
+    {
+        EPwm1Regs.TBPRD = (Uint16 )((float )SYSCLKFREQUENCY) / (Module1_Parameters.OptimizationFsw[Module1_Parameters.MinimumCostIndex] * 2.0);
+        EPwm2Regs.TBPRD = (Uint16 )((float )SYSCLKFREQUENCY) / (Module1_Parameters.OptimizationFsw[Module1_Parameters.MinimumCostIndex] * 2.0);
+        EPwm3Regs.TBPRD = (Uint16 )((float )SYSCLKFREQUENCY) / (Module1_Parameters.OptimizationFsw[Module1_Parameters.MinimumCostIndex] * 2.0);
+    }
+#endif
 
+#if ENABLE_MPC==1
+    EPwm1Regs.CMPA.bit.CMPA = (Uint16 )((float )SYSCLKFREQUENCY) / (Module1_Parameters.OptimizationFsw[Module1_Parameters.MinimumCostIndex] * 2.0);
+    EPwm2Regs.CMPA.bit.CMPA = (Uint16 )((float )SYSCLKFREQUENCY) / (Module1_Parameters.OptimizationFsw[Module1_Parameters.MinimumCostIndex] * 2.0);
+    EPwm3Regs.CMPA.bit.CMPA = (Uint16 )((float )SYSCLKFREQUENCY) / (Module1_Parameters.OptimizationFsw[Module1_Parameters.MinimumCostIndex] * 2.0);
+#else
     EPwm1Regs.CMPA.bit.CMPA = Module1_Parameters.PhaseADutyCycle*EPwm1Regs.TBPRD;
     EPwm2Regs.CMPA.bit.CMPA = Module1_Parameters.PhaseBDutyCycle*EPwm2Regs.TBPRD;
     EPwm3Regs.CMPA.bit.CMPA = Module1_Parameters.PhaseCDutyCycle*EPwm3Regs.TBPRD;
+#endif
+
+
 
     if (SendOneInFour % 4 == 0)
     {
@@ -1642,4 +1674,17 @@ void ZeroiseModule1Parameters(void)
     Module1_Parameters.PhaseADutyCycle = 0;
     Module1_Parameters.PhaseBDutyCycle = 0;
     Module1_Parameters.PhaseCDutyCycle = 0;
+}
+// slew programmable ramper
+float ramper(float in, float out, float rampDelta)
+{
+    float err;
+
+    err = in - out;
+    if (err > rampDelta)
+        return(out + rampDelta);
+    else if (err < -rampDelta)
+        return(out - rampDelta);
+    else
+        return(in);
 }

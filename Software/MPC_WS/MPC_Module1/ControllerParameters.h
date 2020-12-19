@@ -12,6 +12,8 @@
 #define I_COEFFICIENT       10.0
 #define PI_TS_COEFFICIENT   (0.000025)
 
+#define ENABLE_MPC  0
+
 
 #define MODE_MPCCONTROLLER  1
 #define MODE_ALIGNMENT      2

@@ -2,7 +2,7 @@ clear
 clc
 close all
 % load('TestData/TestData301120212502.mat')
-load('TestData/TestData301120212556.mat')
+load('TestData/TestDataVariableFsw_211220191147.mat')
 EnablePlotting = 1;
 TheTagValue = zeros(NumberOfFloatsPerPacket,4);
 TheSaveArrayScreened = RawDataArray;

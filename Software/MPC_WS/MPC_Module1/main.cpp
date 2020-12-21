@@ -26,7 +26,8 @@
 
 AlignmentParameters Alignment = {0,0,0,0,0,0,0,0,0,0,0};
 ModuleParameters Module1_Parameters;
-OpenLoopOperation RL_Load_Operation = {0, 0}; // 0 hz, 0 magnitude
+ModuleParameters Module_temp;
+OpenLoopOperation RL_Load_Operation = {25, 0.5}; // 0 hz, 0 magnitude
 PID_Parameters PI_iq;
 PID_Parameters PI_id;
 unsigned int StartOperation = 0; /*if this is 0, then no operation will be performed. It will be set inside the debugger*/
@@ -85,6 +86,15 @@ uint32_t faultcounter = 0;
 volatile Uint32 Xint1Count = 0;
 float SpeedRefRPM = 50;
 float SpeedRefRadSec = 0;
+float phaseInc = 0;
+float mPhase = 0;
+uint16_t pwmFreq = INITIALPWMFREQ;
+uint16_t pwmFreq_inc = 0;
+uint16_t ClockMod = 1000;
+uint32_t POSLAT_now = 0;
+uint32_t POSLAT_prev = 0;
+uint32_t POSLAT_now_save = 0;
+uint32_t POSLAT_prev_save = 0;
 int main(void)
 {
 
@@ -178,12 +188,14 @@ int main(void)
 
     DELAY_US(50);
     CalculateOffsetValue();
+
+    OperationMode = MODE_RLLOAD; // start with the selected mode
+
     EALLOW;
     EINT; // Enable Global interrupt INTM
     ERTM; // Enable Global realtime interrupt DBGM
     EDIS;
 
-    OperationMode = MODE_ALIGNMENT; // start with the selected mode
 
     while (1)
     {
@@ -216,7 +228,7 @@ void InitializeEpwm1Registers(void)
     /*TODO check which one of these protected with EALLOW EDIS*/
     EPwm1Regs.TBCTL.bit.FREE_SOFT = 0b10;
     EPwm1Regs.TBCTL.bit.PHSDIR = TB_UP;
-    EPwm1Regs.TBCTL.bit.CLKDIV = TB_DIV1;
+    EPwm1Regs.TBCTL.bit.CLKDIV = TB_DIV2;
     EPwm1Regs.TBCTL.bit.HSPCLKDIV = TB_DIV1;
     EPwm1Regs.TBCTL.bit.SWFSYNC = 0;
     EPwm1Regs.TBCTL.bit.SYNCOSEL = TB_CTR_ZERO;
@@ -284,7 +296,7 @@ void InitializeEpwm1Registers(void)
 
     EPwm1Regs.TBPHS.bit.TBPHS = 0;
 
-    EPwm1Regs.TBPRD = SYSCLKFREQUENCY / (INITIALPWMFREQ * 2);
+    EPwm1Regs.TBPRD = ((uint32_t)SYSCLKFREQUENCY) / (((uint16_t)INITIALPWMFREQ) * 4);
     EPwm1Regs.CMPA.bit.CMPA = 0;
 
     /*TODO how to do tripzone?, how are we going to do the protection?
@@ -305,7 +317,7 @@ void InitializeEpwm2Registers(void)
     /*TODO check which one of these protected with EALLOW EDIS*/
     EPwm2Regs.TBCTL.bit.FREE_SOFT = 0b10;
     EPwm2Regs.TBCTL.bit.PHSDIR = TB_UP;
-    EPwm2Regs.TBCTL.bit.CLKDIV = TB_DIV1;
+    EPwm2Regs.TBCTL.bit.CLKDIV = TB_DIV2;
     EPwm2Regs.TBCTL.bit.HSPCLKDIV = TB_DIV1;
     EPwm2Regs.TBCTL.bit.SWFSYNC = 0;
     EPwm2Regs.TBCTL.bit.SYNCOSEL = TB_SYNC_IN;
@@ -373,7 +385,7 @@ void InitializeEpwm2Registers(void)
 
     EPwm2Regs.TBPHS.bit.TBPHS = 0;
 
-    EPwm2Regs.TBPRD = SYSCLKFREQUENCY / (INITIALPWMFREQ * 2);
+    EPwm2Regs.TBPRD = ((uint32_t)SYSCLKFREQUENCY) / (((uint16_t)INITIALPWMFREQ) * 4);
     EPwm2Regs.CMPA.bit.CMPA = 0;
 }
 void InitializeEpwm3Registers(void)
@@ -383,7 +395,7 @@ void InitializeEpwm3Registers(void)
     /*TODO check which one of these protected with EALLOW EDIS*/
     EPwm3Regs.TBCTL.bit.FREE_SOFT = 0b10;
     EPwm3Regs.TBCTL.bit.PHSDIR = TB_UP;
-    EPwm3Regs.TBCTL.bit.CLKDIV = TB_DIV1;
+    EPwm3Regs.TBCTL.bit.CLKDIV = TB_DIV2;
     EPwm3Regs.TBCTL.bit.HSPCLKDIV = TB_DIV1;
     EPwm3Regs.TBCTL.bit.SWFSYNC = 0;
     EPwm3Regs.TBCTL.bit.SYNCOSEL = TB_SYNC_IN;
@@ -451,7 +463,7 @@ void InitializeEpwm3Registers(void)
 
     EPwm3Regs.TBPHS.bit.TBPHS = 0;
 
-    EPwm3Regs.TBPRD = SYSCLKFREQUENCY / (INITIALPWMFREQ * 2);
+    EPwm3Regs.TBPRD = ((uint32_t)SYSCLKFREQUENCY) / (((uint16_t)INITIALPWMFREQ) * 4);
     EPwm3Regs.CMPA.bit.CMPA = 0;
 }
 
@@ -1026,6 +1038,8 @@ void GetEncoderReadings(ModuleParameters &moduleparams)
                AngleDifference = moduleparams.AngleRadTemp.Mechanical - moduleparams.AngleRadPrev.Mechanical; // x2-x1 should be positive
             }
         }
+        POSLAT_prev = POSLAT_now;
+        POSLAT_now = EQep1Regs.QPOSLAT;
         moduleparams.AngularSpeedRadSec.Mechanical = AngleDifference * (float) SYSCLKFREQUENCY / (float) EQep1Regs.QUPRD;
         moduleparams.AngularSpeedRadSec.Electrical = moduleparams.AngularSpeedRadSec.Mechanical*POLEPAIRS;
         moduleparams.AngularSpeedRPM.Mechanical = moduleparams.AngularSpeedRadSec.Mechanical*60.0/(2.0*PI);
@@ -1464,6 +1478,14 @@ __interrupt void epwm1_isr(void)
 
     GetEncoderReadings(Module1_Parameters);
 
+    if(fabsf(Module1_Parameters.AngularSpeedRPM.Mechanical)>10)
+    {
+        memcpy(&Module_temp,&Module1_Parameters,sizeof(ModuleParameters));
+        POSLAT_now_save = POSLAT_now;
+        POSLAT_prev_save = POSLAT_prev;
+
+    }
+
     GetAdcReadings(Module1_Parameters);
 
     CalculateParkTransform(Module1_Parameters);
@@ -1523,10 +1545,23 @@ __interrupt void epwm1_isr(void)
     }
     else if (OperationMode == MODE_RLLOAD)
     {
+        if(ControlISRCounter%ClockMod==0)
+        {
+            pwmFreq = pwmFreq + pwmFreq_inc;
+            if(pwmFreq >= 11000)
+            {
+                pwmFreq = 1000;
+            }
+            EPwm1Regs.TBPRD = (Uint16 )((SYSCLKFREQUENCY) / (pwmFreq * 4.0));
+            EPwm2Regs.TBPRD = (Uint16 )((SYSCLKFREQUENCY) / (pwmFreq * 4.0));
+            EPwm3Regs.TBPRD = (Uint16 )((SYSCLKFREQUENCY) / (pwmFreq * 4.0));
+        }
+        phaseInc = 2*PI*RL_Load_Operation.Frequency/pwmFreq;
+        mPhase = mPhase + phaseInc;
         /*TODO test variable frequency*/
-        Module1_Parameters.PhaseADutyCycle = RL_Load_Operation.ma * (sinf(2.0 * PI * RL_Load_Operation.Frequency * TimeCounter / ((float)INITIALPWMFREQ)) * 0.5 + 0.5);
-        Module1_Parameters.PhaseBDutyCycle = RL_Load_Operation.ma * (sinf(2.0 * PI * RL_Load_Operation.Frequency * TimeCounter / ((float)INITIALPWMFREQ) + TWO_PI_OVER_THREE) * 0.5 + 0.5);
-        Module1_Parameters.PhaseCDutyCycle = RL_Load_Operation.ma * (sinf(2.0 * PI * RL_Load_Operation.Frequency * TimeCounter / ((float)INITIALPWMFREQ) + 2.0 * TWO_PI_OVER_THREE) * 0.5 + 0.5);
+        Module1_Parameters.PhaseADutyCycle = RL_Load_Operation.ma * ((sinf(mPhase)) * 0.5 + 0.5);
+        Module1_Parameters.PhaseBDutyCycle = RL_Load_Operation.ma * ((sinf(mPhase+ TWO_PI_OVER_THREE) ) * 0.5 + 0.5);
+        Module1_Parameters.PhaseCDutyCycle = RL_Load_Operation.ma * ((sinf(mPhase + 2.0 * TWO_PI_OVER_THREE)) * 0.5 + 0.5);
     }
     else if (OperationMode == MODE_NO_OPERATION)
     {
@@ -1537,16 +1572,16 @@ __interrupt void epwm1_isr(void)
 #if ENABLE_MPC==1
     if(OperationMode == MODE_MPCCONTROLLER)
     {
-        EPwm1Regs.TBPRD = (Uint16 )((float )SYSCLKFREQUENCY) / (Module1_Parameters.OptimizationFsw[Module1_Parameters.MinimumCostIndex] * 2.0);
-        EPwm2Regs.TBPRD = (Uint16 )((float )SYSCLKFREQUENCY) / (Module1_Parameters.OptimizationFsw[Module1_Parameters.MinimumCostIndex] * 2.0);
-        EPwm3Regs.TBPRD = (Uint16 )((float )SYSCLKFREQUENCY) / (Module1_Parameters.OptimizationFsw[Module1_Parameters.MinimumCostIndex] * 2.0);
+        EPwm1Regs.TBPRD = (Uint16 )((float )SYSCLKFREQUENCY) / (Module1_Parameters.OptimizationFsw[Module1_Parameters.MinimumCostIndex] * 4.0);
+        EPwm2Regs.TBPRD = (Uint16 )((float )SYSCLKFREQUENCY) / (Module1_Parameters.OptimizationFsw[Module1_Parameters.MinimumCostIndex] * 4.0);
+        EPwm3Regs.TBPRD = (Uint16 )((float )SYSCLKFREQUENCY) / (Module1_Parameters.OptimizationFsw[Module1_Parameters.MinimumCostIndex] * 4.0);
     }
 #endif
 
 #if ENABLE_MPC==1
-    EPwm1Regs.CMPA.bit.CMPA = (Uint16 )((float )SYSCLKFREQUENCY) / (Module1_Parameters.OptimizationFsw[Module1_Parameters.MinimumCostIndex] * 2.0);
-    EPwm2Regs.CMPA.bit.CMPA = (Uint16 )((float )SYSCLKFREQUENCY) / (Module1_Parameters.OptimizationFsw[Module1_Parameters.MinimumCostIndex] * 2.0);
-    EPwm3Regs.CMPA.bit.CMPA = (Uint16 )((float )SYSCLKFREQUENCY) / (Module1_Parameters.OptimizationFsw[Module1_Parameters.MinimumCostIndex] * 2.0);
+    EPwm1Regs.CMPA.bit.CMPA = (Uint16 )(Module1_Parameters.PhaseADutyCycle*((float )SYSCLKFREQUENCY) / (Module1_Parameters.OptimizationFsw[Module1_Parameters.MinimumCostIndex] * 4.0));
+    EPwm2Regs.CMPA.bit.CMPA = (Uint16 )(Module1_Parameters.PhaseBDutyCycle*((float )SYSCLKFREQUENCY) / (Module1_Parameters.OptimizationFsw[Module1_Parameters.MinimumCostIndex] * 4.0));
+    EPwm3Regs.CMPA.bit.CMPA = (Uint16 )(Module1_Parameters.PhaseCDutyCycle*((float )SYSCLKFREQUENCY) / (Module1_Parameters.OptimizationFsw[Module1_Parameters.MinimumCostIndex] * 4.0));
 #else
     EPwm1Regs.CMPA.bit.CMPA = Module1_Parameters.PhaseADutyCycle*EPwm1Regs.TBPRD;
     EPwm2Regs.CMPA.bit.CMPA = Module1_Parameters.PhaseBDutyCycle*EPwm2Regs.TBPRD;

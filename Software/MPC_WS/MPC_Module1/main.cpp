@@ -1595,11 +1595,11 @@ __interrupt void epwm1_isr(void)
 
     if (SendOneInFour % 4 == 0)
     {
-        DataToBeSent[0] = idref;
-        DataToBeSent[1] = Module1_Parameters.Measured.Current.transformed.Dvalue;
-        DataToBeSent[2] = iqref;
-        DataToBeSent[3] = Module1_Parameters.Measured.Current.transformed.Qvalue;
-        DataToBeSent[4] = 0;
+        DataToBeSent[0] = Module1_Parameters.Measured.Current.transformed.Dvalue;
+        DataToBeSent[1] = Module1_Parameters.Measured.Current.transformed.Qvalue;
+        DataToBeSent[2] = M1_IA_CURRENT_FLOAT;
+        DataToBeSent[3] = M1_IB_CURRENT_FLOAT;
+        DataToBeSent[4] = M1_IC_CURRENT_FLOAT;
         DataToBeSent[5] = 0;
 
         SciSendMultipleFloatWithTheTag(DataToBeSent, 6);

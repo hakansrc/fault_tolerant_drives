@@ -16,7 +16,7 @@
 #define Wmech_RATED         62.8319     //rad per sec
 #define IDREF               0.0
 #define IQ_RATED            11.7363     //Amps per modules
-#define IDREF_ALIGNMENT     IQ_RATED/2.0
+#define IDREF_ALIGNMENT     1.0 //IQ_RATED/2.0
 #define IQREF_ALIGNMENT     0.0
 
 

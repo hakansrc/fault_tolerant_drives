@@ -95,6 +95,9 @@ uint32_t POSLAT_now = 0;
 uint32_t POSLAT_prev = 0;
 uint32_t POSLAT_now_save = 0;
 uint32_t POSLAT_prev_save = 0;
+
+float idref = IDREF_ALIGNMENT;
+float iqref = IQREF_ALIGNMENT;
 int main(void)
 {
 
@@ -189,7 +192,7 @@ int main(void)
     DELAY_US(50);
     CalculateOffsetValue();
 
-    OperationMode = MODE_RLLOAD; // start with the selected mode
+    OperationMode = MODE_ALIGNMENT; // start with the selected mode
 
     EALLOW;
     EINT; // Enable Global interrupt INTM
@@ -640,7 +643,7 @@ void InitializationRoutine(void)
     PI_iq.Output = 0;
     PI_iq.Output_prev = 0;
     PI_iq.SaturationMax = 2.0 * IQ_RATED;
-    PI_iq.SaturationMax = -2.0 * IQ_RATED;
+    PI_iq.SaturationMin = -2.0 * IQ_RATED;
     PI_id.I_coeff = I_COEFFICIENT;
     PI_id.P_coeff = P_COEFFICIENT;
     PI_id.Ts = PI_TS_COEFFICIENT;
@@ -649,7 +652,7 @@ void InitializationRoutine(void)
     PI_id.Output = 0;
     PI_id.Output_prev = 0;
     PI_id.SaturationMax = 2.0 * IQ_RATED;
-    PI_id.SaturationMax = -2.0 * IQ_RATED;
+    PI_id.SaturationMin = -2.0 * IQ_RATED;
 
     for(i=0;i<NUMBEROFMPCLOOPS;i++)
     {
@@ -1050,13 +1053,13 @@ void GetEncoderReadings(ModuleParameters &moduleparams)
 void RunAlignmentScenario(void)
 {
     Alignment.ElectricalAngle = 0;
-    PI_iq.Input = IQREF_ALIGNMENT - Module1_Parameters.Measured.Current.transformed.Qvalue; //iq error is the input for the PI_iq
+    PI_iq.Input = iqref - Module1_Parameters.Measured.Current.transformed.Qvalue; //iq error is the input for the PI_iq
     Run_PI_Controller(PI_iq);
-    PI_id.Input = IDREF_ALIGNMENT - Module1_Parameters.Measured.Current.transformed.Dvalue; //id error is the input for the PI_id
+    PI_id.Input = idref - Module1_Parameters.Measured.Current.transformed.Dvalue; //id error is the input for the PI_id
     Run_PI_Controller(PI_id);
 
-    Alignment.Vd = RS_VALUE*Module1_Parameters.Measured.Current.transformed.Dvalue + LS_VALUE*((float)INITIALPWMFREQ)*(IDREF_ALIGNMENT-Module1_Parameters.Measured.Current.transformed.Dvalue)-POLEPAIRS*Module1_Parameters.AngularSpeedRadSec.Mechanical*LS_VALUE*Module1_Parameters.Measured.Current.transformed.Qvalue;
-    Alignment.Vq = RS_VALUE*Module1_Parameters.Measured.Current.transformed.Qvalue + LS_VALUE*((float)INITIALPWMFREQ)*(IQREF_ALIGNMENT-Module1_Parameters.Measured.Current.transformed.Qvalue)+POLEPAIRS*Module1_Parameters.AngularSpeedRadSec.Mechanical*(LS_VALUE*Module1_Parameters.Measured.Current.transformed.Dvalue+FLUX_VALUE);
+    Alignment.Vd = RS_VALUE*Module1_Parameters.Measured.Current.transformed.Dvalue + LS_VALUE*((float)INITIALPWMFREQ)*(PI_id.Output-Module1_Parameters.Measured.Current.transformed.Dvalue)-POLEPAIRS*Module1_Parameters.AngularSpeedRadSec.Mechanical*LS_VALUE*Module1_Parameters.Measured.Current.transformed.Qvalue;
+    Alignment.Vq = RS_VALUE*Module1_Parameters.Measured.Current.transformed.Qvalue + LS_VALUE*((float)INITIALPWMFREQ)*(PI_iq.Output-Module1_Parameters.Measured.Current.transformed.Qvalue)+POLEPAIRS*Module1_Parameters.AngularSpeedRadSec.Mechanical*(LS_VALUE*Module1_Parameters.Measured.Current.transformed.Dvalue+FLUX_VALUE);
 
     Alignment.Magnitude = sqrtf(Alignment.Vd*Alignment.Vd +Alignment.Vq*Alignment.Vq);
 
@@ -1078,7 +1081,7 @@ void RunAlignmentScenario(void)
     EQep1Regs.QCLR.bit.IEL = 1;     // Reset position cnt for QEP
     EQep1Regs.QCLR.bit.UTO = 1;     // Reset position cnt for QEP
 
-    AlignmentCounter++;
+    //AlignmentCounter++;
     if(AlignmentCounter>=ALIGNMENTCOUNTVALUE)
     {
         /*should I reset some values?*/
@@ -1592,12 +1595,12 @@ __interrupt void epwm1_isr(void)
 
     if (SendOneInFour % 4 == 0)
     {
-        DataToBeSent[0] = Module1_Parameters.AngularSpeedRPM.Mechanical;
-        DataToBeSent[1] = M1_PPBADCRESULT_IA*ADC_PU_PPB_SCALE_FACTOR*BASE_CURRENT;
-        DataToBeSent[2] = Module1_Parameters.AngleRad.Mechanical*180.0/PI;
-        DataToBeSent[3] = M1_PPBADCRESULT_IB*ADC_PU_PPB_SCALE_FACTOR*BASE_CURRENT;
-        DataToBeSent[4] = EPwm3Regs.CMPA.bit.CMPA;
-        DataToBeSent[5] = M1_PPBADCRESULT_IC*ADC_PU_PPB_SCALE_FACTOR*BASE_CURRENT;
+        DataToBeSent[0] = idref;
+        DataToBeSent[1] = Module1_Parameters.Measured.Current.transformed.Dvalue;
+        DataToBeSent[2] = iqref;
+        DataToBeSent[3] = Module1_Parameters.Measured.Current.transformed.Qvalue;
+        DataToBeSent[4] = 0;
+        DataToBeSent[5] = 0;
 
         SciSendMultipleFloatWithTheTag(DataToBeSent, 6);
     }

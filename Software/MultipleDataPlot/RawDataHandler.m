@@ -2,7 +2,7 @@ clear
 clc
 close all
 % load('TestData/TestData301120212502.mat')
-load('TestData/TestDataRL_Alignment_281220191813.mat')
+load('TestData/TestDataAlignmentOnMachine_040121191752.mat')
 EnablePlotting = 1;
 TheTagValue = zeros(NumberOfFloatsPerPacket,4);
 TheSaveArrayScreened = RawDataArray;
@@ -28,6 +28,7 @@ if(isempty(TheTagIndices)==0)
         grid on
     end   
 end
+return
 %% TestDataRL_Alignment_281220185406 &  TestDataRL_Alignment_281220185521
 figure
 FontSize = 16;

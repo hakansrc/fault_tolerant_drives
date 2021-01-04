@@ -79,7 +79,7 @@ while(1)
         end
         TheRawDataIsInProcessFlag = 0;
         if(EnableSaving==1)
-            FileName = sprintf("TestData/TestDataVariableFsw_%s", datestr(now, 'ddmmyyHHMMSS'));
+            FileName = sprintf("TestData/TestDataAlignmentOnMachine_%s", datestr(now, 'ddmmyyHHMMSS'));
             save(FileName,'RawDataArray','TheTag','TheTagByteSize','NumberOfFloatsPerPacket','DataSampleRate');
             RawDataArray = 0;
             TheRawDataIsInProcessFlag = 0;

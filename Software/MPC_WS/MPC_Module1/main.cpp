@@ -68,6 +68,7 @@ Uint16 DRV8305_SPI_Write(DRV8305_Vars *deviceptr, Uint16 address);
 Uint16 DRV8305_SPI_Read(DRV8305_Vars *deviceptr, Uint16 address);
 Uint16 SPI_Driver(volatile struct SPI_REGS *s, Uint16 data);
 void InitDRV8305(DRV8305_Vars *deviceptr);
+void ReadDRV8305Registers(DRV8305_Vars *deviceptr);
 void CalculateOffsetValue(void);
 void RunTimeProtectionControl(void);
 void GetSvpwmDutyCycles(float T1, float T2, float T0,float Ts,float VectorAngleRad, float &DutyA, float &DutyB, float &DutyC);
@@ -98,6 +99,9 @@ uint32_t POSLAT_prev_save = 0;
 
 float idref = IDREF_ALIGNMENT;
 float iqref = IQREF_ALIGNMENT;
+
+uint16_t ReadDrv8305RegistersFlag = 0;
+
 int main(void)
 {
 
@@ -204,6 +208,11 @@ int main(void)
     {
         DELAY_US(100);
         SciaBackgroundTask();
+        if(ReadDrv8305RegistersFlag==1)
+        {
+            ReadDRV8305Registers(&Device1Configuration);
+            ReadDrv8305RegistersFlag = 0;
+        }
     }
 }
 __interrupt void cpu_timer0_isr(void)
@@ -218,6 +227,7 @@ __interrupt void cpu_timer1_isr(void)
 {
     CpuTimer1.InterruptCount++;
     PieCtrlRegs.PIEACK.all = PIEACK_GROUP1;
+    ReadDrv8305RegistersFlag = 1;
 }
 
 __interrupt void cpu_timer2_isr(void)
@@ -1299,7 +1309,7 @@ void InitDRV8305Regs(DRV8305_Vars *deviceptr)
 
     deviceptr->cntrl7_gd.bit.COMM_OPTION = drv8305_comm_diode_FW;
     deviceptr->cntrl7_gd.bit.PWM_MODE = drv8305_PWM_mode_3;
-    deviceptr->cntrl7_gd.bit.DEAD_TIME = drv8305_deadTime_60nS;
+    deviceptr->cntrl7_gd.bit.DEAD_TIME = drv8305_deadTime_100nS;
     deviceptr->cntrl7_gd.bit.TBLANK = drv8305_tblank_2us;
     deviceptr->cntrl7_gd.bit.TVDS = drv8305_tblank_4us;
 
@@ -1332,6 +1342,25 @@ void InitDRV8305Regs(DRV8305_Vars *deviceptr)
 
     return;
 }
+void ReadDRV8305Registers(DRV8305_Vars *deviceptr)
+{
+
+
+
+
+    // ===============================================
+    // read all status and control registers
+    // ===============================================
+    deviceptr->status1_wwd.all = DRV8305_SPI_Read(deviceptr, DRV8305_S1_WWD_ADDR) & 0x05ff;              // read DRV8305 status reg 1
+    deviceptr->status2_ov_vds.all = DRV8305_SPI_Read(deviceptr, DRV8305_S2_OV_VDS_FAULTS_ADDR) & 0x07e7; // read DRV8305 status reg 2
+    deviceptr->status3_IC.all = DRV8305_SPI_Read(deviceptr, DRV8305_S3_IC_FAULTS_ADDR) & 0x0777;         // read DRV8305 status reg 3
+    deviceptr->status4_gd_Vgs.all = DRV8305_SPI_Read(deviceptr, DRV8305_S4_GD_VGS_FAULTS_ADDR) & 0x07e0; // read DRV8305 status reg 4
+
+
+
+    return;
+}
+
 void InitDRV8305(DRV8305_Vars *deviceptr)
 {
     Uint16 tmp1, *ptr1, *ptr2;
@@ -1490,6 +1519,12 @@ __interrupt void epwm1_isr(void)
     }
 
     GetAdcReadings(Module1_Parameters);
+    if(OperationMode == MODE_ALIGNMENT)
+    {
+        EQep1Regs.QPOSCNT = 0;          // Reset position cnt for QEP
+        EQep1Regs.QCLR.bit.IEL = 1;     // Reset position cnt for QEP
+        EQep1Regs.QCLR.bit.UTO = 1;     // Reset position cnt for QEP
+    }
 
     CalculateParkTransform(Module1_Parameters);
 
@@ -1586,6 +1621,20 @@ __interrupt void epwm1_isr(void)
     EPwm2Regs.CMPA.bit.CMPA = (Uint16 )(Module1_Parameters.PhaseBDutyCycle*((float )SYSCLKFREQUENCY) / (Module1_Parameters.OptimizationFsw[Module1_Parameters.MinimumCostIndex] * 4.0));
     EPwm3Regs.CMPA.bit.CMPA = (Uint16 )(Module1_Parameters.PhaseCDutyCycle*((float )SYSCLKFREQUENCY) / (Module1_Parameters.OptimizationFsw[Module1_Parameters.MinimumCostIndex] * 4.0));
 #else
+#if 0
+    if(Module1_Parameters.PhaseADutyCycle>1.0)
+        Module1_Parameters.PhaseADutyCycle = 1.0;
+    if(Module1_Parameters.PhaseADutyCycle<0)
+        Module1_Parameters.PhaseADutyCycle = 0;
+    if(Module1_Parameters.PhaseBDutyCycle>1.0)
+        Module1_Parameters.PhaseBDutyCycle = 1.0;
+    if(Module1_Parameters.PhaseBDutyCycle<0)
+        Module1_Parameters.PhaseBDutyCycle = 0;
+    if(Module1_Parameters.PhaseCDutyCycle>1.0)
+        Module1_Parameters.PhaseCDutyCycle = 1.0;
+    if(Module1_Parameters.PhaseCDutyCycle<0)
+        Module1_Parameters.PhaseCDutyCycle = 0;
+#endif
     EPwm1Regs.CMPA.bit.CMPA = Module1_Parameters.PhaseADutyCycle*EPwm1Regs.TBPRD;
     EPwm2Regs.CMPA.bit.CMPA = Module1_Parameters.PhaseBDutyCycle*EPwm2Regs.TBPRD;
     EPwm3Regs.CMPA.bit.CMPA = Module1_Parameters.PhaseCDutyCycle*EPwm3Regs.TBPRD;
@@ -1595,12 +1644,12 @@ __interrupt void epwm1_isr(void)
 
     if (SendOneInFour % 4 == 0)
     {
-        DataToBeSent[0] = Module1_Parameters.Measured.Current.transformed.Dvalue;
-        DataToBeSent[1] = Module1_Parameters.Measured.Current.transformed.Qvalue;
-        DataToBeSent[2] = M1_IA_CURRENT_FLOAT;
+        DataToBeSent[0] = Module1_Parameters.PhaseADutyCycle; //Module1_Parameters.Measured.Current.transformed.Dvalue;
+        DataToBeSent[1] = M1_IA_CURRENT_FLOAT;
+        DataToBeSent[2] = Module1_Parameters.PhaseBDutyCycle; //;M1_IA_CURRENT_FLOAT;
         DataToBeSent[3] = M1_IB_CURRENT_FLOAT;
-        DataToBeSent[4] = M1_IC_CURRENT_FLOAT;
-        DataToBeSent[5] = 0;
+        DataToBeSent[4] = Module1_Parameters.PhaseCDutyCycle;
+        DataToBeSent[5] = M1_IC_CURRENT_FLOAT;
 
         SciSendMultipleFloatWithTheTag(DataToBeSent, 6);
     }

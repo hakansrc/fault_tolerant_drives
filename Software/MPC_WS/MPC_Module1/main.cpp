@@ -101,6 +101,7 @@ float idref = IDREF_ALIGNMENT;
 float iqref = IQREF_ALIGNMENT;
 
 uint16_t ReadDrv8305RegistersFlag = 0;
+uint16_t AngleHasBeenReset = 0;
 
 int main(void)
 {
@@ -1589,6 +1590,40 @@ __interrupt void epwm1_isr(void)
         Module1_Parameters.PhaseBDutyCycle = 0;
         Module1_Parameters.PhaseCDutyCycle = 0;
 #endif
+
+        AlignmentCounter++;
+        if(AlignmentCounter>=ALIGNMENTCOUNTVALUE)
+        {
+            if(AngleHasBeenReset==0)
+            {
+                EQep1Regs.QCLR.bit.IEL = 1;                     // Reset position cnt for QEP
+                EQep1Regs.QCLR.bit.UTO = 1;                     // Reset position cnt for QEP
+                EQep1Regs.QPOSCNT = (ENCODERMAXTICKCOUNT+1)/4;  // Reset position cnt for QEP
+            }
+
+
+
+            /*should I reset some values?*/
+            PI_iq.Input = 0;
+            PI_iq.Input_prev = 0;
+            PI_iq.Output = 0;
+            PI_iq.Output_prev = 0;
+            PI_id.Input = 0;
+            PI_id.Input_prev = 0;
+            PI_id.Output = 0;
+            PI_id.Output_prev = 0;
+
+            ZeroiseModule1Parameters();
+
+            Module1_Parameters.PhaseADutyCycle = 0;
+            Module1_Parameters.PhaseBDutyCycle = 0;
+            Module1_Parameters.PhaseCDutyCycle = 0;
+        }
+        if(AlignmentCounter>=MPC_STARTCOUNTVALUE)
+        {
+            OperationMode = MODE_MPCCONTROLLER;
+        }
+
 
     }
     else if (OperationMode == MODE_RLLOAD)

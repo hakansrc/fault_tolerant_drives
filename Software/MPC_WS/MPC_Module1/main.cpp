@@ -1579,7 +1579,17 @@ __interrupt void epwm1_isr(void)
     }
     else if (OperationMode == MODE_ALIGNMENT)
     {
-        RunAlignmentScenario();
+        //RunAlignmentScenario();
+#if 0
+        Module1_Parameters.PhaseADutyCycle = 0.15;
+        Module1_Parameters.PhaseBDutyCycle = 0;
+        Module1_Parameters.PhaseCDutyCycle = 0;
+#else
+        Module1_Parameters.PhaseADutyCycle = ALIGNMENT_DC_CURRENT*RS_VALUE/Module1_Parameters.Measured.Voltage.Vdc;
+        Module1_Parameters.PhaseBDutyCycle = 0;
+        Module1_Parameters.PhaseCDutyCycle = 0;
+#endif
+
     }
     else if (OperationMode == MODE_RLLOAD)
     {

@@ -26,7 +26,7 @@
 
 AlignmentParameters Alignment = {0,0,0,0,0,0,0,0,0,0,0};
 ModuleParameters Module1_Parameters;
-ModuleParameters Module_temp;
+//ModuleParameters Module_temp;
 OpenLoopOperation RL_Load_Operation = {25, 0.5}; // 0 hz, 0 magnitude
 PID_Parameters PI_iq;
 PID_Parameters PI_id;
@@ -85,7 +85,7 @@ float DataToBeSent[6];
 uint32_t SendOneInFour = 0;
 uint32_t faultcounter = 0;
 volatile Uint32 Xint1Count = 0;
-float SpeedRefRPM = 50;
+float SpeedRefRPM = 25;
 float SpeedRefRadSec = 0;
 float phaseInc = 0;
 float mPhase = 0;
@@ -1315,7 +1315,7 @@ void InitDRV8305Regs(DRV8305_Vars *deviceptr)
     deviceptr->cntrl7_gd.bit.TVDS = drv8305_tblank_4us;
 
     deviceptr->cntrl9_IC_ops.bit.Flip_OTS = drv8305_disable_OTS;
-    deviceptr->cntrl9_IC_ops.bit.DIS_VPVDD_UVLO2 = drv8305_enable_PVDD_UVLO2_fault;
+    deviceptr->cntrl9_IC_ops.bit.DIS_VPVDD_UVLO2 = drv8305_disable_PVDD_UVLO2_fault;//drv8305_enable_PVDD_UVLO2_fault;
     deviceptr->cntrl9_IC_ops.bit.DIS_GDRV_FAULT = drv8305_enable_gdrv_fault;
     deviceptr->cntrl9_IC_ops.bit.EN_SNS_CLAMP = drv8305_disable_Sns_Clamp;
     deviceptr->cntrl9_IC_ops.bit.WD_DLY = drv8305_wd_dly_20mS;
@@ -1507,31 +1507,20 @@ __interrupt void epwm1_isr(void)
     {
         EPwm1Regs.ETCLR.bit.INT = 1;
         PieCtrlRegs.PIEACK.all = PIEACK_GROUP3;
+        return;
     }
 
     GetEncoderReadings(Module1_Parameters);
 
-    if(fabsf(Module1_Parameters.AngularSpeedRPM.Mechanical)>10)
-    {
-        memcpy(&Module_temp,&Module1_Parameters,sizeof(ModuleParameters));
-        POSLAT_now_save = POSLAT_now;
-        POSLAT_prev_save = POSLAT_prev;
-
-    }
 
     GetAdcReadings(Module1_Parameters);
-    if(OperationMode == MODE_ALIGNMENT)
-    {
-        EQep1Regs.QPOSCNT = 0;          // Reset position cnt for QEP
-        EQep1Regs.QCLR.bit.IEL = 1;     // Reset position cnt for QEP
-        EQep1Regs.QCLR.bit.UTO = 1;     // Reset position cnt for QEP
-    }
+
 
     CalculateParkTransform(Module1_Parameters);
 
     if (OperationMode == MODE_MPCCONTROLLER)
     {
-        SpeedRefRadSec =  ramper(SpeedRefRadSec, SpeedRefRPM/60.0*2.0*PI, 0.1); // rate transition is around approximately 1 RPM per second
+        SpeedRefRadSec =  ramper(SpeedRefRadSec, SpeedRefRPM/60.0*2.0*PI, 0.5); // rate transition is around approximately 1 RPM per second
 
         PI_iq.Input = SpeedRefRadSec - Module1_Parameters.AngularSpeedRadSec.Mechanical;
         Run_PI_Controller(PI_iq);
@@ -1598,7 +1587,8 @@ __interrupt void epwm1_isr(void)
             {
                 EQep1Regs.QCLR.bit.IEL = 1;                     // Reset position cnt for QEP
                 EQep1Regs.QCLR.bit.UTO = 1;                     // Reset position cnt for QEP
-                EQep1Regs.QPOSCNT = (ENCODERMAXTICKCOUNT+1)/4;  // Reset position cnt for QEP
+                EQep1Regs.QPOSCNT = 360;//((ENCODERMAXTICKCOUNT+1)/POLEPAIRS)/4;  // Reset position cnt for QEP
+                AngleHasBeenReset = 1;
             }
 
 
@@ -1622,6 +1612,9 @@ __interrupt void epwm1_isr(void)
         if(AlignmentCounter>=MPC_STARTCOUNTVALUE)
         {
             OperationMode = MODE_MPCCONTROLLER;
+            EPwm1Regs.ETCLR.bit.INT = 1;
+            PieCtrlRegs.PIEACK.all = PIEACK_GROUP3;
+            return;
         }
 
 
@@ -1655,16 +1648,40 @@ __interrupt void epwm1_isr(void)
 #if ENABLE_MPC==1
     if(OperationMode == MODE_MPCCONTROLLER)
     {
-        EPwm1Regs.TBPRD = (Uint16 )((float )SYSCLKFREQUENCY) / (Module1_Parameters.OptimizationFsw[Module1_Parameters.MinimumCostIndex] * 4.0);
-        EPwm2Regs.TBPRD = (Uint16 )((float )SYSCLKFREQUENCY) / (Module1_Parameters.OptimizationFsw[Module1_Parameters.MinimumCostIndex] * 4.0);
-        EPwm3Regs.TBPRD = (Uint16 )((float )SYSCLKFREQUENCY) / (Module1_Parameters.OptimizationFsw[Module1_Parameters.MinimumCostIndex] * 4.0);
+        EPwm1Regs.TBPRD = (Uint16 )(((float )SYSCLKFREQUENCY) / (Module1_Parameters.OptimizationFsw[Module1_Parameters.MinimumCostIndex] * 4.0));
+        EPwm2Regs.TBPRD = (Uint16 )(((float )SYSCLKFREQUENCY) / (Module1_Parameters.OptimizationFsw[Module1_Parameters.MinimumCostIndex] * 4.0));
+        EPwm3Regs.TBPRD = (Uint16 )(((float )SYSCLKFREQUENCY) / (Module1_Parameters.OptimizationFsw[Module1_Parameters.MinimumCostIndex] * 4.0));
     }
 #endif
 
 #if ENABLE_MPC==1
-    EPwm1Regs.CMPA.bit.CMPA = (Uint16 )(Module1_Parameters.PhaseADutyCycle*((float )SYSCLKFREQUENCY) / (Module1_Parameters.OptimizationFsw[Module1_Parameters.MinimumCostIndex] * 4.0));
-    EPwm2Regs.CMPA.bit.CMPA = (Uint16 )(Module1_Parameters.PhaseBDutyCycle*((float )SYSCLKFREQUENCY) / (Module1_Parameters.OptimizationFsw[Module1_Parameters.MinimumCostIndex] * 4.0));
-    EPwm3Regs.CMPA.bit.CMPA = (Uint16 )(Module1_Parameters.PhaseCDutyCycle*((float )SYSCLKFREQUENCY) / (Module1_Parameters.OptimizationFsw[Module1_Parameters.MinimumCostIndex] * 4.0));
+    if(OperationMode==MODE_MPCCONTROLLER)
+    {
+        if(Module1_Parameters.PhaseADutyCycle>1.0)
+            Module1_Parameters.PhaseADutyCycle = 1.0;
+        if(Module1_Parameters.PhaseADutyCycle<0)
+            Module1_Parameters.PhaseADutyCycle = 0;
+        if(Module1_Parameters.PhaseBDutyCycle>1.0)
+            Module1_Parameters.PhaseBDutyCycle = 1.0;
+        if(Module1_Parameters.PhaseBDutyCycle<0)
+            Module1_Parameters.PhaseBDutyCycle = 0;
+        if(Module1_Parameters.PhaseCDutyCycle>1.0)
+            Module1_Parameters.PhaseCDutyCycle = 1.0;
+        if(Module1_Parameters.PhaseCDutyCycle<0)
+            Module1_Parameters.PhaseCDutyCycle = 0;
+
+        EPwm1Regs.CMPA.bit.CMPA = (Uint16 )(Module1_Parameters.PhaseADutyCycle*((float )SYSCLKFREQUENCY) / (Module1_Parameters.OptimizationFsw[Module1_Parameters.MinimumCostIndex] * 4.0));
+        EPwm2Regs.CMPA.bit.CMPA = (Uint16 )(Module1_Parameters.PhaseBDutyCycle*((float )SYSCLKFREQUENCY) / (Module1_Parameters.OptimizationFsw[Module1_Parameters.MinimumCostIndex] * 4.0));
+        EPwm3Regs.CMPA.bit.CMPA = (Uint16 )(Module1_Parameters.PhaseCDutyCycle*((float )SYSCLKFREQUENCY) / (Module1_Parameters.OptimizationFsw[Module1_Parameters.MinimumCostIndex] * 4.0));
+    }
+    else
+    {
+        EPwm1Regs.CMPA.bit.CMPA = Module1_Parameters.PhaseADutyCycle*EPwm1Regs.TBPRD;
+        EPwm2Regs.CMPA.bit.CMPA = Module1_Parameters.PhaseBDutyCycle*EPwm2Regs.TBPRD;
+        EPwm3Regs.CMPA.bit.CMPA = Module1_Parameters.PhaseCDutyCycle*EPwm3Regs.TBPRD;
+    }
+
+
 #else
 #if 0
     if(Module1_Parameters.PhaseADutyCycle>1.0)

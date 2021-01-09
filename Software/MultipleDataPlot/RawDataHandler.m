@@ -2,7 +2,7 @@ clear
 clc
 close all
 % load('TestData/TestData301120212502.mat')
-load('TestData/TestDataAlignmentOnMachine_040121191752.mat')
+load('TestData/TestData_Rotation_DutyA_IA_Id_Iq_Vdc_RPM_070121191256.mat')
 EnablePlotting = 1;
 TheTagValue = zeros(NumberOfFloatsPerPacket,4);
 TheSaveArrayScreened = RawDataArray;

@@ -85,7 +85,7 @@ float DataToBeSent[6];
 uint32_t SendOneInFour = 0;
 uint32_t faultcounter = 0;
 volatile Uint32 Xint1Count = 0;
-float SpeedRefRPM = 25;
+float SpeedRefRPM = 50;
 float SpeedRefRadSec = 0;
 float phaseInc = 0;
 float mPhase = 0;
@@ -102,6 +102,7 @@ float iqref = IQREF_ALIGNMENT;
 
 uint16_t ReadDrv8305RegistersFlag = 0;
 uint16_t AngleHasBeenReset = 0;
+float fswdecided = 0;
 
 int main(void)
 {
@@ -1522,7 +1523,7 @@ __interrupt void epwm1_isr(void)
 
     if (OperationMode == MODE_MPCCONTROLLER)
     {
-        SpeedRefRadSec =  ramper(SpeedRefRadSec, SpeedRefRPM/60.0*2.0*PI, 0.5); // rate transition is around approximately 1 RPM per second
+        SpeedRefRadSec =  SpeedRefRPM/60.0*2.0*PI; //ramper(SpeedRefRadSec, SpeedRefRPM/60.0*2.0*PI, 0.5); // rate transition is around approximately 1 RPM per second
 
         PI_iq.Input = SpeedRefRadSec - Module1_Parameters.AngularSpeedRadSec.Mechanical;
         Run_PI_Controller(PI_iq);
@@ -1583,16 +1584,18 @@ __interrupt void epwm1_isr(void)
         Module1_Parameters.PhaseCDutyCycle = 0;
 #endif
 
+        if(AngleHasBeenReset==0)
+        {
+            EQep1Regs.QCLR.bit.IEL = 1;                     // Reset position cnt for QEP
+            EQep1Regs.QCLR.bit.UTO = 1;                     // Reset position cnt for QEP
+            EQep1Regs.QPOSCNT = 360;//((ENCODERMAXTICKCOUNT+1)/POLEPAIRS)/4;  // Reset position cnt for QEP
+        }
+
+
         AlignmentCounter++;
         if(AlignmentCounter>=ALIGNMENTCOUNTVALUE)
         {
-            if(AngleHasBeenReset==0)
-            {
-                EQep1Regs.QCLR.bit.IEL = 1;                     // Reset position cnt for QEP
-                EQep1Regs.QCLR.bit.UTO = 1;                     // Reset position cnt for QEP
-                EQep1Regs.QPOSCNT = 360;//((ENCODERMAXTICKCOUNT+1)/POLEPAIRS)/4;  // Reset position cnt for QEP
-                AngleHasBeenReset = 1;
-            }
+            AngleHasBeenReset = 1;
 
 
 
@@ -1657,6 +1660,8 @@ __interrupt void epwm1_isr(void)
     }
 #endif
 
+    fswdecided = Module1_Parameters.OptimizationFsw[Module1_Parameters.MinimumCostIndex];
+
 #if ENABLE_MPC==1
     if(OperationMode==MODE_MPCCONTROLLER)
     {
@@ -1711,10 +1716,10 @@ __interrupt void epwm1_isr(void)
     {
         DataToBeSent[0] = Module1_Parameters.PhaseADutyCycle; //Module1_Parameters.Measured.Current.transformed.Dvalue;
         DataToBeSent[1] = M1_IA_CURRENT_FLOAT;
-        DataToBeSent[2] = Module1_Parameters.PhaseBDutyCycle; //;M1_IA_CURRENT_FLOAT;
-        DataToBeSent[3] = M1_IB_CURRENT_FLOAT;
-        DataToBeSent[4] = Module1_Parameters.PhaseCDutyCycle;
-        DataToBeSent[5] = M1_IC_CURRENT_FLOAT;
+        DataToBeSent[2] = Module1_Parameters.Measured.Current.transformed.Dvalue; //;M1_IA_CURRENT_FLOAT;
+        DataToBeSent[3] = Module1_Parameters.Measured.Current.transformed.Qvalue;
+        DataToBeSent[4] = Module1_Parameters.Measured.Voltage.Vdc;
+        DataToBeSent[5] = Module1_Parameters.AngularSpeedRPM.Mechanical;
 
         SciSendMultipleFloatWithTheTag(DataToBeSent, 6);
     }

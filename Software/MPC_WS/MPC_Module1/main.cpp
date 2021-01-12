@@ -1523,7 +1523,7 @@ __interrupt void epwm1_isr(void)
 
     if (OperationMode == MODE_MPCCONTROLLER)
     {
-        SpeedRefRadSec =  SpeedRefRPM/60.0*2.0*PI; //ramper(SpeedRefRadSec, SpeedRefRPM/60.0*2.0*PI, 0.5); // rate transition is around approximately 1 RPM per second
+        SpeedRefRadSec =  ramper(SpeedRefRadSec, SpeedRefRPM/60.0*2.0*PI, 0.01); // rate transition is around approximately 1 RPM per second
 
         PI_iq.Input = SpeedRefRadSec - Module1_Parameters.AngularSpeedRadSec.Mechanical;
         Run_PI_Controller(PI_iq);
@@ -1532,7 +1532,7 @@ __interrupt void epwm1_isr(void)
         Module1_Parameters.Reference.Id = IDREF;
 
         Module1_Parameters.MinimumCostValue = (float)1e35;
-
+#if 1
         ExecuteFirstPrediction(Module1_Parameters,0);
         ExecuteSecondPrediction(Module1_Parameters,0);
         ExecuteFirstPrediction(Module1_Parameters,1);
@@ -1541,19 +1541,23 @@ __interrupt void epwm1_isr(void)
         ExecuteSecondPrediction(Module1_Parameters,2);
         ExecuteFirstPrediction(Module1_Parameters,3);
         ExecuteSecondPrediction(Module1_Parameters,3);
+#endif
         ExecuteFirstPrediction(Module1_Parameters,4);
         ExecuteSecondPrediction(Module1_Parameters,4);
         ExecuteFirstPrediction(Module1_Parameters,5);
         ExecuteSecondPrediction(Module1_Parameters,5);
+#if 1
         ExecuteFirstPrediction(Module1_Parameters,6);
         ExecuteSecondPrediction(Module1_Parameters,6);
         ExecuteFirstPrediction(Module1_Parameters,7);
         ExecuteSecondPrediction(Module1_Parameters,7);
+#endif
+#if 1
         ExecuteFirstPrediction(Module1_Parameters,8);
         ExecuteSecondPrediction(Module1_Parameters,8);
         ExecuteFirstPrediction(Module1_Parameters,9);
         ExecuteSecondPrediction(Module1_Parameters,9);
-
+#endif
         GetSvpwmDutyCycles(Module1_Parameters.SecondHorizon[Module1_Parameters.MinimumCostIndex].SvpwmT1,\
                            Module1_Parameters.SecondHorizon[Module1_Parameters.MinimumCostIndex].SvpwmT2,\
                            Module1_Parameters.SecondHorizon[Module1_Parameters.MinimumCostIndex].SvpwmT0,\
@@ -1615,7 +1619,7 @@ __interrupt void epwm1_isr(void)
             Module1_Parameters.PhaseBDutyCycle = 0;
             Module1_Parameters.PhaseCDutyCycle = 0;
         }
-        if(AlignmentCounter>=MPC_STARTCOUNTVALUE)
+        if(AlignmentCounter>=((uint32_t)MPC_STARTCOUNTVALUE))
         {
             OperationMode = MODE_MPCCONTROLLER;
             EPwm1Regs.ETCLR.bit.INT = 1;
@@ -1714,11 +1718,11 @@ __interrupt void epwm1_isr(void)
 
     if (SendOneInFour % 4 == 0)
     {
-        DataToBeSent[0] = Module1_Parameters.PhaseADutyCycle; //Module1_Parameters.Measured.Current.transformed.Dvalue;
-        DataToBeSent[1] = M1_IA_CURRENT_FLOAT;
+        DataToBeSent[0] = EPwm1Regs.TBPRD; //Module1_Parameters.Measured.Current.transformed.Dvalue;
+        DataToBeSent[1] = EPwm1Regs.CMPA.bit.CMPA;
         DataToBeSent[2] = Module1_Parameters.Measured.Current.transformed.Dvalue; //;M1_IA_CURRENT_FLOAT;
         DataToBeSent[3] = Module1_Parameters.Measured.Current.transformed.Qvalue;
-        DataToBeSent[4] = Module1_Parameters.Measured.Voltage.Vdc;
+        DataToBeSent[4] = fswdecided;
         DataToBeSent[5] = Module1_Parameters.AngularSpeedRPM.Mechanical;
 
         SciSendMultipleFloatWithTheTag(DataToBeSent, 6);

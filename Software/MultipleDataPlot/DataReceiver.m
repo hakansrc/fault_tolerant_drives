@@ -70,6 +70,15 @@ while(1)
                     end
                     subplot(3,2,i)
                     plot((1:numel(TheDataConvertedValues(i,:)))/DataSampleRate,TheDataConvertedValues(i,:));
+                    if(i==3)
+                       ylim([-1 1]);
+                    end
+                    if(i==4)
+                        ylim([0 2]);
+                    end
+                    if(i==6)
+                        ylim([40 120]);
+                    end
                     grid on
                 end
                 TheDataConvertedValues = 0;

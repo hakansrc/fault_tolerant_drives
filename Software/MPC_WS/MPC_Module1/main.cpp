@@ -78,6 +78,7 @@ float ramper(float in, float out, float rampDelta);
 /**
  * main.c
  */
+uint32_t    sectornumber = 0;
 uint32_t    ControlISRCounter = 0;
 uint32_t    AlignmentCounter = 0;
 float TimeCounter = 0;
@@ -85,7 +86,7 @@ float DataToBeSent[6];
 uint32_t SendOneInFour = 0;
 uint32_t faultcounter = 0;
 volatile Uint32 Xint1Count = 0;
-float SpeedRefRPM = 50;
+float SpeedRefRPM = 25;
 float SpeedRefRadSec = 0;
 float phaseInc = 0;
 float mPhase = 0;
@@ -103,6 +104,10 @@ float iqref = IQREF_ALIGNMENT;
 uint16_t ReadDrv8305RegistersFlag = 0;
 uint16_t AngleHasBeenReset = 0;
 float fswdecided = 0;
+
+uint16_t    EPwm1_TBCTR_value = 0;
+uint16_t    EPwm2_TBCTR_value = 0;
+uint16_t    EPwm3_TBCTR_value = 0;
 
 int main(void)
 {
@@ -223,6 +228,9 @@ __interrupt void cpu_timer0_isr(void)
     GpioDataRegs.GPATOGGLE.bit.GPIO31 = 1;
     GpioDataRegs.GPBTOGGLE.bit.GPIO34 = 1;
     PieCtrlRegs.PIEACK.all = PIEACK_GROUP1;
+    EPwm1_TBCTR_value = EPwm1Regs.TBCTR;
+    EPwm2_TBCTR_value = EPwm2Regs.TBCTR;
+    EPwm3_TBCTR_value = EPwm3Regs.TBCTR;
 }
 
 __interrupt void cpu_timer1_isr(void)
@@ -1523,7 +1531,7 @@ __interrupt void epwm1_isr(void)
 
     if (OperationMode == MODE_MPCCONTROLLER)
     {
-        SpeedRefRadSec =  ramper(SpeedRefRadSec, SpeedRefRPM/60.0*2.0*PI, 0.01); // rate transition is around approximately 1 RPM per second
+        SpeedRefRadSec =  ramper(SpeedRefRadSec, SpeedRefRPM/60.0*2.0*PI, 0.0001); // rate transition is around approximately 1 RPM per second
 
         PI_iq.Input = SpeedRefRadSec - Module1_Parameters.AngularSpeedRadSec.Mechanical;
         Run_PI_Controller(PI_iq);
@@ -1764,6 +1772,7 @@ void GetSvpwmDutyCycles(float T1, float T2, float T0,float Ts,float VectorAngleR
 {
     if ((fmodf(VectorAngleRad,2.0*PI)<=PI/3.0)&&(fmodf(VectorAngleRad,2.0*PI)>=0))
     {
+        sectornumber = 1;
         DutyA = (T1+T2+T0/2)/Ts;
         DutyB = (T2+T0/2)/Ts;
         DutyC = (T0/2)/Ts;
@@ -1772,6 +1781,7 @@ void GetSvpwmDutyCycles(float T1, float T2, float T0,float Ts,float VectorAngleR
 
     if ((fmodf(VectorAngleRad,2.0*PI)<=2*PI/3)&&(fmodf(VectorAngleRad,2.0*PI)>=PI/3.0))
     {
+        sectornumber = 2;
         DutyA = (T1+T0/2)/Ts;
         DutyB = (T1+T2+T0/2)/Ts;
         DutyC = (T0/2)/Ts;
@@ -1780,6 +1790,7 @@ void GetSvpwmDutyCycles(float T1, float T2, float T0,float Ts,float VectorAngleR
 
     if ((fmodf(VectorAngleRad,2.0*PI)<=PI)&&(fmodf(VectorAngleRad,2.0*PI)>=2*PI/3.0))
     {
+        sectornumber = 3;
         if(fmodf(VectorAngleRad, PI)==0)
         {
             DutyA = (T0/2)/Ts;
@@ -1797,6 +1808,7 @@ void GetSvpwmDutyCycles(float T1, float T2, float T0,float Ts,float VectorAngleR
 
     if ((fmodf(VectorAngleRad,2.0*PI)<=4*PI/3.0)&&(fmodf(VectorAngleRad,2.0*PI)>=PI))
     {
+        sectornumber = 4;
         DutyA = (T0/2)/Ts;
         DutyB = (T1+T0/2)/Ts;
         DutyC = (T1+T2+T0/2)/Ts;
@@ -1804,6 +1816,7 @@ void GetSvpwmDutyCycles(float T1, float T2, float T0,float Ts,float VectorAngleR
     }
     if ((fmodf(VectorAngleRad,2.0*PI)<=5*PI/3.0)&&(fmodf(VectorAngleRad,2.0*PI)>=4*PI/3.0))
     {
+        sectornumber = 5;
         DutyA = (T2+T0/2)/Ts;
         DutyB = (T0/2)/Ts;
         DutyC = (T1+T2+T0/2)/Ts;
@@ -1811,6 +1824,7 @@ void GetSvpwmDutyCycles(float T1, float T2, float T0,float Ts,float VectorAngleR
     }
     if ((fmodf(VectorAngleRad,2.0*PI)<=2*PI)&&(fmodf(VectorAngleRad,2.0*PI)>=5*PI/3.0))
     {
+        sectornumber = 6;
         DutyA = (T1+T2+T0/2)/Ts;
         DutyB = (T0/2)/Ts;
         DutyC = (T1+T0/2)/Ts;

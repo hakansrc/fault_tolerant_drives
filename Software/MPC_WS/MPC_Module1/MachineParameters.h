@@ -11,7 +11,7 @@
 #define ALIGNMENT_DC_CURRENT    8.0
 
 #define RS_VALUE            0.621       //ohm
-#define LS_VALUE            0.0035       //0.0035      //henry
+#define LS_VALUE            0.003       //0.0035      //henry
 #define POLEPAIRS           10.0
 #define FLUX_VALUE          0.1808      //webers
 #define Te_RATED            31.8310     //Nm per module

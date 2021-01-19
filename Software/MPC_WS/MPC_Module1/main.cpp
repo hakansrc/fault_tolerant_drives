@@ -108,6 +108,8 @@ float fswdecided = 0;
 uint16_t    EPwm1_TBCTR_value = 0;
 uint16_t    EPwm2_TBCTR_value = 0;
 uint16_t    EPwm3_TBCTR_value = 0;
+float SpeedMax = 0;
+float SpeedMin = 0;
 
 int main(void)
 {
@@ -1069,6 +1071,18 @@ void GetEncoderReadings(ModuleParameters &moduleparams)
         moduleparams.AngularSpeedRadSec.Electrical = moduleparams.AngularSpeedRadSec.Mechanical*POLEPAIRS;
         moduleparams.AngularSpeedRPM.Mechanical = moduleparams.AngularSpeedRadSec.Mechanical*60.0/(2.0*PI);
         moduleparams.AngleRadPrev.Mechanical =  moduleparams.AngleRadTemp.Mechanical;
+        if(SpeedMax<moduleparams.AngularSpeedRPM.Mechanical)
+        {
+            SpeedMax = moduleparams.AngularSpeedRPM.Mechanical;
+        }
+        if(moduleparams.AngularSpeedRPM.Mechanical<0)
+        {
+            if(moduleparams.AngularSpeedRPM.Mechanical<SpeedMin)
+            {
+                SpeedMin = moduleparams.AngularSpeedRPM.Mechanical;
+            }
+        }
+
         EQep1Regs.QCLR.bit.UTO = 1;                // Clear __interrupt flag
     }
 }

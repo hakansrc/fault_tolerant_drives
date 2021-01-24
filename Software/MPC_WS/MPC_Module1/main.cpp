@@ -959,7 +959,7 @@ void EQEPSetup(void)
     EQep1Regs.QEPCTL.bit.WDE = 1; // Enable the eQEP watchdog timer
 
     EQep1Regs.QPOSINIT = 0;    // Initial QPOSCNT , QPOSCNT set to zero on index event (or strobe or software if desired)
-    EQep1Regs.QPOSMAX = ENCODERMAXTICKCOUNT; // Max value of QPOSCNT    /*better check this value*/
+    EQep1Regs.QPOSMAX = QPOSMAXVALUE; // Max value of QPOSCNT    /*better check this value*/
 
     // Quadrature edge-capture unit for low-speed measurement (QCAP)
     EQep1Regs.QCAPCTL.all = 0x00;
@@ -1030,12 +1030,15 @@ void GetEncoderReadings(ModuleParameters &moduleparams)
     /*TODO*/
     /*TODO put RPM speeds?*/
     float AngleDifference = 0;
-    moduleparams.AngleRad.Mechanical = ((float)EQep1Regs.QPOSCNT)/((float)ENCODERMAXTICKCOUNT)* 2.0 * PI;
+    float QPOSLAT_difference = 0;
+    float DirectionMultiplier = 0;
+    moduleparams.AngleRad.Mechanical = ((float)(EQep1Regs.QPOSCNT%(ENCODERMAXTICKCOUNT+1)))/((float)ENCODERMAXTICKCOUNT)* 2.0 * PI;
     moduleparams.AngleRad.Electrical =  moduleparams.AngleRad.Mechanical*POLEPAIRS;
 
     /*Speed measurement*/
     if (EQep1Regs.QFLG.bit.UTO == 1) // If unit timeout (one 100 Hz period)
     {
+#if 0
         moduleparams.AngleRadTemp.Mechanical = (float) EQep1Regs.QPOSLAT / (float) ENCODERMAXTICKCOUNT * 2.0 * PI;
         //fAngularMechanicalPosition_UTO = (float) EQep1Regs.QPOSLAT / (float) ENCODERMAXTICKCOUNT * 2.0 * PI;
         //fAngularMechanicalPositionDegrees_UTO = fAngularMechanicalPosition_UTO / (2.0 * PI) * 360.0;
@@ -1065,9 +1068,48 @@ void GetEncoderReadings(ModuleParameters &moduleparams)
                AngleDifference = moduleparams.AngleRadTemp.Mechanical - moduleparams.AngleRadPrev.Mechanical; // x2-x1 should be positive
             }
         }
+#else
+        moduleparams.QPOSLATPrev = moduleparams.QPOSLAT;
+        moduleparams.QPOSLAT =  (float) EQep1Regs.QPOSLAT;
+
+        QPOSLAT_difference = fabs(moduleparams.QPOSLAT - moduleparams.QPOSLATPrev);
+        if(QPOSLAT_difference>((float)ENCODERMAXTICKCOUNT)) // if QPOSLAT difference is larger than the maximum count value, then we are counting down & rollover happened
+        {
+            QPOSLAT_difference = ((float)(QPOSMAXVALUE+1)) - QPOSLAT_difference;
+        }
+
+
+        AngleDifference = QPOSLAT_difference/((float)ENCODERMAXTICKCOUNT)* 2.0 * PI;
+
+        EQep1Regs.QPOSCNT = EQep1Regs.QPOSCNT%(ENCODERMAXTICKCOUNT+1);
+
+#if 0
+        if (EQep1Regs.QEPSTS.bit.QDF == 0)            // POSCNT is counting down
+        {
+            DirectionMultiplier = -1.0;
+        }
+        else if (EQep1Regs.QEPSTS.bit.QDF == 1)            // POSCNT is counting up
+        {
+            DirectionMultiplier = 1.0;
+        }
+#else
+        /*we are self sensing the direction*/
+        if((moduleparams.QPOSLAT - moduleparams.QPOSLATPrev)<0)
+        {
+            /*we are counting down, which is negative direction rotation*/
+            DirectionMultiplier = -1.0;
+        }
+        else
+        {
+            /*we are counting up, which is positive direction rotation*/
+            DirectionMultiplier = 1.0;
+        }
+#endif
+
+#endif
         POSLAT_prev = POSLAT_now;
         POSLAT_now = EQep1Regs.QPOSLAT;
-        moduleparams.AngularSpeedRadSec.Mechanical = AngleDifference * (float) SYSCLKFREQUENCY / (float) EQep1Regs.QUPRD;
+        moduleparams.AngularSpeedRadSec.Mechanical = DirectionMultiplier * AngleDifference * (float) SYSCLKFREQUENCY / (float) EQep1Regs.QUPRD;
         moduleparams.AngularSpeedRadSec.Electrical = moduleparams.AngularSpeedRadSec.Mechanical*POLEPAIRS;
         moduleparams.AngularSpeedRPM.Mechanical = moduleparams.AngularSpeedRadSec.Mechanical*60.0/(2.0*PI);
         moduleparams.AngleRadPrev.Mechanical =  moduleparams.AngleRadTemp.Mechanical;

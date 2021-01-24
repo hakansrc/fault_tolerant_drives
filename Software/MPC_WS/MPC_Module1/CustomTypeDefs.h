@@ -128,6 +128,8 @@ typedef struct
     float PhaseADutyCycle;
     float PhaseBDutyCycle;
     float PhaseCDutyCycle;
+    float QPOSLAT;
+    float QPOSLATPrev;
 } ModuleParameters;
 
 typedef struct

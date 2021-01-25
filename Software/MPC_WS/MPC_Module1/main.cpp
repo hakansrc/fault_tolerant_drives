@@ -1069,11 +1069,11 @@ void GetEncoderReadings(ModuleParameters &moduleparams)
             }
         }
 #else
-        moduleparams.QPOSLATPrev = moduleparams.QPOSLAT;
+        moduleparams.QPOSLATPrev = fmodf(moduleparams.QPOSLAT,((float)((float)ENCODERMAXTICKCOUNT+1.0)));
         moduleparams.QPOSLAT =  (float) EQep1Regs.QPOSLAT;
 
         QPOSLAT_difference = fabs(moduleparams.QPOSLAT - moduleparams.QPOSLATPrev);
-        if(QPOSLAT_difference>((float)ENCODERMAXTICKCOUNT)) // if QPOSLAT difference is larger than the maximum count value, then we are counting down & rollover happened
+        if(QPOSLAT_difference>((float)ENCODERMAXTICKCOUNT)) // if QPOSLAT difference is larger than the maximum count value, then we are counting down & rollover happened; handle it
         {
             QPOSLAT_difference = ((float)(QPOSMAXVALUE+1)) - QPOSLAT_difference;
         }

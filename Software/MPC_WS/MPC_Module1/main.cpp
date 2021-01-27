@@ -86,7 +86,7 @@ float DataToBeSent[6];
 uint32_t SendOneInFour = 0;
 uint32_t faultcounter = 0;
 volatile Uint32 Xint1Count = 0;
-float SpeedRefRPM = 25;
+float SpeedRefRPM = -35;
 float SpeedRefRadSec = 0;
 float phaseInc = 0;
 float mPhase = 0;
@@ -110,7 +110,10 @@ uint16_t    EPwm2_TBCTR_value = 0;
 uint16_t    EPwm3_TBCTR_value = 0;
 float SpeedMax = 0;
 float SpeedMin = 0;
-
+float qposlatdiff = 0;
+float qposlatnow = 0;
+float qpolatprev = 0;
+float DirectionMultiplier = 0;
 int main(void)
 {
 
@@ -1031,8 +1034,9 @@ void GetEncoderReadings(ModuleParameters &moduleparams)
     /*TODO put RPM speeds?*/
     float AngleDifference = 0;
     float QPOSLAT_difference = 0;
-    float DirectionMultiplier = 0;
+
     moduleparams.AngleRad.Mechanical = ((float)(EQep1Regs.QPOSCNT%(ENCODERMAXTICKCOUNT+1)))/((float)ENCODERMAXTICKCOUNT)* 2.0 * PI;
+    //moduleparams.AngleRad.Mechanical = fmodf((float)EQep1Regs.QPOSCNT,((float)(float)ENCODERMAXTICKCOUNT+1.0))/((float)ENCODERMAXTICKCOUNT)*2.0*PI;
     moduleparams.AngleRad.Electrical =  moduleparams.AngleRad.Mechanical*POLEPAIRS;
 
     /*Speed measurement*/
@@ -1097,12 +1101,18 @@ void GetEncoderReadings(ModuleParameters &moduleparams)
         if((moduleparams.QPOSLAT - moduleparams.QPOSLATPrev)<0)
         {
             /*we are counting down, which is negative direction rotation*/
-            DirectionMultiplier = -1.0;
+            if(fabs(moduleparams.QPOSLAT - moduleparams.QPOSLATPrev)<ENCODERMAXTICKCOUNT)
+            {
+                DirectionMultiplier = -1.0;
+            }
         }
         else
         {
             /*we are counting up, which is positive direction rotation*/
-            DirectionMultiplier = 1.0;
+            if(fabs(moduleparams.QPOSLAT - moduleparams.QPOSLATPrev)<ENCODERMAXTICKCOUNT)
+            {
+                DirectionMultiplier = 1.0;
+            }
         }
 #endif
 
@@ -1564,6 +1574,7 @@ __interrupt void epwm1_isr(void)
 
     ControlISRCounter++;
 
+
     TimeCounter = TimeCounter + 1.0;
     if (TimeCounter == ((float)INITIALPWMFREQ))
     {
@@ -1637,7 +1648,12 @@ __interrupt void epwm1_isr(void)
         Module1_Parameters.PhaseBDutyCycle = 0;
         Module1_Parameters.PhaseCDutyCycle = 0;
 #endif
-
+#if 0
+        if((ControlISRCounter%20000)==0)
+        {
+            SpeedRefRPM = SpeedRefRPM * -1;
+        }
+#endif
     }
     else if (OperationMode == MODE_ALIGNMENT)
     {
@@ -1782,8 +1798,8 @@ __interrupt void epwm1_isr(void)
 
     if (SendOneInFour % 4 == 0)
     {
-        DataToBeSent[0] = EPwm1Regs.TBPRD; //Module1_Parameters.Measured.Current.transformed.Dvalue;
-        DataToBeSent[1] = EPwm1Regs.CMPA.bit.CMPA;
+        DataToBeSent[0] = EQep1Regs.QPOSCNT; //Module1_Parameters.Measured.Current.transformed.Dvalue;
+        DataToBeSent[1] = SpeedRefRadSec;
         DataToBeSent[2] = Module1_Parameters.Measured.Current.transformed.Dvalue; //;M1_IA_CURRENT_FLOAT;
         DataToBeSent[3] = Module1_Parameters.Measured.Current.transformed.Qvalue;
         DataToBeSent[4] = fswdecided;

@@ -60,7 +60,7 @@
 #define ADC_PU_SCALE_FACTOR 0.000244140625     //1/2^12
 #define ADC_PU_PPB_SCALE_FACTOR 0.000488281250 //1/2^11
 
-#define VREF 3.3
+#define VREF 3.0
 #define VREF_SCALE 2.0 //k value for drv8305
 #define ADC_MAX_12BIT 4095
 #define CURRENT_SENSE_RESISTOR 0.007 //ohm

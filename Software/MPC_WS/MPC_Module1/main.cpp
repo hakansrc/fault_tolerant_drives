@@ -1076,9 +1076,10 @@ void GetEncoderReadings(ModuleParameters &moduleparams)
         moduleparams.QPOSLATPrev = fmodf(moduleparams.QPOSLAT,((float)((float)ENCODERMAXTICKCOUNT+1.0)));
         moduleparams.QPOSLAT =  (float) EQep1Regs.QPOSLAT;
 
-        QPOSLAT_difference = fabs(moduleparams.QPOSLAT - moduleparams.QPOSLATPrev);
+        QPOSLAT_difference = fabsf(moduleparams.QPOSLAT - moduleparams.QPOSLATPrev);
         if(QPOSLAT_difference>((float)ENCODERMAXTICKCOUNT)) // if QPOSLAT difference is larger than the maximum count value, then we are counting down & rollover happened; handle it
         {
+            // In octave, we found that the subtraction operation must be 28799-QPOSLAT_difference
             QPOSLAT_difference = ((float)(QPOSMAXVALUE+1)) - QPOSLAT_difference;
         }
 
@@ -1101,7 +1102,7 @@ void GetEncoderReadings(ModuleParameters &moduleparams)
         if((moduleparams.QPOSLAT - moduleparams.QPOSLATPrev)<0)
         {
             /*we are counting down, which is negative direction rotation*/
-            if(fabs(moduleparams.QPOSLAT - moduleparams.QPOSLATPrev)<ENCODERMAXTICKCOUNT)
+            if(fabsf(moduleparams.QPOSLAT - moduleparams.QPOSLATPrev)<ENCODERMAXTICKCOUNT)
             {
                 DirectionMultiplier = -1.0;
             }
@@ -1109,7 +1110,7 @@ void GetEncoderReadings(ModuleParameters &moduleparams)
         else
         {
             /*we are counting up, which is positive direction rotation*/
-            if(fabs(moduleparams.QPOSLAT - moduleparams.QPOSLATPrev)<ENCODERMAXTICKCOUNT)
+            if(fabsf(moduleparams.QPOSLAT - moduleparams.QPOSLATPrev)<ENCODERMAXTICKCOUNT)
             {
                 DirectionMultiplier = 1.0;
             }
@@ -1827,7 +1828,7 @@ interrupt void xint1_isr(void)
 }
 void RunTimeProtectionControl(void)
 {
-    if((fabs(M1_IA_CURRENT_FLOAT)>M1_IA_RUNTIME_PROTECTION_VALUE)||(fabs(M1_IB_CURRENT_FLOAT)>M1_IB_RUNTIME_PROTECTION_VALUE)||(fabs(M1_IC_CURRENT_FLOAT)>M1_IC_RUNTIME_PROTECTION_VALUE))
+    if((fabsf(M1_IA_CURRENT_FLOAT)>M1_IA_RUNTIME_PROTECTION_VALUE)||(fabsf(M1_IB_CURRENT_FLOAT)>M1_IB_RUNTIME_PROTECTION_VALUE)||(fabsf(M1_IC_CURRENT_FLOAT)>M1_IC_RUNTIME_PROTECTION_VALUE))
     {
         EPwm1Regs.TZFRC.bit.DCAEVT1 = 1;
         EPwm2Regs.TZFRC.bit.DCAEVT1 = 1;

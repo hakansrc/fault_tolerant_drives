@@ -86,7 +86,7 @@ float DataToBeSent[6];
 uint32_t SendOneInFour = 0;
 uint32_t faultcounter = 0;
 volatile Uint32 Xint1Count = 0;
-float SpeedRefRPM = -35;
+float SpeedRefRPM = 35;
 float SpeedRefRadSec = 0;
 float phaseInc = 0;
 float mPhase = 0;
@@ -112,8 +112,11 @@ float SpeedMax = 0;
 float SpeedMin = 0;
 float qposlatdiff = 0;
 float qposlatnow = 0;
-float qpolatprev = 0;
+float qposlatprev = 0;
 float DirectionMultiplier = 0;
+float angledifferencesave = 0;
+uint16_t SpeedRefArrayCount = 0;
+float SpeedRefArray[6] = {35,80,35,-35,-80,-35};
 int main(void)
 {
 
@@ -241,6 +244,25 @@ __interrupt void cpu_timer0_isr(void)
 __interrupt void cpu_timer1_isr(void)
 {
     CpuTimer1.InterruptCount++;
+#if 0
+    if(OperationMode==MODE_MPCCONTROLLER)
+    {
+        if((CpuTimer1.InterruptCount%5)==0)
+        {
+            SpeedRefRPM = SpeedRefArray[SpeedRefArrayCount];
+            SpeedRefArrayCount++;
+            if(SpeedRefArrayCount==6)
+            {
+                SpeedRefArrayCount = 0;
+            }
+        }
+
+    }
+    else
+    {
+        CpuTimer1.InterruptCount = 0;
+    }
+#endif
     PieCtrlRegs.PIEACK.all = PIEACK_GROUP1;
     ReadDrv8305RegistersFlag = 1;
 }
@@ -645,7 +667,7 @@ static inline void ExecuteSecondPrediction(ModuleParameters &moduleparams, unsig
     moduleparams.SecondHorizon[indexcount].IqPrediction = moduleparams.FirstHorizon[indexcount].IqPrediction + (1.0 / moduleparams.OptimizationFsw[indexcount]) * (moduleparams.SecondHorizon[indexcount].Vq / LS_VALUE - RS_VALUE / LS_VALUE * moduleparams.FirstHorizon[indexcount].IqPrediction - LS_VALUE / LS_VALUE * POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical * moduleparams.FirstHorizon[indexcount].IdPrediction - FLUX_VALUE * POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical / LS_VALUE);
 
     /*TODO add protection to cost*/
-    moduleparams.Cost[indexcount] = IQRIPPLECOEFF * powf(moduleparams.SecondHorizon[indexcount].Iq_Ripple_Prediction / IQ_RATED, 2) + IQREFCOEFF * powf((moduleparams.Reference.Iq - moduleparams.SecondHorizon[indexcount].IqPrediction) / IQ_RATED, 2) + IDREFCOEFF * powf((moduleparams.Reference.Id - moduleparams.SecondHorizon[indexcount].IdPrediction), 2) + FSWCOEFF * moduleparams.OptimizationFsw[indexcount] / OPT_FSW_MAX;
+    moduleparams.Cost[indexcount] = IQRIPPLECOEFF * powf(moduleparams.SecondHorizon[indexcount].Iq_Ripple_Prediction / IQ_RATED, 2) + IQREFCOEFF * powf((moduleparams.Reference.Iq - moduleparams.SecondHorizon[indexcount].IqPrediction) / IQ_RATED, 2) + IDREFCOEFF * powf((moduleparams.Reference.Id - moduleparams.SecondHorizon[indexcount].IdPrediction)/IQ_RATED, 2) + FSWCOEFF * moduleparams.OptimizationFsw[indexcount] / OPT_FSW_MAX;
     if (moduleparams.Cost[indexcount] < moduleparams.MinimumCostValue)
     {
         moduleparams.MinimumCostValue = moduleparams.Cost[indexcount];
@@ -962,7 +984,7 @@ void EQEPSetup(void)
     EQep1Regs.QEPCTL.bit.WDE = 1; // Enable the eQEP watchdog timer
 
     EQep1Regs.QPOSINIT = 0;    // Initial QPOSCNT , QPOSCNT set to zero on index event (or strobe or software if desired)
-    EQep1Regs.QPOSMAX = QPOSMAXVALUE; // Max value of QPOSCNT    /*better check this value*/
+    EQep1Regs.QPOSMAX = ENCODERMAXTICKCOUNT; // Max value of QPOSCNT    /*better check this value*/
 
     // Quadrature edge-capture unit for low-speed measurement (QCAP)
     EQep1Regs.QCAPCTL.all = 0x00;
@@ -1033,94 +1055,27 @@ void GetEncoderReadings(ModuleParameters &moduleparams)
     /*TODO*/
     /*TODO put RPM speeds?*/
     float AngleDifference = 0;
-    float QPOSLAT_difference = 0;
-
-    moduleparams.AngleRad.Mechanical = ((float)(EQep1Regs.QPOSCNT%(ENCODERMAXTICKCOUNT+1)))/((float)ENCODERMAXTICKCOUNT)* 2.0 * PI;
-    //moduleparams.AngleRad.Mechanical = fmodf((float)EQep1Regs.QPOSCNT,((float)(float)ENCODERMAXTICKCOUNT+1.0))/((float)ENCODERMAXTICKCOUNT)*2.0*PI;
+    moduleparams.AngleRad.Mechanical = ((float)EQep1Regs.QPOSCNT)/((float)ENCODERMAXTICKCOUNT)* 2.0 * PI;
     moduleparams.AngleRad.Electrical =  moduleparams.AngleRad.Mechanical*POLEPAIRS;
 
     /*Speed measurement*/
     if (EQep1Regs.QFLG.bit.UTO == 1) // If unit timeout (one 100 Hz period)
     {
-#if 0
         moduleparams.AngleRadTemp.Mechanical = (float) EQep1Regs.QPOSLAT / (float) ENCODERMAXTICKCOUNT * 2.0 * PI;
-        //fAngularMechanicalPosition_UTO = (float) EQep1Regs.QPOSLAT / (float) ENCODERMAXTICKCOUNT * 2.0 * PI;
-        //fAngularMechanicalPositionDegrees_UTO = fAngularMechanicalPosition_UTO / (2.0 * PI) * 360.0;
-        if (EQep1Regs.QEPSTS.bit.QDF == 0)            // POSCNT is counting down
+        AngleDifference = moduleparams.AngleRadTemp.Mechanical - moduleparams.AngleRadPrev.Mechanical;
+        if(fabsf(AngleDifference)>=PI)
         {
-            if (moduleparams.AngleRadTemp.Mechanical > moduleparams.AngleRadPrev.Mechanical)
+            if(AngleDifference<0)
             {
-                //get the position difference
-               AngleDifference = -(2.0 * PI - moduleparams.AngleRadTemp.Mechanical  + moduleparams.AngleRadPrev.Mechanical ); // x2-x1 should be negative
+                AngleDifference = AngleDifference + 2.0*PI;
             }
             else
             {
-                //get the position difference
-               AngleDifference = moduleparams.AngleRadTemp.Mechanical - moduleparams.AngleRadPrev.Mechanical;
+                AngleDifference = -(2.0*PI - AngleDifference) ;
             }
         }
-        else if (EQep1Regs.QEPSTS.bit.QDF == 1)         // POSCNT is counting up
-        {
-            if (moduleparams.AngleRadTemp.Mechanical < moduleparams.AngleRadPrev.Mechanical)
-            {
-                //get the position difference
-               AngleDifference = 2.0 * PI + moduleparams.AngleRadTemp.Mechanical - moduleparams.AngleRadPrev.Mechanical;
-            }
-            else
-            {
-                //get the position difference
-               AngleDifference = moduleparams.AngleRadTemp.Mechanical - moduleparams.AngleRadPrev.Mechanical; // x2-x1 should be positive
-            }
-        }
-#else
-        moduleparams.QPOSLATPrev = fmodf(moduleparams.QPOSLAT,((float)((float)ENCODERMAXTICKCOUNT+1.0)));
-        moduleparams.QPOSLAT =  (float) EQep1Regs.QPOSLAT;
 
-        QPOSLAT_difference = fabsf(moduleparams.QPOSLAT - moduleparams.QPOSLATPrev);
-        if(QPOSLAT_difference>((float)ENCODERMAXTICKCOUNT)) // if QPOSLAT difference is larger than the maximum count value, then we are counting down & rollover happened; handle it
-        {
-            // In octave, we found that the subtraction operation must be 28799-QPOSLAT_difference
-            QPOSLAT_difference = ((float)(QPOSMAXVALUE+1)) - QPOSLAT_difference;
-        }
-
-
-        AngleDifference = QPOSLAT_difference/((float)ENCODERMAXTICKCOUNT)* 2.0 * PI;
-
-        EQep1Regs.QPOSCNT = EQep1Regs.QPOSCNT%(ENCODERMAXTICKCOUNT+1);
-
-#if 0
-        if (EQep1Regs.QEPSTS.bit.QDF == 0)            // POSCNT is counting down
-        {
-            DirectionMultiplier = -1.0;
-        }
-        else if (EQep1Regs.QEPSTS.bit.QDF == 1)            // POSCNT is counting up
-        {
-            DirectionMultiplier = 1.0;
-        }
-#else
-        /*we are self sensing the direction*/
-        if((moduleparams.QPOSLAT - moduleparams.QPOSLATPrev)<0)
-        {
-            /*we are counting down, which is negative direction rotation*/
-            if(fabsf(moduleparams.QPOSLAT - moduleparams.QPOSLATPrev)<ENCODERMAXTICKCOUNT)
-            {
-                DirectionMultiplier = -1.0;
-            }
-        }
-        else
-        {
-            /*we are counting up, which is positive direction rotation*/
-            if(fabsf(moduleparams.QPOSLAT - moduleparams.QPOSLATPrev)<ENCODERMAXTICKCOUNT)
-            {
-                DirectionMultiplier = 1.0;
-            }
-        }
-#endif
-
-#endif
-        POSLAT_prev = POSLAT_now;
-        POSLAT_now = EQep1Regs.QPOSLAT;
-        moduleparams.AngularSpeedRadSec.Mechanical = DirectionMultiplier * AngleDifference * (float) SYSCLKFREQUENCY / (float) EQep1Regs.QUPRD;
+        moduleparams.AngularSpeedRadSec.Mechanical = AngleDifference * (float) SYSCLKFREQUENCY / (float) EQep1Regs.QUPRD;
         moduleparams.AngularSpeedRadSec.Electrical = moduleparams.AngularSpeedRadSec.Mechanical*POLEPAIRS;
         moduleparams.AngularSpeedRPM.Mechanical = moduleparams.AngularSpeedRadSec.Mechanical*60.0/(2.0*PI);
         moduleparams.AngleRadPrev.Mechanical =  moduleparams.AngleRadTemp.Mechanical;
@@ -1139,6 +1094,7 @@ void GetEncoderReadings(ModuleParameters &moduleparams)
         EQep1Regs.QCLR.bit.UTO = 1;                // Clear __interrupt flag
     }
 }
+
 void RunAlignmentScenario(void)
 {
     Alignment.ElectricalAngle = 0;

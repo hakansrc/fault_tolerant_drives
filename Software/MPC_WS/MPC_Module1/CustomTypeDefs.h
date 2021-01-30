@@ -20,6 +20,9 @@ typedef struct
     float Dvalue;
     float Qvalue;
     float ZeroValue;
+    float DvaluePrev;
+    float QvaluePrev;
+    float ZeroValuePrev;
 } Transformed;
 
 typedef struct
@@ -128,8 +131,6 @@ typedef struct
     float PhaseADutyCycle;
     float PhaseBDutyCycle;
     float PhaseCDutyCycle;
-    float QPOSLAT;
-    float QPOSLATPrev;
 } ModuleParameters;
 
 typedef struct

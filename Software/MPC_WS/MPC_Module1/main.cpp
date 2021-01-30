@@ -583,6 +583,8 @@ inline void Run_PI_Controller(PID_Parameters &pidparams)
 }
 inline void CalculateParkTransform(ModuleParameters &moduleparams)
 {
+    moduleparams.Measured.Current.transformed.DvaluePrev = moduleparams.Measured.Current.transformed.Dvalue;
+    moduleparams.Measured.Current.transformed.QvaluePrev = moduleparams.Measured.Current.transformed.Qvalue;
 
     moduleparams.Measured.Current.transformed.Dvalue = 0.66667 * (moduleparams.Measured.Current.PhaseA * sinf(moduleparams.AngleRad.Electrical) + moduleparams.Measured.Current.PhaseB * sinf(moduleparams.AngleRad.Electrical - 0.66667 * PI /*2*PI/3*/) + moduleparams.Measured.Current.PhaseC * sinf(moduleparams.AngleRad.Electrical + 0.66667 * PI /*2*PI/3*/));
     moduleparams.Measured.Current.transformed.Qvalue = 0.66667 * (moduleparams.Measured.Current.PhaseA * cosf(moduleparams.AngleRad.Electrical) + moduleparams.Measured.Current.PhaseB * cosf(moduleparams.AngleRad.Electrical - 0.66667 * PI /*2*PI/3*/) + moduleparams.Measured.Current.PhaseC * cosf(moduleparams.AngleRad.Electrical + 0.66667 * PI /*2*PI/3*/));
@@ -598,8 +600,8 @@ inline void CalculateParkTransform(ModuleParameters &moduleparams)
 static inline void ExecuteFirstPrediction(ModuleParameters &moduleparams, unsigned int indexcount)
 {
 
-    moduleparams.FirstHorizon[indexcount].Vd = RS_VALUE * moduleparams.Measured.Current.transformed.Dvalue + LS_VALUE * moduleparams.OptimizationFsw[indexcount] * (moduleparams.Reference.Id - moduleparams.Measured.Current.transformed.Dvalue) - POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical * LS_VALUE * moduleparams.Measured.Current.transformed.Qvalue;
-    moduleparams.FirstHorizon[indexcount].Vq = RS_VALUE * moduleparams.Measured.Current.transformed.Qvalue + LS_VALUE * moduleparams.OptimizationFsw[indexcount] * (moduleparams.Reference.Iq - moduleparams.Measured.Current.transformed.Qvalue) + POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical * (LS_VALUE * moduleparams.Measured.Current.transformed.Dvalue + FLUX_VALUE);
+    moduleparams.FirstHorizon[indexcount].Vd = RS_VALUE * moduleparams.Measured.Current.transformed.DvaluePrev + LS_VALUE * moduleparams.OptimizationFsw[indexcount] * (moduleparams.Reference.Id - moduleparams.Measured.Current.transformed.DvaluePrev) - POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical * LS_VALUE * moduleparams.Measured.Current.transformed.QvaluePrev;
+    moduleparams.FirstHorizon[indexcount].Vq = RS_VALUE * moduleparams.Measured.Current.transformed.QvaluePrev + LS_VALUE * moduleparams.OptimizationFsw[indexcount] * (moduleparams.Reference.Iq - moduleparams.Measured.Current.transformed.QvaluePrev) + POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical * (LS_VALUE * moduleparams.Measured.Current.transformed.DvaluePrev + FLUX_VALUE);
 #if 0 /*ripple prediction is unnecessary for the first horizon*/
     moduleparams.FirstHorizon[indexcount].Magnitude = sqrtf(moduleparams.FirstHorizon[indexcount].Vd*moduleparams.FirstHorizon[indexcount].Vd\
                                                           + moduleparams.FirstHorizon[indexcount].Vq*moduleparams.FirstHorizon[indexcount].Vq);
@@ -1052,8 +1054,6 @@ void EQEPSetup(void)
 
 void GetEncoderReadings(ModuleParameters &moduleparams)
 {
-    /*TODO*/
-    /*TODO put RPM speeds?*/
     float AngleDifference = 0;
     moduleparams.AngleRad.Mechanical = ((float)EQep1Regs.QPOSCNT)/((float)ENCODERMAXTICKCOUNT)* 2.0 * PI;
     moduleparams.AngleRad.Electrical =  moduleparams.AngleRad.Mechanical*POLEPAIRS;
@@ -1090,7 +1090,6 @@ void GetEncoderReadings(ModuleParameters &moduleparams)
                 SpeedMin = moduleparams.AngularSpeedRPM.Mechanical;
             }
         }
-
         EQep1Regs.QCLR.bit.UTO = 1;                // Clear __interrupt flag
     }
 }

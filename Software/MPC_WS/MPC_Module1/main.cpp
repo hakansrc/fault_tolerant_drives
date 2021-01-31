@@ -86,7 +86,7 @@ float DataToBeSent[6];
 uint32_t SendOneInFour = 0;
 uint32_t faultcounter = 0;
 volatile Uint32 Xint1Count = 0;
-float SpeedRefRPM = 25;
+float SpeedRefRPM = 50;
 float SpeedRefRadSec = 0;
 float phaseInc = 0;
 float mPhase = 0;
@@ -244,7 +244,7 @@ __interrupt void cpu_timer0_isr(void)
 __interrupt void cpu_timer1_isr(void)
 {
     CpuTimer1.InterruptCount++;
-#if 1
+#if 0
     if(OperationMode==MODE_MPCCONTROLLER)
     {
         if((CpuTimer1.InterruptCount%5)==0)
@@ -638,8 +638,9 @@ static inline void ExecuteFirstPrediction(ModuleParameters &moduleparams, unsign
 }
 static inline void ExecuteSecondPrediction(ModuleParameters &moduleparams, unsigned int indexcount)
 {
+    /*for the following part, the estimation of the vd vq voltages is problematic and will be investigated*/
     moduleparams.SecondHorizon[indexcount].Vd = RS_VALUE * moduleparams.Measured.Current.transformed.Dvalue + LS_VALUE * moduleparams.OptimizationFsw[indexcount] * (moduleparams.Reference.Id - moduleparams.Measured.Current.transformed.Dvalue) - POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical * LS_VALUE *  moduleparams.Measured.Current.transformed.Qvalue;
-    moduleparams.SecondHorizon[indexcount].Vq = RS_VALUE * moduleparams.Measured.Current.transformed.Qvalue + LS_VALUE * moduleparams.OptimizationFsw[indexcount] * (moduleparams.Reference.Iq - moduleparams.Measured.Current.transformed.Qvalue) + POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical * (moduleparams.Measured.Current.transformed.Dvalue + FLUX_VALUE);
+    moduleparams.SecondHorizon[indexcount].Vq = RS_VALUE * moduleparams.Measured.Current.transformed.Qvalue + LS_VALUE * moduleparams.OptimizationFsw[indexcount] * (moduleparams.Reference.Iq - moduleparams.Measured.Current.transformed.Qvalue) + POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical * (LS_VALUE * moduleparams.Measured.Current.transformed.Dvalue + FLUX_VALUE);
 
     moduleparams.SecondHorizon[indexcount].Magnitude = sqrtf(moduleparams.SecondHorizon[indexcount].Vd * moduleparams.SecondHorizon[indexcount].Vd + moduleparams.SecondHorizon[indexcount].Vq * moduleparams.SecondHorizon[indexcount].Vq);
 
@@ -1757,7 +1758,7 @@ __interrupt void epwm1_isr(void)
         DataToBeSent[0] = Module1_Parameters.FirstHorizon[Module1_Parameters.MinimumCostIndex].IdPrediction;
         DataToBeSent[1] = Module1_Parameters.FirstHorizon[Module1_Parameters.MinimumCostIndex].IqPrediction;
         DataToBeSent[2] = Module1_Parameters.SecondHorizon[Module1_Parameters.MinimumCostIndex].IdPrediction;; //Module1_Parameters.Measured.Current.transformed.Dvalue;
-        DataToBeSent[3] = Module1_Parameters.SecondHorizon[Module1_Parameters.MinimumCostIndex].IdPrediction;;
+        DataToBeSent[3] = Module1_Parameters.SecondHorizon[Module1_Parameters.MinimumCostIndex].IqPrediction;;
         DataToBeSent[4] = Module1_Parameters.Measured.Current.transformed.Dvalue; //;M1_IA_CURRENT_FLOAT;
         DataToBeSent[5] = Module1_Parameters.Measured.Current.transformed.Qvalue;
 

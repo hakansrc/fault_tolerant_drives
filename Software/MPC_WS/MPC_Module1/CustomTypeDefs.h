@@ -20,9 +20,6 @@ typedef struct
     float Dvalue;
     float Qvalue;
     float ZeroValue;
-    float DvaluePrev;
-    float QvaluePrev;
-    float ZeroValuePrev;
 } Transformed;
 
 typedef struct

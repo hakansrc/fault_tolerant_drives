@@ -117,6 +117,8 @@ float DirectionMultiplier = 0;
 float angledifferencesave = 0;
 uint16_t SpeedRefArrayCount = 0;
 float SpeedRefArray[6] = {35,80,35,-35,-80,-35};
+float Vd_Current_Value[NUMBEROFMPCLOOPS] = {0,0,0,0,0,0,0,0,0,0};
+float Vq_Current_Value[NUMBEROFMPCLOOPS] = {0,0,0,0,0,0,0,0,0,0};
 int main(void)
 {
 
@@ -583,9 +585,6 @@ inline void Run_PI_Controller(PID_Parameters &pidparams)
 }
 inline void CalculateParkTransform(ModuleParameters &moduleparams)
 {
-    moduleparams.Measured.Current.transformed.DvaluePrev = moduleparams.Measured.Current.transformed.Dvalue;
-    moduleparams.Measured.Current.transformed.QvaluePrev = moduleparams.Measured.Current.transformed.Qvalue;
-
     moduleparams.Measured.Current.transformed.Dvalue = 0.66667 * (moduleparams.Measured.Current.PhaseA * sinf(moduleparams.AngleRad.Electrical) + moduleparams.Measured.Current.PhaseB * sinf(moduleparams.AngleRad.Electrical - 0.66667 * PI /*2*PI/3*/) + moduleparams.Measured.Current.PhaseC * sinf(moduleparams.AngleRad.Electrical + 0.66667 * PI /*2*PI/3*/));
     moduleparams.Measured.Current.transformed.Qvalue = 0.66667 * (moduleparams.Measured.Current.PhaseA * cosf(moduleparams.AngleRad.Electrical) + moduleparams.Measured.Current.PhaseB * cosf(moduleparams.AngleRad.Electrical - 0.66667 * PI /*2*PI/3*/) + moduleparams.Measured.Current.PhaseC * cosf(moduleparams.AngleRad.Electrical + 0.66667 * PI /*2*PI/3*/));
 #if 0
@@ -599,9 +598,10 @@ inline void CalculateParkTransform(ModuleParameters &moduleparams)
 }
 static inline void ExecuteFirstPrediction(ModuleParameters &moduleparams, unsigned int indexcount)
 {
-
-    moduleparams.FirstHorizon[indexcount].Vd = RS_VALUE * moduleparams.Measured.Current.transformed.DvaluePrev + LS_VALUE * moduleparams.OptimizationFsw[indexcount] * (moduleparams.Reference.Id - moduleparams.Measured.Current.transformed.DvaluePrev) - POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical * LS_VALUE * moduleparams.Measured.Current.transformed.QvaluePrev;
-    moduleparams.FirstHorizon[indexcount].Vq = RS_VALUE * moduleparams.Measured.Current.transformed.QvaluePrev + LS_VALUE * moduleparams.OptimizationFsw[indexcount] * (moduleparams.Reference.Iq - moduleparams.Measured.Current.transformed.QvaluePrev) + POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical * (LS_VALUE * moduleparams.Measured.Current.transformed.DvaluePrev + FLUX_VALUE);
+    Vd_Current_Value[indexcount] = moduleparams.FirstHorizon[indexcount].Vd;    // the previous' first horizon is the new current, save it for id first horizon prediction.
+    Vq_Current_Value[indexcount] = moduleparams.FirstHorizon[indexcount].Vq;    // the previous' first horizon is the new current, save it for iq first horizon prediction.
+    moduleparams.FirstHorizon[indexcount].Vd = RS_VALUE * moduleparams.Measured.Current.transformed.Dvalue + LS_VALUE * moduleparams.OptimizationFsw[indexcount] * (moduleparams.Reference.Id - moduleparams.Measured.Current.transformed.Dvalue) - POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical * LS_VALUE * moduleparams.Measured.Current.transformed.Qvalue;
+    moduleparams.FirstHorizon[indexcount].Vq = RS_VALUE * moduleparams.Measured.Current.transformed.Qvalue + LS_VALUE * moduleparams.OptimizationFsw[indexcount] * (moduleparams.Reference.Iq - moduleparams.Measured.Current.transformed.Qvalue) + POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical * (LS_VALUE * moduleparams.Measured.Current.transformed.Dvalue + FLUX_VALUE);
 #if 0 /*ripple prediction is unnecessary for the first horizon*/
     moduleparams.FirstHorizon[indexcount].Magnitude = sqrtf(moduleparams.FirstHorizon[indexcount].Vd*moduleparams.FirstHorizon[indexcount].Vd\
                                                           + moduleparams.FirstHorizon[indexcount].Vq*moduleparams.FirstHorizon[indexcount].Vq);
@@ -633,19 +633,21 @@ static inline void ExecuteFirstPrediction(ModuleParameters &moduleparams, unsign
 #endif
 
 
-    moduleparams.FirstHorizon[indexcount].IdPrediction = moduleparams.Measured.Current.transformed.Dvalue + (1.0 / moduleparams.OptimizationFsw[indexcount]) * (moduleparams.FirstHorizon[indexcount].Vd / LS_VALUE - RS_VALUE / LS_VALUE * moduleparams.Measured.Current.transformed.Dvalue + LS_VALUE / LS_VALUE * POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical * moduleparams.Measured.Current.transformed.Qvalue);
-    moduleparams.FirstHorizon[indexcount].IqPrediction = moduleparams.Measured.Current.transformed.Qvalue + (1.0 / moduleparams.OptimizationFsw[indexcount]) * (moduleparams.FirstHorizon[indexcount].Vq / LS_VALUE - RS_VALUE / LS_VALUE * moduleparams.Measured.Current.transformed.Qvalue - LS_VALUE / LS_VALUE * POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical * moduleparams.Measured.Current.transformed.Dvalue - FLUX_VALUE * POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical / LS_VALUE);
+    moduleparams.FirstHorizon[indexcount].IdPrediction = moduleparams.Measured.Current.transformed.Dvalue + (1.0 / moduleparams.OptimizationFsw[indexcount]) * (Vd_Current_Value[indexcount] / LS_VALUE - RS_VALUE / LS_VALUE * moduleparams.Measured.Current.transformed.Dvalue + LS_VALUE / LS_VALUE * POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical * moduleparams.Measured.Current.transformed.Qvalue);
+    moduleparams.FirstHorizon[indexcount].IqPrediction = moduleparams.Measured.Current.transformed.Qvalue + (1.0 / moduleparams.OptimizationFsw[indexcount]) * (Vq_Current_Value[indexcount] / LS_VALUE - RS_VALUE / LS_VALUE * moduleparams.Measured.Current.transformed.Qvalue - LS_VALUE / LS_VALUE * POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical * moduleparams.Measured.Current.transformed.Dvalue - FLUX_VALUE * POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical / LS_VALUE);
 }
 static inline void ExecuteSecondPrediction(ModuleParameters &moduleparams, unsigned int indexcount)
 {
     /*for the following part, the estimation of the vd vq voltages is problematic and will be investigated*/
-    moduleparams.SecondHorizon[indexcount].Vd = RS_VALUE * moduleparams.Measured.Current.transformed.Dvalue + LS_VALUE * moduleparams.OptimizationFsw[indexcount] * (moduleparams.Reference.Id - moduleparams.Measured.Current.transformed.Dvalue) - POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical * LS_VALUE *  moduleparams.Measured.Current.transformed.Qvalue;
-    moduleparams.SecondHorizon[indexcount].Vq = RS_VALUE * moduleparams.Measured.Current.transformed.Qvalue + LS_VALUE * moduleparams.OptimizationFsw[indexcount] * (moduleparams.Reference.Iq - moduleparams.Measured.Current.transformed.Qvalue) + POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical * (LS_VALUE * moduleparams.Measured.Current.transformed.Dvalue + FLUX_VALUE);
+    //moduleparams.SecondHorizon[indexcount].Vd = RS_VALUE * moduleparams.Measured.Current.transformed.Dvalue + LS_VALUE * moduleparams.OptimizationFsw[indexcount] * (moduleparams.Reference.Id - moduleparams.Measured.Current.transformed.Dvalue) - POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical * LS_VALUE *  moduleparams.Measured.Current.transformed.Qvalue;
+    //moduleparams.SecondHorizon[indexcount].Vq = RS_VALUE * moduleparams.Measured.Current.transformed.Qvalue + LS_VALUE * moduleparams.OptimizationFsw[indexcount] * (moduleparams.Reference.Iq - moduleparams.Measured.Current.transformed.Qvalue) + POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical * (LS_VALUE * moduleparams.Measured.Current.transformed.Dvalue + FLUX_VALUE);
+    moduleparams.SecondHorizon[indexcount].Vd = moduleparams.FirstHorizon[indexcount].Vd;   // bypass the second prediction of the vdq voltage for now (it is not needed), this part will be fixed later on (major code revision is required)
+    moduleparams.SecondHorizon[indexcount].Vq = moduleparams.FirstHorizon[indexcount].Vq;   // bypass the second prediction of the vdq voltage for now (it is not needed), this part will be fixed later on (major code revision is required)
 
     moduleparams.SecondHorizon[indexcount].Magnitude = sqrtf(moduleparams.SecondHorizon[indexcount].Vd * moduleparams.SecondHorizon[indexcount].Vd + moduleparams.SecondHorizon[indexcount].Vq * moduleparams.SecondHorizon[indexcount].Vq);
 
     moduleparams.SecondHorizon[indexcount].Valfa = sinf(moduleparams.AngleRad.Electrical) * moduleparams.SecondHorizon[indexcount].Vd + cosf(moduleparams.AngleRad.Electrical) * moduleparams.SecondHorizon[indexcount].Vq;
-    moduleparams.SecondHorizon[indexcount].Vbeta = -cosf(moduleparams.AngleRad.Electrical) * moduleparams.SecondHorizon[indexcount].Vd + sinf(moduleparams.AngleRad.Electrical) * moduleparams.SecondHorizon[indexcount].Vq;
+    moduleparams.SecondHorizon[indexcount].Vbeta =-cosf(moduleparams.AngleRad.Electrical) * moduleparams.SecondHorizon[indexcount].Vd + sinf(moduleparams.AngleRad.Electrical) * moduleparams.SecondHorizon[indexcount].Vq;
 
     moduleparams.SecondHorizon[indexcount].VoltageVectorAngleRad = atan2f(moduleparams.SecondHorizon[indexcount].Vbeta, moduleparams.SecondHorizon[indexcount].Valfa) + 4.0*PI;
     moduleparams.SecondHorizon[indexcount].VoltageVectorAngleRad_Mod = fmodf(moduleparams.SecondHorizon[indexcount].VoltageVectorAngleRad, PI / 3.0);

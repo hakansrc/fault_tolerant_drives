@@ -30,7 +30,7 @@ ModuleParameters Module1_Parameters;
 OpenLoopOperation RL_Load_Operation = {25, 0.5}; // 0 hz, 0 magnitude
 PID_Parameters PI_iq;
 PID_Parameters PI_id;
-unsigned int StartOperation = 0; /*if this is 0, then no operation will be performed. It will be set inside the debugger*/
+unsigned int StartOperation = 1; /*if this is 0, then no operation will be performed. It will be set inside the debugger*/
 unsigned long int BlankCounter = 0;
 unsigned int OperationMode = MODE_NO_OPERATION; /*this will be changed */
 DRV8305_Vars Device1Configuration;
@@ -98,8 +98,8 @@ uint32_t POSLAT_prev = 0;
 uint32_t POSLAT_now_save = 0;
 uint32_t POSLAT_prev_save = 0;
 
-float idref = IDREF_ALIGNMENT;
-float iqref = IQREF_ALIGNMENT;
+float idref = 0;
+float iqref = 0;
 
 uint16_t ReadDrv8305RegistersFlag = 0;
 uint16_t AngleHasBeenReset = 0;
@@ -119,6 +119,11 @@ uint16_t SpeedRefArrayCount = 0;
 float SpeedRefArray[6] = {35,80,35,-35,-80,-35};
 float Vd_Current_Value[NUMBEROFMPCLOOPS] = {0,0,0,0,0,0,0,0,0,0};
 float Vq_Current_Value[NUMBEROFMPCLOOPS] = {0,0,0,0,0,0,0,0,0,0};
+
+float Vd_Part1[NUMBEROFMPCLOOPS] = {0,0,0,0,0,0,0,0,0,0};
+float Vd_Part2[NUMBEROFMPCLOOPS] = {0,0,0,0,0,0,0,0,0,0};
+float Vd_Part3[NUMBEROFMPCLOOPS] = {0,0,0,0,0,0,0,0,0,0};
+
 int main(void)
 {
 
@@ -600,8 +605,14 @@ static inline void ExecuteFirstPrediction(ModuleParameters &moduleparams, unsign
 {
     Vd_Current_Value[indexcount] = moduleparams.FirstHorizon[indexcount].Vd;    // the previous' first horizon is the new current, save it for id first horizon prediction.
     Vq_Current_Value[indexcount] = moduleparams.FirstHorizon[indexcount].Vq;    // the previous' first horizon is the new current, save it for iq first horizon prediction.
+
     moduleparams.FirstHorizon[indexcount].Vd = RS_VALUE * moduleparams.Measured.Current.transformed.Dvalue + LS_VALUE * moduleparams.OptimizationFsw[indexcount] * (moduleparams.Reference.Id - moduleparams.Measured.Current.transformed.Dvalue) - POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical * LS_VALUE * moduleparams.Measured.Current.transformed.Qvalue;
     moduleparams.FirstHorizon[indexcount].Vq = RS_VALUE * moduleparams.Measured.Current.transformed.Qvalue + LS_VALUE * moduleparams.OptimizationFsw[indexcount] * (moduleparams.Reference.Iq - moduleparams.Measured.Current.transformed.Qvalue) + POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical * (LS_VALUE * moduleparams.Measured.Current.transformed.Dvalue + FLUX_VALUE);
+    Vd_Part1[indexcount] = RS_VALUE * moduleparams.Measured.Current.transformed.Dvalue;
+    Vd_Part2[indexcount] = LS_VALUE * moduleparams.OptimizationFsw[indexcount] * (moduleparams.Reference.Id - moduleparams.Measured.Current.transformed.Dvalue);
+    Vd_Part3[indexcount] = - POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical * LS_VALUE * moduleparams.Measured.Current.transformed.Qvalue;
+
+
 #if 0 /*ripple prediction is unnecessary for the first horizon*/
     moduleparams.FirstHorizon[indexcount].Magnitude = sqrtf(moduleparams.FirstHorizon[indexcount].Vd*moduleparams.FirstHorizon[indexcount].Vd\
                                                           + moduleparams.FirstHorizon[indexcount].Vq*moduleparams.FirstHorizon[indexcount].Vq);
@@ -652,7 +663,7 @@ static inline void ExecuteSecondPrediction(ModuleParameters &moduleparams, unsig
     moduleparams.SecondHorizon[indexcount].VoltageVectorAngleRad = atan2f(moduleparams.SecondHorizon[indexcount].Vbeta, moduleparams.SecondHorizon[indexcount].Valfa) + 4.0*PI;
     moduleparams.SecondHorizon[indexcount].VoltageVectorAngleRad_Mod = fmodf(moduleparams.SecondHorizon[indexcount].VoltageVectorAngleRad, PI / 3.0);
 
-    moduleparams.SecondHorizon[indexcount].ma = moduleparams.SecondHorizon[indexcount].Magnitude / (moduleparams.Measured.Voltage.Vdc / sqrtf(3));
+    moduleparams.SecondHorizon[indexcount].ma = moduleparams.SecondHorizon[indexcount].Magnitude / (moduleparams.Measured.Voltage.Vdc * 0.666667);
 
     moduleparams.SecondHorizon[indexcount].SvpwmT1 = (1.0 / moduleparams.OptimizationFsw[indexcount]) * moduleparams.SecondHorizon[indexcount].ma * sinf(PI / 3.0 - moduleparams.SecondHorizon[indexcount].VoltageVectorAngleRad_Mod);
     moduleparams.SecondHorizon[indexcount].SvpwmT2 = (1.0 / moduleparams.OptimizationFsw[indexcount]) * moduleparams.SecondHorizon[indexcount].ma * sinf(moduleparams.SecondHorizon[indexcount].VoltageVectorAngleRad_Mod);
@@ -1563,7 +1574,7 @@ __interrupt void epwm1_isr(void)
         Run_PI_Controller(PI_iq);
 
         Module1_Parameters.Reference.Iq = PI_iq.Output;
-        Module1_Parameters.Reference.Id = IDREF;
+        Module1_Parameters.Reference.Id = idref;
 
         Module1_Parameters.MinimumCostValue = (float)1e35;
 #if 1
@@ -1757,10 +1768,10 @@ __interrupt void epwm1_isr(void)
 
     if (SendOneInFour % 4 == 0)
     {
-        DataToBeSent[0] = Module1_Parameters.FirstHorizon[Module1_Parameters.MinimumCostIndex].IdPrediction;
-        DataToBeSent[1] = Module1_Parameters.FirstHorizon[Module1_Parameters.MinimumCostIndex].IqPrediction;
-        DataToBeSent[2] = Module1_Parameters.SecondHorizon[Module1_Parameters.MinimumCostIndex].IdPrediction;; //Module1_Parameters.Measured.Current.transformed.Dvalue;
-        DataToBeSent[3] = Module1_Parameters.SecondHorizon[Module1_Parameters.MinimumCostIndex].IqPrediction;;
+        DataToBeSent[0] = Vd_Part1[Module1_Parameters.MinimumCostIndex];
+        DataToBeSent[1] = Vd_Part2[Module1_Parameters.MinimumCostIndex];
+        DataToBeSent[2] = Vd_Part3[Module1_Parameters.MinimumCostIndex];
+        DataToBeSent[3] = Module1_Parameters.SecondHorizon[Module1_Parameters.MinimumCostIndex].ma;;
         DataToBeSent[4] = Module1_Parameters.Measured.Current.transformed.Dvalue; //;M1_IA_CURRENT_FLOAT;
         DataToBeSent[5] = Module1_Parameters.Measured.Current.transformed.Qvalue;
 

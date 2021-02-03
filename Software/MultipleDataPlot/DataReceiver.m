@@ -70,14 +70,17 @@ while(1)
                     end
                     subplot(3,2,i)
                     plot((1:numel(TheDataConvertedValues(i,:)))/DataSampleRate,TheDataConvertedValues(i,:));
+                    if(i==1)
+%                         ylim([0 30000]);
+                    end
                     if(i==3)
-                       ylim([-1 1]);
+%                        ylim([-1 1]);
                     end
                     if(i==4)
-                        ylim([0 2]);
+%                         ylim([0 2]);
                     end
                     if(i==6)
-                        ylim([40 120]);
+%                         ylim([40 120]);
                     end
                     grid on
                 end
@@ -88,7 +91,7 @@ while(1)
         end
         TheRawDataIsInProcessFlag = 0;
         if(EnableSaving==1)
-            FileName = sprintf("TestData/TestDataAlignmentOnMachine_%s", datestr(now, 'ddmmyyHHMMSS'));
+            FileName = sprintf("TestData/TestData_50rpm_Id1_Iq1_Id2_Iq2_Id_Iq_%s_nodivision", datestr(now, 'ddmmyyHHMMSS'));
             save(FileName,'RawDataArray','TheTag','TheTagByteSize','NumberOfFloatsPerPacket','DataSampleRate');
             RawDataArray = 0;
             TheRawDataIsInProcessFlag = 0;

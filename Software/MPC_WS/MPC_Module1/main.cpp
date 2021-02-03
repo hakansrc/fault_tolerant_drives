@@ -608,8 +608,8 @@ static inline void ExecuteFirstPrediction(ModuleParameters &moduleparams, unsign
 
     moduleparams.FirstHorizon[indexcount].Vd = RS_VALUE * moduleparams.Measured.Current.transformed.Dvalue + LS_VALUE * moduleparams.OptimizationFsw[indexcount] * (moduleparams.Reference.Id - moduleparams.Measured.Current.transformed.Dvalue) - POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical * LS_VALUE * moduleparams.Measured.Current.transformed.Qvalue;
     moduleparams.FirstHorizon[indexcount].Vq = RS_VALUE * moduleparams.Measured.Current.transformed.Qvalue + LS_VALUE * moduleparams.OptimizationFsw[indexcount] * (moduleparams.Reference.Iq - moduleparams.Measured.Current.transformed.Qvalue) + POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical * (LS_VALUE * moduleparams.Measured.Current.transformed.Dvalue + FLUX_VALUE);
-    Vd_Part1[indexcount] = RS_VALUE * moduleparams.Measured.Current.transformed.Dvalue;
-    Vd_Part2[indexcount] = LS_VALUE * moduleparams.OptimizationFsw[indexcount] * (moduleparams.Reference.Id - moduleparams.Measured.Current.transformed.Dvalue);
+    Vd_Part1[indexcount] =  moduleparams.SecondHorizon[indexcount].Vd;
+    Vd_Part2[indexcount] =  moduleparams.SecondHorizon[indexcount].Vq;
     Vd_Part3[indexcount] = - POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical * LS_VALUE * moduleparams.Measured.Current.transformed.Qvalue;
 
 
@@ -663,7 +663,7 @@ static inline void ExecuteSecondPrediction(ModuleParameters &moduleparams, unsig
     moduleparams.SecondHorizon[indexcount].VoltageVectorAngleRad = atan2f(moduleparams.SecondHorizon[indexcount].Vbeta, moduleparams.SecondHorizon[indexcount].Valfa) + 4.0*PI;
     moduleparams.SecondHorizon[indexcount].VoltageVectorAngleRad_Mod = fmodf(moduleparams.SecondHorizon[indexcount].VoltageVectorAngleRad, PI / 3.0);
 
-    moduleparams.SecondHorizon[indexcount].ma = moduleparams.SecondHorizon[indexcount].Magnitude / (moduleparams.Measured.Voltage.Vdc * 0.666667);
+    moduleparams.SecondHorizon[indexcount].ma = sqrtf(3)*moduleparams.SecondHorizon[indexcount].Magnitude / (moduleparams.Measured.Voltage.Vdc );
 
     moduleparams.SecondHorizon[indexcount].SvpwmT1 = (1.0 / moduleparams.OptimizationFsw[indexcount]) * moduleparams.SecondHorizon[indexcount].ma * sinf(PI / 3.0 - moduleparams.SecondHorizon[indexcount].VoltageVectorAngleRad_Mod);
     moduleparams.SecondHorizon[indexcount].SvpwmT2 = (1.0 / moduleparams.OptimizationFsw[indexcount]) * moduleparams.SecondHorizon[indexcount].ma * sinf(moduleparams.SecondHorizon[indexcount].VoltageVectorAngleRad_Mod);

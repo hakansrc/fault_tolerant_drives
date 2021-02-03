@@ -20,7 +20,7 @@
 
 #define CS_DC_OFFSET 2.68 // this is the current measuring offset caused by the CS of the inverter
 
-#define PI 3.1415926
+#define PI ((float )3.1415926)
 #define TWO_PI_OVER_THREE 2.09439510
 
 #define BUILDMODE MODE_RL_LOAD

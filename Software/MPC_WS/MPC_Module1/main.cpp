@@ -124,6 +124,9 @@ float Vd_Part1[NUMBEROFMPCLOOPS] = {0,0,0,0,0,0,0,0,0,0};
 float Vd_Part2[NUMBEROFMPCLOOPS] = {0,0,0,0,0,0,0,0,0,0};
 float Vd_Part3[NUMBEROFMPCLOOPS] = {0,0,0,0,0,0,0,0,0,0};
 
+#define VD_VQ_KP 2.4
+#define VD_VQ_KI 1220.6
+
 int main(void)
 {
 
@@ -606,8 +609,10 @@ static inline void ExecuteFirstPrediction(ModuleParameters &moduleparams, unsign
     Vd_Current_Value[indexcount] = moduleparams.FirstHorizon[indexcount].Vd;    // the previous' first horizon is the new current, save it for id first horizon prediction.
     Vq_Current_Value[indexcount] = moduleparams.FirstHorizon[indexcount].Vq;    // the previous' first horizon is the new current, save it for iq first horizon prediction.
 
+#if 0
     moduleparams.FirstHorizon[indexcount].Vd = RS_VALUE * moduleparams.Measured.Current.transformed.Dvalue + LS_VALUE * moduleparams.OptimizationFsw[indexcount] * (moduleparams.Reference.Id - moduleparams.Measured.Current.transformed.Dvalue) - POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical * LS_VALUE * moduleparams.Measured.Current.transformed.Qvalue;
     moduleparams.FirstHorizon[indexcount].Vq = RS_VALUE * moduleparams.Measured.Current.transformed.Qvalue + LS_VALUE * moduleparams.OptimizationFsw[indexcount] * (moduleparams.Reference.Iq - moduleparams.Measured.Current.transformed.Qvalue) + POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical * (LS_VALUE * moduleparams.Measured.Current.transformed.Dvalue + FLUX_VALUE);
+#endif
     Vd_Part1[indexcount] =  moduleparams.SecondHorizon[indexcount].Vd;
     Vd_Part2[indexcount] =  moduleparams.SecondHorizon[indexcount].Vq;
     Vd_Part3[indexcount] = - POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical * LS_VALUE * moduleparams.Measured.Current.transformed.Qvalue;
@@ -652,6 +657,11 @@ static inline void ExecuteSecondPrediction(ModuleParameters &moduleparams, unsig
     /*for the following part, the estimation of the vd vq voltages is problematic and will be investigated*/
     //moduleparams.SecondHorizon[indexcount].Vd = RS_VALUE * moduleparams.Measured.Current.transformed.Dvalue + LS_VALUE * moduleparams.OptimizationFsw[indexcount] * (moduleparams.Reference.Id - moduleparams.Measured.Current.transformed.Dvalue) - POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical * LS_VALUE *  moduleparams.Measured.Current.transformed.Qvalue;
     //moduleparams.SecondHorizon[indexcount].Vq = RS_VALUE * moduleparams.Measured.Current.transformed.Qvalue + LS_VALUE * moduleparams.OptimizationFsw[indexcount] * (moduleparams.Reference.Iq - moduleparams.Measured.Current.transformed.Qvalue) + POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical * (LS_VALUE * moduleparams.Measured.Current.transformed.Dvalue + FLUX_VALUE);
+
+#if 1
+    moduleparams.FirstHorizon[indexcount].Vd = VD_VQ_KP * (moduleparams.Reference.Id -  moduleparams.FirstHorizon[indexcount].IdPrediction) * (1.0 + VD_VQ_KI / moduleparams.OptimizationFsw[indexcount]) + moduleparams.Measured.Current.transformed.Dvalue - POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical * LS_VALUE * moduleparams.FirstHorizon[indexcount].IqPrediction;
+    moduleparams.FirstHorizon[indexcount].Vq = VD_VQ_KP * (moduleparams.Reference.Iq -  moduleparams.FirstHorizon[indexcount].IqPrediction) * (1.0 + VD_VQ_KI / moduleparams.OptimizationFsw[indexcount]) + moduleparams.Measured.Current.transformed.Qvalue + POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical * (LS_VALUE * moduleparams.FirstHorizon[indexcount].IdPrediction+ FLUX_VALUE);
+#endif
     moduleparams.SecondHorizon[indexcount].Vd = moduleparams.FirstHorizon[indexcount].Vd;   // bypass the second prediction of the vdq voltage for now (it is not needed), this part will be fixed later on (major code revision is required)
     moduleparams.SecondHorizon[indexcount].Vq = moduleparams.FirstHorizon[indexcount].Vq;   // bypass the second prediction of the vdq voltage for now (it is not needed), this part will be fixed later on (major code revision is required)
 
@@ -1574,7 +1584,7 @@ __interrupt void epwm1_isr(void)
         Run_PI_Controller(PI_iq);
 
         Module1_Parameters.Reference.Iq = PI_iq.Output;
-        Module1_Parameters.Reference.Id = idref;
+        Module1_Parameters.Reference.Id = idref-Module1_Parameters.Measured.Current.transformed.Dvalue;
 
         Module1_Parameters.MinimumCostValue = (float)1e35;
 #if 1
@@ -1768,10 +1778,10 @@ __interrupt void epwm1_isr(void)
 
     if (SendOneInFour % 4 == 0)
     {
-        DataToBeSent[0] = Vd_Part1[Module1_Parameters.MinimumCostIndex];
-        DataToBeSent[1] = Vd_Part2[Module1_Parameters.MinimumCostIndex];
+        DataToBeSent[0] = Module1_Parameters.SecondHorizon[Module1_Parameters.MinimumCostIndex].IdPrediction;
+        DataToBeSent[1] = Module1_Parameters.SecondHorizon[Module1_Parameters.MinimumCostIndex].IqPrediction;
         DataToBeSent[2] = Vd_Part3[Module1_Parameters.MinimumCostIndex];
-        DataToBeSent[3] = Module1_Parameters.SecondHorizon[Module1_Parameters.MinimumCostIndex].ma;;
+        DataToBeSent[3] = fswdecided;
         DataToBeSent[4] = Module1_Parameters.Measured.Current.transformed.Dvalue; //;M1_IA_CURRENT_FLOAT;
         DataToBeSent[5] = Module1_Parameters.Measured.Current.transformed.Qvalue;
 

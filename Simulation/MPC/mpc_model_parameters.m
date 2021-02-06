@@ -73,7 +73,7 @@ MeanLd = (1/12)*(Module1Phase_A_Ld+Module1Phase_B_Ld+Module1Phase_C_Ld+...
 
 %% Inverter parameters
 DCLINK_Cap = 1000e-12;
-Vdc = 45;
+Vdc = 40;
 ma = 0.9;
 sw_frequency = 40000;
 intangle1 = 0;
@@ -86,12 +86,12 @@ iqrated = Trated/(1.5*PolePairs*FluxPM);
 %% Other parameters
 Load_Nominal_Freq = 50;
 THD_mean_frequency = 50;
-SpeedRef1 = 40; % RPM
-SpeedRef2 = 100;
-SpeedRefUpdateTime = 1;
+SpeedRef1 = 50; % RPM
+SpeedRef2 = 80;
+SpeedRefUpdateTime = 1.5;
 Tload1 = 1.5; %Nm
-Tload2 = 30;
-TloadUpdateTime = 2;
+Tload2 = 20;
+TloadUpdateTime = 0.75;
 FaultTime = 50;
 PmaxPerModule = 2000;
 RPMmaxPerModule = 600;

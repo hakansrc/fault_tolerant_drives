@@ -13,7 +13,7 @@
 #define RS_VALUE            0.539        //ohm
 #define LS_VALUE            0.00343       //0.0035      //henry
 #define POLEPAIRS           10.0
-#define FLUX_VALUE          0.1808      //webers
+#define FLUX_VALUE          0.180      //webers
 #define Te_RATED            31.8310     //Nm per module
 #define Wmech_RATED         62.8319     //rad per sec
 #define IDREF               0.0

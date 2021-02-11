@@ -127,6 +127,9 @@ float Vd_Part3[NUMBEROFMPCLOOPS] = {0,0,0,0,0,0,0,0,0,0};
 #define VD_VQ_KP LS_VALUE/2.0*moduleparams.OptimizationFsw[indexcount] //2.4
 #define VD_VQ_KI RS_VALUE/LS_VALUE // 1220.6
 
+float AngleOffsetDegreeElectrical=0;
+uint32_t saveqposcnt = 0;
+
 int main(void)
 {
 
@@ -671,7 +674,7 @@ static inline void ExecuteSecondPrediction(ModuleParameters &moduleparams, unsig
     moduleparams.SecondHorizon[indexcount].Valfa = sinf(moduleparams.AngleRad.Electrical) * moduleparams.SecondHorizon[indexcount].Vd + cosf(moduleparams.AngleRad.Electrical) * moduleparams.SecondHorizon[indexcount].Vq;
     moduleparams.SecondHorizon[indexcount].Vbeta =-cosf(moduleparams.AngleRad.Electrical) * moduleparams.SecondHorizon[indexcount].Vd + sinf(moduleparams.AngleRad.Electrical) * moduleparams.SecondHorizon[indexcount].Vq;
 
-    moduleparams.SecondHorizon[indexcount].VoltageVectorAngleRad = atan2f(moduleparams.SecondHorizon[indexcount].Vbeta, moduleparams.SecondHorizon[indexcount].Valfa) + 4.0*PI;
+    moduleparams.SecondHorizon[indexcount].VoltageVectorAngleRad = atan2f(moduleparams.SecondHorizon[indexcount].Vbeta, moduleparams.SecondHorizon[indexcount].Valfa) + 4.0*PI + 1.5*POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical/moduleparams.OptimizationFsw[indexcount] + AngleOffsetDegreeElectrical*2.0*PI/(360.0);
     moduleparams.SecondHorizon[indexcount].VoltageVectorAngleRad_Mod = fmodf(moduleparams.SecondHorizon[indexcount].VoltageVectorAngleRad, PI / 3.0);
 
     moduleparams.SecondHorizon[indexcount].ma = sqrtf(3)*moduleparams.SecondHorizon[indexcount].Magnitude / (moduleparams.Measured.Voltage.Vdc );
@@ -1579,7 +1582,13 @@ __interrupt void epwm1_isr(void)
 
     if (OperationMode == MODE_MPCCONTROLLER)
     {
+        if(saveqposcnt==0)
+        {
+            saveqposcnt = EQep1Regs.QPOSCNT;
+        }
         SpeedRefRadSec =  ramper(SpeedRefRadSec, SpeedRefRPM/60.0*2.0*PI, 0.0001); // rate transition is around approximately 1 RPM per second
+
+
 
         PI_iq.Input = SpeedRefRadSec - Module1_Parameters.AngularSpeedRadSec.Mechanical;
         Run_PI_Controller(PI_iq);
@@ -1657,9 +1666,11 @@ __interrupt void epwm1_isr(void)
         }
 
 
+
         AlignmentCounter++;
         if(AlignmentCounter>=ALIGNMENTCOUNTVALUE)
         {
+
             AngleHasBeenReset = 1;
 
 

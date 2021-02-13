@@ -129,6 +129,16 @@ float Vd_Part3[NUMBEROFMPCLOOPS] = {0,0,0,0,0,0,0,0,0,0};
 
 float AngleOffsetDegreeElectrical=0;
 uint32_t saveqposcnt = 0;
+float savemechanicalangle = 0;
+float saveelectricalangle = 0;
+
+
+uint16_t StopTheOperation = 0;
+uint16_t RunPseudoAlignment = 0;
+
+
+
+
 
 int main(void)
 {
@@ -1554,6 +1564,31 @@ __interrupt void epwm1_isr(void)
     /*check ADCBSY register if  it makes here wait*/
     /*TODO, need to consider alignment scenario*/
 
+    if(StopTheOperation==1) // WARNING: use this with care. only for test purposes
+    {
+
+        if(RunPseudoAlignment==1)
+        {
+
+            Module1_Parameters.PhaseADutyCycle = ALIGNMENT_DC_CURRENT*RS_VALUE/Module1_Parameters.Measured.Voltage.Vdc;
+            Module1_Parameters.PhaseBDutyCycle = 0;
+            Module1_Parameters.PhaseCDutyCycle = 0;
+
+            EPwm1Regs.CMPA.bit.CMPA = Module1_Parameters.PhaseADutyCycle*EPwm1Regs.TBPRD;
+            EPwm2Regs.CMPA.bit.CMPA = Module1_Parameters.PhaseBDutyCycle*EPwm2Regs.TBPRD;
+            EPwm3Regs.CMPA.bit.CMPA = Module1_Parameters.PhaseCDutyCycle*EPwm3Regs.TBPRD;
+        }
+        else
+        {
+            EPwm1Regs.CMPA.bit.CMPA = 0;
+            EPwm2Regs.CMPA.bit.CMPA = 0;
+            EPwm3Regs.CMPA.bit.CMPA = 0;
+        }
+        EPwm1Regs.ETCLR.bit.INT = 1;
+        PieCtrlRegs.PIEACK.all = PIEACK_GROUP3;
+        return;
+    }
+
     RunTimeProtectionControl();
 
     ControlISRCounter++;
@@ -1585,6 +1620,8 @@ __interrupt void epwm1_isr(void)
         if(saveqposcnt==0)
         {
             saveqposcnt = EQep1Regs.QPOSCNT;
+            savemechanicalangle = Module1_Parameters.AngleRad.Mechanical;
+            saveelectricalangle = Module1_Parameters.AngleRad.Electrical;
         }
         SpeedRefRadSec =  ramper(SpeedRefRadSec, SpeedRefRPM/60.0*2.0*PI, 0.0001); // rate transition is around approximately 1 RPM per second
 

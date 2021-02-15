@@ -684,7 +684,7 @@ static inline void ExecuteSecondPrediction(ModuleParameters &moduleparams, unsig
     moduleparams.SecondHorizon[indexcount].Valfa = sinf(moduleparams.AngleRad.Electrical) * moduleparams.SecondHorizon[indexcount].Vd + cosf(moduleparams.AngleRad.Electrical) * moduleparams.SecondHorizon[indexcount].Vq;
     moduleparams.SecondHorizon[indexcount].Vbeta =-cosf(moduleparams.AngleRad.Electrical) * moduleparams.SecondHorizon[indexcount].Vd + sinf(moduleparams.AngleRad.Electrical) * moduleparams.SecondHorizon[indexcount].Vq;
 
-    moduleparams.SecondHorizon[indexcount].VoltageVectorAngleRad = atan2f(moduleparams.SecondHorizon[indexcount].Vbeta, moduleparams.SecondHorizon[indexcount].Valfa) + 4.0*PI + 1.5*POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical/moduleparams.OptimizationFsw[indexcount] + AngleOffsetDegreeElectrical*2.0*PI/(360.0);
+    moduleparams.SecondHorizon[indexcount].VoltageVectorAngleRad = atan2f(moduleparams.SecondHorizon[indexcount].Vbeta, moduleparams.SecondHorizon[indexcount].Valfa) + 4.0*PI + POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical/moduleparams.OptimizationFsw[indexcount];
     moduleparams.SecondHorizon[indexcount].VoltageVectorAngleRad_Mod = fmodf(moduleparams.SecondHorizon[indexcount].VoltageVectorAngleRad, PI / 3.0);
 
     moduleparams.SecondHorizon[indexcount].ma = sqrtf(3)*moduleparams.SecondHorizon[indexcount].Magnitude / (moduleparams.Measured.Voltage.Vdc );
@@ -1830,7 +1830,7 @@ __interrupt void epwm1_isr(void)
         DataToBeSent[0] = Module1_Parameters.Measured.Current.PhaseA;
         DataToBeSent[1] = Module1_Parameters.Measured.Current.PhaseB;
         DataToBeSent[2] = Module1_Parameters.Measured.Current.PhaseC;
-        DataToBeSent[3] = Module1_Parameters.AngleRad.Electrical*360.0/(2.0*PI);
+        DataToBeSent[3] = fswdecided;
         DataToBeSent[4] = Module1_Parameters.Measured.Current.transformed.Dvalue; //;M1_IA_CURRENT_FLOAT;
         DataToBeSent[5] = Module1_Parameters.Measured.Current.transformed.Qvalue;
 

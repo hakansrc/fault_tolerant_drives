@@ -116,7 +116,7 @@ float qposlatprev = 0;
 float DirectionMultiplier = 0;
 float angledifferencesave = 0;
 uint16_t SpeedRefArrayCount = 0;
-float SpeedRefArray[6] = {35,80,35,-35,-80,-35};
+float SpeedRefArray[4] = {-35,80,35,-80};
 float Vd_Current_Value[NUMBEROFMPCLOOPS] = {0,0,0,0,0,0,0,0,0,0};
 float Vq_Current_Value[NUMBEROFMPCLOOPS] = {0,0,0,0,0,0,0,0,0,0};
 
@@ -137,7 +137,10 @@ uint16_t StopTheOperation = 0;
 uint16_t RunPseudoAlignment = 0;
 
 
-
+uint32_t    QPOSCNT_at_index = 0;
+uint32_t    QPOSLAT_at_index = 0;
+uint16_t    SweetPointCount = 0;
+uint16_t    bypass_qposlat = 0;
 
 
 int main(void)
@@ -207,6 +210,7 @@ int main(void)
     EDIS;
     PieCtrlRegs.PIEIER1.bit.INTx4 = 1;          // Enable PIE Group 1 INT4
 
+#if 0
     EALLOW;
     GpioCtrlRegs.GPAMUX1.bit.GPIO6 = 0;         // GPIO
     GpioCtrlRegs.GPADIR.bit.GPIO6 = 0;          // input
@@ -215,6 +219,16 @@ int main(void)
     GPIO_SetupXINT1Gpio(6);
     XintRegs.XINT1CR.bit.POLARITY = 0;          // Falling edge interrupt
     XintRegs.XINT1CR.bit.ENABLE = 1;            // Enable XINT1
+#else
+    EALLOW;
+    GpioCtrlRegs.GPDMUX1.bit.GPIO99 = 0;         // GPIO
+    GpioCtrlRegs.GPDDIR.bit.GPIO99 = 0;          // input
+    GpioCtrlRegs.GPDQSEL1.bit.GPIO99 = 0;        // XINT1 Synch to SYSCLKOUT only
+    EDIS;
+    GPIO_SetupXINT1Gpio(99);
+    XintRegs.XINT1CR.bit.POLARITY = 1;          // rising edge interrupt
+    XintRegs.XINT1CR.bit.ENABLE = 1;            // Enable XINT1
+#endif
 #endif
 
     IER |= M_INT1;  /*Enable the PIE group of Cpu timer 0 and ADCA1 interrupt*/
@@ -225,6 +239,7 @@ int main(void)
     PieCtrlRegs.PIECTRL.bit.ENPIE = 1; // Enable the PIE block
     PieCtrlRegs.PIEIER1.bit.INTx7 = 1; /*Enable the 7th interrupt of the Group 1, which is for timer 0 interrupt*/
     PieCtrlRegs.PIEIER3.bit.INTx1 = 1;  /*Enable the 1st interrupt of the Group 3, which is for epwm1 interrupt*/
+    PieCtrlRegs.PIEIER1.bit.INTx4 = 1;          // Enable PIE Group 1 INT4
 
     EALLOW;
     CpuSysRegs.PCLKCR0.bit.TBCLKSYNC = 1;  /*start the TimeBase clock */
@@ -274,7 +289,7 @@ __interrupt void cpu_timer1_isr(void)
         {
             SpeedRefRPM = SpeedRefArray[SpeedRefArrayCount];
             SpeedRefArrayCount++;
-            if(SpeedRefArrayCount==6)
+            if(SpeedRefArrayCount==4)
             {
                 SpeedRefArrayCount = 0;
             }
@@ -585,8 +600,10 @@ void SetupGPIOs(void)
     GpioCtrlRegs.GPAMUX2.bit.GPIO20 = 1;    //set this as EQEP1A pin
     GpioCtrlRegs.GPAGMUX2.bit.GPIO21 = 0;
     GpioCtrlRegs.GPAMUX2.bit.GPIO21 = 1;    //set this as EQEP1B pin
+#if 0
     GpioCtrlRegs.GPDGMUX1.bit.GPIO99 = 1;
     GpioCtrlRegs.GPDMUX1.bit.GPIO99 = 1;    //set this as EQEP1I pin
+#endif
     EDIS;
 }
 
@@ -1099,6 +1116,16 @@ void GetEncoderReadings(ModuleParameters &moduleparams)
     /*Speed measurement*/
     if (EQep1Regs.QFLG.bit.UTO == 1) // If unit timeout (one 100 Hz period)
     {
+        if(bypass_qposlat>=1)
+        {
+            bypass_qposlat++;
+            EQep1Regs.QCLR.bit.UTO = 1;                // Clear __interrupt flag
+            if(bypass_qposlat==3)
+            {
+                bypass_qposlat = 0;
+            }
+            return;
+        }
         moduleparams.AngleRadTemp.Mechanical = (float) EQep1Regs.QPOSLAT / (float) ENCODERMAXTICKCOUNT * 2.0 * PI;
         AngleDifference = moduleparams.AngleRadTemp.Mechanical - moduleparams.AngleRadPrev.Mechanical;
         if(fabsf(AngleDifference)>=PI)
@@ -1829,7 +1856,7 @@ __interrupt void epwm1_isr(void)
     {
         DataToBeSent[0] = Module1_Parameters.Measured.Current.PhaseA;
         DataToBeSent[1] = Module1_Parameters.Measured.Current.PhaseB;
-        DataToBeSent[2] = Module1_Parameters.Measured.Current.PhaseC;
+        DataToBeSent[2] = Module1_Parameters.AngularSpeedRPM.Mechanical;
         DataToBeSent[3] = fswdecided;
         DataToBeSent[4] = Module1_Parameters.Measured.Current.transformed.Dvalue; //;M1_IA_CURRENT_FLOAT;
         DataToBeSent[5] = Module1_Parameters.Measured.Current.transformed.Qvalue;
@@ -1848,10 +1875,31 @@ __interrupt void epwm1_isr(void)
 interrupt void xint1_isr(void)
 {
     Xint1Count++;
+    //QPOSCNT_at_index = EQep1Regs.QPOSCNT;
+
+    if(Xint1Count<2)
+    {
+        EQep1Regs.QPOSCNT = 1340;
+        Module1_Parameters.AngleRadPrev.Mechanical = (float) EQep1Regs.QPOSCNT / (float) ENCODERMAXTICKCOUNT * 2.0 * PI;
+        Module1_Parameters.AngleRadTemp.Mechanical = (float) EQep1Regs.QPOSCNT / (float) ENCODERMAXTICKCOUNT * 2.0 * PI;
+#if 0
+        EQep1Regs.QPOSLAT = 1340;
+#endif
+        bypass_qposlat = 1;
+
+    }
+#if 0
+    if((EQep1Regs.QPOSLAT>1500)&&(EQep1Regs.QPOSLAT<2500))
+    {
+        SweetPointCount++;
+    }
+    QPOSLAT_at_index = EQep1Regs.QPOSLAT/1440;
+    EQep1Regs.QPOSCNT = QPOSLAT_at_index + 1340;
 
     //
     // Acknowledge this interrupt to get more from group 1
     //
+#endif
     PieCtrlRegs.PIEACK.all = PIEACK_GROUP1;
 }
 void RunTimeProtectionControl(void)

@@ -8,7 +8,7 @@
 #ifndef MACHINEPARAMETERS_H_
 #define MACHINEPARAMETERS_H_
 
-#define ALIGNMENT_DC_CURRENT    10.0 // amps
+#define ALIGNMENT_DC_CURRENT    12.0 // amps
 
 #define RS_VALUE            0.539        //ohm
 #define LS_VALUE            0.00343       //0.0035      //henry

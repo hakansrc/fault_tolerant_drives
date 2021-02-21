@@ -73,21 +73,7 @@ typedef struct
     float IqPrediction;
     float TePrediction;
 } PredictionParameters;
-typedef struct
-{
-    float Vd;
-    float Vq;
-    float Valfa;
-    float Vbeta;
-    float VoltageVectorAngleRad;
-    float VoltageVectorAngleRad_Mod;
-    float Magnitude;
-    float SvpwmT1;
-    float SvpwmT2;
-    float SvpwmT0;
-    float ElectricalAngle;
-    float ma;
-}AlignmentParameters;
+
 
 typedef struct
 {

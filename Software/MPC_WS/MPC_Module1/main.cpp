@@ -24,12 +24,10 @@
  *
  * */
 
-AlignmentParameters Alignment = {0,0,0,0,0,0,0,0,0,0,0};
 ModuleParameters Module1_Parameters;
-//ModuleParameters Module_temp;
+
 OpenLoopOperation RL_Load_Operation = {25, 0.5}; // 0 hz, 0 magnitude
 PID_Parameters PI_iq;
-PID_Parameters PI_id;
 unsigned int StartOperation = 1; /*if this is 0, then no operation will be performed. It will be set inside the debugger*/
 unsigned long int BlankCounter = 0;
 unsigned int OperationMode = MODE_NO_OPERATION; /*this will be changed */
@@ -58,7 +56,6 @@ static inline void ExecuteFirstPrediction(ModuleParameters &moduleparams, unsign
 static inline void ExecuteSecondPrediction(ModuleParameters &moduleparams, unsigned int indexcount);
 
 void GetEncoderReadings(ModuleParameters &moduleparams);
-void RunAlignmentScenario(void);
 void GetAdcReadings(ModuleParameters &moduleparams);
 void SetupCmpssProtections(void);
 void InitSpiDrv8305Gpio(void);
@@ -78,69 +75,41 @@ float ramper(float in, float out, float rampDelta);
 /**
  * main.c
  */
-uint32_t    sectornumber = 0;
+uint32_t    SvpwmSectorNumber = 0;
 uint32_t    ControlISRCounter = 0;
 uint32_t    AlignmentCounter = 0;
-float TimeCounter = 0;
 float DataToBeSent[6];
 uint32_t SendOneInFour = 0;
-uint32_t faultcounter = 0;
-volatile Uint32 Xint1Count = 0;
+uint32_t Xint1Count = 0;
 float SpeedRefRPM = 50;
 float SpeedRefRadSec = 0;
-float phaseInc = 0;
-float mPhase = 0;
-uint16_t pwmFreq = INITIALPWMFREQ;
-uint16_t pwmFreq_inc = 0;
+float PhaseIncrement = 0;
+float PhaseValue = 0;
+uint16_t PwmFrequency = INITIALPWMFREQ;
+uint16_t PwmFrequencyIncrement = 0;
 uint16_t ClockMod = 1000;
-uint32_t POSLAT_now = 0;
-uint32_t POSLAT_prev = 0;
-uint32_t POSLAT_now_save = 0;
-uint32_t POSLAT_prev_save = 0;
 
-float idref = 0;
-float iqref = 0;
 
 uint16_t ReadDrv8305RegistersFlag = 0;
 uint16_t AngleHasBeenReset = 0;
-float fswdecided = 0;
+float FswDecided = 0;
 
-uint16_t    EPwm1_TBCTR_value = 0;
-uint16_t    EPwm2_TBCTR_value = 0;
-uint16_t    EPwm3_TBCTR_value = 0;
-float SpeedMax = 0;
-float SpeedMin = 0;
-float qposlatdiff = 0;
-float qposlatnow = 0;
-float qposlatprev = 0;
-float DirectionMultiplier = 0;
-float angledifferencesave = 0;
+
+
 uint16_t SpeedRefArrayCount = 0;
 float SpeedRefArray[4] = {-35,80,35,-80};
+
+
 float Vd_Current_Value[NUMBEROFMPCLOOPS] = {0,0,0,0,0,0,0,0,0,0};
 float Vq_Current_Value[NUMBEROFMPCLOOPS] = {0,0,0,0,0,0,0,0,0,0};
 
-float Vd_Part1[NUMBEROFMPCLOOPS] = {0,0,0,0,0,0,0,0,0,0};
-float Vd_Part2[NUMBEROFMPCLOOPS] = {0,0,0,0,0,0,0,0,0,0};
-float Vd_Part3[NUMBEROFMPCLOOPS] = {0,0,0,0,0,0,0,0,0,0};
-
-#define VD_VQ_KP LS_VALUE/2.0*moduleparams.OptimizationFsw[indexcount] //2.4
-#define VD_VQ_KI RS_VALUE/LS_VALUE // 1220.6
-
-float AngleOffsetDegreeElectrical=0;
-uint32_t saveqposcnt = 0;
-float savemechanicalangle = 0;
-float saveelectricalangle = 0;
 
 
-uint16_t StopTheOperation = 0;
-uint16_t RunPseudoAlignment = 0;
 
 
-uint32_t    QPOSCNT_at_index = 0;
-uint32_t    QPOSLAT_at_index = 0;
-uint16_t    SweetPointCount = 0;
-uint16_t    bypass_qposlat = 0;
+
+
+uint16_t    ByPass_SpeedMeasurement = 0;
 
 
 int main(void)
@@ -204,22 +173,12 @@ int main(void)
     PieVectTable.EPWM1_INT = &epwm1_isr;        /*specify the interrupt service routine (ISR) address to the PIE table*/
     EDIS;
 
-#if 1
+#if 1 // we are getting the index pin as external interrupt. This way we can easily obtain the alignment point
     EALLOW;
     PieVectTable.XINT1_INT = &xint1_isr;
     EDIS;
     PieCtrlRegs.PIEIER1.bit.INTx4 = 1;          // Enable PIE Group 1 INT4
 
-#if 0
-    EALLOW;
-    GpioCtrlRegs.GPAMUX1.bit.GPIO6 = 0;         // GPIO
-    GpioCtrlRegs.GPADIR.bit.GPIO6 = 0;          // input
-    GpioCtrlRegs.GPAQSEL1.bit.GPIO6 = 0;        // XINT1 Synch to SYSCLKOUT only
-    EDIS;
-    GPIO_SetupXINT1Gpio(6);
-    XintRegs.XINT1CR.bit.POLARITY = 0;          // Falling edge interrupt
-    XintRegs.XINT1CR.bit.ENABLE = 1;            // Enable XINT1
-#else
     EALLOW;
     GpioCtrlRegs.GPDMUX1.bit.GPIO99 = 0;         // GPIO
     GpioCtrlRegs.GPDDIR.bit.GPIO99 = 0;          // input
@@ -229,9 +188,8 @@ int main(void)
     XintRegs.XINT1CR.bit.POLARITY = 1;          // rising edge interrupt
     XintRegs.XINT1CR.bit.ENABLE = 1;            // Enable XINT1
 #endif
-#endif
 
-    IER |= M_INT1;  /*Enable the PIE group of Cpu timer 0 and ADCA1 interrupt*/
+    IER |= M_INT1;  /*Enable the PIE group of Cpu timer 0 and XINT1 interrupt*/
     IER |= M_INT3;  /*Enable the PIE group of Epwm1 interrupt*/
     IER |= M_INT13; /*Enable the PIE group of Cpu timer 1 interrupt*/
     IER |= M_INT14; /*Enable the PIE group of Cpu timer 2 interrupt*/
@@ -247,7 +205,7 @@ int main(void)
     EDIS;
 
     DELAY_US(50);
-    CalculateOffsetValue();
+    CalculateOffsetValue();                 // Calculate the offset value of the current measurements.
 
     OperationMode = MODE_ALIGNMENT; // start with the selected mode
 
@@ -274,9 +232,6 @@ __interrupt void cpu_timer0_isr(void)
     GpioDataRegs.GPATOGGLE.bit.GPIO31 = 1;
     GpioDataRegs.GPBTOGGLE.bit.GPIO34 = 1;
     PieCtrlRegs.PIEACK.all = PIEACK_GROUP1;
-    EPwm1_TBCTR_value = EPwm1Regs.TBCTR;
-    EPwm2_TBCTR_value = EPwm2Regs.TBCTR;
-    EPwm3_TBCTR_value = EPwm3Regs.TBCTR;
 }
 
 __interrupt void cpu_timer1_isr(void)
@@ -301,8 +256,8 @@ __interrupt void cpu_timer1_isr(void)
         CpuTimer1.InterruptCount = 0;
     }
 #endif
-    PieCtrlRegs.PIEACK.all = PIEACK_GROUP1;
     ReadDrv8305RegistersFlag = 1;
+    PieCtrlRegs.PIEACK.all = PIEACK_GROUP1;
 }
 
 __interrupt void cpu_timer2_isr(void)
@@ -600,7 +555,7 @@ void SetupGPIOs(void)
     GpioCtrlRegs.GPAMUX2.bit.GPIO20 = 1;    //set this as EQEP1A pin
     GpioCtrlRegs.GPAGMUX2.bit.GPIO21 = 0;
     GpioCtrlRegs.GPAMUX2.bit.GPIO21 = 1;    //set this as EQEP1B pin
-#if 0
+#if 0  // this pin is used for xint1
     GpioCtrlRegs.GPDGMUX1.bit.GPIO99 = 1;
     GpioCtrlRegs.GPDMUX1.bit.GPIO99 = 1;    //set this as EQEP1I pin
 #endif
@@ -639,56 +594,12 @@ static inline void ExecuteFirstPrediction(ModuleParameters &moduleparams, unsign
     Vd_Current_Value[indexcount] = moduleparams.FirstHorizon[indexcount].Vd;    // the previous' first horizon is the new current, save it for id first horizon prediction.
     Vq_Current_Value[indexcount] = moduleparams.FirstHorizon[indexcount].Vq;    // the previous' first horizon is the new current, save it for iq first horizon prediction.
 
-#if 0
-    moduleparams.FirstHorizon[indexcount].Vd = RS_VALUE * moduleparams.Measured.Current.transformed.Dvalue + LS_VALUE * moduleparams.OptimizationFsw[indexcount] * (moduleparams.Reference.Id - moduleparams.Measured.Current.transformed.Dvalue) - POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical * LS_VALUE * moduleparams.Measured.Current.transformed.Qvalue;
-    moduleparams.FirstHorizon[indexcount].Vq = RS_VALUE * moduleparams.Measured.Current.transformed.Qvalue + LS_VALUE * moduleparams.OptimizationFsw[indexcount] * (moduleparams.Reference.Iq - moduleparams.Measured.Current.transformed.Qvalue) + POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical * (LS_VALUE * moduleparams.Measured.Current.transformed.Dvalue + FLUX_VALUE);
-#endif
-    Vd_Part1[indexcount] =  moduleparams.SecondHorizon[indexcount].Vd;
-    Vd_Part2[indexcount] =  moduleparams.SecondHorizon[indexcount].Vq;
-    Vd_Part3[indexcount] = - POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical * LS_VALUE * moduleparams.Measured.Current.transformed.Qvalue;
-
-
-#if 0 /*ripple prediction is unnecessary for the first horizon*/
-    moduleparams.FirstHorizon[indexcount].Magnitude = sqrtf(moduleparams.FirstHorizon[indexcount].Vd*moduleparams.FirstHorizon[indexcount].Vd\
-                                                          + moduleparams.FirstHorizon[indexcount].Vq*moduleparams.FirstHorizon[indexcount].Vq);
-
-    moduleparams.FirstHorizon[indexcount].Valfa = sinf(moduleparams.AngleRad.Electrical)*moduleparams.FirstHorizon[indexcount].Vd+cosf(moduleparams.AngleRad.Electrical)*moduleparams.FirstHorizon[indexcount].Vq;
-    moduleparams.FirstHorizon[indexcount].Vbeta =-cosf(moduleparams.AngleRad.Electrical)*moduleparams.FirstHorizon[indexcount].Vd+sinf(moduleparams.AngleRad.Electrical)*moduleparams.FirstHorizon[indexcount].Vq;
-
-    moduleparams.FirstHorizon[indexcount].VoltageVectorAngleRad = atan2f(moduleparams.FirstHorizon[indexcount].Vbeta,moduleparams.FirstHorizon[indexcount].Valfa);
-    moduleparams.FirstHorizon[indexcount].VoltageVectorAngleRad_Mod = fmodf(moduleparams.FirstHorizon[indexcount].VoltageVectorAngleRad,PI/3.0);
-
-    moduleparams.FirstHorizon[indexcount].ma = moduleparams.FirstHorizon[indexcount].Magnitude/(moduleparams.Measured.Voltage.Vdc/sqrtf(3));
-
-
-    moduleparams.FirstHorizon[indexcount].SvpwmT1 = (1.0/moduleparams.OptimizationFsw[indexcount])*moduleparams.FirstHorizon[indexcount].ma*sinf(PI/3.0-moduleparams.FirstHorizon[indexcount].VoltageVectorAngleRad_Mod);
-    moduleparams.FirstHorizon[indexcount].SvpwmT2 = (1.0/moduleparams.OptimizationFsw[indexcount])*moduleparams.FirstHorizon[indexcount].ma*sinf(moduleparams.FirstHorizon[indexcount].VoltageVectorAngleRad_Mod);
-    moduleparams.FirstHorizon[indexcount].SvpwmT0 = (1.0/moduleparams.OptimizationFsw[indexcount]) -moduleparams.FirstHorizon[indexcount].SvpwmT1-moduleparams.FirstHorizon[indexcount].SvpwmT2;
-
-    moduleparams.FirstHorizon[indexcount].VoltageDuring_SvpwmT1 = 0.66667*moduleparams.Measured.Voltage.Vdc - moduleparams.FirstHorizon[indexcount].Magnitude;
-    moduleparams.FirstHorizon[indexcount].VoltageDuring_SvpwmT2 = 0.66667*moduleparams.Measured.Voltage.Vdc - moduleparams.FirstHorizon[indexcount].Magnitude;
-    moduleparams.FirstHorizon[indexcount].VoltageDuring_SvpwmT0 = - moduleparams.FirstHorizon[indexcount].Magnitude;
-
-    moduleparams.FirstHorizon[indexcount].Iq_Delta_DuringT1 = moduleparams.FirstHorizon[indexcount].VoltageDuring_SvpwmT1*moduleparams.FirstHorizon[indexcount].SvpwmT1/LS_VALUE;
-    moduleparams.FirstHorizon[indexcount].Iq_Delta_DuringT2 = moduleparams.FirstHorizon[indexcount].VoltageDuring_SvpwmT2*moduleparams.FirstHorizon[indexcount].SvpwmT2/LS_VALUE;
-    moduleparams.FirstHorizon[indexcount].Iq_Delta_DuringT0 = -moduleparams.FirstHorizon[indexcount].VoltageDuring_SvpwmT0*moduleparams.FirstHorizon[indexcount].SvpwmT0/LS_VALUE;
-
-
-    moduleparams.FirstHorizon[indexcount].Iq_Ripple_Prediction = moduleparams.FirstHorizon[indexcount].Iq_Delta_DuringT1+moduleparams.FirstHorizon[indexcount].Iq_Delta_DuringT2+moduleparams.FirstHorizon[indexcount].Iq_Delta_DuringT0;
-
-#endif
-
 
     moduleparams.FirstHorizon[indexcount].IdPrediction = moduleparams.Measured.Current.transformed.Dvalue + (1.0 / moduleparams.OptimizationFsw[indexcount]) * (Vd_Current_Value[indexcount] / LS_VALUE - RS_VALUE / LS_VALUE * moduleparams.Measured.Current.transformed.Dvalue + LS_VALUE / LS_VALUE * POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical * moduleparams.Measured.Current.transformed.Qvalue);
     moduleparams.FirstHorizon[indexcount].IqPrediction = moduleparams.Measured.Current.transformed.Qvalue + (1.0 / moduleparams.OptimizationFsw[indexcount]) * (Vq_Current_Value[indexcount] / LS_VALUE - RS_VALUE / LS_VALUE * moduleparams.Measured.Current.transformed.Qvalue - LS_VALUE / LS_VALUE * POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical * moduleparams.Measured.Current.transformed.Dvalue - FLUX_VALUE * POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical / LS_VALUE);
 }
 static inline void ExecuteSecondPrediction(ModuleParameters &moduleparams, unsigned int indexcount)
 {
-    /*for the following part, the estimation of the vd vq voltages is problematic and will be investigated*/
-    //moduleparams.SecondHorizon[indexcount].Vd = RS_VALUE * moduleparams.Measured.Current.transformed.Dvalue + LS_VALUE * moduleparams.OptimizationFsw[indexcount] * (moduleparams.Reference.Id - moduleparams.Measured.Current.transformed.Dvalue) - POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical * LS_VALUE *  moduleparams.Measured.Current.transformed.Qvalue;
-    //moduleparams.SecondHorizon[indexcount].Vq = RS_VALUE * moduleparams.Measured.Current.transformed.Qvalue + LS_VALUE * moduleparams.OptimizationFsw[indexcount] * (moduleparams.Reference.Iq - moduleparams.Measured.Current.transformed.Qvalue) + POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical * (LS_VALUE * moduleparams.Measured.Current.transformed.Dvalue + FLUX_VALUE);
-
-
 #if 1
     moduleparams.FirstHorizon[indexcount].Vd = VD_VQ_KP * (moduleparams.Reference.Id -  moduleparams.FirstHorizon[indexcount].IdPrediction) * (1.0 + VD_VQ_KI / moduleparams.OptimizationFsw[indexcount]) + moduleparams.Measured.Current.transformed.Dvalue - POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical * LS_VALUE * moduleparams.FirstHorizon[indexcount].IqPrediction;
     moduleparams.FirstHorizon[indexcount].Vq = VD_VQ_KP * (moduleparams.Reference.Iq -  moduleparams.FirstHorizon[indexcount].IqPrediction) * (1.0 + VD_VQ_KI / moduleparams.OptimizationFsw[indexcount]) + moduleparams.Measured.Current.transformed.Qvalue + POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical * (LS_VALUE * moduleparams.FirstHorizon[indexcount].IdPrediction+ FLUX_VALUE);
@@ -750,15 +661,6 @@ void InitializationRoutine(void)
     PI_iq.Output_prev = 0;
     PI_iq.SaturationMax = 2.0 * IQ_RATED;
     PI_iq.SaturationMin = -2.0 * IQ_RATED;
-    PI_id.I_coeff = I_COEFFICIENT;
-    PI_id.P_coeff = P_COEFFICIENT;
-    PI_id.Ts = PI_TS_COEFFICIENT;
-    PI_id.Input = 0;
-    PI_id.Input_prev = 0;
-    PI_id.Output = 0;
-    PI_id.Output_prev = 0;
-    PI_id.SaturationMax = 2.0 * IQ_RATED;
-    PI_id.SaturationMin = -2.0 * IQ_RATED;
 
     for(i=0;i<NUMBEROFMPCLOOPS;i++)
     {
@@ -793,12 +695,14 @@ void InitializationRoutine(void)
     GPIO_WritePin(124, 1); // Enable DRV
     DELAY_US(50000);       // delay to allow DRV830x supplies to ramp up
     InitDRV8305(&Device1Configuration);
+
 #if 0
     while (Device1Configuration.DRV_fault)
     {
         faultcounter++; // hang on if drv init is faulty
     }
 #endif
+
     SetupCmpssProtections();
     EQEPSetup();
 }
@@ -1116,13 +1020,13 @@ void GetEncoderReadings(ModuleParameters &moduleparams)
     /*Speed measurement*/
     if (EQep1Regs.QFLG.bit.UTO == 1) // If unit timeout (one 100 Hz period)
     {
-        if(bypass_qposlat>=1)
+        if(ByPass_SpeedMeasurement>=1)
         {
-            bypass_qposlat++;
+            ByPass_SpeedMeasurement++;
             EQep1Regs.QCLR.bit.UTO = 1;                // Clear __interrupt flag
-            if(bypass_qposlat==3)
+            if(ByPass_SpeedMeasurement==3)
             {
-                bypass_qposlat = 0;
+                ByPass_SpeedMeasurement = 0;
             }
             return;
         }
@@ -1144,70 +1048,10 @@ void GetEncoderReadings(ModuleParameters &moduleparams)
         moduleparams.AngularSpeedRadSec.Electrical = moduleparams.AngularSpeedRadSec.Mechanical*POLEPAIRS;
         moduleparams.AngularSpeedRPM.Mechanical = moduleparams.AngularSpeedRadSec.Mechanical*60.0/(2.0*PI);
         moduleparams.AngleRadPrev.Mechanical =  moduleparams.AngleRadTemp.Mechanical;
-        if(SpeedMax<moduleparams.AngularSpeedRPM.Mechanical)
-        {
-            SpeedMax = moduleparams.AngularSpeedRPM.Mechanical;
-        }
-        if(moduleparams.AngularSpeedRPM.Mechanical<0)
-        {
-            if(moduleparams.AngularSpeedRPM.Mechanical<SpeedMin)
-            {
-                SpeedMin = moduleparams.AngularSpeedRPM.Mechanical;
-            }
-        }
         EQep1Regs.QCLR.bit.UTO = 1;                // Clear __interrupt flag
     }
 }
 
-void RunAlignmentScenario(void)
-{
-    Alignment.ElectricalAngle = 0;
-    PI_iq.Input = iqref - Module1_Parameters.Measured.Current.transformed.Qvalue; //iq error is the input for the PI_iq
-    Run_PI_Controller(PI_iq);
-    PI_id.Input = idref - Module1_Parameters.Measured.Current.transformed.Dvalue; //id error is the input for the PI_id
-    Run_PI_Controller(PI_id);
-
-    Alignment.Vd = RS_VALUE*Module1_Parameters.Measured.Current.transformed.Dvalue + LS_VALUE*((float)INITIALPWMFREQ)*(PI_id.Output-Module1_Parameters.Measured.Current.transformed.Dvalue)-POLEPAIRS*Module1_Parameters.AngularSpeedRadSec.Mechanical*LS_VALUE*Module1_Parameters.Measured.Current.transformed.Qvalue;
-    Alignment.Vq = RS_VALUE*Module1_Parameters.Measured.Current.transformed.Qvalue + LS_VALUE*((float)INITIALPWMFREQ)*(PI_iq.Output-Module1_Parameters.Measured.Current.transformed.Qvalue)+POLEPAIRS*Module1_Parameters.AngularSpeedRadSec.Mechanical*(LS_VALUE*Module1_Parameters.Measured.Current.transformed.Dvalue+FLUX_VALUE);
-
-    Alignment.Magnitude = sqrtf(Alignment.Vd*Alignment.Vd +Alignment.Vq*Alignment.Vq);
-
-    Alignment.Valfa = sinf(Alignment.ElectricalAngle)*Alignment.Vd + cosf(Alignment.ElectricalAngle)*Alignment.Vq;
-    Alignment.Vbeta =-cosf(Alignment.ElectricalAngle)*Alignment.Vd + sinf(Alignment.ElectricalAngle)*Alignment.Vq;
-
-    Alignment.VoltageVectorAngleRad = atan2f(Alignment.Vbeta,Alignment.Valfa) + 2.0*PI;
-    Alignment.VoltageVectorAngleRad_Mod = fmodf(Alignment.VoltageVectorAngleRad,PI/3);
-
-    Alignment.ma = Alignment.Magnitude/(Module1_Parameters.Measured.Voltage.Vdc/(sqrtf(3.0)));
-
-    Alignment.SvpwmT1 = (1.0/((float)INITIALPWMFREQ))*Alignment.ma*sinf(PI/3.0-Alignment.VoltageVectorAngleRad_Mod);
-    Alignment.SvpwmT2 = (1.0/((float)INITIALPWMFREQ))*Alignment.ma*sinf(Alignment.VoltageVectorAngleRad_Mod);
-    Alignment.SvpwmT0 = (1.0/((float)INITIALPWMFREQ)) - Alignment.SvpwmT1 - Alignment.SvpwmT2;
-
-    GetSvpwmDutyCycles(Alignment.SvpwmT1, Alignment.SvpwmT2, Alignment.SvpwmT0, (1.0/((float)INITIALPWMFREQ)), Alignment.VoltageVectorAngleRad, Module1_Parameters.PhaseADutyCycle, Module1_Parameters.PhaseBDutyCycle, Module1_Parameters.PhaseCDutyCycle);
-
-    EQep1Regs.QPOSCNT = 0;          // Reset position cnt for QEP
-    EQep1Regs.QCLR.bit.IEL = 1;     // Reset position cnt for QEP
-    EQep1Regs.QCLR.bit.UTO = 1;     // Reset position cnt for QEP
-
-    //AlignmentCounter++;
-    if(AlignmentCounter>=ALIGNMENTCOUNTVALUE)
-    {
-        /*should I reset some values?*/
-        PI_iq.Input = 0;
-        PI_iq.Input_prev = 0;
-        PI_iq.Output = 0;
-        PI_iq.Output_prev = 0;
-        PI_id.Input = 0;
-        PI_id.Input_prev = 0;
-        PI_id.Output = 0;
-        PI_id.Output_prev = 0;
-
-        ZeroiseModule1Parameters();
-
-        OperationMode = MODE_MPCCONTROLLER;
-    }
-}
 void GetAdcReadings(ModuleParameters &moduleparams)
 {
     moduleparams.Measured.Current.PhaseA = M1_IA_CURRENT_FLOAT;
@@ -1591,41 +1435,13 @@ __interrupt void epwm1_isr(void)
     /*check ADCBSY register if  it makes here wait*/
     /*TODO, need to consider alignment scenario*/
 
-    if(StopTheOperation==1) // WARNING: use this with care. only for test purposes
-    {
-
-        if(RunPseudoAlignment==1)
-        {
-
-            Module1_Parameters.PhaseADutyCycle = ALIGNMENT_DC_CURRENT*RS_VALUE/Module1_Parameters.Measured.Voltage.Vdc;
-            Module1_Parameters.PhaseBDutyCycle = 0;
-            Module1_Parameters.PhaseCDutyCycle = 0;
-
-            EPwm1Regs.CMPA.bit.CMPA = Module1_Parameters.PhaseADutyCycle*EPwm1Regs.TBPRD;
-            EPwm2Regs.CMPA.bit.CMPA = Module1_Parameters.PhaseBDutyCycle*EPwm2Regs.TBPRD;
-            EPwm3Regs.CMPA.bit.CMPA = Module1_Parameters.PhaseCDutyCycle*EPwm3Regs.TBPRD;
-        }
-        else
-        {
-            EPwm1Regs.CMPA.bit.CMPA = 0;
-            EPwm2Regs.CMPA.bit.CMPA = 0;
-            EPwm3Regs.CMPA.bit.CMPA = 0;
-        }
-        EPwm1Regs.ETCLR.bit.INT = 1;
-        PieCtrlRegs.PIEACK.all = PIEACK_GROUP3;
-        return;
-    }
 
     RunTimeProtectionControl();
 
     ControlISRCounter++;
 
 
-    TimeCounter = TimeCounter + 1.0;
-    if (TimeCounter == ((float)INITIALPWMFREQ))
-    {
-        TimeCounter = 0;
-    }
+
 
     if (OffsetCalculationIsDone == 0)
     {
@@ -1644,24 +1460,16 @@ __interrupt void epwm1_isr(void)
 
     if (OperationMode == MODE_MPCCONTROLLER)
     {
-        if(saveqposcnt==0)
-        {
-            saveqposcnt = EQep1Regs.QPOSCNT;
-            savemechanicalangle = Module1_Parameters.AngleRad.Mechanical;
-            saveelectricalangle = Module1_Parameters.AngleRad.Electrical;
-        }
         SpeedRefRadSec =  ramper(SpeedRefRadSec, SpeedRefRPM/60.0*2.0*PI, 0.0001); // rate transition is around approximately 1 RPM per second
-
-
 
         PI_iq.Input = SpeedRefRadSec - Module1_Parameters.AngularSpeedRadSec.Mechanical;
         Run_PI_Controller(PI_iq);
 
         Module1_Parameters.Reference.Iq = PI_iq.Output;
-        Module1_Parameters.Reference.Id = idref;
+        Module1_Parameters.Reference.Id = IDREF;
 
         Module1_Parameters.MinimumCostValue = (float)1e35;
-#if 1
+
         ExecuteFirstPrediction(Module1_Parameters,0);
         ExecuteSecondPrediction(Module1_Parameters,0);
         ExecuteFirstPrediction(Module1_Parameters,1);
@@ -1670,57 +1478,34 @@ __interrupt void epwm1_isr(void)
         ExecuteSecondPrediction(Module1_Parameters,2);
         ExecuteFirstPrediction(Module1_Parameters,3);
         ExecuteSecondPrediction(Module1_Parameters,3);
-#endif
         ExecuteFirstPrediction(Module1_Parameters,4);
         ExecuteSecondPrediction(Module1_Parameters,4);
         ExecuteFirstPrediction(Module1_Parameters,5);
         ExecuteSecondPrediction(Module1_Parameters,5);
-#if 1
         ExecuteFirstPrediction(Module1_Parameters,6);
         ExecuteSecondPrediction(Module1_Parameters,6);
         ExecuteFirstPrediction(Module1_Parameters,7);
         ExecuteSecondPrediction(Module1_Parameters,7);
-#endif
-#if 1
         ExecuteFirstPrediction(Module1_Parameters,8);
         ExecuteSecondPrediction(Module1_Parameters,8);
         ExecuteFirstPrediction(Module1_Parameters,9);
         ExecuteSecondPrediction(Module1_Parameters,9);
-#endif
+
         GetSvpwmDutyCycles(Module1_Parameters.SecondHorizon[Module1_Parameters.MinimumCostIndex].SvpwmT1,\
                            Module1_Parameters.SecondHorizon[Module1_Parameters.MinimumCostIndex].SvpwmT2,\
                            Module1_Parameters.SecondHorizon[Module1_Parameters.MinimumCostIndex].SvpwmT0,\
                            (1.0/((float)Module1_Parameters.OptimizationFsw[Module1_Parameters.MinimumCostIndex])),\
-                           /*Module1_Parameters.AngleRad.Electrical,\*/
                            Module1_Parameters.SecondHorizon[Module1_Parameters.MinimumCostIndex].VoltageVectorAngleRad,\
                            Module1_Parameters.PhaseADutyCycle,\
                            Module1_Parameters.PhaseBDutyCycle,\
                            Module1_Parameters.PhaseCDutyCycle);
-
-#if ENABLE_MPC!=1
-        Module1_Parameters.PhaseADutyCycle = 0;
-        Module1_Parameters.PhaseBDutyCycle = 0;
-        Module1_Parameters.PhaseCDutyCycle = 0;
-#endif
-#if 0
-        if((ControlISRCounter%20000)==0)
-        {
-            SpeedRefRPM = SpeedRefRPM * -1;
-        }
-#endif
     }
     else if (OperationMode == MODE_ALIGNMENT)
     {
-        //RunAlignmentScenario();
-#if 0
-        Module1_Parameters.PhaseADutyCycle = 0.15;
-        Module1_Parameters.PhaseBDutyCycle = 0;
-        Module1_Parameters.PhaseCDutyCycle = 0;
-#else
+
         Module1_Parameters.PhaseADutyCycle = ALIGNMENT_DC_CURRENT*RS_VALUE/Module1_Parameters.Measured.Voltage.Vdc;
         Module1_Parameters.PhaseBDutyCycle = 0;
         Module1_Parameters.PhaseCDutyCycle = 0;
-#endif
 
         if(AngleHasBeenReset==0)
         {
@@ -1737,17 +1522,11 @@ __interrupt void epwm1_isr(void)
 
             AngleHasBeenReset = 1;
 
-
-
             /*should I reset some values?*/
             PI_iq.Input = 0;
             PI_iq.Input_prev = 0;
             PI_iq.Output = 0;
             PI_iq.Output_prev = 0;
-            PI_id.Input = 0;
-            PI_id.Input_prev = 0;
-            PI_id.Output = 0;
-            PI_id.Output_prev = 0;
 
             ZeroiseModule1Parameters();
 
@@ -1769,21 +1548,21 @@ __interrupt void epwm1_isr(void)
     {
         if(ControlISRCounter%ClockMod==0)
         {
-            pwmFreq = pwmFreq + pwmFreq_inc;
-            if(pwmFreq >= 11000)
+            PwmFrequency = PwmFrequency + PwmFrequencyIncrement;
+            if(PwmFrequency >= 11000)
             {
-                pwmFreq = 1000;
+                PwmFrequency = 1000;
             }
-            EPwm1Regs.TBPRD = (Uint16 )((SYSCLKFREQUENCY) / (pwmFreq * 4.0));
-            EPwm2Regs.TBPRD = (Uint16 )((SYSCLKFREQUENCY) / (pwmFreq * 4.0));
-            EPwm3Regs.TBPRD = (Uint16 )((SYSCLKFREQUENCY) / (pwmFreq * 4.0));
+            EPwm1Regs.TBPRD = (Uint16 )((SYSCLKFREQUENCY) / (PwmFrequency * 4.0));
+            EPwm2Regs.TBPRD = (Uint16 )((SYSCLKFREQUENCY) / (PwmFrequency * 4.0));
+            EPwm3Regs.TBPRD = (Uint16 )((SYSCLKFREQUENCY) / (PwmFrequency * 4.0));
         }
-        phaseInc = 2*PI*RL_Load_Operation.Frequency/pwmFreq;
-        mPhase = mPhase + phaseInc;
+        PhaseIncrement = 2*PI*RL_Load_Operation.Frequency/PwmFrequency;
+        PhaseValue = PhaseValue + PhaseIncrement;
         /*TODO test variable frequency*/
-        Module1_Parameters.PhaseADutyCycle = RL_Load_Operation.ma * ((sinf(mPhase)) * 0.5 + 0.5);
-        Module1_Parameters.PhaseBDutyCycle = RL_Load_Operation.ma * ((sinf(mPhase+ TWO_PI_OVER_THREE) ) * 0.5 + 0.5);
-        Module1_Parameters.PhaseCDutyCycle = RL_Load_Operation.ma * ((sinf(mPhase + 2.0 * TWO_PI_OVER_THREE)) * 0.5 + 0.5);
+        Module1_Parameters.PhaseADutyCycle = RL_Load_Operation.ma * ((sinf(PhaseValue)) * 0.5 + 0.5);
+        Module1_Parameters.PhaseBDutyCycle = RL_Load_Operation.ma * ((sinf(PhaseValue+ TWO_PI_OVER_THREE) ) * 0.5 + 0.5);
+        Module1_Parameters.PhaseCDutyCycle = RL_Load_Operation.ma * ((sinf(PhaseValue + 2.0 * TWO_PI_OVER_THREE)) * 0.5 + 0.5);
     }
     else if (OperationMode == MODE_NO_OPERATION)
     {
@@ -1800,7 +1579,7 @@ __interrupt void epwm1_isr(void)
     }
 #endif
 
-    fswdecided = Module1_Parameters.OptimizationFsw[Module1_Parameters.MinimumCostIndex];
+    FswDecided = Module1_Parameters.OptimizationFsw[Module1_Parameters.MinimumCostIndex];
 
 #if ENABLE_MPC==1
     if(OperationMode==MODE_MPCCONTROLLER)
@@ -1857,7 +1636,7 @@ __interrupt void epwm1_isr(void)
         DataToBeSent[0] = Module1_Parameters.Measured.Current.PhaseA;
         DataToBeSent[1] = Module1_Parameters.Measured.Current.PhaseB;
         DataToBeSent[2] = Module1_Parameters.AngularSpeedRPM.Mechanical;
-        DataToBeSent[3] = fswdecided;
+        DataToBeSent[3] = FswDecided;
         DataToBeSent[4] = Module1_Parameters.Measured.Current.transformed.Dvalue; //;M1_IA_CURRENT_FLOAT;
         DataToBeSent[5] = Module1_Parameters.Measured.Current.transformed.Qvalue;
 
@@ -1875,31 +1654,14 @@ __interrupt void epwm1_isr(void)
 interrupt void xint1_isr(void)
 {
     Xint1Count++;
-    //QPOSCNT_at_index = EQep1Regs.QPOSCNT;
-
     if(Xint1Count<2)
     {
         EQep1Regs.QPOSCNT = 1340;
         Module1_Parameters.AngleRadPrev.Mechanical = (float) EQep1Regs.QPOSCNT / (float) ENCODERMAXTICKCOUNT * 2.0 * PI;
         Module1_Parameters.AngleRadTemp.Mechanical = (float) EQep1Regs.QPOSCNT / (float) ENCODERMAXTICKCOUNT * 2.0 * PI;
-#if 0
-        EQep1Regs.QPOSLAT = 1340;
-#endif
-        bypass_qposlat = 1;
+        ByPass_SpeedMeasurement = 1;
 
     }
-#if 0
-    if((EQep1Regs.QPOSLAT>1500)&&(EQep1Regs.QPOSLAT<2500))
-    {
-        SweetPointCount++;
-    }
-    QPOSLAT_at_index = EQep1Regs.QPOSLAT/1440;
-    EQep1Regs.QPOSCNT = QPOSLAT_at_index + 1340;
-
-    //
-    // Acknowledge this interrupt to get more from group 1
-    //
-#endif
     PieCtrlRegs.PIEACK.all = PIEACK_GROUP1;
 }
 void RunTimeProtectionControl(void)
@@ -1921,7 +1683,7 @@ void GetSvpwmDutyCycles(float T1, float T2, float T0,float Ts,float VectorAngleR
 {
     if ((fmodf(VectorAngleRad,2.0*PI)<=PI/3.0)&&(fmodf(VectorAngleRad,2.0*PI)>=0))
     {
-        sectornumber = 1;
+        SvpwmSectorNumber = 1;
         DutyA = (T1+T2+T0/2)/Ts;
         DutyB = (T2+T0/2)/Ts;
         DutyC = (T0/2)/Ts;
@@ -1930,7 +1692,7 @@ void GetSvpwmDutyCycles(float T1, float T2, float T0,float Ts,float VectorAngleR
 
     if ((fmodf(VectorAngleRad,2.0*PI)<=2*PI/3)&&(fmodf(VectorAngleRad,2.0*PI)>=PI/3.0))
     {
-        sectornumber = 2;
+        SvpwmSectorNumber = 2;
         DutyA = (T1+T0/2)/Ts;
         DutyB = (T1+T2+T0/2)/Ts;
         DutyC = (T0/2)/Ts;
@@ -1939,7 +1701,7 @@ void GetSvpwmDutyCycles(float T1, float T2, float T0,float Ts,float VectorAngleR
 
     if ((fmodf(VectorAngleRad,2.0*PI)<=PI)&&(fmodf(VectorAngleRad,2.0*PI)>=2*PI/3.0))
     {
-        sectornumber = 3;
+        SvpwmSectorNumber = 3;
         if(fmodf(VectorAngleRad, PI)==0)
         {
             DutyA = (T0/2)/Ts;
@@ -1957,7 +1719,7 @@ void GetSvpwmDutyCycles(float T1, float T2, float T0,float Ts,float VectorAngleR
 
     if ((fmodf(VectorAngleRad,2.0*PI)<=4*PI/3.0)&&(fmodf(VectorAngleRad,2.0*PI)>=PI))
     {
-        sectornumber = 4;
+        SvpwmSectorNumber = 4;
         DutyA = (T0/2)/Ts;
         DutyB = (T1+T0/2)/Ts;
         DutyC = (T1+T2+T0/2)/Ts;
@@ -1965,7 +1727,7 @@ void GetSvpwmDutyCycles(float T1, float T2, float T0,float Ts,float VectorAngleR
     }
     if ((fmodf(VectorAngleRad,2.0*PI)<=5*PI/3.0)&&(fmodf(VectorAngleRad,2.0*PI)>=4*PI/3.0))
     {
-        sectornumber = 5;
+        SvpwmSectorNumber = 5;
         DutyA = (T2+T0/2)/Ts;
         DutyB = (T0/2)/Ts;
         DutyC = (T1+T2+T0/2)/Ts;
@@ -1973,7 +1735,7 @@ void GetSvpwmDutyCycles(float T1, float T2, float T0,float Ts,float VectorAngleR
     }
     if ((fmodf(VectorAngleRad,2.0*PI)<=2*PI)&&(fmodf(VectorAngleRad,2.0*PI)>=5*PI/3.0))
     {
-        sectornumber = 6;
+        SvpwmSectorNumber = 6;
         DutyA = (T1+T2+T0/2)/Ts;
         DutyB = (T0/2)/Ts;
         DutyC = (T1+T0/2)/Ts;

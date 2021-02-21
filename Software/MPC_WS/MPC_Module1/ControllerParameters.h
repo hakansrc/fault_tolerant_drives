@@ -37,6 +37,9 @@
 #define IDREFCOEFF 15.0
 #define FSWCOEFF 1250.0
 
+#define VD_VQ_KP LS_VALUE/2.0*moduleparams.OptimizationFsw[indexcount] //2.4
+#define VD_VQ_KI RS_VALUE/LS_VALUE // 1220.6
+
 
 
 

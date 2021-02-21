@@ -13,4 +13,5 @@
 	<templateProperties value="id=com.ti.common.project.core.emptyProjectWithMainTemplate"/>
 	<filesToOpen value="main.c"/>
 	<origin value="C:/Users/hakan/OneDrive/Belgeler/GitHub/Public_Notes/C2000/theproject/MyProject"/>
+	<isTargetManual value="false"/>
 </projectOptions>

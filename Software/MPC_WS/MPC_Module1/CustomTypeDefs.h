@@ -45,14 +45,27 @@ typedef struct
 {
     float Dvalue;
     float Qvalue;
-    float Alfavalue;
-    float Betavalue;
 } TransformValues;
 
 typedef struct
 {
-    float Vd;
-    float Vq;
+    float IdPrediction;
+    float IqPrediction;
+    float VdPrediction;
+    float VqPrediction;
+} FirstHorizonParameters;
+
+typedef struct
+{
+    float IdPrediction;
+    float IqPrediction;
+    float VdPrediction;
+    float VqPrediction;
+} CurrentHorizonParameters;
+
+
+typedef struct
+{
     float Valfa;
     float Vbeta;
     float VoltageVectorAngleRad;
@@ -98,7 +111,8 @@ typedef struct
 typedef struct
 {
     MeasuredParams Measured;
-    PredictionParameters FirstHorizon[NUMBEROFMPCLOOPS];
+    CurrentHorizonParameters CurrentHorizon[NUMBEROFMPCLOOPS];
+    FirstHorizonParameters FirstHorizon[NUMBEROFMPCLOOPS];
     PredictionParameters SecondHorizon[NUMBEROFMPCLOOPS];
     unsigned int MinimumCostIndex;
     float MinimumCostValue;

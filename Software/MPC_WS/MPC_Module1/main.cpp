@@ -19,8 +19,6 @@
  * */
 
 /*TODO s
- * 1-   using comparator module, protection will be done on the phase currents for extreme conditions
- * 2-   Initialization routine for rotor alignment is needed
  *
  * */
 
@@ -28,12 +26,12 @@ ModuleParameters Module1_Parameters;
 
 OpenLoopOperation RL_Load_Operation = {25, 0.5}; // 0 hz, 0 magnitude
 PID_Parameters PI_iq;
-unsigned int StartOperation = 1; /*if this is 0, then no operation will be performed. It will be set inside the debugger*/
-unsigned long int BlankCounter = 0;
-unsigned int OperationMode = MODE_NO_OPERATION; /*this will be changed */
-DRV8305_Vars Device1Configuration;
-int32 OffsetCalCounter;
-uint16_t OffsetCalculationIsDone = 0;
+unsigned int        StartOperation = 1; /*if this is 0, then no operation will be performed. It will be set inside the debugger*/
+unsigned long int   BlankCounter = 0;
+unsigned int        OperationMode = MODE_NO_OPERATION; /*this will be changed */
+DRV8305_Vars        Device1Configuration;
+int32_t             OffsetCalCounter;
+uint16_t            OffsetCalculationIsDone = 0;
 float K1 = (0.998),  // Offset filter coefficient K1: 0.05/(T+0.05);
     K2 = (0.001999); // Offset filter coefficient K2: T/(T+0.05);
 
@@ -70,45 +68,28 @@ void CalculateOffsetValue(void);
 void RunTimeProtectionControl(void);
 void GetSvpwmDutyCycles(float T1, float T2, float T0,float Ts,float VectorAngleRad, float &DutyA, float &DutyB, float &DutyC);
 void ZeroiseModule1Parameters(void);
+void InitializeInterfacesForCpu2(void);
+void InitializeGpiosForCpu2(void);
 float ramper(float in, float out, float rampDelta);
 
-/**
- * main.c
- */
 uint32_t    SvpwmSectorNumber = 0;
 uint32_t    ControlISRCounter = 0;
 uint32_t    AlignmentCounter = 0;
-float DataToBeSent[6];
-uint32_t SendOneInFour = 0;
-uint32_t Xint1Count = 0;
-float SpeedRefRPM = 50;
-float SpeedRefRadSec = 0;
-float PhaseIncrement = 0;
-float PhaseValue = 0;
-uint16_t PwmFrequency = INITIALPWMFREQ;
-uint16_t PwmFrequencyIncrement = 0;
-uint16_t ClockMod = 1000;
-
-
-uint16_t ReadDrv8305RegistersFlag = 0;
-uint16_t AngleHasBeenReset = 0;
-float FswDecided = 0;
-
-
-
-uint16_t SpeedRefArrayCount = 0;
-float SpeedRefArray[4] = {-35,80,35,-80};
-
-
-float Vd_Current_Value[NUMBEROFMPCLOOPS] = {0,0,0,0,0,0,0,0,0,0};
-float Vq_Current_Value[NUMBEROFMPCLOOPS] = {0,0,0,0,0,0,0,0,0,0};
-
-
-
-
-
-
-
+float       DataToBeSent[6];
+uint32_t    SendOneInFour = 0;
+uint32_t    Xint1Count = 0;
+float       SpeedRefRPM = 50;
+float       SpeedRefRadSec = 0;
+float       PhaseIncrement = 0;
+float       PhaseValue = 0;
+uint16_t    PwmFrequency = INITIALPWMFREQ;
+uint16_t    PwmFrequencyIncrement = 0;
+uint16_t    ClockMod = 1000;
+uint16_t    ReadDrv8305RegistersFlag = 0;
+uint16_t    AngleHasBeenReset = 0;
+float       FswDecided = 0;
+uint16_t    SpeedRefArrayCount = 0;
+float       SpeedRefArray[4] = {-35,80,35,-80};
 uint16_t    ByPass_SpeedMeasurement = 0;
 
 
@@ -267,8 +248,6 @@ __interrupt void cpu_timer2_isr(void)
 void InitializeEpwm1Registers(void)
 {
     /*TODO, make sync operation of the PWM modules*/
-    /*TODO use shadow registers on both CMPA and PRDLD*/
-    /*TODO check which one of these protected with EALLOW EDIS*/
     EPwm1Regs.TBCTL.bit.FREE_SOFT = 0b10;
     EPwm1Regs.TBCTL.bit.PHSDIR = TB_UP;
     EPwm1Regs.TBCTL.bit.CLKDIV = TB_DIV2;
@@ -309,8 +288,6 @@ void InitializeEpwm1Registers(void)
     EPwm1Regs.CMPCTL2.bit.LOADCMODE = CC_CTR_ZERO;
 #endif
 
-    /*TODO check those deadtimes with an oscilloscope*/
-    /*TODO check how do we apply the duty cycles*/
     EPwm1Regs.DBCTL.all = 0;
     EPwm1Regs.DBCTL.bit.OUT_MODE = DB_FULL_ENABLE; /*deadband is set for both fed and red*/
     EPwm1Regs.DBCTL.bit.POLSEL = DB_ACTV_HIC;      /*EPWmxB is inverted*/
@@ -342,8 +319,6 @@ void InitializeEpwm1Registers(void)
     EPwm1Regs.TBPRD = ((uint32_t)SYSCLKFREQUENCY) / (((uint16_t)INITIALPWMFREQ) * 4);
     EPwm1Regs.CMPA.bit.CMPA = 0;
 
-    /*TODO how to do tripzone?, how are we going to do the protection?
-     * consider when the inverter arrives*/
     EPwm1Regs.ETSEL.bit.SOCAEN = 1; /*enable EPWMxSOCA signal*/
     EPwm1Regs.ETSEL.bit.SOCASEL = 2;    /*ADC sampling is done when TBCTR==TBPRD*/
     EPwm1Regs.ETSEL.bit.INTEN = 1;  /*enable pwm interrupt*/
@@ -356,8 +331,6 @@ void InitializeEpwm1Registers(void)
 void InitializeEpwm2Registers(void)
 {
     /*TODO, make sync operation of the PWM modules*/
-    /*TODO use shadow registers on both CMPA and PRDLD*/
-    /*TODO check which one of these protected with EALLOW EDIS*/
     EPwm2Regs.TBCTL.bit.FREE_SOFT = 0b10;
     EPwm2Regs.TBCTL.bit.PHSDIR = TB_UP;
     EPwm2Regs.TBCTL.bit.CLKDIV = TB_DIV2;
@@ -398,8 +371,6 @@ void InitializeEpwm2Registers(void)
     EPwm2Regs.CMPCTL2.bit.LOADCMODE = CC_CTR_ZERO;
 #endif
 
-    /*TODO check those deadtimes with an oscilloscope*/
-    /*TODO check how do we apply the duty cycles*/
     EPwm2Regs.DBCTL.all = 0;
     EPwm2Regs.DBCTL.bit.OUT_MODE = DB_FULL_ENABLE; /*deadband is set for both fed and red*/
     EPwm2Regs.DBCTL.bit.POLSEL = DB_ACTV_HIC;      /*EPWmxB is inverted*/
@@ -434,8 +405,6 @@ void InitializeEpwm2Registers(void)
 void InitializeEpwm3Registers(void)
 {
     /*TODO, make sync operation of the PWM modules*/
-    /*TODO use shadow registers on both CMPA and PRDLD*/
-    /*TODO check which one of these protected with EALLOW EDIS*/
     EPwm3Regs.TBCTL.bit.FREE_SOFT = 0b10;
     EPwm3Regs.TBCTL.bit.PHSDIR = TB_UP;
     EPwm3Regs.TBCTL.bit.CLKDIV = TB_DIV2;
@@ -476,8 +445,6 @@ void InitializeEpwm3Registers(void)
     EPwm3Regs.CMPCTL2.bit.LOADCMODE = CC_CTR_ZERO;
 #endif
 
-    /*TODO check those deadtimes with an oscilloscope*/
-    /*TODO check how do we apply the duty cycles*/
     EPwm3Regs.DBCTL.all = 0;
     EPwm3Regs.DBCTL.bit.OUT_MODE = DB_FULL_ENABLE; /*deadband is set for both fed and red*/
     EPwm3Regs.DBCTL.bit.POLSEL = DB_ACTV_HIC;      /*EPWmxB is inverted*/
@@ -591,26 +558,21 @@ inline void CalculateParkTransform(ModuleParameters &moduleparams)
 }
 static inline void ExecuteFirstPrediction(ModuleParameters &moduleparams, unsigned int indexcount)
 {
-    Vd_Current_Value[indexcount] = moduleparams.FirstHorizon[indexcount].Vd;    // the previous' first horizon is the new current, save it for id first horizon prediction.
-    Vq_Current_Value[indexcount] = moduleparams.FirstHorizon[indexcount].Vq;    // the previous' first horizon is the new current, save it for iq first horizon prediction.
+    moduleparams.CurrentHorizon[indexcount].VdPrediction = moduleparams.FirstHorizon[indexcount].VdPrediction;  // First horizon prediction on the previous horizon is our current value now
+    moduleparams.CurrentHorizon[indexcount].VqPrediction = moduleparams.FirstHorizon[indexcount].VdPrediction;  // First horizon prediction on the previous horizon is our current value now
 
-
-    moduleparams.FirstHorizon[indexcount].IdPrediction = moduleparams.Measured.Current.transformed.Dvalue + (1.0 / moduleparams.OptimizationFsw[indexcount]) * (Vd_Current_Value[indexcount] / LS_VALUE - RS_VALUE / LS_VALUE * moduleparams.Measured.Current.transformed.Dvalue + LS_VALUE / LS_VALUE * POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical * moduleparams.Measured.Current.transformed.Qvalue);
-    moduleparams.FirstHorizon[indexcount].IqPrediction = moduleparams.Measured.Current.transformed.Qvalue + (1.0 / moduleparams.OptimizationFsw[indexcount]) * (Vq_Current_Value[indexcount] / LS_VALUE - RS_VALUE / LS_VALUE * moduleparams.Measured.Current.transformed.Qvalue - LS_VALUE / LS_VALUE * POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical * moduleparams.Measured.Current.transformed.Dvalue - FLUX_VALUE * POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical / LS_VALUE);
+    moduleparams.FirstHorizon[indexcount].IdPrediction = moduleparams.Measured.Current.transformed.Dvalue + (1.0 / moduleparams.OptimizationFsw[indexcount]) * (moduleparams.CurrentHorizon[indexcount].VdPrediction / LS_VALUE - RS_VALUE / LS_VALUE * moduleparams.Measured.Current.transformed.Dvalue + LS_VALUE / LS_VALUE * POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical * moduleparams.Measured.Current.transformed.Qvalue);
+    moduleparams.FirstHorizon[indexcount].IqPrediction = moduleparams.Measured.Current.transformed.Qvalue + (1.0 / moduleparams.OptimizationFsw[indexcount]) * (moduleparams.CurrentHorizon[indexcount].VqPrediction / LS_VALUE - RS_VALUE / LS_VALUE * moduleparams.Measured.Current.transformed.Qvalue - LS_VALUE / LS_VALUE * POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical * moduleparams.Measured.Current.transformed.Dvalue - FLUX_VALUE * POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical / LS_VALUE);
 }
 static inline void ExecuteSecondPrediction(ModuleParameters &moduleparams, unsigned int indexcount)
 {
-#if 1
-    moduleparams.FirstHorizon[indexcount].Vd = VD_VQ_KP * (moduleparams.Reference.Id -  moduleparams.FirstHorizon[indexcount].IdPrediction) * (1.0 + VD_VQ_KI / moduleparams.OptimizationFsw[indexcount]) + moduleparams.Measured.Current.transformed.Dvalue - POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical * LS_VALUE * moduleparams.FirstHorizon[indexcount].IqPrediction;
-    moduleparams.FirstHorizon[indexcount].Vq = VD_VQ_KP * (moduleparams.Reference.Iq -  moduleparams.FirstHorizon[indexcount].IqPrediction) * (1.0 + VD_VQ_KI / moduleparams.OptimizationFsw[indexcount]) + moduleparams.Measured.Current.transformed.Qvalue + POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical * (LS_VALUE * moduleparams.FirstHorizon[indexcount].IdPrediction+ FLUX_VALUE);
-#endif
-    moduleparams.SecondHorizon[indexcount].Vd = moduleparams.FirstHorizon[indexcount].Vd;   // bypass the second prediction of the vdq voltage for now (it is not needed), this part will be fixed later on (major code revision is required)
-    moduleparams.SecondHorizon[indexcount].Vq = moduleparams.FirstHorizon[indexcount].Vq;   // bypass the second prediction of the vdq voltage for now (it is not needed), this part will be fixed later on (major code revision is required)
+    moduleparams.FirstHorizon[indexcount].VdPrediction = VD_VQ_KP * (moduleparams.Reference.Id -  moduleparams.FirstHorizon[indexcount].IdPrediction) * (1.0 + VD_VQ_KI / moduleparams.OptimizationFsw[indexcount]) + moduleparams.Measured.Current.transformed.Dvalue - POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical * LS_VALUE * moduleparams.FirstHorizon[indexcount].IqPrediction;
+    moduleparams.FirstHorizon[indexcount].VqPrediction = VD_VQ_KP * (moduleparams.Reference.Iq -  moduleparams.FirstHorizon[indexcount].IqPrediction) * (1.0 + VD_VQ_KI / moduleparams.OptimizationFsw[indexcount]) + moduleparams.Measured.Current.transformed.Qvalue + POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical * (LS_VALUE * moduleparams.FirstHorizon[indexcount].IdPrediction+ FLUX_VALUE);
 
-    moduleparams.SecondHorizon[indexcount].Magnitude = sqrtf(moduleparams.SecondHorizon[indexcount].Vd * moduleparams.SecondHorizon[indexcount].Vd + moduleparams.SecondHorizon[indexcount].Vq * moduleparams.SecondHorizon[indexcount].Vq);
+    moduleparams.SecondHorizon[indexcount].Magnitude = sqrtf(powf(moduleparams.FirstHorizon[indexcount].VdPrediction,2) + powf(moduleparams.FirstHorizon[indexcount].VqPrediction,2));
 
-    moduleparams.SecondHorizon[indexcount].Valfa = sinf(moduleparams.AngleRad.Electrical) * moduleparams.SecondHorizon[indexcount].Vd + cosf(moduleparams.AngleRad.Electrical) * moduleparams.SecondHorizon[indexcount].Vq;
-    moduleparams.SecondHorizon[indexcount].Vbeta =-cosf(moduleparams.AngleRad.Electrical) * moduleparams.SecondHorizon[indexcount].Vd + sinf(moduleparams.AngleRad.Electrical) * moduleparams.SecondHorizon[indexcount].Vq;
+    moduleparams.SecondHorizon[indexcount].Valfa = sinf(moduleparams.AngleRad.Electrical) * moduleparams.FirstHorizon[indexcount].VdPrediction + cosf(moduleparams.AngleRad.Electrical) * moduleparams.FirstHorizon[indexcount].VqPrediction;
+    moduleparams.SecondHorizon[indexcount].Vbeta =-cosf(moduleparams.AngleRad.Electrical) * moduleparams.FirstHorizon[indexcount].VdPrediction + sinf(moduleparams.AngleRad.Electrical) * moduleparams.FirstHorizon[indexcount].VqPrediction;
 
     moduleparams.SecondHorizon[indexcount].VoltageVectorAngleRad = atan2f(moduleparams.SecondHorizon[indexcount].Vbeta, moduleparams.SecondHorizon[indexcount].Valfa) + 4.0*PI + POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical/moduleparams.OptimizationFsw[indexcount];
     moduleparams.SecondHorizon[indexcount].VoltageVectorAngleRad_Mod = fmodf(moduleparams.SecondHorizon[indexcount].VoltageVectorAngleRad, PI / 3.0);
@@ -631,8 +593,8 @@ static inline void ExecuteSecondPrediction(ModuleParameters &moduleparams, unsig
 
     moduleparams.SecondHorizon[indexcount].Iq_Ripple_Prediction = moduleparams.SecondHorizon[indexcount].Iq_Delta_DuringT1 + moduleparams.SecondHorizon[indexcount].Iq_Delta_DuringT2 + moduleparams.SecondHorizon[indexcount].Iq_Delta_DuringT0;
 
-    moduleparams.SecondHorizon[indexcount].IdPrediction = moduleparams.FirstHorizon[indexcount].IdPrediction + (1.0 / moduleparams.OptimizationFsw[indexcount]) * (moduleparams.SecondHorizon[indexcount].Vd / LS_VALUE - RS_VALUE / LS_VALUE * moduleparams.FirstHorizon[indexcount].IdPrediction + LS_VALUE / LS_VALUE * POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical * moduleparams.FirstHorizon[indexcount].IqPrediction);
-    moduleparams.SecondHorizon[indexcount].IqPrediction = moduleparams.FirstHorizon[indexcount].IqPrediction + (1.0 / moduleparams.OptimizationFsw[indexcount]) * (moduleparams.SecondHorizon[indexcount].Vq / LS_VALUE - RS_VALUE / LS_VALUE * moduleparams.FirstHorizon[indexcount].IqPrediction - LS_VALUE / LS_VALUE * POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical * moduleparams.FirstHorizon[indexcount].IdPrediction - FLUX_VALUE * POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical / LS_VALUE);
+    moduleparams.SecondHorizon[indexcount].IdPrediction = moduleparams.FirstHorizon[indexcount].IdPrediction + (1.0 / moduleparams.OptimizationFsw[indexcount]) * (moduleparams.FirstHorizon[indexcount].VdPrediction / LS_VALUE - RS_VALUE / LS_VALUE * moduleparams.FirstHorizon[indexcount].IdPrediction + LS_VALUE / LS_VALUE * POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical * moduleparams.FirstHorizon[indexcount].IqPrediction);
+    moduleparams.SecondHorizon[indexcount].IqPrediction = moduleparams.FirstHorizon[indexcount].IqPrediction + (1.0 / moduleparams.OptimizationFsw[indexcount]) * (moduleparams.FirstHorizon[indexcount].VqPrediction / LS_VALUE - RS_VALUE / LS_VALUE * moduleparams.FirstHorizon[indexcount].IqPrediction - LS_VALUE / LS_VALUE * POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical * moduleparams.FirstHorizon[indexcount].IdPrediction - FLUX_VALUE * POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical / LS_VALUE);
 
     /*TODO add protection to cost*/
     moduleparams.Cost[indexcount] = IQRIPPLECOEFF * powf(moduleparams.SecondHorizon[indexcount].Iq_Ripple_Prediction / IQ_RATED, 2) + IQREFCOEFF * powf((moduleparams.Reference.Iq - moduleparams.SecondHorizon[indexcount].IqPrediction) / IQ_RATED, 2) + IDREFCOEFF * powf((moduleparams.Reference.Id - moduleparams.SecondHorizon[indexcount].IdPrediction)/IQ_RATED, 2) + FSWCOEFF * moduleparams.OptimizationFsw[indexcount] / OPT_FSW_MAX;
@@ -692,7 +654,7 @@ void InitializationRoutine(void)
     EDIS;
 
 
-    GPIO_WritePin(124, 1); // Enable DRV
+    GPIO_WritePin(CPU1_ENABLEDRV8305_PIN, 1); // Enable DRV
     DELAY_US(50000);       // delay to allow DRV830x supplies to ramp up
     InitDRV8305(&Device1Configuration);
 
@@ -708,11 +670,6 @@ void InitializationRoutine(void)
 }
 void InitializeADCs(void)
 {
-    /*
-    TODOS for ADC absurd measurements
-    - Try continous ADC mode
-    - PPB block of the ADC will be used
-*/
     EALLOW;
     AdcaRegs.ADCCTL2.bit.PRESCALE = 6; //ADCCLK = InputClokc/4.0
     AdcbRegs.ADCCTL2.bit.PRESCALE = 6; //ADCCLK = InputClokc/4.0
@@ -737,16 +694,15 @@ void InitializeADCs(void)
 
     DELAY_US(2000);
 
-    AdcaRegs.ADCCTL2.bit.SIGNALMODE = 0; // (Single ended ADC)TODO Verify these
-    AdcbRegs.ADCCTL2.bit.SIGNALMODE = 0; // (Single ended ADC)TODO Verify these
-    AdccRegs.ADCCTL2.bit.SIGNALMODE = 0; // (Single ended ADC)TODO Verify these
-    AdcdRegs.ADCCTL2.bit.SIGNALMODE = 0; // (Single ended ADC)TODO Verify these
-    /*TODO, adcsetmode might be used?*/
+    AdcaRegs.ADCCTL2.bit.SIGNALMODE = 0; // (Single ended ADC)
+    AdcbRegs.ADCCTL2.bit.SIGNALMODE = 0; // (Single ended ADC)
+    AdccRegs.ADCCTL2.bit.SIGNALMODE = 0; // (Single ended ADC)
+    AdcdRegs.ADCCTL2.bit.SIGNALMODE = 0; // (Single ended ADC)
 
-    AdcaRegs.ADCCTL2.bit.RESOLUTION = 0; // 12 bit ADC results (TODO Verify these)
-    AdcbRegs.ADCCTL2.bit.RESOLUTION = 0; // 12 bit ADC results (TODO Verify these)
-    AdccRegs.ADCCTL2.bit.RESOLUTION = 0; // 12 bit ADC results (TODO Verify these)
-    AdcdRegs.ADCCTL2.bit.RESOLUTION = 0; // 12 bit ADC results (TODO Verify these)
+    AdcaRegs.ADCCTL2.bit.RESOLUTION = 0; // 12 bit ADC results
+    AdcbRegs.ADCCTL2.bit.RESOLUTION = 0; // 12 bit ADC results
+    AdccRegs.ADCCTL2.bit.RESOLUTION = 0; // 12 bit ADC results
+    AdcdRegs.ADCCTL2.bit.RESOLUTION = 0; // 12 bit ADC results
 
     AdcaRegs.ADCBURSTCTL.all = 0x00;      // ADC Burst Control Register
     AdcaRegs.ADCBURSTCTL.bit.BURSTEN = 0; // Burst mode is disabled
@@ -842,56 +798,170 @@ void InitializeADCs(void)
     AdccRegs.ADCINTSOCSEL2.all = 0x00; // ADC Interrupt SOC Selection 2 Register
     AdcdRegs.ADCINTSOCSEL2.all = 0x00; // ADC Interrupt SOC Selection 2 Register
 
-    /*Va pin*/
+
+    /* For the M1;
+     * A_SOC0 -> Va     (M1)
+     * C_SOC0 -> Vb     (M1)
+     * B_SOC0 -> Vc     (M1)
+     * A_SOC1 -> Vdc    (M1)
+     * C_SOC1 & C_PPB1 -> Ia     (M1)
+     * B_SOC1 & B_PPB1 -> Ib     (M1)
+     * A_SOC2 & A_PPB1 -> Ic     (M1)
+     *
+     *
+#define M1_ADCRESULT_VA AdcaResultRegs.ADCRESULT0
+#define M1_ADCRESULT_VB AdccResultRegs.ADCRESULT0
+#define M1_ADCRESULT_VC AdcbResultRegs.ADCRESULT0
+#define M1_ADCRESULT_VDC AdcaResultRegs.ADCRESULT1
+#define M1_ADCRESULT_IA AdccResultRegs.ADCRESULT1
+#define M1_ADCRESULT_IB AdcbResultRegs.ADCRESULT1
+#define M1_ADCRESULT_IC AdcaResultRegs.ADCRESULT2
+     * */
+    /* For the M2;
+     * A_SOC3 -> Va     (M2)
+     * C_SOC2 -> Vb     (M2)
+     * B_SOC2 -> Vc     (M2)
+     * A_SOC4 -> Vdc    (M2)
+     * C_SOC3 & C_PPB2  -> Ia     (M2)
+     * B_SOC3 & B_PPB2  -> Ib     (M2)
+     * A_SOC5 & A_PPB2  -> Ic     (M2)
+#define M2_ADCRESULT_VA AdcaResultRegs.ADCRESULT3
+#define M2_ADCRESULT_VB AdccResultRegs.ADCRESULT2
+#define M2_ADCRESULT_VC AdcbResultRegs.ADCRESULT2
+#define M2_ADCRESULT_VDC AdcaResultRegs.ADCRESULT4
+#define M2_ADCRESULT_IA AdccResultRegs.ADCRESULT3
+#define M2_ADCRESULT_IB AdcbResultRegs.ADCRESULT3
+#define M2_ADCRESULT_IC AdcaResultRegs.ADCRESULT5
+     * */
+
+    /* M1 Va pin*/
     AdcaRegs.ADCSOC0CTL.all = 0x00;
     AdcaRegs.ADCSOC0CTL.bit.TRIGSEL = EPWM1_SOCA_TRG; /*ePWM1 SocA is the trigger*/
     AdcaRegs.ADCSOC0CTL.bit.CHSEL = 0xE;              /*This is Va pin for TIDA-00909 PCB*/
     AdcaRegs.ADCSOC0CTL.bit.ACQPS = ACQPS_PERIOD;     /*TODO: This value should be tested*/
 
-    /*Vb pin*/
+    /* M1 Vb pin*/
     AdccRegs.ADCSOC0CTL.all = 0x00;
     AdccRegs.ADCSOC0CTL.bit.TRIGSEL = EPWM1_SOCA_TRG; /*ePWM1 SocA is the trigger*/
     AdccRegs.ADCSOC0CTL.bit.CHSEL = 0x3;              /*This is Vb pin for TIDA-00909 PCB*/
     AdccRegs.ADCSOC0CTL.bit.ACQPS = ACQPS_PERIOD;     /*TODO: This value should be tested*/
 
-    /*Vc pin*/
+    /* M1 Vc pin*/
     AdcbRegs.ADCSOC0CTL.all = 0x00;
     AdcbRegs.ADCSOC0CTL.bit.TRIGSEL = EPWM1_SOCA_TRG; /*ePWM1 SocA is the trigger*/
     AdcbRegs.ADCSOC0CTL.bit.CHSEL = 0x3;              /*This is Vc pin for TIDA-00909 PCB*/
     AdcbRegs.ADCSOC0CTL.bit.ACQPS = ACQPS_PERIOD;     /*TODO: This value should be tested*/
 
-    /*Vdc pin*/
+    /* M1 Vdc pin*/
     AdcaRegs.ADCSOC1CTL.all = 0x00;
     AdcaRegs.ADCSOC1CTL.bit.TRIGSEL = EPWM1_SOCA_TRG; /*ePWM1 SocA is the trigger*/
     AdcaRegs.ADCSOC1CTL.bit.CHSEL = 0x3;              /*This is Vdc pin for TIDA-00909 PCB*/
     AdcaRegs.ADCSOC1CTL.bit.ACQPS = ACQPS_PERIOD;     /*TODO: This value should be tested*/
 
-    /*Ia pin*/
+    /* M1 Ia pin*/
     AdccRegs.ADCSOC1CTL.all = 0x00;
     AdccRegs.ADCSOC1CTL.bit.TRIGSEL = EPWM1_SOCA_TRG; /*ePWM1 SocA is the trigger*/
     AdccRegs.ADCSOC1CTL.bit.CHSEL = 0x2;              /*This is Ia pin for TIDA-00909 PCB*/
     AdccRegs.ADCSOC1CTL.bit.ACQPS = ACQPS_PERIOD;     /*TODO: This value should be tested*/
-    AdccRegs.ADCPPB1CONFIG.bit.CONFIG = 1;            // PPB is associated with SOC0
+    AdccRegs.ADCPPB1CONFIG.bit.CONFIG = 1;            // PPB is associated with SOC1
     AdccRegs.ADCPPB1OFFCAL.bit.OFFCAL = 0;            // Write zero to this for now
-    AdccRegs.ADCPPB1OFFREF = 0;                       // THIS VALUE IS TODO
+    AdccRegs.ADCPPB1OFFREF = 0;                       // This value is calculated automatically
 
-    /*Ib pin*/
+    /* M1 Ib pin*/
     AdcbRegs.ADCSOC1CTL.all = 0x00;
     AdcbRegs.ADCSOC1CTL.bit.TRIGSEL = EPWM1_SOCA_TRG; /*ePWM1 SocA is the trigger*/
     AdcbRegs.ADCSOC1CTL.bit.CHSEL = 0x2;              /*This is Ib pin for TIDA-00909 PCB*/
     AdcbRegs.ADCSOC1CTL.bit.ACQPS = ACQPS_PERIOD;     /*TODO: This value should be tested*/
-    AdcbRegs.ADCPPB1CONFIG.bit.CONFIG = 1;            // PPB is associated with SOC0
+    AdcbRegs.ADCPPB1CONFIG.bit.CONFIG = 1;            // PPB is associated with SOC1
     AdcbRegs.ADCPPB1OFFCAL.bit.OFFCAL = 0;            // Write zero to this for now
-    AdcbRegs.ADCPPB1OFFREF = 0;                       // THIS VALUE IS TODO
+    AdcbRegs.ADCPPB1OFFREF = 0;                       // This value is calculated automatically
 
-    /*Ic pin*/
+    /* M1 Ic pin*/
     AdcaRegs.ADCSOC2CTL.all = 0x00;
     AdcaRegs.ADCSOC2CTL.bit.TRIGSEL = EPWM1_SOCA_TRG; /*ePWM1 SocA is the trigger*/
     AdcaRegs.ADCSOC2CTL.bit.CHSEL = 0x2;              /*This is Ib pin for TIDA-00909 PCB*/
     AdcaRegs.ADCSOC2CTL.bit.ACQPS = ACQPS_PERIOD;     /*TODO: This value should be tested*/
-    AdcaRegs.ADCPPB2CONFIG.bit.CONFIG = 2;            // PPB is associated with SOC0
+    AdcaRegs.ADCPPB1CONFIG.bit.CONFIG = 2;            // PPB is associated with SOC2
+    AdcaRegs.ADCPPB1OFFCAL.bit.OFFCAL = 0;            // Write zero to this for now
+    AdcaRegs.ADCPPB1OFFREF = 0;                       // This value is calculated automatically
+
+    /*Module 2 ADCs are initialized here, adcresultregs can be read from both cpus, therefore the control of whole ADCs are left to CPU2 */
+    /* For the M1;
+     * A_SOC0 -> Va     (M1)
+     * C_SOC0 -> Vb     (M1)
+     * B_SOC0 -> Vc     (M1)
+     * A_SOC1 -> Vdc    (M1)
+     * C_SOC1 & C_PPB1 -> Ia     (M1)
+     * B_SOC1 & B_PPB1 -> Ib     (M1)
+     * A_SOC2 & A_PPB1 -> Ic     (M1)
+     *
+     * */
+    /* For the M2;
+     * A_SOC3 -> Va     (M2)
+     * C_SOC2 -> Vb     (M2)
+     * B_SOC2 -> Vc     (M2)
+     * A_SOC4 -> Vdc    (M2)
+     * C_SOC3 & C_PPB2  -> Ia     (M2)
+     * B_SOC3 & B_PPB2  -> Ib     (M2)
+     * A_SOC5 & A_PPB2  -> Ic     (M2)
+     *
+     * */
+
+    /*-------------- M2 Adc Configuration start --------------*/
+    /* M2 Va pin*/
+    AdcaRegs.ADCSOC3CTL.all = 0x00;
+    AdcaRegs.ADCSOC3CTL.bit.TRIGSEL = EPWM4_SOCA_TRG; /*ePWM4 SocA is the trigger*/
+    AdcaRegs.ADCSOC3CTL.bit.CHSEL = 0xF;              /*This is Va pin for TIDA-00909 PCB*/
+    AdcaRegs.ADCSOC3CTL.bit.ACQPS = ACQPS_PERIOD;     /*TODO: This value should be tested*/
+
+    /* M2 Vb pin*/
+    AdccRegs.ADCSOC2CTL.all = 0x00;
+    AdccRegs.ADCSOC2CTL.bit.TRIGSEL = EPWM4_SOCA_TRG; /*ePWM4 SocA is the trigger*/
+    AdccRegs.ADCSOC2CTL.bit.CHSEL = 0x5;              /*This is Vb pin for TIDA-00909 PCB*/
+    AdccRegs.ADCSOC2CTL.bit.ACQPS = ACQPS_PERIOD;     /*TODO: This value should be tested*/
+
+    /* M2 Vc pin*/
+    AdcbRegs.ADCSOC2CTL.all = 0x00;
+    AdcbRegs.ADCSOC2CTL.bit.TRIGSEL = EPWM4_SOCA_TRG; /*ePWM4 SocA is the trigger*/
+    AdcbRegs.ADCSOC2CTL.bit.CHSEL = 0x5;              /*This is Vc pin for TIDA-00909 PCB*/
+    AdcbRegs.ADCSOC2CTL.bit.ACQPS = ACQPS_PERIOD;     /*TODO: This value should be tested*/
+
+    /* M2 Vdc pin*/
+    AdcaRegs.ADCSOC4CTL.all = 0x00;
+    AdcaRegs.ADCSOC4CTL.bit.TRIGSEL = EPWM4_SOCA_TRG; /*ePWM4 SocA is the trigger*/
+    AdcaRegs.ADCSOC4CTL.bit.CHSEL = 0x5;              /*This is Vdc pin for TIDA-00909 PCB*/
+    AdcaRegs.ADCSOC4CTL.bit.ACQPS = ACQPS_PERIOD;     /*TODO: This value should be tested*/
+
+    /* M2 Ia pin*/
+    AdccRegs.ADCSOC3CTL.all = 0x00;
+    AdccRegs.ADCSOC3CTL.bit.TRIGSEL = EPWM4_SOCA_TRG; /*ePWM4 SocA is the trigger*/
+    AdccRegs.ADCSOC3CTL.bit.CHSEL = 0x4;              /*This is Ia pin for TIDA-00909 PCB*/
+    AdccRegs.ADCSOC3CTL.bit.ACQPS = ACQPS_PERIOD;     /*TODO: This value should be tested*/
+    AdccRegs.ADCPPB2CONFIG.bit.CONFIG = 3;            // PPB is associated with SOC3
+    AdccRegs.ADCPPB2OFFCAL.bit.OFFCAL = 0;            // Write zero to this for now
+    AdccRegs.ADCPPB2OFFREF = 0;                       // This value is calculated automatically
+
+    /* M2 Ib pin*/
+    AdcbRegs.ADCSOC3CTL.all = 0x00;
+    AdcbRegs.ADCSOC3CTL.bit.TRIGSEL = EPWM4_SOCA_TRG; /*ePWM4 SocA is the trigger*/
+    AdcbRegs.ADCSOC3CTL.bit.CHSEL = 0x4;              /*This is Ib pin for TIDA-00909 PCB*/
+    AdcbRegs.ADCSOC3CTL.bit.ACQPS = ACQPS_PERIOD;     /*TODO: This value should be tested*/
+    AdcbRegs.ADCPPB2CONFIG.bit.CONFIG = 3;            // PPB is associated with SOC3
+    AdcbRegs.ADCPPB2OFFCAL.bit.OFFCAL = 0;            // Write zero to this for now
+    AdcbRegs.ADCPPB2OFFREF = 0;                       // This value is calculated automatically
+
+    /* M2 Ic pin*/
+    AdcaRegs.ADCSOC5CTL.all = 0x00;
+    AdcaRegs.ADCSOC5CTL.bit.TRIGSEL = EPWM4_SOCA_TRG; /*ePWM4 SocA is the trigger*/
+    AdcaRegs.ADCSOC5CTL.bit.CHSEL = 0x4;              /*This is Ib pin for TIDA-00909 PCB*/
+    AdcaRegs.ADCSOC5CTL.bit.ACQPS = ACQPS_PERIOD;     /*TODO: This value should be tested*/
+    AdcaRegs.ADCPPB2CONFIG.bit.CONFIG = 5;            // PPB is associated with SOC5
     AdcaRegs.ADCPPB2OFFCAL.bit.OFFCAL = 0;            // Write zero to this for now
-    AdcaRegs.ADCPPB2OFFREF = 0;                       // THIS VALUE IS TODO
+    AdcaRegs.ADCPPB2OFFREF = 0;                       // This value is calculated automatically
+
+
+
+    /*-------------- M2 Adc Configuration end   --------------*/
 
     EDIS;
 }
@@ -1423,7 +1493,7 @@ void CalculateOffsetValue(void)
     EALLOW;
     AdccRegs.ADCPPB1OFFREF = Module1_Parameters.OffsetValue.PhaseA * 4096.0;
     AdcbRegs.ADCPPB1OFFREF = Module1_Parameters.OffsetValue.PhaseB * 4096.0;
-    AdcaRegs.ADCPPB2OFFREF = Module1_Parameters.OffsetValue.PhaseC * 4096.0;
+    AdcaRegs.ADCPPB1OFFREF = Module1_Parameters.OffsetValue.PhaseC * 4096.0;
     EDIS;
     OffsetCalculationIsDone = 1;
 }
@@ -1651,15 +1721,15 @@ __interrupt void epwm1_isr(void)
     // Acknowledge this interrupt to receive more interrupts from group 3
     PieCtrlRegs.PIEACK.all = PIEACK_GROUP3;
 }
-interrupt void xint1_isr(void)
+__interrupt void xint1_isr(void)
 {
     Xint1Count++;
-    if(Xint1Count<2)
+    if(Xint1Count<2) // in the first two rotations, reset the encoder value so that we are aligned to the "sweetpoint"
     {
-        EQep1Regs.QPOSCNT = 1340;
+        EQep1Regs.QPOSCNT = ENCODER_SWEETPOINT_VALUE;
         Module1_Parameters.AngleRadPrev.Mechanical = (float) EQep1Regs.QPOSCNT / (float) ENCODERMAXTICKCOUNT * 2.0 * PI;
         Module1_Parameters.AngleRadTemp.Mechanical = (float) EQep1Regs.QPOSCNT / (float) ENCODERMAXTICKCOUNT * 2.0 * PI;
-        ByPass_SpeedMeasurement = 1;
+        ByPass_SpeedMeasurement = 1;  // do not try to calculate speed at first two rotation. the speed measurements would be TOO wrong at first two rotations, therefore omit the speed calculation for two cycles,
 
     }
     PieCtrlRegs.PIEACK.all = PIEACK_GROUP1;
@@ -1773,4 +1843,12 @@ float ramper(float in, float out, float rampDelta)
         return(out - rampDelta);
     else
         return(in);
+}
+void InitializeInterfacesForCpu2(void)
+{
+    /*TODO*/
+}
+void InitializeGpiosForCpu2(void)
+{
+    /*TODO*/
 }

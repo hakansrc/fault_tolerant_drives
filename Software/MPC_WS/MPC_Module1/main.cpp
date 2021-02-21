@@ -23,15 +23,20 @@
  * */
 
 ModuleParameters Module1_Parameters;
+ModuleParameters Module2_Parameters;
 
-OpenLoopOperation RL_Load_Operation = {25, 0.5}; // 0 hz, 0 magnitude
-PID_Parameters PI_iq;
-unsigned int        StartOperation = 1; /*if this is 0, then no operation will be performed. It will be set inside the debugger*/
-unsigned long int   BlankCounter = 0;
-unsigned int        OperationMode = MODE_NO_OPERATION; /*this will be changed */
-DRV8305_Vars        Device1Configuration;
-int32_t             OffsetCalCounter;
-uint16_t            OffsetCalculationIsDone = 0;
+OpenLoopOperation   RL_Load_Operation = {25, 0.5}; // 0 hz, 0 magnitude
+PID_Parameters      PI_iq;
+unsigned int        M1_StartOperation = 1; /*if this is 0, then no operation will be performed. It will be set inside the debugger*/
+unsigned long int   M1_BlankCounter = 0;
+unsigned int        M1_OperationMode = MODE_NO_OPERATION; /*this will be changed */
+unsigned int        M2_OperationMode = MODE_NO_OPERATION; /*this will be changed */
+DRV8305_Vars        M1_Device1Configuration;
+DRV8305_Vars        M2_Device1Configuration;
+int32_t             M1_OffsetCalCounter;
+int32_t             M2_OffsetCalCounter;
+uint16_t            M1_OffsetCalculationIsDone = 0;
+uint16_t            M2_OffsetCalculationIsDone = 0;
 float K1 = (0.998),  // Offset filter coefficient K1: 0.05/(T+0.05);
     K2 = (0.001999); // Offset filter coefficient K2: T/(T+0.05);
 
@@ -45,6 +50,7 @@ __interrupt void xint1_isr(void);       /*prototype of the ISR functions*/
 void InitializationRoutine(void); /*all modules and gpios are initialized inside this function.*/
 void InitializeEpwm1Registers(void);
 void InitializeEpwm2Registers(void);
+void InitializeEpwm3Registers(void);
 void InitializeADCs(void);
 void SetupGPIOs(void);
 void EQEPSetup(void);
@@ -56,21 +62,26 @@ static inline void ExecuteSecondPrediction(ModuleParameters &moduleparams, unsig
 void GetEncoderReadings(ModuleParameters &moduleparams);
 void GetAdcReadings(ModuleParameters &moduleparams);
 void SetupCmpssProtections(void);
-void InitSpiDrv8305Gpio(void);
+void InitSpiDrv8305Gpios(void);
 void InitSpiRegs_DRV830x(volatile struct SPI_REGS *s);
 void InitDRV8305Regs(DRV8305_Vars *motor);
-Uint16 DRV8305_SPI_Write(DRV8305_Vars *deviceptr, Uint16 address);
-Uint16 DRV8305_SPI_Read(DRV8305_Vars *deviceptr, Uint16 address);
+Uint16 M1_DRV8305_SPI_Write(DRV8305_Vars *deviceptr, Uint16 address);
+Uint16 M1_DRV8305_SPI_Read(DRV8305_Vars *deviceptr, Uint16 address);
+Uint16 M2_DRV8305_SPI_Write(DRV8305_Vars *deviceptr, Uint16 address);
+Uint16 M2_DRV8305_SPI_Read(DRV8305_Vars *deviceptr, Uint16 address);
 Uint16 SPI_Driver(volatile struct SPI_REGS *s, Uint16 data);
-void InitDRV8305(DRV8305_Vars *deviceptr);
-void ReadDRV8305Registers(DRV8305_Vars *deviceptr);
-void CalculateOffsetValue(void);
+void M1_InitDRV8305(DRV8305_Vars *deviceptr);
+void M2_InitDRV8305(DRV8305_Vars *deviceptr);
+void M1_ReadDRV8305Registers(DRV8305_Vars *deviceptr);
+void M1_CalculateOffsetValue(void);
+void M2_CalculateOffsetValue(void);
 void RunTimeProtectionControl(void);
 void GetSvpwmDutyCycles(float T1, float T2, float T0,float Ts,float VectorAngleRad, float &DutyA, float &DutyB, float &DutyC);
 void ZeroiseModule1Parameters(void);
-void InitializeInterfacesForCpu2(void);
-void InitializeGpiosForCpu2(void);
 float ramper(float in, float out, float rampDelta);
+
+void InitializePeripharelsForCpu2(void);
+void InitializeGpiosForCpu2(void);
 
 uint32_t    SvpwmSectorNumber = 0;
 uint32_t    ControlISRCounter = 0;
@@ -91,6 +102,18 @@ float       FswDecided = 0;
 uint16_t    SpeedRefArrayCount = 0;
 float       SpeedRefArray[4] = {-35,80,35,-80};
 uint16_t    ByPass_SpeedMeasurement = 0;
+
+uint16_t    StartOperationCpu2 = 0; // when this is set to 1, cpu2 will start operation & inverter2 will contribute to the traction
+
+/*TODO's before starting two module operation, following variables will be put to GSRAMs
+ * 1- StartOperationCpu2
+ * 2- PI_iq
+ * 3- M1_OperationMode & M2_OperationMode
+ * 4- SpeedRefRPM
+ * 5- M2_OffsetCalculationIsDone
+ * 6- Module1_Parameters & Module2_Parameters
+ * */
+
 
 
 int main(void)
@@ -124,15 +147,15 @@ int main(void)
     EDIS;
 
 
-    while (StartOperation == 0)
+    while (M1_StartOperation == 0)
     {
-        if ((BlankCounter % 10) == 0)
+        if ((M1_BlankCounter % 10) == 0)
         {
             GpioDataRegs.GPATOGGLE.bit.GPIO31 = 1;
             GpioDataRegs.GPBTOGGLE.bit.GPIO34 = 1;
         }
 
-        BlankCounter++;
+        M1_BlankCounter++;
         DELAY_US(100000);
     }
     DINT;
@@ -186,9 +209,10 @@ int main(void)
     EDIS;
 
     DELAY_US(50);
-    CalculateOffsetValue();                 // Calculate the offset value of the current measurements.
+    M1_CalculateOffsetValue();                 // Calculate the offset value of the current measurements.
+    M2_CalculateOffsetValue();
 
-    OperationMode = MODE_ALIGNMENT; // start with the selected mode
+    M1_OperationMode = MODE_ALIGNMENT; // start with the selected mode
 
     EALLOW;
     EINT; // Enable Global interrupt INTM
@@ -202,7 +226,7 @@ int main(void)
         SciaBackgroundTask();
         if(ReadDrv8305RegistersFlag==1)
         {
-            ReadDRV8305Registers(&Device1Configuration);
+            M1_ReadDRV8305Registers(&M1_Device1Configuration);
             ReadDrv8305RegistersFlag = 0;
         }
     }
@@ -219,7 +243,7 @@ __interrupt void cpu_timer1_isr(void)
 {
     CpuTimer1.InterruptCount++;
 #if 0
-    if(OperationMode==MODE_MPCCONTROLLER)
+    if(M1_OperationMode==MODE_MPCCONTROLLER)
     {
         if((CpuTimer1.InterruptCount%5)==0)
         {
@@ -624,29 +648,49 @@ void InitializationRoutine(void)
     PI_iq.SaturationMax = 2.0 * IQ_RATED;
     PI_iq.SaturationMin = -2.0 * IQ_RATED;
 
+
+
+
     for(i=0;i<NUMBEROFMPCLOOPS;i++)
     {
         Module1_Parameters.OptimizationFsw[i] = (i+1)*1000;
+        Module2_Parameters.OptimizationFsw[i] = (i+1)*1000;
     }
 
-    InitializeADCs();
+    InitializeADCs();               // initialize gpios for both cpu1 & cpu2
     SetupGPIOs();
     InitializeEpwm1Registers();
     InitializeEpwm2Registers();
     InitializeEpwm3Registers();
-    InitSpiDrv8305Gpio();
+    InitSpiDrv8305Gpios();          // initialize SPIs for both M1 & M2
     DELAY_US(100000);
-    InitSpiRegs_DRV830x(&SpiaRegs);
-    InitDRV8305Regs(&Device1Configuration);
+    InitSpiRegs_DRV830x(&SpiaRegs); // initialize spi registers for M1 inverter
+    InitSpiRegs_DRV830x(&SpibRegs); // initialize spi registers for M2 inverter
+    InitDRV8305Regs(&M1_Device1Configuration);  // initialize drv8305 registers for M1
+    InitDRV8305Regs(&M2_Device1Configuration);  // initialize drv8305 registers for M2
 
-    EALLOW; /*configure GPIO124 to be the EN_GATE*/
+    EALLOW; /*configure GPIO26 to be the EN_GATE for M2 inverter*/
+    GpioDataRegs.GPACLEAR.bit.GPIO26 = 1;
+    GpioCtrlRegs.GPAGMUX2.bit.GPIO26 = 0;
+    GpioCtrlRegs.GPAMUX2.bit.GPIO26 = 0;
+    GpioCtrlRegs.GPADIR.bit.GPIO26 = 1;
+    EDIS;
+
+    EALLOW; /*configure GPIO27 to be the WAKE for M2 inverter*/
+    GpioDataRegs.GPACLEAR.bit.GPIO27 = 1;
+    GpioCtrlRegs.GPAGMUX2.bit.GPIO27 = 0;
+    GpioCtrlRegs.GPAMUX2.bit.GPIO27 = 0;
+    GpioCtrlRegs.GPADIR.bit.GPIO27 = 1;
+    EDIS;
+
+    EALLOW; /*configure GPIO124 to be the EN_GATE for M1 inverter*/
     GpioDataRegs.GPDCLEAR.bit.GPIO124 = 1;
     GpioCtrlRegs.GPDGMUX2.bit.GPIO124 = 0;
     GpioCtrlRegs.GPDMUX2.bit.GPIO124 = 0;
     GpioCtrlRegs.GPDDIR.bit.GPIO124 = 1;
     EDIS;
 
-    EALLOW; /*configure GPIO125 to be the WAKE*/
+    EALLOW; /*configure GPIO125 to be the WAKE for M1 inverter*/
     GpioDataRegs.GPDCLEAR.bit.GPIO125 = 1;
     GpioCtrlRegs.GPDGMUX2.bit.GPIO125 = 0;
     GpioCtrlRegs.GPDMUX2.bit.GPIO125 = 0;
@@ -654,12 +698,14 @@ void InitializationRoutine(void)
     EDIS;
 
 
-    GPIO_WritePin(CPU1_ENABLEDRV8305_PIN, 1); // Enable DRV
+    GPIO_WritePin(CPU1_ENABLEDRV8305_PIN, 1); // Enable DRV for module 1
+    GPIO_WritePin(CPU2_ENABLEDRV8305_PIN, 1); // Enable DRV for module 2
     DELAY_US(50000);       // delay to allow DRV830x supplies to ramp up
-    InitDRV8305(&Device1Configuration);
+    M1_InitDRV8305(&M1_Device1Configuration);
+    M2_InitDRV8305(&M2_Device1Configuration);
 
 #if 0
-    while (Device1Configuration.DRV_fault)
+    while (M1_Device1Configuration.DRV_fault)
     {
         faultcounter++; // hang on if drv init is faulty
     }
@@ -1265,7 +1311,7 @@ void SetupCmpssProtections(void)
 
 }
 
-void InitSpiDrv8305Gpio(void)
+void InitSpiDrv8305Gpios(void)
 {
     EALLOW;
     GpioCtrlRegs.GPBMUX2.bit.GPIO58 = 3;  /*SPISIMOA*/
@@ -1276,6 +1322,17 @@ void InitSpiDrv8305Gpio(void)
     GpioCtrlRegs.GPBGMUX2.bit.GPIO60 = 3; /*SPICLKA*/
     GpioCtrlRegs.GPBMUX2.bit.GPIO61 = 3;  /*SPISTEA*/
     GpioCtrlRegs.GPBGMUX2.bit.GPIO61 = 3; /*SPISTEA*/
+    EDIS;
+
+    EALLOW;
+    GpioCtrlRegs.GPBMUX2.bit.GPIO63 = 3;  /*SPISIMOA*/
+    GpioCtrlRegs.GPBGMUX2.bit.GPIO63 = 3; /*SPISIMOA*/
+    GpioCtrlRegs.GPCMUX1.bit.GPIO64 = 3;  /*SPISOMIA*/
+    GpioCtrlRegs.GPCGMUX1.bit.GPIO64 = 3; /*SPISOMIA*/
+    GpioCtrlRegs.GPCMUX1.bit.GPIO65 = 3;  /*SPICLKA*/
+    GpioCtrlRegs.GPCGMUX1.bit.GPIO65 = 3; /*SPICLKA*/
+    GpioCtrlRegs.GPCMUX1.bit.GPIO66 = 3;  /*SPISTEA*/
+    GpioCtrlRegs.GPCGMUX1.bit.GPIO66 = 3; /*SPISTEA*/
     EDIS;
 }
 
@@ -1355,7 +1412,7 @@ void InitDRV8305Regs(DRV8305_Vars *deviceptr)
 
     return;
 }
-void ReadDRV8305Registers(DRV8305_Vars *deviceptr)
+void M1_ReadDRV8305Registers(DRV8305_Vars *deviceptr)
 {
 
 
@@ -1364,17 +1421,17 @@ void ReadDRV8305Registers(DRV8305_Vars *deviceptr)
     // ===============================================
     // read all status and control registers
     // ===============================================
-    deviceptr->status1_wwd.all = DRV8305_SPI_Read(deviceptr, DRV8305_S1_WWD_ADDR) & 0x05ff;              // read DRV8305 status reg 1
-    deviceptr->status2_ov_vds.all = DRV8305_SPI_Read(deviceptr, DRV8305_S2_OV_VDS_FAULTS_ADDR) & 0x07e7; // read DRV8305 status reg 2
-    deviceptr->status3_IC.all = DRV8305_SPI_Read(deviceptr, DRV8305_S3_IC_FAULTS_ADDR) & 0x0777;         // read DRV8305 status reg 3
-    deviceptr->status4_gd_Vgs.all = DRV8305_SPI_Read(deviceptr, DRV8305_S4_GD_VGS_FAULTS_ADDR) & 0x07e0; // read DRV8305 status reg 4
+    deviceptr->status1_wwd.all = M1_DRV8305_SPI_Read(deviceptr, DRV8305_S1_WWD_ADDR) & 0x05ff;              // read DRV8305 status reg 1
+    deviceptr->status2_ov_vds.all = M1_DRV8305_SPI_Read(deviceptr, DRV8305_S2_OV_VDS_FAULTS_ADDR) & 0x07e7; // read DRV8305 status reg 2
+    deviceptr->status3_IC.all = M1_DRV8305_SPI_Read(deviceptr, DRV8305_S3_IC_FAULTS_ADDR) & 0x0777;         // read DRV8305 status reg 3
+    deviceptr->status4_gd_Vgs.all = M1_DRV8305_SPI_Read(deviceptr, DRV8305_S4_GD_VGS_FAULTS_ADDR) & 0x07e0; // read DRV8305 status reg 4
 
 
 
     return;
 }
 
-void InitDRV8305(DRV8305_Vars *deviceptr)
+void M1_InitDRV8305(DRV8305_Vars *deviceptr)
 {
     Uint16 tmp1, *ptr1, *ptr2;
 
@@ -1384,31 +1441,31 @@ void InitDRV8305(DRV8305_Vars *deviceptr)
     //  for (tmp1=5; tmp1<= 0xc; tmp1++)
     //  {
     //      if (tmp1 != 8)
-    //          tmp2 = DRV8305_SPI_Write(motor, tmp1);                //write to DRV8305 control reg @ address 'tmp1';
+    //          tmp2 = M1_DRV8305_SPI_Write(motor, tmp1);                //write to DRV8305 control reg @ address 'tmp1';
     //  }
 
-    tmp1 = DRV8305_SPI_Write(deviceptr, DRV8305_C5_HS_GATE_DRIVER_CNTRL_ADDR); //write to DRV8305 control reg 5
-    tmp1 = DRV8305_SPI_Write(deviceptr, DRV8305_C6_LS_GATE_DRIVER_CNTRL_ADDR); //write to DRV8305 control reg 6
-    tmp1 = DRV8305_SPI_Write(deviceptr, DRV8305_C7_GD_CNTRL_ADDR);             //write to DRV8305 control reg 7
-    tmp1 = DRV8305_SPI_Write(deviceptr, DRV8305_C9_IC_OPS_ADDR);               //write to DRV8305 control reg 9
-    tmp1 = DRV8305_SPI_Write(deviceptr, DRV8305_CA_SHUNT_AMP_CNTRL_ADDR);      //write to DRV8305 control reg A
-    tmp1 = DRV8305_SPI_Write(deviceptr, DRV8305_CB_VREG_CNTRL_ADDR);           //write to DRV8305 control reg B
-    tmp1 = DRV8305_SPI_Write(deviceptr, DRV8305_CC_VDS_SNS_CNTRL_ADDR);        //write to DRV8305 control reg C
+    tmp1 = M1_DRV8305_SPI_Write(deviceptr, DRV8305_C5_HS_GATE_DRIVER_CNTRL_ADDR); //write to DRV8305 control reg 5
+    tmp1 = M1_DRV8305_SPI_Write(deviceptr, DRV8305_C6_LS_GATE_DRIVER_CNTRL_ADDR); //write to DRV8305 control reg 6
+    tmp1 = M1_DRV8305_SPI_Write(deviceptr, DRV8305_C7_GD_CNTRL_ADDR);             //write to DRV8305 control reg 7
+    tmp1 = M1_DRV8305_SPI_Write(deviceptr, DRV8305_C9_IC_OPS_ADDR);               //write to DRV8305 control reg 9
+    tmp1 = M1_DRV8305_SPI_Write(deviceptr, DRV8305_CA_SHUNT_AMP_CNTRL_ADDR);      //write to DRV8305 control reg A
+    tmp1 = M1_DRV8305_SPI_Write(deviceptr, DRV8305_CB_VREG_CNTRL_ADDR);           //write to DRV8305 control reg B
+    tmp1 = M1_DRV8305_SPI_Write(deviceptr, DRV8305_CC_VDS_SNS_CNTRL_ADDR);        //write to DRV8305 control reg C
 
     // ===============================================
     // read all status and control registers
     // ===============================================
-    deviceptr->status1_wwd.all = DRV8305_SPI_Read(deviceptr, DRV8305_S1_WWD_ADDR) & 0x05ff;              // read DRV8305 status reg 1
-    deviceptr->status2_ov_vds.all = DRV8305_SPI_Read(deviceptr, DRV8305_S2_OV_VDS_FAULTS_ADDR) & 0x07e7; // read DRV8305 status reg 2
-    deviceptr->status3_IC.all = DRV8305_SPI_Read(deviceptr, DRV8305_S3_IC_FAULTS_ADDR) & 0x0777;         // read DRV8305 status reg 3
-    deviceptr->status4_gd_Vgs.all = DRV8305_SPI_Read(deviceptr, DRV8305_S4_GD_VGS_FAULTS_ADDR) & 0x07e0; // read DRV8305 status reg 4
-    deviceptr->readCntrl5 = DRV8305_SPI_Write(deviceptr, DRV8305_C5_HS_GATE_DRIVER_CNTRL_ADDR) & 0x03ff; // read DRV8305 control reg 5
-    deviceptr->readCntrl6 = DRV8305_SPI_Write(deviceptr, DRV8305_C6_LS_GATE_DRIVER_CNTRL_ADDR) & 0x03ff; // read DRV8305 control reg 6
-    deviceptr->readCntrl7 = DRV8305_SPI_Write(deviceptr, DRV8305_C7_GD_CNTRL_ADDR) & 0x03ff;             // read DRV8305 control reg 7
-    deviceptr->readCntrl9 = DRV8305_SPI_Write(deviceptr, DRV8305_C9_IC_OPS_ADDR) & 0x07ff;               // read DRV8305 control reg 9
-    deviceptr->readCntrlA = DRV8305_SPI_Write(deviceptr, DRV8305_CA_SHUNT_AMP_CNTRL_ADDR) & 0x07ff;      // read DRV8305 control reg A
-    deviceptr->readCntrlB = DRV8305_SPI_Write(deviceptr, DRV8305_CB_VREG_CNTRL_ADDR) & 0x031f;           // read DRV8305 control reg B
-    deviceptr->readCntrlC = DRV8305_SPI_Write(deviceptr, DRV8305_CC_VDS_SNS_CNTRL_ADDR) & 0x00ff;        // read DRV8305 control reg C
+    deviceptr->status1_wwd.all = M1_DRV8305_SPI_Read(deviceptr, DRV8305_S1_WWD_ADDR) & 0x05ff;              // read DRV8305 status reg 1
+    deviceptr->status2_ov_vds.all = M1_DRV8305_SPI_Read(deviceptr, DRV8305_S2_OV_VDS_FAULTS_ADDR) & 0x07e7; // read DRV8305 status reg 2
+    deviceptr->status3_IC.all = M1_DRV8305_SPI_Read(deviceptr, DRV8305_S3_IC_FAULTS_ADDR) & 0x0777;         // read DRV8305 status reg 3
+    deviceptr->status4_gd_Vgs.all = M1_DRV8305_SPI_Read(deviceptr, DRV8305_S4_GD_VGS_FAULTS_ADDR) & 0x07e0; // read DRV8305 status reg 4
+    deviceptr->readCntrl5 = M1_DRV8305_SPI_Write(deviceptr, DRV8305_C5_HS_GATE_DRIVER_CNTRL_ADDR) & 0x03ff; // read DRV8305 control reg 5
+    deviceptr->readCntrl6 = M1_DRV8305_SPI_Write(deviceptr, DRV8305_C6_LS_GATE_DRIVER_CNTRL_ADDR) & 0x03ff; // read DRV8305 control reg 6
+    deviceptr->readCntrl7 = M1_DRV8305_SPI_Write(deviceptr, DRV8305_C7_GD_CNTRL_ADDR) & 0x03ff;             // read DRV8305 control reg 7
+    deviceptr->readCntrl9 = M1_DRV8305_SPI_Write(deviceptr, DRV8305_C9_IC_OPS_ADDR) & 0x07ff;               // read DRV8305 control reg 9
+    deviceptr->readCntrlA = M1_DRV8305_SPI_Write(deviceptr, DRV8305_CA_SHUNT_AMP_CNTRL_ADDR) & 0x07ff;      // read DRV8305 control reg A
+    deviceptr->readCntrlB = M1_DRV8305_SPI_Write(deviceptr, DRV8305_CB_VREG_CNTRL_ADDR) & 0x031f;           // read DRV8305 control reg B
+    deviceptr->readCntrlC = M1_DRV8305_SPI_Write(deviceptr, DRV8305_CC_VDS_SNS_CNTRL_ADDR) & 0x00ff;        // read DRV8305 control reg C
 
     // ===============================================
     // DRV Fault diagnostics -  and Control regs
@@ -1434,6 +1491,69 @@ void InitDRV8305(DRV8305_Vars *deviceptr)
 
     return;
 }
+
+void M2_InitDRV8305(DRV8305_Vars *deviceptr)
+{
+    Uint16 tmp1, *ptr1, *ptr2;
+
+    // ===============================================================
+    // write all control regs, ignore the return value of each write
+    // ===============================================================
+    //  for (tmp1=5; tmp1<= 0xc; tmp1++)
+    //  {
+    //      if (tmp1 != 8)
+    //          tmp2 = M2_DRV8305_SPI_Write(motor, tmp1);                //write to DRV8305 control reg @ address 'tmp1';
+    //  }
+
+    tmp1 = M2_DRV8305_SPI_Write(deviceptr, DRV8305_C5_HS_GATE_DRIVER_CNTRL_ADDR); //write to DRV8305 control reg 5
+    tmp1 = M2_DRV8305_SPI_Write(deviceptr, DRV8305_C6_LS_GATE_DRIVER_CNTRL_ADDR); //write to DRV8305 control reg 6
+    tmp1 = M2_DRV8305_SPI_Write(deviceptr, DRV8305_C7_GD_CNTRL_ADDR);             //write to DRV8305 control reg 7
+    tmp1 = M2_DRV8305_SPI_Write(deviceptr, DRV8305_C9_IC_OPS_ADDR);               //write to DRV8305 control reg 9
+    tmp1 = M2_DRV8305_SPI_Write(deviceptr, DRV8305_CA_SHUNT_AMP_CNTRL_ADDR);      //write to DRV8305 control reg A
+    tmp1 = M2_DRV8305_SPI_Write(deviceptr, DRV8305_CB_VREG_CNTRL_ADDR);           //write to DRV8305 control reg B
+    tmp1 = M2_DRV8305_SPI_Write(deviceptr, DRV8305_CC_VDS_SNS_CNTRL_ADDR);        //write to DRV8305 control reg C
+
+    // ===============================================
+    // read all status and control registers
+    // ===============================================
+    deviceptr->status1_wwd.all = M2_DRV8305_SPI_Read(deviceptr, DRV8305_S1_WWD_ADDR) & 0x05ff;              // read DRV8305 status reg 1
+    deviceptr->status2_ov_vds.all = M2_DRV8305_SPI_Read(deviceptr, DRV8305_S2_OV_VDS_FAULTS_ADDR) & 0x07e7; // read DRV8305 status reg 2
+    deviceptr->status3_IC.all = M2_DRV8305_SPI_Read(deviceptr, DRV8305_S3_IC_FAULTS_ADDR) & 0x0777;         // read DRV8305 status reg 3
+    deviceptr->status4_gd_Vgs.all = M2_DRV8305_SPI_Read(deviceptr, DRV8305_S4_GD_VGS_FAULTS_ADDR) & 0x07e0; // read DRV8305 status reg 4
+    deviceptr->readCntrl5 = M2_DRV8305_SPI_Write(deviceptr, DRV8305_C5_HS_GATE_DRIVER_CNTRL_ADDR) & 0x03ff; // read DRV8305 control reg 5
+    deviceptr->readCntrl6 = M2_DRV8305_SPI_Write(deviceptr, DRV8305_C6_LS_GATE_DRIVER_CNTRL_ADDR) & 0x03ff; // read DRV8305 control reg 6
+    deviceptr->readCntrl7 = M2_DRV8305_SPI_Write(deviceptr, DRV8305_C7_GD_CNTRL_ADDR) & 0x03ff;             // read DRV8305 control reg 7
+    deviceptr->readCntrl9 = M2_DRV8305_SPI_Write(deviceptr, DRV8305_C9_IC_OPS_ADDR) & 0x07ff;               // read DRV8305 control reg 9
+    deviceptr->readCntrlA = M2_DRV8305_SPI_Write(deviceptr, DRV8305_CA_SHUNT_AMP_CNTRL_ADDR) & 0x07ff;      // read DRV8305 control reg A
+    deviceptr->readCntrlB = M2_DRV8305_SPI_Write(deviceptr, DRV8305_CB_VREG_CNTRL_ADDR) & 0x031f;           // read DRV8305 control reg B
+    deviceptr->readCntrlC = M2_DRV8305_SPI_Write(deviceptr, DRV8305_CC_VDS_SNS_CNTRL_ADDR) & 0x00ff;        // read DRV8305 control reg C
+
+    // ===============================================
+    // DRV Fault diagnostics -  and Control regs
+    // ===============================================
+    ptr1 = (Uint16 *)&(deviceptr->Rsvd0);
+    ptr2 = (Uint16 *)&(deviceptr->readCntrl5);
+    deviceptr->DRV_fault = 0;
+
+    // check all Status regs
+    for (tmp1 = 1; tmp1 <= 0x4; tmp1++)
+    {
+        if (ptr1[tmp1])
+            deviceptr->DRV_fault |= 1 << tmp1;
+    }
+
+    // check all control regs
+    for (; tmp1 <= 0xc; tmp1++)
+    {
+        if (tmp1 != 8)
+            if (ptr1[tmp1] != *ptr2++)
+                deviceptr->DRV_fault |= 1 << tmp1;
+    }
+
+    return;
+}
+
+
 Uint16 SPI_Driver(volatile struct SPI_REGS *s, Uint16 data)
 {
     s->SPITXBUF = data; // send out the data
@@ -1444,7 +1564,7 @@ Uint16 SPI_Driver(volatile struct SPI_REGS *s, Uint16 data)
     return (data);
 }
 
-Uint16 DRV8305_SPI_Write(DRV8305_Vars *deviceptr, Uint16 address)
+Uint16 M1_DRV8305_SPI_Write(DRV8305_Vars *deviceptr, Uint16 address)
 {
     DELAY_US(10);
     union DRV830x_SPI_WRITE_WORD_REG w;
@@ -1458,7 +1578,7 @@ Uint16 DRV8305_SPI_Write(DRV8305_Vars *deviceptr, Uint16 address)
 
     return (SPI_Driver(&SpiaRegs, w.all));
 }
-Uint16 DRV8305_SPI_Read(DRV8305_Vars *deviceptr, Uint16 address)
+Uint16 M1_DRV8305_SPI_Read(DRV8305_Vars *deviceptr, Uint16 address)
 {
     union DRV830x_SPI_WRITE_WORD_REG w;
 
@@ -1469,13 +1589,38 @@ Uint16 DRV8305_SPI_Read(DRV8305_Vars *deviceptr, Uint16 address)
     return (SPI_Driver(&SpiaRegs, w.all));
 }
 
-void CalculateOffsetValue(void)
+Uint16 M2_DRV8305_SPI_Write(DRV8305_Vars *deviceptr, Uint16 address)
 {
-    for (OffsetCalCounter = 0; OffsetCalCounter < 50000;)
+    DELAY_US(10);
+    union DRV830x_SPI_WRITE_WORD_REG w;
+    Uint16 *cntrlReg;
+
+    cntrlReg = &(deviceptr->Rsvd0);
+
+    w.bit.R_W = 0;                  // write - 0
+    w.bit.ADDRESS = address;        // load the address
+    w.bit.DATA = cntrlReg[address]; // data to be written
+
+    return (SPI_Driver(&SpibRegs, w.all));
+}
+Uint16 M2_DRV8305_SPI_Read(DRV8305_Vars *deviceptr, Uint16 address)
+{
+    union DRV830x_SPI_WRITE_WORD_REG w;
+
+    w.bit.R_W = 1;           // read - 1
+    w.bit.ADDRESS = address; // load the address
+    w.bit.DATA = 0;          // data to be written
+
+    return (SPI_Driver(&SpibRegs, w.all));
+}
+
+void M1_CalculateOffsetValue(void)
+{
+    for (M1_OffsetCalCounter = 0; M1_OffsetCalCounter < 50000;)
     {
         if (EPwm1Regs.ETFLG.bit.SOCA == 1)
         {
-            if (OffsetCalCounter > 2500)
+            if (M1_OffsetCalCounter > 2500)
             {
                 Module1_Parameters.OffsetValue.PhaseA = K1 * Module1_Parameters.OffsetValue.PhaseA + K2 * M1_ADCRESULT_IA * ADC_PU_SCALE_FACTOR; //Module1 : Phase A offset
                 Module1_Parameters.OffsetValue.PhaseB = K1 * Module1_Parameters.OffsetValue.PhaseB + K2 * M1_ADCRESULT_IB * ADC_PU_SCALE_FACTOR; //Module1 : Phase B offset
@@ -1487,7 +1632,7 @@ void CalculateOffsetValue(void)
 #endif
             }
             EPwm1Regs.ETCLR.bit.SOCA = 1;
-            OffsetCalCounter++;
+            M1_OffsetCalCounter++;
         }
     }
     EALLOW;
@@ -1495,7 +1640,41 @@ void CalculateOffsetValue(void)
     AdcbRegs.ADCPPB1OFFREF = Module1_Parameters.OffsetValue.PhaseB * 4096.0;
     AdcaRegs.ADCPPB1OFFREF = Module1_Parameters.OffsetValue.PhaseC * 4096.0;
     EDIS;
-    OffsetCalculationIsDone = 1;
+    M1_OffsetCalculationIsDone = 1;
+}
+
+void M2_CalculateOffsetValue(void)
+{
+    /* For the M2;
+     * A_SOC3 -> Va     (M2)
+     * C_SOC2 -> Vb     (M2)
+     * B_SOC2 -> Vc     (M2)
+     * A_SOC4 -> Vdc    (M2)
+     * C_SOC3 & C_PPB2  -> Ia     (M2)
+     * B_SOC3 & B_PPB2  -> Ib     (M2)
+     * A_SOC5 & A_PPB2  -> Ic     (M2)
+     *
+     * */
+    for (M2_OffsetCalCounter = 0; M2_OffsetCalCounter < 50000;)
+    {
+        AdccRegs.ADCSOCFRC1.bit.SOC3 = 1;
+        AdcbRegs.ADCSOCFRC1.bit.SOC3 = 1;
+        AdcaRegs.ADCSOCFRC1.bit.SOC5 = 1;
+        DELAY_US(100);
+        if (M2_OffsetCalCounter > 2500)
+        {
+            Module2_Parameters.OffsetValue.PhaseA = K1 * Module2_Parameters.OffsetValue.PhaseA + K2 * M2_ADCRESULT_IA * ADC_PU_SCALE_FACTOR; //Module1 : Phase A offset
+            Module2_Parameters.OffsetValue.PhaseB = K1 * Module2_Parameters.OffsetValue.PhaseB + K2 * M2_ADCRESULT_IB * ADC_PU_SCALE_FACTOR; //Module1 : Phase B offset
+            Module2_Parameters.OffsetValue.PhaseC = K1 * Module2_Parameters.OffsetValue.PhaseC + K2 * M2_ADCRESULT_IC * ADC_PU_SCALE_FACTOR; //Module1 : Phase C offset
+        }
+        M2_OffsetCalCounter++;
+    }
+    EALLOW;
+    AdccRegs.ADCPPB2OFFREF = Module2_Parameters.OffsetValue.PhaseA * 4096.0;
+    AdcbRegs.ADCPPB2OFFREF = Module2_Parameters.OffsetValue.PhaseB * 4096.0;
+    AdcaRegs.ADCPPB2OFFREF = Module2_Parameters.OffsetValue.PhaseC * 4096.0;
+    EDIS;
+    M2_OffsetCalculationIsDone = 1;
 }
 
 
@@ -1513,7 +1692,7 @@ __interrupt void epwm1_isr(void)
 
 
 
-    if (OffsetCalculationIsDone == 0)
+    if ((M1_OffsetCalculationIsDone == 0)||(M2_OffsetCalculationIsDone==0))
     {
         EPwm1Regs.ETCLR.bit.INT = 1;
         PieCtrlRegs.PIEACK.all = PIEACK_GROUP3;
@@ -1528,7 +1707,7 @@ __interrupt void epwm1_isr(void)
 
     CalculateParkTransform(Module1_Parameters);
 
-    if (OperationMode == MODE_MPCCONTROLLER)
+    if (M1_OperationMode == MODE_MPCCONTROLLER)
     {
         SpeedRefRadSec =  ramper(SpeedRefRadSec, SpeedRefRPM/60.0*2.0*PI, 0.0001); // rate transition is around approximately 1 RPM per second
 
@@ -1570,7 +1749,7 @@ __interrupt void epwm1_isr(void)
                            Module1_Parameters.PhaseBDutyCycle,\
                            Module1_Parameters.PhaseCDutyCycle);
     }
-    else if (OperationMode == MODE_ALIGNMENT)
+    else if (M1_OperationMode == MODE_ALIGNMENT)
     {
 
         Module1_Parameters.PhaseADutyCycle = ALIGNMENT_DC_CURRENT*RS_VALUE/Module1_Parameters.Measured.Voltage.Vdc;
@@ -1606,7 +1785,7 @@ __interrupt void epwm1_isr(void)
         }
         if(AlignmentCounter>=((uint32_t)MPC_STARTCOUNTVALUE))
         {
-            OperationMode = MODE_MPCCONTROLLER;
+            M1_OperationMode = MODE_MPCCONTROLLER;
             EPwm1Regs.ETCLR.bit.INT = 1;
             PieCtrlRegs.PIEACK.all = PIEACK_GROUP3;
             return;
@@ -1614,7 +1793,7 @@ __interrupt void epwm1_isr(void)
 
 
     }
-    else if (OperationMode == MODE_RLLOAD)
+    else if (M1_OperationMode == MODE_RLLOAD)
     {
         if(ControlISRCounter%ClockMod==0)
         {
@@ -1634,14 +1813,14 @@ __interrupt void epwm1_isr(void)
         Module1_Parameters.PhaseBDutyCycle = RL_Load_Operation.ma * ((sinf(PhaseValue+ TWO_PI_OVER_THREE) ) * 0.5 + 0.5);
         Module1_Parameters.PhaseCDutyCycle = RL_Load_Operation.ma * ((sinf(PhaseValue + 2.0 * TWO_PI_OVER_THREE)) * 0.5 + 0.5);
     }
-    else if (OperationMode == MODE_NO_OPERATION)
+    else if (M1_OperationMode == MODE_NO_OPERATION)
     {
     }
 
 
 
 #if ENABLE_MPC==1
-    if(OperationMode == MODE_MPCCONTROLLER)
+    if(M1_OperationMode == MODE_MPCCONTROLLER)
     {
         EPwm1Regs.TBPRD = (Uint16 )(((float )SYSCLKFREQUENCY) / (Module1_Parameters.OptimizationFsw[Module1_Parameters.MinimumCostIndex] * 4.0));
         EPwm2Regs.TBPRD = (Uint16 )(((float )SYSCLKFREQUENCY) / (Module1_Parameters.OptimizationFsw[Module1_Parameters.MinimumCostIndex] * 4.0));
@@ -1652,7 +1831,7 @@ __interrupt void epwm1_isr(void)
     FswDecided = Module1_Parameters.OptimizationFsw[Module1_Parameters.MinimumCostIndex];
 
 #if ENABLE_MPC==1
-    if(OperationMode==MODE_MPCCONTROLLER)
+    if(M1_OperationMode==MODE_MPCCONTROLLER)
     {
         if(Module1_Parameters.PhaseADutyCycle>1.0)
             Module1_Parameters.PhaseADutyCycle = 1.0;
@@ -1844,11 +2023,50 @@ float ramper(float in, float out, float rampDelta)
     else
         return(in);
 }
-void InitializeInterfacesForCpu2(void)
+void InitializePeripharelsForCpu2(void)
 {
-    /*TODO*/
+    EALLOW;
+    DevCfgRegs.CPUSEL0.bit.EPWM4 = 1; // EPwm4 block is assigned to CPU2
+    DevCfgRegs.CPUSEL0.bit.EPWM5 = 1; // EPwm5 block is assigned to CPU2
+    DevCfgRegs.CPUSEL0.bit.EPWM6 = 1; // EPwm6 block is assigned to CPU2
+    EDIS;
 }
 void InitializeGpiosForCpu2(void)
 {
-    /*TODO*/
+    EALLOW;
+    GpioCtrlRegs.GPAPUD.bit.GPIO6 = 1;   // Disable pull-up on GPIO6 (EPWM4A)
+    GpioCtrlRegs.GPAPUD.bit.GPIO7 = 1;   // Disable pull-up on GPIO7 (EPWM4B)
+    GpioCtrlRegs.GPAGMUX1.bit.GPIO6 = 0; // Configure GPIO6 as EPWM4A
+    GpioCtrlRegs.GPAGMUX1.bit.GPIO7 = 0; // Configure GPIO7 as EPWM4B
+    GpioCtrlRegs.GPAMUX1.bit.GPIO6 = 1;  // Configure GPIO6 as EPWM4A
+    GpioCtrlRegs.GPAMUX1.bit.GPIO7 = 1;  // Configure GPIO7 as EPWM4B
+    EDIS;
+
+    EALLOW;
+    GpioCtrlRegs.GPAPUD.bit.GPIO8 = 1;   // Disable pull-up on GPIO8 (EPWM5A)
+    GpioCtrlRegs.GPAPUD.bit.GPIO9 = 1;   // Disable pull-up on GPIO9 (EPWM5B)
+    GpioCtrlRegs.GPAGMUX1.bit.GPIO8 = 0; // Configure GPIO8 as EPWM5A
+    GpioCtrlRegs.GPAGMUX1.bit.GPIO9 = 0; // Configure GPIO9 as EPWM5B
+    GpioCtrlRegs.GPAMUX1.bit.GPIO8 = 1;  // Configure GPIO8 as EPWM5A
+    GpioCtrlRegs.GPAMUX1.bit.GPIO9 = 1;  // Configure GPIO9 as EPWM5B
+    EDIS;
+
+    EALLOW;
+    GpioCtrlRegs.GPAPUD.bit.GPIO10 = 1;   // Disable pull-up on GPIO10 (EPWM6A)
+    GpioCtrlRegs.GPAPUD.bit.GPIO11 = 1;   // Disable pull-up on GPIO11 (EPWM6B)
+    GpioCtrlRegs.GPAGMUX1.bit.GPIO10 = 0; // Configure GPIO10 as EPWM6A
+    GpioCtrlRegs.GPAGMUX1.bit.GPIO11 = 0; // Configure GPIO11 as EPWM6B
+    GpioCtrlRegs.GPAMUX1.bit.GPIO10 = 1;  // Configure GPIO10 as EPWM6A
+    GpioCtrlRegs.GPAMUX1.bit.GPIO11 = 1;  // Configure GPIO11 as EPWM6B
+    EDIS;
+
+    EALLOW;
+    GpioCtrlRegs.GPACSEL1.bit.GPIO6 = 2;// GPIO6 is controlled by CPU2
+    GpioCtrlRegs.GPACSEL1.bit.GPIO7 = 2;// GPIO6 is controlled by CPU2
+    GpioCtrlRegs.GPACSEL2.bit.GPIO8 = 2;// GPIO6 is controlled by CPU2
+    GpioCtrlRegs.GPACSEL2.bit.GPIO9 = 2;// GPIO6 is controlled by CPU2
+    GpioCtrlRegs.GPACSEL2.bit.GPIO10 = 2;// GPIO6 is controlled by CPU2
+    GpioCtrlRegs.GPACSEL2.bit.GPIO11 = 2;// GPIO6 is controlled by CPU2
+    EDIS;
+
 }

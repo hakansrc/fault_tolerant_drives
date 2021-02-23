@@ -1,33 +1,56 @@
+#include <math.h>
+#include <limits.h>
+#include <stdio.h>
+#include <string.h>
 #include <F2837xD_Device.h>
 #include <F2837xD_Examples.h>
+
+#include "MachineParameters.h"
+#include "ConstantParameters.h"
+#include "ControllerParameters.h"
+#include "DRV8305_defs.h"
+//#include "MultipleFloatDataSender.h" // float data sender will only work from CPU1
+#include "CustomTypeDefs.h"
+
+uint32_t    ControlISRCounter = 0;
+
 
 
 __interrupt void cpu_timer0_isr(void);  /*prototype of the ISR functions*/
 __interrupt void cpu_timer1_isr(void);  /*prototype of the ISR functions*/
 __interrupt void cpu_timer2_isr(void);  /*prototype of the ISR functions*/
+__interrupt void epwm4_isr(void);       /*prototype of the ISR functions*/
 
-/**
- * main.c
- */
-Uint32 Epwm1Counter = 0;
+void InitializeEpwm4Registers(void);
+void InitializeEpwm5Registers(void);
+void InitializeEpwm6Registers(void);
+void InitializationRoutine(void);
+
+
+
+
 int main(void)
 {
 
     InitSysCtrl();  /*initialize the peripheral clocks*/
 
+#if 0 // remove from cpu2
     EALLOW;
     ClkCfgRegs.PERCLKDIVSEL.bit.EPWMCLKDIV = 0; // EPWM Clock Divide Select: /1 of PLLSYSCLK
     EDIS;
+#endif
 
     InitPieCtrl();  /*initialize the PIE table (interrupt related)*/
     IER = 0x0000;   /*clear the Interrupt Enable Register   (IER)*/
     IFR = 0x0000;   /*clear the Interrupt Flag Register     (IFR)*/
     InitPieVectTable();
 
+#if 0 // remove from cpu2
     EALLOW;
     CpuSysRegs.PCLKCR0.bit.TBCLKSYNC = 0;   /*stop the TimeBase clock for later synchronization*/
     CpuSysRegs.PCLKCR0.bit.GTBCLKSYNC = 0;  /*stop the global TimeBase clock for later synchronization*/
     EDIS;
+#endif
 
     /*Initialize cpu timers*/
     InitCpuTimers();
@@ -42,20 +65,24 @@ int main(void)
     PieVectTable.TIMER0_INT = &cpu_timer0_isr;  /*specify the interrupt service routine (ISR) address to the PIE table*/
     PieVectTable.TIMER1_INT = &cpu_timer1_isr;  /*specify the interrupt service routine (ISR) address to the PIE table*/
     PieVectTable.TIMER2_INT = &cpu_timer2_isr;  /*specify the interrupt service routine (ISR) address to the PIE table*/
+    PieVectTable.EPWM4_INT = &epwm4_isr;        /*specify the interrupt service routine (ISR) address to the PIE table*/
     EDIS;
 
     IER |= M_INT1;  /*Enable the PIE group of Cpu timer 0 interrupt*/
-    IER |= M_INT3;  /*Enable the PIE group of Epwm1 interrupt*/
+    IER |= M_INT3;  /*Enable the PIE group of Epwm4 interrupt*/
     IER |= M_INT13; /*Enable the PIE group of Cpu timer 1 interrupt*/
     IER |= M_INT14; /*Enable the PIE group of Cpu timer 2 interrupt*/
     PieCtrlRegs.PIECTRL.bit.ENPIE = 1;  // Enable the PIE block
     PieCtrlRegs.PIEIER1.bit.INTx7 = 1;  /*Enable the 7th interrupt of the Group 1, which is for timer 0 interrupt*/
-    PieCtrlRegs.PIEIER3.bit.INTx1 = 1;  /*Enable the 1st interrupt of the Group 3, which is for epwm1 interrupt*/
+    PieCtrlRegs.PIEIER3.bit.INTx4 = 1;  /*Enable the 4th interrupt of the Group 3, which is for epwm4 interrupt*/
 
+#if 0
     EALLOW;
     CpuSysRegs.PCLKCR0.bit.TBCLKSYNC = 1;   /*start the TimeBase clock */
     CpuSysRegs.PCLKCR0.bit.GTBCLKSYNC = 1;  /*start the global TimeBase clock */
     EDIS;
+#endif
+
 
     EINT;  // Enable Global interrupt INTM
     ERTM;  // Enable Global realtime interrupt DBGM
@@ -85,3 +112,244 @@ __interrupt void cpu_timer2_isr(void)
 
 }
 
+void InitializeEpwm4Registers(void)
+{
+    /*TODO, make sync operation of the PWM modules*/
+    EPwm4Regs.TBCTL.bit.FREE_SOFT = 0b10;
+    EPwm4Regs.TBCTL.bit.PHSDIR = TB_UP;
+    EPwm4Regs.TBCTL.bit.CLKDIV = TB_DIV2;
+    EPwm4Regs.TBCTL.bit.HSPCLKDIV = TB_DIV1;
+    EPwm4Regs.TBCTL.bit.SWFSYNC = 0;
+    EPwm4Regs.TBCTL.bit.SYNCOSEL = TB_CTR_ZERO;
+    EPwm4Regs.TBCTL.bit.PRDLD = TB_SHADOW;
+    EPwm4Regs.TBCTL.bit.PHSEN = TB_DISABLE;
+    EPwm4Regs.TBCTL.bit.CTRMODE = TB_COUNT_UPDOWN;
+
+    EPwm4Regs.TBCTL2.bit.PRDLDSYNC = 0;    /*the period will be loaded from shadow to active after TBCTR = 0*/
+    EPwm4Regs.TBCTL2.bit.SYNCOSELX = 0;    /*this is unnecessary*/
+    EPwm4Regs.TBCTL2.bit.OSHTSYNC = 0;     /*this is unnecessary*/
+    EPwm4Regs.TBCTL2.bit.OSHTSYNCMODE = 0; /*one shot sync is disabled*/
+
+    EPwm4Regs.TBCTR = 0;
+
+    EPwm4Regs.TBSTS.bit.CTRMAX = 0; /*this is unnecessary*/
+    EPwm4Regs.TBSTS.bit.SYNCI = 0;  /*this is unnecessary*/
+    EPwm4Regs.TBSTS.bit.CTRDIR = 0; /*this is unnecessary*/
+
+    EPwm4Regs.CMPCTL.bit.LOADBSYNC = 0; /*Shadow to Active Load of CMPB:CMPBHR occurs according to LOADBMODE */
+    EPwm4Regs.CMPCTL.bit.LOADASYNC = 0; /*Shadow to Active Load of CMPA:CMPAHR occurs according to LOADAMODE */
+    //EPwm4Regs.CMPCTL.bit.SHDWBFULL = 0; /*you can check if the shadow register is filled or not*/
+    //EPwm4Regs.CMPCTL.bit.SHDWAFULL = 0; /*you can check if the shadow register is filled or not*/
+    EPwm4Regs.CMPCTL.bit.SHDWBMODE = CC_SHADOW;
+    EPwm4Regs.CMPCTL.bit.SHDWAMODE = CC_SHADOW;
+    EPwm4Regs.CMPCTL.bit.LOADBMODE = CC_CTR_ZERO;
+    EPwm4Regs.CMPCTL.bit.LOADAMODE = CC_CTR_ZERO;
+#if 0 /*CMPC or CMPD will not be used, therefore they left uninitialized*/
+    EPwm4Regs.CMPCTL2.bit.LOADDSYNC = 0; /*Shadow to Active Load of CMPB:CMPBHR occurs according to LOADBMODE */
+    EPwm4Regs.CMPCTL2.bit.LOADCSYNC = 0; /*Shadow to Active Load of CMPA:CMPAHR occurs according to LOADAMODE */
+    //EPwm4Regs.CMPCTL.bit.SHDWBFULL = 0; /*you can check if the shadow register is filled or not*/
+    //EPwm4Regs.CMPCTL.bit.SHDWAFULL = 0; /*you can check if the shadow register is filled or not*/
+    EPwm4Regs.CMPCTL2.bit.SHDWDMODE = CC_SHADOW;
+    EPwm4Regs.CMPCTL2.bit.SHDWCMODE = CC_SHADOW;
+    EPwm4Regs.CMPCTL2.bit.LOADDMODE = CC_CTR_ZERO;
+    EPwm4Regs.CMPCTL2.bit.LOADCMODE = CC_CTR_ZERO;
+#endif
+
+    EPwm4Regs.DBCTL.all = 0;
+    EPwm4Regs.DBCTL.bit.OUT_MODE = DB_FULL_ENABLE; /*deadband is set for both fed and red*/
+    EPwm4Regs.DBCTL.bit.POLSEL = DB_ACTV_HIC;      /*EPWmxB is inverted*/
+    EPwm4Regs.DBFED.bit.DBFED = DEADBAND_FED / SYSCLKPERIOD;
+    EPwm4Regs.DBRED.bit.DBRED = DEADBAND_RED / SYSCLKPERIOD;
+    EPwm4Regs.DBCTL2.all = 0; /*has no useful setting*/
+
+    /*action qualifier settings will be set once, therefore shadowing is unnecessary.*/
+    EPwm4Regs.AQCTL.all = 0;
+
+    /*No trip zone is set for now*/
+    EPwm4Regs.AQTSRCSEL.all = 0;
+
+    /*NO chopping is needed*/
+    EPwm4Regs.PCCTL.all = 0;
+
+    /*HRPWM will not be used*/
+    EPwm4Regs.HRCNFG.all = 0;
+    EPwm4Regs.HRCNFG2.all = 0;
+    EPwm4Regs.HRPWR.bit.CALPWRON = 0;
+    EPwm4Regs.HRPCTL.all = 0;
+
+    EPwm4Regs.AQCTLA.all = 0;
+    EPwm4Regs.AQCTLA.bit.CAD = AQ_SET;
+    EPwm4Regs.AQCTLA.bit.CAU = AQ_CLEAR;
+
+    EPwm4Regs.TBPHS.bit.TBPHS = 0;
+
+    EPwm4Regs.TBPRD = ((uint32_t)SYSCLKFREQUENCY) / (((uint16_t)INITIALPWMFREQ) * 4);
+    EPwm4Regs.CMPA.bit.CMPA = 0;
+
+    EPwm4Regs.ETSEL.bit.SOCAEN = 1;     /*enable EPWMxSOCA signal*/
+    EPwm4Regs.ETSEL.bit.SOCASEL = 2;    /*ADC sampling is done when TBCTR==TBPRD*/
+    EPwm4Regs.ETSEL.bit.INTEN = 1;      /*enable pwm interrupt*/
+    EPwm4Regs.ETSEL.bit.INTSEL = 1;     /*interrupt occurs when TBCTR = 0*/
+
+    EPwm4Regs.ETPS.all = 0x00;
+    EPwm4Regs.ETPS.bit.INTPRD = 1;      // Generate INT on first event
+    EPwm4Regs.ETPS.bit.SOCAPRD = 1;     // Generate SOC on first event
+}
+void InitializeEpwm5Registers(void)
+{
+    /*TODO, make sync operation of the PWM modules*/
+    EPwm5Regs.TBCTL.bit.FREE_SOFT = 0b10;
+    EPwm5Regs.TBCTL.bit.PHSDIR = TB_UP;
+    EPwm5Regs.TBCTL.bit.CLKDIV = TB_DIV2;
+    EPwm5Regs.TBCTL.bit.HSPCLKDIV = TB_DIV1;
+    EPwm5Regs.TBCTL.bit.SWFSYNC = 0;
+    EPwm5Regs.TBCTL.bit.SYNCOSEL = TB_SYNC_IN;
+    EPwm5Regs.TBCTL.bit.PRDLD = TB_SHADOW;
+    EPwm5Regs.TBCTL.bit.PHSEN = TB_ENABLE;
+    EPwm5Regs.TBCTL.bit.CTRMODE = TB_COUNT_UPDOWN;
+
+    EPwm5Regs.TBCTL2.bit.PRDLDSYNC = 0;    /*the period will be loaded from shadow to active after TBCTR = 0*/
+    EPwm5Regs.TBCTL2.bit.SYNCOSELX = 0;    /*this is unnecessary*/
+    EPwm5Regs.TBCTL2.bit.OSHTSYNC = 0;     /*this is unnecessary*/
+    EPwm5Regs.TBCTL2.bit.OSHTSYNCMODE = 0; /*one shot sync is disabled*/
+
+    EPwm5Regs.TBCTR = 0;
+
+    EPwm5Regs.TBSTS.bit.CTRMAX = 0; /*this is unnecessary*/
+    EPwm5Regs.TBSTS.bit.SYNCI = 0;  /*this is unnecessary*/
+    EPwm5Regs.TBSTS.bit.CTRDIR = 0; /*this is unnecessary*/
+
+    EPwm5Regs.CMPCTL.bit.LOADBSYNC = 0; /*Shadow to Active Load of CMPB:CMPBHR occurs according to LOADBMODE */
+    EPwm5Regs.CMPCTL.bit.LOADASYNC = 0; /*Shadow to Active Load of CMPA:CMPAHR occurs according to LOADAMODE */
+    //EPwm5Regs.CMPCTL.bit.SHDWBFULL = 0; /*you can check if the shadow register is filled or not*/
+    //EPwm5Regs.CMPCTL.bit.SHDWAFULL = 0; /*you can check if the shadow register is filled or not*/
+    EPwm5Regs.CMPCTL.bit.SHDWBMODE = CC_SHADOW;
+    EPwm5Regs.CMPCTL.bit.SHDWAMODE = CC_SHADOW;
+    EPwm5Regs.CMPCTL.bit.LOADBMODE = CC_CTR_ZERO;
+    EPwm5Regs.CMPCTL.bit.LOADAMODE = CC_CTR_ZERO;
+#if 0 /*CMPC or CMPD will not be used, therefore they left uninitialized*/
+    EPwm5Regs.CMPCTL2.bit.LOADDSYNC = 0; /*Shadow to Active Load of CMPB:CMPBHR occurs according to LOADBMODE */
+    EPwm5Regs.CMPCTL2.bit.LOADCSYNC = 0; /*Shadow to Active Load of CMPA:CMPAHR occurs according to LOADAMODE */
+    //EPwm5Regs.CMPCTL.bit.SHDWBFULL = 0; /*you can check if the shadow register is filled or not*/
+    //EPwm5Regs.CMPCTL.bit.SHDWAFULL = 0; /*you can check if the shadow register is filled or not*/
+    EPwm5Regs.CMPCTL2.bit.SHDWDMODE = CC_SHADOW;
+    EPwm5Regs.CMPCTL2.bit.SHDWCMODE = CC_SHADOW;
+    EPwm5Regs.CMPCTL2.bit.LOADDMODE = CC_CTR_ZERO;
+    EPwm5Regs.CMPCTL2.bit.LOADCMODE = CC_CTR_ZERO;
+#endif
+
+    EPwm5Regs.DBCTL.all = 0;
+    EPwm5Regs.DBCTL.bit.OUT_MODE = DB_FULL_ENABLE; /*deadband is set for both fed and red*/
+    EPwm5Regs.DBCTL.bit.POLSEL = DB_ACTV_HIC;      /*EPWmxB is inverted*/
+    EPwm5Regs.DBFED.bit.DBFED = DEADBAND_FED / SYSCLKPERIOD;
+    EPwm5Regs.DBRED.bit.DBRED = DEADBAND_RED / SYSCLKPERIOD;
+    EPwm5Regs.DBCTL2.all = 0; /*has no useful setting*/
+
+    /*action qualifier settings will be set once, therefore shadowing is unnecessary.*/
+    EPwm5Regs.AQCTL.all = 0;
+
+    /*No trip zone is set for now*/
+    EPwm5Regs.AQTSRCSEL.all = 0;
+
+    /*NO chopping is needed*/
+    EPwm5Regs.PCCTL.all = 0;
+
+    /*HRPWM will not be used*/
+    EPwm5Regs.HRCNFG.all = 0;
+    EPwm5Regs.HRCNFG2.all = 0;
+    EPwm5Regs.HRPWR.bit.CALPWRON = 0;
+    EPwm5Regs.HRPCTL.all = 0;
+
+    EPwm5Regs.AQCTLA.all = 0;
+    EPwm5Regs.AQCTLA.bit.CAD = AQ_SET;
+    EPwm5Regs.AQCTLA.bit.CAU = AQ_CLEAR;
+
+    EPwm5Regs.TBPHS.bit.TBPHS = 0;
+
+    EPwm5Regs.TBPRD = ((uint32_t)SYSCLKFREQUENCY) / (((uint16_t)INITIALPWMFREQ) * 4);
+    EPwm5Regs.CMPA.bit.CMPA = 0;
+}
+void InitializeEpwm6Registers(void)
+{
+    /*TODO, make sync operation of the PWM modules*/
+    EPwm6Regs.TBCTL.bit.FREE_SOFT = 0b10;
+    EPwm6Regs.TBCTL.bit.PHSDIR = TB_UP;
+    EPwm6Regs.TBCTL.bit.CLKDIV = TB_DIV2;
+    EPwm6Regs.TBCTL.bit.HSPCLKDIV = TB_DIV1;
+    EPwm6Regs.TBCTL.bit.SWFSYNC = 0;
+    EPwm6Regs.TBCTL.bit.SYNCOSEL = TB_SYNC_IN;
+    EPwm6Regs.TBCTL.bit.PRDLD = TB_SHADOW;
+    EPwm6Regs.TBCTL.bit.PHSEN = TB_ENABLE;
+    EPwm6Regs.TBCTL.bit.CTRMODE = TB_COUNT_UPDOWN;
+
+    EPwm6Regs.TBCTL2.bit.PRDLDSYNC = 0;    /*the period will be loaded from shadow to active after TBCTR = 0*/
+    EPwm6Regs.TBCTL2.bit.SYNCOSELX = 0;    /*this is unnecessary*/
+    EPwm6Regs.TBCTL2.bit.OSHTSYNC = 0;     /*this is unnecessary*/
+    EPwm6Regs.TBCTL2.bit.OSHTSYNCMODE = 0; /*one shot sync is disabled*/
+
+    EPwm6Regs.TBCTR = 0;
+
+    EPwm6Regs.TBSTS.bit.CTRMAX = 0; /*this is unnecessary*/
+    EPwm6Regs.TBSTS.bit.SYNCI = 0;  /*this is unnecessary*/
+    EPwm6Regs.TBSTS.bit.CTRDIR = 0; /*this is unnecessary*/
+
+    EPwm6Regs.CMPCTL.bit.LOADBSYNC = 0; /*Shadow to Active Load of CMPB:CMPBHR occurs according to LOADBMODE */
+    EPwm6Regs.CMPCTL.bit.LOADASYNC = 0; /*Shadow to Active Load of CMPA:CMPAHR occurs according to LOADAMODE */
+    //EPwm6Regs.CMPCTL.bit.SHDWBFULL = 0; /*you can check if the shadow register is filled or not*/
+    //EPwm6Regs.CMPCTL.bit.SHDWAFULL = 0; /*you can check if the shadow register is filled or not*/
+    EPwm6Regs.CMPCTL.bit.SHDWBMODE = CC_SHADOW;
+    EPwm6Regs.CMPCTL.bit.SHDWAMODE = CC_SHADOW;
+    EPwm6Regs.CMPCTL.bit.LOADBMODE = CC_CTR_ZERO;
+    EPwm6Regs.CMPCTL.bit.LOADAMODE = CC_CTR_ZERO;
+#if 0 /*CMPC or CMPD will not be used, therefore they left uninitialized*/
+    EPwm6Regs.CMPCTL2.bit.LOADDSYNC = 0; /*Shadow to Active Load of CMPB:CMPBHR occurs according to LOADBMODE */
+    EPwm6Regs.CMPCTL2.bit.LOADCSYNC = 0; /*Shadow to Active Load of CMPA:CMPAHR occurs according to LOADAMODE */
+    //EPwm6Regs.CMPCTL.bit.SHDWBFULL = 0; /*you can check if the shadow register is filled or not*/
+    //EPwm6Regs.CMPCTL.bit.SHDWAFULL = 0; /*you can check if the shadow register is filled or not*/
+    EPwm6Regs.CMPCTL2.bit.SHDWDMODE = CC_SHADOW;
+    EPwm6Regs.CMPCTL2.bit.SHDWCMODE = CC_SHADOW;
+    EPwm6Regs.CMPCTL2.bit.LOADDMODE = CC_CTR_ZERO;
+    EPwm6Regs.CMPCTL2.bit.LOADCMODE = CC_CTR_ZERO;
+#endif
+
+    EPwm6Regs.DBCTL.all = 0;
+    EPwm6Regs.DBCTL.bit.OUT_MODE = DB_FULL_ENABLE; /*deadband is set for both fed and red*/
+    EPwm6Regs.DBCTL.bit.POLSEL = DB_ACTV_HIC;      /*EPWmxB is inverted*/
+    EPwm6Regs.DBFED.bit.DBFED = DEADBAND_FED / SYSCLKPERIOD;
+    EPwm6Regs.DBRED.bit.DBRED = DEADBAND_RED / SYSCLKPERIOD;
+    EPwm6Regs.DBCTL2.all = 0; /*has no useful setting*/
+
+    /*action qualifier settings will be set once, therefore shadowing is unnecessary.*/
+    EPwm6Regs.AQCTL.all = 0;
+
+    /*No trip zone is set for now*/
+    EPwm6Regs.AQTSRCSEL.all = 0;
+
+    /*NO chopping is needed*/
+    EPwm6Regs.PCCTL.all = 0;
+
+    /*HRPWM will not be used*/
+    EPwm6Regs.HRCNFG.all = 0;
+    EPwm6Regs.HRCNFG2.all = 0;
+    EPwm6Regs.HRPWR.bit.CALPWRON = 0;
+    EPwm6Regs.HRPCTL.all = 0;
+
+    EPwm6Regs.AQCTLA.all = 0;
+    EPwm6Regs.AQCTLA.bit.CAD = AQ_SET;
+    EPwm6Regs.AQCTLA.bit.CAU = AQ_CLEAR;
+
+    EPwm6Regs.TBPHS.bit.TBPHS = 0;
+
+    EPwm6Regs.TBPRD = ((uint32_t)SYSCLKFREQUENCY) / (((uint16_t)INITIALPWMFREQ) * 4);
+    EPwm6Regs.CMPA.bit.CMPA = 0;
+}
+__interrupt void epwm4_isr(void)
+{
+    ControlISRCounter++;
+    EPwm4Regs.ETCLR.bit.INT = 1;
+    PieCtrlRegs.PIEACK.all = PIEACK_GROUP3;
+}
+void InitializationRoutine(void)
+{
+
+}

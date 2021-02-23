@@ -20,12 +20,12 @@ typedef struct
     float Dvalue;
     float Qvalue;
     float ZeroValue;
-} Transformed;
+} Transformed; /*12 bytes*/
 
 typedef struct
 {
     float Vdc;
-} VoltageMeasured;
+} VoltageMeasured; /*4 bytes*/
 
 typedef struct
 {
@@ -33,13 +33,13 @@ typedef struct
     float PhaseB;
     float PhaseC;
     Transformed transformed;
-} CurrentMeasured;
+} CurrentMeasured;      /*12+12=24 bytes*/
 
 typedef struct
 {
     VoltageMeasured Voltage;
     CurrentMeasured Current;
-} MeasuredParams;
+} MeasuredParams;       /*24+4=28bytes*/
 
 typedef struct
 {
@@ -53,7 +53,7 @@ typedef struct
     float IqPrediction;
     float VdPrediction;
     float VqPrediction;
-} FirstHorizonParameters;
+} FirstHorizonParameters;   // 16 bytes
 
 typedef struct
 {
@@ -61,7 +61,7 @@ typedef struct
     float IqPrediction;
     float VdPrediction;
     float VqPrediction;
-} CurrentHorizonParameters;
+} CurrentHorizonParameters; // 16 bytes
 
 
 typedef struct
@@ -92,43 +92,45 @@ typedef struct
 {
     float Electrical;
     float Mechanical;
-} Angle;
+} Angle;    /*8 bytes*/
+
 typedef Angle AngularSpeed;
 
 typedef struct
 {
     float Iq;
     float Id;
-} ReferenceValues;
+} ReferenceValues; /*8 bytes*/
 
 typedef struct
 {
     float PhaseA;
     float PhaseB;
     float PhaseC;
-} Offset;
+} Offset;   /*12 bytes*/
+
 
 typedef struct
 {
-    MeasuredParams Measured;
-    CurrentHorizonParameters CurrentHorizon[NUMBEROFMPCLOOPS];
-    FirstHorizonParameters FirstHorizon[NUMBEROFMPCLOOPS];
-    PredictionParameters SecondHorizon[NUMBEROFMPCLOOPS];
-    unsigned int MinimumCostIndex;
-    float MinimumCostValue;
-    float OptimizationFsw[NUMBEROFMPCLOOPS];
-    float Cost[NUMBEROFMPCLOOPS];
-    ReferenceValues Reference;
-    Angle AngleRad;
-    Angle AngleRadPrev;
-    Angle AngleRadTemp;
-    AngularSpeed AngularSpeedRadSec;
-    AngularSpeed AngularSpeedRPM;
-    Offset OffsetValue;
-    float PhaseADutyCycle;
-    float PhaseBDutyCycle;
-    float PhaseCDutyCycle;
-} ModuleParameters;
+    MeasuredParams Measured;                                            /*  28 bytes    */
+    CurrentHorizonParameters CurrentHorizon[NUMBEROFMPCLOOPS];  /* 16*10=   160 bytes   */
+    FirstHorizonParameters FirstHorizon[NUMBEROFMPCLOOPS];      /* 16*10=   160 bytes   */
+    PredictionParameters SecondHorizon[NUMBEROFMPCLOOPS];       /* 76*10=   760 bytes   */
+    unsigned int MinimumCostIndex;                                      /*  2 bytes     */
+    float MinimumCostValue;                                             /*  1 byte      */
+    float OptimizationFsw[NUMBEROFMPCLOOPS];                    /* 10*4=    40 bytes    */
+    float Cost[NUMBEROFMPCLOOPS];                               /* 10*4=    40 bytes    */
+    ReferenceValues Reference;                                          /*  8 bytes     */
+    Angle AngleRad;                                                     /*  8 bytes     */
+    Angle AngleRadPrev;                                                 /*  8 bytes     */
+    Angle AngleRadTemp;                                                 /*  8 bytes     */
+    AngularSpeed AngularSpeedRadSec;                                    /*  8 bytes     */
+    AngularSpeed AngularSpeedRPM;                                       /*  8 bytes     */
+    Offset OffsetValue;                                                 /*  12 bytes    */
+    float PhaseADutyCycle;                                              /*  1 byte      */
+    float PhaseBDutyCycle;                                              /*  1 byte      */
+    float PhaseCDutyCycle;                                              /*  1 byte      */
+} ModuleParameters; /*1254 bytes*/
 
 typedef struct
 {

@@ -54,6 +54,7 @@ void InitializeEpwm3Registers(void);
 void InitializeADCs(void);
 void SetupGPIOs(void);
 void EQEPSetup(void);
+void AssignGSRAMs(void);
 inline void Run_PI_Controller(PID_Parameters &pidparams);
 inline void CalculateParkTransform(ModuleParameters &moduleparams);
 static inline void ExecuteFirstPrediction(ModuleParameters &moduleparams, unsigned int indexcount);
@@ -198,10 +199,10 @@ int main(void)
     IER |= M_INT13; /*Enable the PIE group of Cpu timer 1 interrupt*/
     IER |= M_INT14; /*Enable the PIE group of Cpu timer 2 interrupt*/
 
-    PieCtrlRegs.PIECTRL.bit.ENPIE = 1; // Enable the PIE block
-    PieCtrlRegs.PIEIER1.bit.INTx7 = 1; /*Enable the 7th interrupt of the Group 1, which is for timer 0 interrupt*/
+    PieCtrlRegs.PIECTRL.bit.ENPIE = 1;  // Enable the PIE block
+    PieCtrlRegs.PIEIER1.bit.INTx7 = 1;  /*Enable the 7th interrupt of the Group 1, which is for timer 0 interrupt*/
     PieCtrlRegs.PIEIER3.bit.INTx1 = 1;  /*Enable the 1st interrupt of the Group 3, which is for epwm1 interrupt*/
-    PieCtrlRegs.PIEIER1.bit.INTx4 = 1;          // Enable PIE Group 1 INT4
+    PieCtrlRegs.PIEIER1.bit.INTx4 = 1;  // Enable PIE Group 1 INT4
 
     EALLOW;
     CpuSysRegs.PCLKCR0.bit.TBCLKSYNC = 1;  /*start the TimeBase clock */
@@ -638,6 +639,8 @@ void InitializationRoutine(void)
     GpioCtrlRegs.GPBMUX1.bit.GPIO43 = 3;
     EDIS;
     InitializeSciaRegisters(921600.0);
+
+
     PI_iq.I_coeff = I_COEFFICIENT;
     PI_iq.P_coeff = P_COEFFICIENT;
     PI_iq.Ts = PI_TS_COEFFICIENT;
@@ -648,13 +651,13 @@ void InitializationRoutine(void)
     PI_iq.SaturationMax = 2.0 * IQ_RATED;
     PI_iq.SaturationMin = -2.0 * IQ_RATED;
 
+    AssignGSRAMs();
 
 
 
     for(i=0;i<NUMBEROFMPCLOOPS;i++)
     {
         Module1_Parameters.OptimizationFsw[i] = (i+1)*1000;
-        Module2_Parameters.OptimizationFsw[i] = (i+1)*1000;
     }
 
     InitializeADCs();               // initialize gpios for both cpu1 & cpu2
@@ -1009,6 +1012,13 @@ void InitializeADCs(void)
 
     /*-------------- M2 Adc Configuration end   --------------*/
 
+    EDIS;
+}
+void AssignGSRAMs(void)
+{
+    EALLOW;
+    MemCfgRegs.GSxMSEL.bit.MSEL_GS13 = 0;       /*CPU1 is the owner of RAMGS13*/
+    MemCfgRegs.GSxMSEL.bit.MSEL_GS14 = 1;       /*CPU2 is the owner of RAMGS14*/
     EDIS;
 }
 void EQEPSetup(void)

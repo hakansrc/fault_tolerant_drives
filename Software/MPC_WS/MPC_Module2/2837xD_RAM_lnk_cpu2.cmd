@@ -22,6 +22,22 @@ PAGE 1 :
 
    RAMLS5      : origin = 0x00A800, length = 0x000800
 
+   RAMGS0      : origin = 0x00C000, length = 0x001000
+   RAMGS1      : origin = 0x00D000, length = 0x001000
+   RAMGS2      : origin = 0x00E000, length = 0x001000
+   RAMGS3      : origin = 0x00F000, length = 0x001000
+   RAMGS4      : origin = 0x010000, length = 0x001000
+   RAMGS5      : origin = 0x011000, length = 0x001000
+   RAMGS6      : origin = 0x012000, length = 0x001000
+   RAMGS7      : origin = 0x013000, length = 0x001000
+   RAMGS8      : origin = 0x014000, length = 0x001000
+   RAMGS9      : origin = 0x015000, length = 0x001000
+   RAMGS10     : origin = 0x016000, length = 0x001000
+   RAMGS11     : origin = 0x017000, length = 0x001000
+   RAMGS12     : origin = 0x018000, length = 0x001000     
+   RAMGS13     : origin = 0x019000, length = 0x001000     /*CPU1 is the owner of RAMGS13*/
+   RAMGS14     : origin = 0x01A000, length = 0x001000     /*CPU2 is the owner of RAMGS14*/ 
+
    CANA_MSG_RAM     : origin = 0x049000, length = 0x000800
    CANB_MSG_RAM     : origin = 0x04B000, length = 0x000800
 

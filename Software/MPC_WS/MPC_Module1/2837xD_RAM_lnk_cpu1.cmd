@@ -35,9 +35,23 @@ PAGE 1 :
    RAMGS9      : origin = 0x015000, length = 0x001000
    RAMGS10     : origin = 0x016000, length = 0x001000
    RAMGS11     : origin = 0x017000, length = 0x001000
-   RAMGS12     : origin = 0x018000, length = 0x001000     
-   RAMGS13     : origin = 0x019000, length = 0x001000     /*CPU1 is the owner of RAMGS13*/
-   RAMGS14     : origin = 0x01A000, length = 0x001000     /*CPU2 is the owner of RAMGS14*/  
+   RAMGS12     : origin = 0x018000, length = 0x001000
+   M1_PARAMS_ADDRESS_RAMGS13   : origin = 0x019000, length = 0x00027A
+   PI_IQ_ADDRESS_RAMGS13   : origin = 0x019280, length = 0x000012     
+   M1_OPERATION_MODE_RAMGS13   : origin = 0x019292, length = 0x000001
+   M1_SPEEDREF_RAMGS13   : origin = 0x019294, length = 0x000002
+   RAMGS13     : origin = 0x019296, length = 0x000D6A
+   //PI_IQ_ADDRESS_RAMGS13   : origin = 0x019000, length = 0x000012     
+   //M1_OPERATION_MODE_RAMGS13   : origin = 0x019012, length = 0x000001
+   //M1_SPEEDREF_RAMGS13   : origin = 0x019014, length = 0x000002
+   //M1_PARAMS_ADDRESS_RAMGS13   : origin = 0x019016, length = 0x00027A
+   //RAMGS13     : origin = 0x019290, length = 0x000D70
+   M2_PARAMS_ADDRESS_RAMGS14 : origin = 0x01A000, length = 0x00027A  
+   M2_OPERATION_MODE_RAMGS14 : origin = 0x01A27A, length = 0x000001  
+   RAMGS14     : origin = 0x01A27B, length = 0x000D85
+   
+   //RAMGS13     : origin = 0x019000, length = 0x001000     /*CPU1 is the owner of RAMGS13*/
+   //RAMGS14     : origin = 0x01A000, length = 0x001000     /*CPU2 is the owner of RAMGS14*/  
 
    CPU2TOCPU1RAM   : origin = 0x03F800, length = 0x000400
    CPU1TOCPU2RAM   : origin = 0x03FC00, length = 0x000400
@@ -64,6 +78,14 @@ SECTIONS
 
    ramgs0           : > RAMGS0,    PAGE = 1
    ramgs1           : > RAMGS1,    PAGE = 1
+
+   PI_IQ_LOCATION   : > PI_IQ_ADDRESS_RAMGS13, PAGE = 1
+   M1_OPERATION_MODE_LOCATION : > M1_OPERATION_MODE_RAMGS13, PAGE = 1
+   M1_SPEEDREF_LOCATION : > M1_SPEEDREF_RAMGS13, PAGE = 1
+   M1_PARAMS_ADDRESS_LOCATION : > M1_PARAMS_ADDRESS_RAMGS13, PAGE = 1
+   M2_PARAMS_ADDRESS_LOCATION : > M2_PARAMS_ADDRESS_RAMGS14, PAGE = 1
+   M2_OPERATION_MODE_LOCATION : > M2_OPERATION_MODE_RAMGS14, PAGE = 1
+
 
 #ifdef __TI_COMPILER_VERSION__
    #if __TI_COMPILER_VERSION__ >= 15009000

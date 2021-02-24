@@ -22,15 +22,25 @@
  *
  * */
 
-ModuleParameters Module1_Parameters;
+#pragma DATA_SECTION("M1_SPEEDREF_LOCATION")
+float       SpeedRefRPM = 50;
+#pragma DATA_SECTION("M2_PARAMS_ADDRESS_LOCATION")
 ModuleParameters Module2_Parameters;
+#pragma DATA_SECTION("PI_IQ_LOCATION")
+PID_Parameters      PI_iq;
+#pragma DATA_SECTION("M1_OPERATION_MODE_LOCATION")
+unsigned int        M1_OperationMode = MODE_NO_OPERATION; /*this will be changed */
+#pragma DATA_SECTION("M2_OPERATION_MODE_LOCATION")
+unsigned int        M2_OperationMode = MODE_NO_OPERATION; /*this will be changed */
+#pragma DATA_SECTION("M1_PARAMS_ADDRESS_LOCATION")
+ModuleParameters Module1_Parameters;
+
 
 OpenLoopOperation   RL_Load_Operation = {25, 0.5}; // 0 hz, 0 magnitude
-PID_Parameters      PI_iq;
+
 unsigned int        M1_StartOperation = 1; /*if this is 0, then no operation will be performed. It will be set inside the debugger*/
 unsigned long int   M1_BlankCounter = 0;
-unsigned int        M1_OperationMode = MODE_NO_OPERATION; /*this will be changed */
-unsigned int        M2_OperationMode = MODE_NO_OPERATION; /*this will be changed */
+
 DRV8305_Vars        M1_Device1Configuration;
 DRV8305_Vars        M2_Device1Configuration;
 int32_t             M1_OffsetCalCounter;
@@ -90,7 +100,7 @@ uint32_t    AlignmentCounter = 0;
 float       DataToBeSent[6];
 uint32_t    SendOneInFour = 0;
 uint32_t    Xint1Count = 0;
-float       SpeedRefRPM = 50;
+
 float       SpeedRefRadSec = 0;
 float       PhaseIncrement = 0;
 float       PhaseValue = 0;
@@ -104,15 +114,15 @@ uint16_t    SpeedRefArrayCount = 0;
 float       SpeedRefArray[4] = {-35,80,35,-80};
 uint16_t    ByPass_SpeedMeasurement = 0;
 
+/*Following flag will be replaced with an IPC call*/
 uint16_t    StartOperationCpu2 = 0; // when this is set to 1, cpu2 will start operation & inverter2 will contribute to the traction
 
 /*TODO's before starting two module operation, following variables will be put to GSRAMs
- * 1- StartOperationCpu2
- * 2- PI_iq
- * 3- M1_OperationMode & M2_OperationMode
- * 4- SpeedRefRPM
- * 5- M2_OffsetCalculationIsDone
- * 6- Module1_Parameters & Module2_Parameters
+ * 1- StartOperationCpu2 ( will be replaced with an IPC call)
+ * 2- PI_iq (done)
+ * 3- M1_OperationMode & M2_OperationMode (done)
+ * 4- SpeedRefRPM (done)
+ * 5- Module1_Parameters
  * */
 
 
@@ -660,8 +670,8 @@ void InitializationRoutine(void)
         Module1_Parameters.OptimizationFsw[i] = (i+1)*1000;
     }
 
-    InitializeADCs();               // initialize gpios for both cpu1 & cpu2
-    SetupGPIOs();
+    InitializeADCs();
+    SetupGPIOs();                   // initialize gpios for both cpu1 & cpu2
     InitializeEpwm1Registers();
     InitializeEpwm2Registers();
     InitializeEpwm3Registers();
@@ -1724,7 +1734,7 @@ __interrupt void epwm1_isr(void)
         PI_iq.Input = SpeedRefRadSec - Module1_Parameters.AngularSpeedRadSec.Mechanical;
         Run_PI_Controller(PI_iq);
 
-        Module1_Parameters.Reference.Iq = PI_iq.Output;
+        Module1_Parameters.Reference.Iq = PI_iq.Output/2;
         Module1_Parameters.Reference.Id = IDREF;
 
         Module1_Parameters.MinimumCostValue = (float)1e35;
@@ -1920,6 +1930,11 @@ __interrupt void xint1_isr(void)
         Module1_Parameters.AngleRadTemp.Mechanical = (float) EQep1Regs.QPOSCNT / (float) ENCODERMAXTICKCOUNT * 2.0 * PI;
         ByPass_SpeedMeasurement = 1;  // do not try to calculate speed at first two rotation. the speed measurements would be TOO wrong at first two rotations, therefore omit the speed calculation for two cycles,
 
+    }
+
+    if(Xint1Count>=10)
+    {
+        IpcRegs.IPCSET.bit.IPC31; // set this so that CPU2 will continue
     }
     PieCtrlRegs.PIEACK.all = PIEACK_GROUP1;
 }

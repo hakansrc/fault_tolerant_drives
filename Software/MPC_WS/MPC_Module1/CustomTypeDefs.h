@@ -112,25 +112,25 @@ typedef struct
 
 typedef struct
 {
-    MeasuredParams Measured;                                            /*  28 bytes    */
-    CurrentHorizonParameters CurrentHorizon[NUMBEROFMPCLOOPS];  /* 16*10=   160 bytes   */
-    FirstHorizonParameters FirstHorizon[NUMBEROFMPCLOOPS];      /* 16*10=   160 bytes   */
-    PredictionParameters SecondHorizon[NUMBEROFMPCLOOPS];       /* 76*10=   760 bytes   */
-    unsigned int MinimumCostIndex;                                      /*  2 bytes     */
-    float MinimumCostValue;                                             /*  1 byte      */
-    float OptimizationFsw[NUMBEROFMPCLOOPS];                    /* 10*4=    40 bytes    */
-    float Cost[NUMBEROFMPCLOOPS];                               /* 10*4=    40 bytes    */
-    ReferenceValues Reference;                                          /*  8 bytes     */
-    Angle AngleRad;                                                     /*  8 bytes     */
-    Angle AngleRadPrev;                                                 /*  8 bytes     */
-    Angle AngleRadTemp;                                                 /*  8 bytes     */
-    AngularSpeed AngularSpeedRadSec;                                    /*  8 bytes     */
-    AngularSpeed AngularSpeedRPM;                                       /*  8 bytes     */
-    Offset OffsetValue;                                                 /*  12 bytes    */
-    float PhaseADutyCycle;                                              /*  1 byte      */
-    float PhaseBDutyCycle;                                              /*  1 byte      */
-    float PhaseCDutyCycle;                                              /*  1 byte      */
-} ModuleParameters; /*1254 bytes*/
+    MeasuredParams Measured;                                            /*  28 bytes    -> 14 for C2000*/
+    CurrentHorizonParameters CurrentHorizon[NUMBEROFMPCLOOPS];  /* 16*10=   160 bytes   -> 80 for C2000*/
+    FirstHorizonParameters FirstHorizon[NUMBEROFMPCLOOPS];      /* 16*10=   160 bytes   -> 80 for C2000*/
+    PredictionParameters SecondHorizon[NUMBEROFMPCLOOPS];       /* 76*10=   760 bytes   -> 380 for C2000*/
+    float MinimumCostValue;                                             /*  4 byte      -> 2 for C2000*/
+    float OptimizationFsw[NUMBEROFMPCLOOPS];                    /* 10*4=    40 bytes    -> 20 for C2000*/
+    float Cost[NUMBEROFMPCLOOPS];                               /* 10*4=    40 bytes    -> 20 for C2000*/
+    ReferenceValues Reference;                                          /*  8 bytes     -> 4 for C2000*/
+    Angle AngleRad;                                                     /*  8 bytes     -> 4 for C2000*/
+    Angle AngleRadPrev;                                                 /*  8 bytes     -> 4 for C2000*/
+    Angle AngleRadTemp;                                                 /*  8 bytes     -> 4 for C2000*/
+    AngularSpeed AngularSpeedRadSec;                                    /*  8 bytes     -> 4 for C2000*/
+    AngularSpeed AngularSpeedRPM;                                       /*  8 bytes     -> 4 for C2000*/
+    Offset OffsetValue;                                                 /*  12 bytes    -> 6 for C2000*/
+    float PhaseADutyCycle;                                              /*  4 byte      -> 2 for C2000*/
+    float PhaseBDutyCycle;                                              /*  4 byte      -> 2 for C2000*/
+    float PhaseCDutyCycle;                                              /*  4 byte      -> 2 for C2000*/
+    unsigned int MinimumCostIndex;                                      /*  4 bytes     -> 1 for C2000*/
+} ModuleParameters;                                                     /*  = 1268 bytes-> = 633 for C2000 (this is because an address can hold 2 bytes in 28379d)*/
 
 typedef struct
 {
@@ -143,7 +143,7 @@ typedef struct
     float Input_prev;
     float SaturationMax;
     float SaturationMin;
-} PID_Parameters;
+} PID_Parameters; // = 18bytes for C2000 (this is because an address can hold 2 bytes in 28379d)
 
 enum
 {

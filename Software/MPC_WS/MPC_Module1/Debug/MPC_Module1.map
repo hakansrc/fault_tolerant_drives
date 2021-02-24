@@ -1,7 +1,7 @@
 ******************************************************************************
              TMS320C2000 Linker PC v20.2.1                     
 ******************************************************************************
->> Linked Sun Feb 21 21:10:16 2021
+>> Linked Wed Feb 24 22:36:46 2021
 
 OUTPUT FILE NAME:   <MPC_Module1.out>
 ENTRY POINT SYMBOL: "_c_int00"  address: 0001b639
@@ -13,10 +13,10 @@ MEMORY CONFIGURATION
 ----------------------  --------  ---------  --------  --------  ----  --------
 PAGE 0:
   BEGIN                 00000000   00000002  00000002  00000000  RWIX
-  RAMM0                 00000122   000002de  0000013a  000001a4  RWIX
+  RAMM0                 00000122   000002de  00000142  0000019c  RWIX
   RAMLS0                00008000   00002800  00002800  00000000  RWIX
   RAMD0                 0000b000   00000800  00000000  00000800  RWIX
-  RAMGS15               0001b000   00001000  000007b5  0000084b  RWIX
+  RAMGS15               0001b000   00001000  000007c1  0000083f  RWIX
   RESET                 003fffc0   00000002  00000000  00000002  RWIX
 
 PAGE 1:
@@ -98,7 +98,7 @@ PAGE 1:
   GPIODAT               00007f00   00000030  00000030  00000000  RWIX
   RAMLS5                0000a800   00000800  00000212  000005ee  RWIX
   RAMD1                 0000b800   00000800  00000000  00000800  RWIX
-  RAMGS0                0000c000   00001000  00000742  000008be  RWIX
+  RAMGS0                0000c000   00001000  00000232  00000dce  RWIX
   RAMGS1                0000d000   00001000  00000000  00001000  RWIX
   RAMGS2                0000e000   00001000  00000000  00001000  RWIX
   RAMGS3                0000f000   00001000  00000000  00001000  RWIX
@@ -111,8 +111,14 @@ PAGE 1:
   RAMGS10               00016000   00001000  00000000  00001000  RWIX
   RAMGS11               00017000   00001000  00000000  00001000  RWIX
   RAMGS12               00018000   00001000  00000000  00001000  RWIX
-  RAMGS13               00019000   00001000  00000000  00001000  RWIX
-  RAMGS14               0001a000   00001000  00000000  00001000  RWIX
+  M1_PARAMS_ADDRESS_RAM 00019000   0000027a  0000027a  00000000  RWIX
+  PI_IQ_ADDRESS_RAMGS13 00019280   00000012  00000012  00000000  RWIX
+  M1_OPERATION_MODE_RAM 00019292   00000001  00000001  00000000  RWIX
+  M1_SPEEDREF_RAMGS13   00019294   00000002  00000002  00000000  RWIX
+  RAMGS13               00019296   00000d6a  00000000  00000d6a  RWIX
+  M2_PARAMS_ADDRESS_RAM 0001a000   0000027a  0000027a  00000000  RWIX
+  M2_OPERATION_MODE_RAM 0001a27a   00000001  00000001  00000000  RWIX
+  RAMGS14               0001a27b   00000d85  00000000  00000d85  RWIX
   CPU2TOCPU1RAM         0003f800   00000400  00000000  00000400  RWIX
   CPU1TOCPU2RAM         0003fc00   00000400  00000088  00000378  RWIX
   EMIF1                 00047000   00000800  00000070  00000790  RWIX
@@ -152,30 +158,34 @@ codestart
 *          0    00000000    00000002     
                   00000000    00000002     F2837xD_CodeStartBranch.obj (codestart)
 
-.cinit     0    00000122    00000136     
-                  00000122    00000074     main.obj (.cinit)
-                  00000196    00000021     F2837xD_struct.obj (.cinit:_TRIP_SEL)
-                  000001b7    0000001d     F2837xD_struct.obj (.cinit:_EPWM)
-                  000001d4    00000011     F2837xD_struct.obj (.cinit:_ECAP)
-                  000001e5    00000010     MultipleFloatDataSender.obj (.cinit)
-                  000001f5    0000000e     rts2800_fpu32.lib : exit.c.obj (.cinit)
-                  00000203    0000000d     F2837xD_struct.obj (.cinit:_ADC)
-                  00000210    0000000b     F2837xD_struct.obj (.cinit:_EQEP)
-                  0000021b    0000000b     F2837xD_struct.obj (.cinit:_SPI)
-                  00000226    00000009     F2837xD_struct.obj (.cinit:_SDFM)
-                  0000022f    00000007     F2837xD_struct.obj (.cinit:_I2C)
-                  00000236    00000007     F2837xD_struct.obj (.cinit:_MCBSP)
-                  0000023d    00000007     F2837xD_struct.obj (.cinit:_SCI)
-                  00000244    00000005     rts2800_fpu32.lib : _lock.c.obj (.cinit:__lock)
-                  00000249    00000005                       : _lock.c.obj (.cinit:__unlock)
-                  0000024e    00000004     F2837xD_sci_io.obj (.cinit)
-                  00000252    00000004     rts2800_fpu32.lib : errno.c.obj (.cinit)
-                  00000256    00000002     --HOLE-- [fill = 0]
+.cinit     0    00000122    0000013e     
+                  00000122    0000007c     main.obj (.cinit)
+                  0000019e    00000021     F2837xD_struct.obj (.cinit:_TRIP_SEL)
+                  000001bf    0000001d     F2837xD_struct.obj (.cinit:_EPWM)
+                  000001dc    00000011     F2837xD_struct.obj (.cinit:_ECAP)
+                  000001ed    00000010     MultipleFloatDataSender.obj (.cinit)
+                  000001fd    0000000e     rts2800_fpu32.lib : exit.c.obj (.cinit)
+                  0000020b    0000000d     F2837xD_struct.obj (.cinit:_ADC)
+                  00000218    0000000b     F2837xD_struct.obj (.cinit:_EQEP)
+                  00000223    0000000b     F2837xD_struct.obj (.cinit:_SPI)
+                  0000022e    00000009     F2837xD_struct.obj (.cinit:_SDFM)
+                  00000237    00000007     F2837xD_struct.obj (.cinit:_I2C)
+                  0000023e    00000007     F2837xD_struct.obj (.cinit:_MCBSP)
+                  00000245    00000007     F2837xD_struct.obj (.cinit:_SCI)
+                  0000024c    00000005     rts2800_fpu32.lib : _lock.c.obj (.cinit:__lock)
+                  00000251    00000005                       : _lock.c.obj (.cinit:__unlock)
+                  00000256    00000004     F2837xD_sci_io.obj (.cinit)
+                  0000025a    00000004     rts2800_fpu32.lib : errno.c.obj (.cinit)
+                  0000025e    00000002     --HOLE-- [fill = 0]
 
 .pinit     0    00000122    00000000     UNINITIALIZED
 
 .reset     0    003fffc0    00000002     DSECT
                   003fffc0    00000002     rts2800_fpu32.lib : boot28.asm.obj (.reset)
+
+.TI.ramfunc 
+*          0    00000260    00000004     
+                  00000260    00000004     F2837xD_usDelay.obj (.TI.ramfunc)
 
 .stack     1    00000400    00000200     UNINITIALIZED
                   00000400    00000200     --HOLE--
@@ -429,33 +439,53 @@ GpioDataRegsFile
                   0000aa0e    00000002                       : e_fmodf.c.obj (.econst)
                   0000aa10    00000002                       : s_floorf.c.obj (.econst)
 
-.ebss      1    0000c000    00000742     UNINITIALIZED
-                  0000c000    0000057a     main.obj (.ebss)
-                  0000c57a    00000006     F2837xD_TempSensorConv.obj (.ebss)
-                  0000c580    00000100     MultipleFloatDataSender.obj (.ebss:_cSciaLibDataBuffer)
-                  0000c680    0000001e     F2837xD_struct.obj (.ebss:_TRIP_SEL)
-                  0000c69e    0000001c     MultipleFloatDataSender.obj (.ebss:_cSendMultipleFloatArray)
-                  0000c6ba    00000006     F2837xD_struct.obj (.ebss:_SDFM)
-                  0000c6c0    0000001a     F2837xD_struct.obj (.ebss:_EPWM)
-                  0000c6da    00000018     F2837xD_CpuTimers.obj (.ebss)
-                  0000c6f2    0000000e     F2837xD_struct.obj (.ebss:_ECAP)
-                  0000c700    0000000c     main.obj (.ebss:_DataToBeSent)
-                  0000c70c    0000000a     F2837xD_struct.obj (.ebss:_ADC)
-                  0000c716    00000008     F2837xD_struct.obj (.ebss:_EQEP)
-                  0000c71e    00000008     F2837xD_struct.obj (.ebss:_SPI)
-                  0000c726    00000006     rts2800_fpu32.lib : exit.c.obj (.ebss)
-                  0000c72c    00000004     MultipleFloatDataSender.obj (.ebss)
-                  0000c730    00000004     F2837xD_struct.obj (.ebss:_I2C)
-                  0000c734    00000004     F2837xD_struct.obj (.ebss:_MCBSP)
-                  0000c738    00000004     F2837xD_struct.obj (.ebss:_SCI)
-                  0000c73c    00000002     rts2800_fpu32.lib : _lock.c.obj (.ebss:__lock)
-                  0000c73e    00000002                       : _lock.c.obj (.ebss:__unlock)
-                  0000c740    00000001     F2837xD_sci_io.obj (.ebss)
-                  0000c741    00000001     rts2800_fpu32.lib : errno.c.obj (.ebss)
+.ebss      1    0000c000    00000232     UNINITIALIZED
+                  0000c000    00000100     MultipleFloatDataSender.obj (.ebss:_cSciaLibDataBuffer)
+                  0000c100    0000006a     main.obj (.ebss)
+                  0000c16a    0000000e     F2837xD_struct.obj (.ebss:_ECAP)
+                  0000c178    00000008     F2837xD_struct.obj (.ebss:_EQEP)
+                  0000c180    0000001e     F2837xD_struct.obj (.ebss:_TRIP_SEL)
+                  0000c19e    0000001c     MultipleFloatDataSender.obj (.ebss:_cSendMultipleFloatArray)
+                  0000c1ba    00000006     F2837xD_TempSensorConv.obj (.ebss)
+                  0000c1c0    0000001a     F2837xD_struct.obj (.ebss:_EPWM)
+                  0000c1da    00000018     F2837xD_CpuTimers.obj (.ebss)
+                  0000c1f2    0000000c     main.obj (.ebss:_DataToBeSent)
+                  0000c1fe    00000002     rts2800_fpu32.lib : _lock.c.obj (.ebss:__lock)
+                  0000c200    0000000a     F2837xD_struct.obj (.ebss:_ADC)
+                  0000c20a    00000008     F2837xD_struct.obj (.ebss:_SPI)
+                  0000c212    00000006     F2837xD_struct.obj (.ebss:_SDFM)
+                  0000c218    00000006     rts2800_fpu32.lib : exit.c.obj (.ebss)
+                  0000c21e    00000004     MultipleFloatDataSender.obj (.ebss)
+                  0000c222    00000004     F2837xD_struct.obj (.ebss:_I2C)
+                  0000c226    00000004     F2837xD_struct.obj (.ebss:_MCBSP)
+                  0000c22a    00000004     F2837xD_struct.obj (.ebss:_SCI)
+                  0000c22e    00000002     rts2800_fpu32.lib : _lock.c.obj (.ebss:__unlock)
+                  0000c230    00000001     F2837xD_sci_io.obj (.ebss)
+                  0000c231    00000001     rts2800_fpu32.lib : errno.c.obj (.ebss)
 
-.TI.ramfunc 
-*          0    00000258    00000004     
-                  00000258    00000004     F2837xD_usDelay.obj (.TI.ramfunc)
+M1_PARAMS_ADDRESS_LOCATION 
+*          1    00019000    0000027a     UNINITIALIZED
+                  00019000    0000027a     main.obj (M1_PARAMS_ADDRESS_LOCATION)
+
+PI_IQ_LOCATION 
+*          1    00019280    00000012     UNINITIALIZED
+                  00019280    00000012     main.obj (PI_IQ_LOCATION)
+
+M1_OPERATION_MODE_LOCATION 
+*          1    00019292    00000001     UNINITIALIZED
+                  00019292    00000001     main.obj (M1_OPERATION_MODE_LOCATION)
+
+M1_SPEEDREF_LOCATION 
+*          1    00019294    00000002     UNINITIALIZED
+                  00019294    00000002     main.obj (M1_SPEEDREF_LOCATION)
+
+M2_PARAMS_ADDRESS_LOCATION 
+*          1    0001a000    0000027a     UNINITIALIZED
+                  0001a000    0000027a     main.obj (M2_PARAMS_ADDRESS_LOCATION)
+
+M2_OPERATION_MODE_LOCATION 
+*          1    0001a27a    00000001     UNINITIALIZED
+                  0001a27a    00000001     main.obj (M2_OPERATION_MODE_LOCATION)
 
 PUTBUFFER 
 *          1    0003fc00    00000080     UNINITIALIZED
@@ -515,6 +545,14 @@ AdcdRegsFile
 *          1    00007580    00000080     UNINITIALIZED
                   00007580    00000080     F2837xD_GlobalVariableDefs.obj (AdcdRegsFile)
 
+Emif1RegsFile 
+*          1    00047000    00000070     UNINITIALIZED
+                  00047000    00000070     F2837xD_GlobalVariableDefs.obj (Emif1RegsFile)
+
+Emif2RegsFile 
+*          1    00047800    00000070     UNINITIALIZED
+                  00047800    00000070     F2837xD_GlobalVariableDefs.obj (Emif2RegsFile)
+
 CanaRegsFile 
 *          1    00048000    00000164     UNINITIALIZED
                   00048000    00000164     F2837xD_GlobalVariableDefs.obj (CanaRegsFile)
@@ -522,6 +560,14 @@ CanaRegsFile
 CanbRegsFile 
 *          1    0004a000    00000164     UNINITIALIZED
                   0004a000    00000164     F2837xD_GlobalVariableDefs.obj (CanbRegsFile)
+
+IpcRegsFile 
+*          1    00050000    00000024     UNINITIALIZED
+                  00050000    00000024     F2837xD_GlobalVariableDefs.obj (IpcRegsFile)
+
+FlashPumpSemaphoreRegsFile 
+*          1    00050024    00000002     UNINITIALIZED
+                  00050024    00000002     F2837xD_GlobalVariableDefs.obj (FlashPumpSemaphoreRegsFile)
 
 AnalogSubsysRegsFile 
 *          1    0005d180    00000048     UNINITIALIZED
@@ -562,22 +608,6 @@ Cmpss7RegsFile
 Cmpss8RegsFile 
 *          1    00005d60    00000020     UNINITIALIZED
                   00005d60    00000020     F2837xD_GlobalVariableDefs.obj (Cmpss8RegsFile)
-
-Emif1RegsFile 
-*          1    00047000    00000070     UNINITIALIZED
-                  00047000    00000070     F2837xD_GlobalVariableDefs.obj (Emif1RegsFile)
-
-Emif2RegsFile 
-*          1    00047800    00000070     UNINITIALIZED
-                  00047800    00000070     F2837xD_GlobalVariableDefs.obj (Emif2RegsFile)
-
-IpcRegsFile 
-*          1    00050000    00000024     UNINITIALIZED
-                  00050000    00000024     F2837xD_GlobalVariableDefs.obj (IpcRegsFile)
-
-FlashPumpSemaphoreRegsFile 
-*          1    00050024    00000002     UNINITIALIZED
-                  00050024    00000002     F2837xD_GlobalVariableDefs.obj (FlashPumpSemaphoreRegsFile)
 
 RomPrefetchRegsFile 
 *          1    0005e608    00000002     UNINITIALIZED
@@ -648,16 +678,16 @@ CpuSysRegsFile
                   0005d300    00000082     F2837xD_GlobalVariableDefs.obj (CpuSysRegsFile)
 
 .text.1    0    00008000    00002800     
-                  00008000    000012b5     main.obj (.text)
-                  000092b5    000009b7     main.obj (.text:retain)
-                  00009c6c    00000585     F2837xD_DefaultISR.obj (.text:retain)
-                  0000a1f1    00000382     F2837xD_SysCtrl.obj (.text)
-                  0000a573    00000208     F2837xD_Gpio.obj (.text)
-                  0000a77b    0000005e     F2837xD_CpuTimers.obj (.text)
-                  0000a7d9    00000024     rts2800_fpu32.lib : cpy_tbl.c.obj (.text)
+                  00008000    000012a4     main.obj (.text)
+                  000092a4    000009d4     main.obj (.text:retain)
+                  00009c78    00000585     F2837xD_DefaultISR.obj (.text:retain)
+                  0000a1fd    00000382     F2837xD_SysCtrl.obj (.text)
+                  0000a57f    00000208     F2837xD_Gpio.obj (.text)
+                  0000a787    0000005e     F2837xD_CpuTimers.obj (.text)
+                  0000a7e5    00000018     rts2800_fpu32.lib : ll_aox28.asm.obj (.text)
                   0000a7fd    00000003     F2837xD_DBGIER.obj (.text)
 
-.text.2    0    0001b000    000007b5     
+.text.2    0    0001b000    000007c1     
                   0001b000    00000369     rts2800_fpu32.lib : e_powf.c.obj (.text)
                   0001b369    000000cf                       : e_fmodf.c.obj (.text)
                   0001b438    000000c8     MultipleFloatDataSender.obj (.text)
@@ -670,22 +700,22 @@ CpuSysRegsFile
                   0001b6f1    00000028     F2837xD_PieCtrl.obj (.text)
                   0001b719    00000001     rts2800_fpu32.lib : startup.c.obj (.text)
                   0001b71a    00000027                       : e_sqrtf.c.obj (.text)
-                  0001b741    0000001d                       : memcpy.c.obj (.text)
-                  0001b75e    00000018                       : ll_aox28.asm.obj (.text)
-                  0001b776    00000012                       : args_main.c.obj (.text)
-                  0001b788    00000011     F2837xD_PieVect.obj (.text)
-                  0001b799    00000011     rts2800_fpu32.lib : s_copysignf.c.obj (.text)
-                  0001b7aa    00000009                       : _lock.c.obj (.text)
-                  0001b7b3    00000002                       : pre_init.c.obj (.text)
+                  0001b741    00000024                       : cpy_tbl.c.obj (.text)
+                  0001b765    0000001d                       : memcpy.c.obj (.text)
+                  0001b782    00000012                       : args_main.c.obj (.text)
+                  0001b794    00000011     F2837xD_PieVect.obj (.text)
+                  0001b7a5    00000011     rts2800_fpu32.lib : s_copysignf.c.obj (.text)
+                  0001b7b6    00000009                       : _lock.c.obj (.text)
+                  0001b7bf    00000002                       : pre_init.c.obj (.text)
 
 MODULE SUMMARY
 
        Module                           code    initialized data   uninitialized data
        ------                           ----    ----------------   ------------------
     .\
-       main.obj                         7276    116                1414              
+       main.obj                         7288    124                1408              
     +--+--------------------------------+-------+------------------+--------------------+
-       Total:                           7276    116                1414              
+       Total:                           7288    124                1408              
                                                                                      
     .\Libs\
        MultipleFloatDataSender.obj      200     21                 288               
@@ -734,7 +764,7 @@ MODULE SUMMARY
                                                                                      
        Stack:                           0       0                  512               
     +--+--------------------------------+-------+------------------+--------------------+
-       Grand Total:                     12219   837                11265             
+       Grand Total:                     12231   845                11259             
 
 
 GLOBAL DATA SYMBOLS: SORTED BY DATA PAGE
@@ -872,77 +902,79 @@ address     data page           name
 
 0000a800     2a0 (0000a800)     _PieVectTableInit
 
-0000c000     300 (0000c000)     _M1_StartOperation
-0000c001     300 (0000c000)     _M1_OperationMode
-0000c002     300 (0000c000)     _M1_OffsetCalculationIsDone
-0000c003     300 (0000c000)     _M2_OffsetCalculationIsDone
-0000c004     300 (0000c000)     _PwmFrequency
-0000c005     300 (0000c000)     _PwmFrequencyIncrement
-0000c006     300 (0000c000)     _ClockMod
-0000c007     300 (0000c000)     _ReadDrv8305RegistersFlag
-0000c008     300 (0000c000)     _AngleHasBeenReset
-0000c009     300 (0000c000)     _SpeedRefArrayCount
-0000c00a     300 (0000c000)     _ByPass_SpeedMeasurement
-0000c00c     300 (0000c000)     _M1_BlankCounter
-0000c00e     300 (0000c000)     _M1_OffsetCalCounter
-0000c010     300 (0000c000)     _M2_OffsetCalCounter
-0000c012     300 (0000c000)     _K1
-0000c014     300 (0000c000)     _K2
-0000c016     300 (0000c000)     _SvpwmSectorNumber
-0000c018     300 (0000c000)     _ControlISRCounter
-0000c01a     300 (0000c000)     _AlignmentCounter
-0000c01c     300 (0000c000)     _SendOneInFour
-0000c01e     300 (0000c000)     _Xint1Count
-0000c020     300 (0000c000)     _SpeedRefRPM
-0000c022     300 (0000c000)     _SpeedRefRadSec
-0000c024     300 (0000c000)     _PhaseIncrement
-0000c026     300 (0000c000)     _PhaseValue
-0000c028     300 (0000c000)     _FswDecided
-0000c02a     300 (0000c000)     _RL_Load_Operation
-0000c02e     300 (0000c000)     _PI_iq
+0000c000     300 (0000c000)     _cSciaLibDataBuffer
 
-0000c040     301 (0000c040)     _M1_Device1Configuration
-0000c055     301 (0000c040)     _M2_Device1Configuration
+0000c100     304 (0000c100)     _M1_StartOperation
+0000c101     304 (0000c100)     _M1_OffsetCalculationIsDone
+0000c102     304 (0000c100)     _M2_OffsetCalculationIsDone
+0000c103     304 (0000c100)     _PwmFrequency
+0000c104     304 (0000c100)     _PwmFrequencyIncrement
+0000c105     304 (0000c100)     _ClockMod
+0000c106     304 (0000c100)     _ReadDrv8305RegistersFlag
+0000c107     304 (0000c100)     _AngleHasBeenReset
+0000c108     304 (0000c100)     _SpeedRefArrayCount
+0000c109     304 (0000c100)     _ByPass_SpeedMeasurement
+0000c10a     304 (0000c100)     _StartOperationCpu2
+0000c10c     304 (0000c100)     _M1_BlankCounter
+0000c10e     304 (0000c100)     _M1_OffsetCalCounter
+0000c110     304 (0000c100)     _M2_OffsetCalCounter
+0000c112     304 (0000c100)     _K1
+0000c114     304 (0000c100)     _K2
+0000c116     304 (0000c100)     _SvpwmSectorNumber
+0000c118     304 (0000c100)     _ControlISRCounter
+0000c11a     304 (0000c100)     _AlignmentCounter
+0000c11c     304 (0000c100)     _SendOneInFour
+0000c11e     304 (0000c100)     _Xint1Count
+0000c120     304 (0000c100)     _SpeedRefRadSec
+0000c122     304 (0000c100)     _PhaseIncrement
+0000c124     304 (0000c100)     _PhaseValue
+0000c126     304 (0000c100)     _FswDecided
+0000c128     304 (0000c100)     _RL_Load_Operation
 
-0000c080     302 (0000c080)     _Module1_Parameters
+0000c140     305 (0000c140)     _M1_Device1Configuration
+0000c155     305 (0000c140)     _M2_Device1Configuration
+0000c16a     305 (0000c140)     _ECAP
+0000c178     305 (0000c140)     _EQEP
 
-0000c300     30c (0000c300)     _Module2_Parameters
+0000c180     306 (0000c180)     _TRIP_SEL
+0000c19e     306 (0000c180)     _cSendMultipleFloatArray
+0000c1ba     306 (0000c180)     _tempSensor_tempSlope
+0000c1bc     306 (0000c180)     _tempSensor_tempOffset
+0000c1be     306 (0000c180)     _tempSensor_scaleFactor
 
-0000c57a     315 (0000c540)     _tempSensor_tempSlope
-0000c57c     315 (0000c540)     _tempSensor_tempOffset
-0000c57e     315 (0000c540)     _tempSensor_scaleFactor
+0000c1c0     307 (0000c1c0)     _EPWM
+0000c1da     307 (0000c1c0)     _CpuTimer0
+0000c1e2     307 (0000c1c0)     _CpuTimer1
+0000c1ea     307 (0000c1c0)     _CpuTimer2
+0000c1f2     307 (0000c1c0)     _DataToBeSent
+0000c1fe     307 (0000c1c0)     __lock
 
-0000c580     316 (0000c580)     _cSciaLibDataBuffer
+0000c200     308 (0000c200)     _ADC
+0000c20a     308 (0000c200)     _SPI
+0000c212     308 (0000c200)     _SDFM
+0000c218     308 (0000c200)     ___TI_enable_exit_profile_output
+0000c21a     308 (0000c200)     ___TI_cleanup_ptr
+0000c21c     308 (0000c200)     ___TI_dtors_ptr
+0000c21e     308 (0000c200)     _uiSciaRxBufferIndex
+0000c21f     308 (0000c200)     _uiSciaLibReadFromBufferIndex
+0000c220     308 (0000c200)     _uiSciaLibWriteToBufferIndex
+0000c221     308 (0000c200)     _uiSciaLibBufferNumberOfMessages
+0000c222     308 (0000c200)     _I2C
+0000c226     308 (0000c200)     _MCBSP
+0000c22a     308 (0000c200)     _SCI
+0000c22e     308 (0000c200)     __unlock
+0000c230     308 (0000c200)     _deviceOpen
+0000c231     308 (0000c200)     _errno
 
-0000c680     31a (0000c680)     _TRIP_SEL
-0000c69e     31a (0000c680)     _cSendMultipleFloatArray
-0000c6ba     31a (0000c680)     _SDFM
+00019000     640 (00019000)     _Module1_Parameters
 
-0000c6c0     31b (0000c6c0)     _EPWM
-0000c6da     31b (0000c6c0)     _CpuTimer0
-0000c6e2     31b (0000c6c0)     _CpuTimer1
-0000c6ea     31b (0000c6c0)     _CpuTimer2
-0000c6f2     31b (0000c6c0)     _ECAP
+00019280     64a (00019280)     _PI_iq
+00019292     64a (00019280)     _M1_OperationMode
+00019294     64a (00019280)     _SpeedRefRPM
 
-0000c700     31c (0000c700)     _DataToBeSent
-0000c70c     31c (0000c700)     _ADC
-0000c716     31c (0000c700)     _EQEP
-0000c71e     31c (0000c700)     _SPI
-0000c726     31c (0000c700)     ___TI_enable_exit_profile_output
-0000c728     31c (0000c700)     ___TI_cleanup_ptr
-0000c72a     31c (0000c700)     ___TI_dtors_ptr
-0000c72c     31c (0000c700)     _uiSciaRxBufferIndex
-0000c72d     31c (0000c700)     _uiSciaLibReadFromBufferIndex
-0000c72e     31c (0000c700)     _uiSciaLibWriteToBufferIndex
-0000c72f     31c (0000c700)     _uiSciaLibBufferNumberOfMessages
-0000c730     31c (0000c700)     _I2C
-0000c734     31c (0000c700)     _MCBSP
-0000c738     31c (0000c700)     _SCI
-0000c73c     31c (0000c700)     __lock
-0000c73e     31c (0000c700)     __unlock
+0001a000     680 (0001a000)     _Module2_Parameters
 
-0000c740     31d (0000c740)     _deviceOpen
-0000c741     31d (0000c740)     _errno
+0001a27a     689 (0001a240)     _M2_OperationMode
 
 0003f800     fe0 (0003f800)     _g_asIPCCPU2toCPU1Buffers
 
@@ -1007,31 +1039,31 @@ page  address   name
 abs   ffffffff  .text                                     
 0     0001b6c8  C$$EXIT                                   
 0     0001b500  FS$$DIV                                   
-0     0001b75e  LL$$AND                                   
-0     0001b766  LL$$OR                                    
-0     0001b76e  LL$$XOR                                   
-1     0000c70c  _ADC                                      
-0     0000a1e7  _ADCA1_ISR                                
-0     0000a1dd  _ADCA2_ISR                                
-0     0000a1d3  _ADCA3_ISR                                
-0     0000a1c9  _ADCA4_ISR                                
-0     0000a1bf  _ADCA_EVT_ISR                             
-0     0000a1b5  _ADCB1_ISR                                
-0     0000a1ab  _ADCB2_ISR                                
-0     0000a1a1  _ADCB3_ISR                                
-0     0000a197  _ADCB4_ISR                                
-0     0000a18d  _ADCB_EVT_ISR                             
-0     0000a183  _ADCC1_ISR                                
-0     0000a179  _ADCC2_ISR                                
-0     0000a16f  _ADCC3_ISR                                
-0     0000a165  _ADCC4_ISR                                
-0     0000a15b  _ADCC_EVT_ISR                             
-0     0000a151  _ADCD1_ISR                                
-0     0000a147  _ADCD2_ISR                                
-0     0000a13d  _ADCD3_ISR                                
-0     0000a133  _ADCD4_ISR                                
-0     0000a129  _ADCD_EVT_ISR                             
-0     0000a11f  _AUX_PLL_SLIP_ISR                         
+0     0000a7e5  LL$$AND                                   
+0     0000a7ed  LL$$OR                                    
+0     0000a7f5  LL$$XOR                                   
+1     0000c200  _ADC                                      
+0     0000a1f3  _ADCA1_ISR                                
+0     0000a1e9  _ADCA2_ISR                                
+0     0000a1df  _ADCA3_ISR                                
+0     0000a1d5  _ADCA4_ISR                                
+0     0000a1cb  _ADCA_EVT_ISR                             
+0     0000a1c1  _ADCB1_ISR                                
+0     0000a1b7  _ADCB2_ISR                                
+0     0000a1ad  _ADCB3_ISR                                
+0     0000a1a3  _ADCB4_ISR                                
+0     0000a199  _ADCB_EVT_ISR                             
+0     0000a18f  _ADCC1_ISR                                
+0     0000a185  _ADCC2_ISR                                
+0     0000a17b  _ADCC3_ISR                                
+0     0000a171  _ADCC4_ISR                                
+0     0000a167  _ADCC_EVT_ISR                             
+0     0000a15d  _ADCD1_ISR                                
+0     0000a153  _ADCD2_ISR                                
+0     0000a149  _ADCD3_ISR                                
+0     0000a13f  _ADCD4_ISR                                
+0     0000a135  _ADCD_EVT_ISR                             
+0     0000a12b  _AUX_PLL_SLIP_ISR                         
 1     0005f4c0  _AccessProtectionRegs                     
 1     00007400  _AdcaRegs                                 
 1     00000b00  _AdcaResultRegs                           
@@ -1041,33 +1073,34 @@ abs   ffffffff  .text
 1     00000b40  _AdccResultRegs                           
 1     00007580  _AdcdRegs                                 
 1     00000b60  _AdcdResultRegs                           
-1     0000c01a  _AlignmentCounter                         
+1     0000c11a  _AlignmentCounter                         
 1     0005d180  _AnalogSubsysRegs                         
-1     0000c008  _AngleHasBeenReset                        
-0     0000a3f3  _AuxAuxClkSel                             
-0     0000a40e  _AuxIntOsc2Sel                            
-0     0000a3fd  _AuxXtalOscSel                            
-1     0000c00a  _ByPass_SpeedMeasurement                  
-0     0000a115  _CANA0_ISR                                
-0     0000a10b  _CANA1_ISR                                
-0     0000a101  _CANB0_ISR                                
-0     0000a0f7  _CANB1_ISR                                
-0     0000a0ed  _CLA1_1_ISR                               
-0     0000a0e3  _CLA1_2_ISR                               
-0     0000a0d9  _CLA1_3_ISR                               
-0     0000a0cf  _CLA1_4_ISR                               
-0     0000a0c5  _CLA1_5_ISR                               
-0     0000a0bb  _CLA1_6_ISR                               
-0     0000a0b1  _CLA1_7_ISR                               
-0     0000a0a7  _CLA1_8_ISR                               
-0     0000a09d  _CLA_OVERFLOW_ISR                         
-0     0000a093  _CLA_UNDERFLOW_ISR                        
+1     0000c107  _AngleHasBeenReset                        
+0     0000801c  _AssignGSRAMs__Fv                         
+0     0000a3ff  _AuxAuxClkSel                             
+0     0000a41a  _AuxIntOsc2Sel                            
+0     0000a409  _AuxXtalOscSel                            
+1     0000c109  _ByPass_SpeedMeasurement                  
+0     0000a121  _CANA0_ISR                                
+0     0000a117  _CANA1_ISR                                
+0     0000a10d  _CANB0_ISR                                
+0     0000a103  _CANB1_ISR                                
+0     0000a0f9  _CLA1_1_ISR                               
+0     0000a0ef  _CLA1_2_ISR                               
+0     0000a0e5  _CLA1_3_ISR                               
+0     0000a0db  _CLA1_4_ISR                               
+0     0000a0d1  _CLA1_5_ISR                               
+0     0000a0c7  _CLA1_6_ISR                               
+0     0000a0bd  _CLA1_7_ISR                               
+0     0000a0b3  _CLA1_8_ISR                               
+0     0000a0a9  _CLA_OVERFLOW_ISR                         
+0     0000a09f  _CLA_UNDERFLOW_ISR                        
 1     00048000  _CanaRegs                                 
 1     0004a000  _CanbRegs                                 
 1     00001400  _Cla1Regs                                 
 0     00000ce0  _Cla1SoftIntRegs                          
 1     0005d200  _ClkCfgRegs                               
-1     0000c006  _ClockMod                                 
+1     0000c105  _ClockMod                                 
 1     00005c80  _Cmpss1Regs                               
 1     00005ca0  _Cmpss2Regs                               
 1     00005cc0  _Cmpss3Regs                               
@@ -1076,78 +1109,78 @@ abs   ffffffff  .text
 1     00005d20  _Cmpss6Regs                               
 1     00005d40  _Cmpss7Regs                               
 1     00005d60  _Cmpss8Regs                               
-0     0000a7b6  _ConfigCpuTimer                           
-1     0000c018  _ControlISRCounter                        
+0     0000a7c2  _ConfigCpuTimer                           
+1     0000c118  _ControlISRCounter                        
 1     0005d300  _CpuSysRegs                               
-1     0000c6da  _CpuTimer0                                
+1     0000c1da  _CpuTimer0                                
 1     00000c00  _CpuTimer0Regs                            
-1     0000c6e2  _CpuTimer1                                
+1     0000c1e2  _CpuTimer1                                
 1     00000c08  _CpuTimer1Regs                            
-1     0000c6ea  _CpuTimer2                                
+1     0000c1ea  _CpuTimer2                                
 1     00000c10  _CpuTimer2Regs                            
-0     0000a552  _CsmUnlock                                
-0     0000a089  _DATALOG_ISR                              
-0     0000a07f  _DMA_CH1_ISR                              
-0     0000a075  _DMA_CH2_ISR                              
-0     0000a06b  _DMA_CH3_ISR                              
-0     0000a061  _DMA_CH4_ISR                              
-0     0000a057  _DMA_CH5_ISR                              
-0     0000a04d  _DMA_CH6_ISR                              
+0     0000a55e  _CsmUnlock                                
+0     0000a095  _DATALOG_ISR                              
+0     0000a08b  _DMA_CH1_ISR                              
+0     0000a081  _DMA_CH2_ISR                              
+0     0000a077  _DMA_CH3_ISR                              
+0     0000a06d  _DMA_CH4_ISR                              
+0     0000a063  _DMA_CH5_ISR                              
+0     0000a059  _DMA_CH6_ISR                              
 1     00005c00  _DacaRegs                                 
 1     00005c10  _DacbRegs                                 
 1     00005c20  _DaccRegs                                 
-1     0000c700  _DataToBeSent                             
+1     0000c1f2  _DataToBeSent                             
 1     0005f070  _DcsmCommonRegs                           
 1     00078000  _DcsmZ1Otp                                
 1     0005f000  _DcsmZ1Regs                               
 1     00078200  _DcsmZ2Otp                                
 1     0005f040  _DcsmZ2Regs                               
 1     0005d000  _DevCfgRegs                               
-0     0000a305  _DisableDog                               
-0     0000a4fc  _DisablePeripheralClocks                  
+0     0000a311  _DisableDog                               
+0     0000a508  _DisablePeripheralClocks                  
 1     00007980  _DmaClaSrcSelRegs                         
 1     00001000  _DmaRegs                                  
-1     0000c6f2  _ECAP                                     
-0     0000a043  _ECAP1_ISR                                
-0     0000a039  _ECAP2_ISR                                
-0     0000a02f  _ECAP3_ISR                                
-0     0000a025  _ECAP4_ISR                                
-0     0000a01b  _ECAP5_ISR                                
-0     0000a011  _ECAP6_ISR                                
+1     0000c16a  _ECAP                                     
+0     0000a04f  _ECAP1_ISR                                
+0     0000a045  _ECAP2_ISR                                
+0     0000a03b  _ECAP3_ISR                                
+0     0000a031  _ECAP4_ISR                                
+0     0000a027  _ECAP5_ISR                                
+0     0000a01d  _ECAP6_ISR                                
 1     00005000  _ECap1Regs                                
 1     00005020  _ECap2Regs                                
 1     00005040  _ECap3Regs                                
 1     00005060  _ECap4Regs                                
 1     00005080  _ECap5Regs                                
 1     000050a0  _ECap6Regs                                
-0     0000a007  _EMIF_ERROR_ISR                           
-0     00009ffa  _EMPTY_ISR                                
-0     00009ff0  _EMU_ISR                                  
-1     0000c6c0  _EPWM                                     
-0     00009fe6  _EPWM10_ISR                               
-0     00009fdc  _EPWM10_TZ_ISR                            
-0     00009fd2  _EPWM11_ISR                               
-0     00009fc8  _EPWM11_TZ_ISR                            
-0     00009fbe  _EPWM12_ISR                               
-0     00009fb4  _EPWM12_TZ_ISR                            
-0     00009faa  _EPWM1_ISR                                
-0     00009fa0  _EPWM1_TZ_ISR                             
-0     00009f96  _EPWM2_ISR                                
-0     00009f8c  _EPWM2_TZ_ISR                             
-0     00009f82  _EPWM3_ISR                                
-0     00009f78  _EPWM3_TZ_ISR                             
-0     00009f6e  _EPWM4_ISR                                
-0     00009f64  _EPWM4_TZ_ISR                             
-0     00009f5a  _EPWM5_ISR                                
-0     00009f50  _EPWM5_TZ_ISR                             
-0     00009f46  _EPWM6_ISR                                
-0     00009f3c  _EPWM6_TZ_ISR                             
-0     00009f32  _EPWM7_ISR                                
-0     00009f28  _EPWM7_TZ_ISR                             
-0     00009f1e  _EPWM8_ISR                                
-0     00009f14  _EPWM8_TZ_ISR                             
-0     00009f0a  _EPWM9_ISR                                
-0     00009f00  _EPWM9_TZ_ISR                             
+0     0000a013  _EMIF_ERROR_ISR                           
+0     0000a006  _EMPTY_ISR                                
+0     00009ffc  _EMU_ISR                                  
+1     0000c1c0  _EPWM                                     
+0     00009ff2  _EPWM10_ISR                               
+0     00009fe8  _EPWM10_TZ_ISR                            
+0     00009fde  _EPWM11_ISR                               
+0     00009fd4  _EPWM11_TZ_ISR                            
+0     00009fca  _EPWM12_ISR                               
+0     00009fc0  _EPWM12_TZ_ISR                            
+0     00009fb6  _EPWM1_ISR                                
+0     00009fac  _EPWM1_TZ_ISR                             
+0     00009fa2  _EPWM2_ISR                                
+0     00009f98  _EPWM2_TZ_ISR                             
+0     00009f8e  _EPWM3_ISR                                
+0     00009f84  _EPWM3_TZ_ISR                             
+0     00009f7a  _EPWM4_ISR                                
+0     00009f70  _EPWM4_TZ_ISR                             
+0     00009f66  _EPWM5_ISR                                
+0     00009f5c  _EPWM5_TZ_ISR                             
+0     00009f52  _EPWM6_ISR                                
+0     00009f48  _EPWM6_TZ_ISR                             
+0     00009f3e  _EPWM7_ISR                                
+0     00009f34  _EPWM7_TZ_ISR                             
+0     00009f2a  _EPWM8_ISR                                
+0     00009f20  _EPWM8_TZ_ISR                             
+0     00009f16  _EPWM9_ISR                                
+0     00009f0c  _EPWM9_TZ_ISR                             
 1     00004900  _EPwm10Regs                               
 1     00004a00  _EPwm11Regs                               
 1     00004b00  _EPwm12Regs                               
@@ -1161,11 +1194,11 @@ abs   ffffffff  .text
 1     00004700  _EPwm8Regs                                
 1     00004800  _EPwm9Regs                                
 1     00007a00  _EPwmXbarRegs                             
-1     0000c716  _EQEP                                     
-0     00009ef6  _EQEP1_ISR                                
-0     00009eec  _EQEP2_ISR                                
-0     00009ee2  _EQEP3_ISR                                
-0     00008829  _EQEPSetup__Fv                            
+1     0000c178  _EQEP                                     
+0     00009f02  _EQEP1_ISR                                
+0     00009ef8  _EQEP2_ISR                                
+0     00009eee  _EQEP3_ISR                                
+0     00008833  _EQEPSetup__Fv                            
 1     00005100  _EQep1Regs                                
 1     00005140  _EQep2Regs                                
 1     00005180  _EQep3Regs                                
@@ -1176,143 +1209,144 @@ abs   ffffffff  .text
 1     00000d01  _EmuBMode                                 
 1     00000d00  _EmuKey                                   
 0     0001b710  _EnableInterrupts                         
-0     00000258  _F28x_usDelay                             
-0     00009ed8  _FLASH_CORRECTABLE_ERROR_ISR              
-0     00009ece  _FPU_OVERFLOW_ISR                         
-0     00009ec4  _FPU_UNDERFLOW_ISR                        
+0     00000260  _F28x_usDelay                             
+0     00009ee4  _FLASH_CORRECTABLE_ERROR_ISR              
+0     00009eda  _FPU_OVERFLOW_ISR                         
+0     00009ed0  _FPU_UNDERFLOW_ISR                        
 1     0005f800  _Flash0CtrlRegs                           
 1     0005fb00  _Flash0EccRegs                            
 1     00050024  _FlashPumpSemaphoreRegs                   
-1     0000c028  _FswDecided                               
-0     0000a76b  _GPIO_EnableUnbondedIOPullups             
-0     0000a746  _GPIO_EnableUnbondedIOPullupsFor100Pin    
-0     0000a72d  _GPIO_EnableUnbondedIOPullupsFor176Pin    
-0     0000a719  _GPIO_ReadPin                             
-0     0000a6f7  _GPIO_SetupLock                           
-0     0000a6a2  _GPIO_SetupPinMux                         
-0     0000a61d  _GPIO_SetupPinOptions                     
-0     0000a616  _GPIO_SetupXINT1Gpio                      
-0     0000a60f  _GPIO_SetupXINT2Gpio                      
-0     0000a608  _GPIO_SetupXINT3Gpio                      
-0     0000a601  _GPIO_SetupXINT4Gpio                      
-0     0000a5fa  _GPIO_SetupXINT5Gpio                      
-0     0000a5e0  _GPIO_WritePin                            
-0     00008d72  _GetAdcReadings__FR16ModuleParameters     
-0     00008cce  _GetEncoderReadings__FR16ModuleParameters 
-0     000090a0  _GetSvpwmDutyCycles__FfN41RfN26           
+1     0000c126  _FswDecided                               
+0     0000a777  _GPIO_EnableUnbondedIOPullups             
+0     0000a752  _GPIO_EnableUnbondedIOPullupsFor100Pin    
+0     0000a739  _GPIO_EnableUnbondedIOPullupsFor176Pin    
+0     0000a725  _GPIO_ReadPin                             
+0     0000a703  _GPIO_SetupLock                           
+0     0000a6ae  _GPIO_SetupPinMux                         
+0     0000a629  _GPIO_SetupPinOptions                     
+0     0000a622  _GPIO_SetupXINT1Gpio                      
+0     0000a61b  _GPIO_SetupXINT2Gpio                      
+0     0000a614  _GPIO_SetupXINT3Gpio                      
+0     0000a60d  _GPIO_SetupXINT4Gpio                      
+0     0000a606  _GPIO_SetupXINT5Gpio                      
+0     0000a5ec  _GPIO_WritePin                            
+0     00008d5f  _GetAdcReadings__FR16ModuleParameters     
+0     00008cbb  _GetEncoderReadings__FR16ModuleParameters 
+0     0000908f  _GetSvpwmDutyCycles__FfN41RfN26           
 1     00007c00  _GpioCtrlRegs                             
 1     00007f00  _GpioDataRegs                             
-0     0000a539  _HALT                                     
-0     0000a51a  _HIB                                      
-1     0000c730  _I2C                                      
-0     00009eba  _I2CA_FIFO_ISR                            
-0     00009eb0  _I2CA_ISR                                 
-0     00009ea6  _I2CB_FIFO_ISR                            
-0     00009e9c  _I2CB_ISR                                 
+0     0000a545  _HALT                                     
+0     0000a526  _HIB                                      
+1     0000c222  _I2C                                      
+0     00009ec6  _I2CA_FIFO_ISR                            
+0     00009ebc  _I2CA_ISR                                 
+0     00009eb2  _I2CB_FIFO_ISR                            
+0     00009ea8  _I2CB_ISR                                 
 1     00007300  _I2caRegs                                 
 1     00007340  _I2cbRegs                                 
-0     0000a4f3  _IDLE                                     
-0     00009e92  _ILLEGAL_ISR                              
-0     00009e88  _IPC0_ISR                                 
-0     00009e7e  _IPC1_ISR                                 
-0     00009e74  _IPC2_ISR                                 
-0     00009e6a  _IPC3_ISR                                 
-0     0000a41b  _InitAuxPll                               
-0     0000a77b  _InitCpuTimers                            
-0     000084db  _InitDRV8305Regs__FP12DRV8305_Vars        
-0     0000a573  _InitGpio                                 
-0     0000a312  _InitPeripheralClocks                     
+0     0000a4ff  _IDLE                                     
+0     00009e9e  _ILLEGAL_ISR                              
+0     00009e94  _IPC0_ISR                                 
+0     00009e8a  _IPC1_ISR                                 
+0     00009e80  _IPC2_ISR                                 
+0     00009e76  _IPC3_ISR                                 
+0     0000a427  _InitAuxPll                               
+0     0000a787  _InitCpuTimers                            
+0     000084e5  _InitDRV8305Regs__FP12DRV8305_Vars        
+0     0000a57f  _InitGpio                                 
+0     0000a31e  _InitPeripheralClocks                     
 0     0001b6f1  _InitPieCtrl                              
-0     0001b788  _InitPieVectTable                         
-0     0000848c  _InitSpiDrv8305Gpios__Fv                  
-0     000084c2  _InitSpiRegs_DRV830x__FPV8SPI_REGS        
-0     0000a3bb  _InitSysCtrl                              
-0     0000a246  _InitSysPll                               
-0     00008879  _InitializationRoutine__Fv                
-0     0000801c  _InitializeADCs__Fv                       
-0     00008325  _InitializeEpwm1Registers__Fv             
-0     000083b2  _InitializeEpwm2Registers__Fv             
-0     0000841f  _InitializeEpwm3Registers__Fv             
-0     00009251  _InitializeGpiosForCpu2__Fv               
-0     00009245  _InitializePeripharelsForCpu2__Fv         
+0     0001b794  _InitPieVectTable                         
+0     00008496  _InitSpiDrv8305Gpios__Fv                  
+0     000084cc  _InitSpiRegs_DRV830x__FPV8SPI_REGS        
+0     0000a3c7  _InitSysCtrl                              
+0     0000a252  _InitSysPll                               
+0     00008883  _InitializationRoutine__Fv                
+0     00008026  _InitializeADCs__Fv                       
+0     0000832f  _InitializeEpwm1Registers__Fv             
+0     000083bc  _InitializeEpwm2Registers__Fv             
+0     00008429  _InitializeEpwm3Registers__Fv             
+0     00009240  _InitializeGpiosForCpu2__Fv               
+0     00009234  _InitializePeripharelsForCpu2__Fv         
 0     0001b4c8  _InitializeSciaRegisters__Ff              
 1     00007900  _InputXbarRegs                            
 1     00050000  _IpcRegs                                  
-1     0000c012  _K1                                       
-1     0000c014  _K2                                       
-1     0000c00c  _M1_BlankCounter                          
-0     000089c5  _M1_CalculateOffsetValue__Fv              
-0     0000851b  _M1_DRV8305_SPI_Read__FP12DRV8305_VarsUi  
-0     00008502  _M1_DRV8305_SPI_Write__FP12DRV8305_VarsUi 
-1     0000c040  _M1_Device1Configuration                  
-0     00008524  _M1_InitDRV8305__FP12DRV8305_Vars         
-1     0000c00e  _M1_OffsetCalCounter                      
-1     0000c002  _M1_OffsetCalculationIsDone               
-1     0000c001  _M1_OperationMode                         
-0     00008b0f  _M1_ReadDRV8305Registers__FP12DRV8305_Vars
-1     0000c000  _M1_StartOperation                        
-0     00008a66  _M2_CalculateOffsetValue__Fv              
-0     0000860f  _M2_DRV8305_SPI_Read__FP12DRV8305_VarsUi  
-0     000085f6  _M2_DRV8305_SPI_Write__FP12DRV8305_VarsUi 
-1     0000c055  _M2_Device1Configuration                  
-0     00008618  _M2_InitDRV8305__FP12DRV8305_Vars         
-1     0000c010  _M2_OffsetCalCounter                      
-1     0000c003  _M2_OffsetCalculationIsDone               
-1     0000c734  _MCBSP                                    
-0     00009e60  _MCBSPA_RX_ISR                            
-0     00009e56  _MCBSPA_TX_ISR                            
-0     00009e4c  _MCBSPB_RX_ISR                            
-0     00009e42  _MCBSPB_TX_ISR                            
+1     0000c112  _K1                                       
+1     0000c114  _K2                                       
+1     0000c10c  _M1_BlankCounter                          
+0     000089b0  _M1_CalculateOffsetValue__Fv              
+0     00008525  _M1_DRV8305_SPI_Read__FP12DRV8305_VarsUi  
+0     0000850c  _M1_DRV8305_SPI_Write__FP12DRV8305_VarsUi 
+1     0000c140  _M1_Device1Configuration                  
+0     0000852e  _M1_InitDRV8305__FP12DRV8305_Vars         
+1     0000c10e  _M1_OffsetCalCounter                      
+1     0000c101  _M1_OffsetCalculationIsDone               
+1     00019292  _M1_OperationMode                         
+0     00008afa  _M1_ReadDRV8305Registers__FP12DRV8305_Vars
+1     0000c100  _M1_StartOperation                        
+0     00008a51  _M2_CalculateOffsetValue__Fv              
+0     00008619  _M2_DRV8305_SPI_Read__FP12DRV8305_VarsUi  
+0     00008600  _M2_DRV8305_SPI_Write__FP12DRV8305_VarsUi 
+1     0000c155  _M2_Device1Configuration                  
+0     00008622  _M2_InitDRV8305__FP12DRV8305_Vars         
+1     0000c110  _M2_OffsetCalCounter                      
+1     0000c102  _M2_OffsetCalculationIsDone               
+1     0001a27a  _M2_OperationMode                         
+1     0000c226  _MCBSP                                    
+0     00009e6c  _MCBSPA_RX_ISR                            
+0     00009e62  _MCBSPA_TX_ISR                            
+0     00009e58  _MCBSPB_RX_ISR                            
+0     00009e4e  _MCBSPB_TX_ISR                            
 1     00006000  _McbspaRegs                               
 1     00006040  _McbspbRegs                               
 1     0005f400  _MemCfgRegs                               
 1     0005f500  _MemoryErrorRegs                          
-1     0000c080  _Module1_Parameters                       
-1     0000c300  _Module2_Parameters                       
-0     00009e38  _NMI_ISR                                  
-0     00009e2e  _NOTUSED_ISR                              
+1     00019000  _Module1_Parameters                       
+1     0001a000  _Module2_Parameters                       
+0     00009e44  _NMI_ISR                                  
+0     00009e3a  _NOTUSED_ISR                              
 1     00007060  _NmiIntruptRegs                           
 1     00007a80  _OutputXbarRegs                           
-0     00009e24  _PIE_RESERVED_ISR                         
-1     0000c02e  _PI_iq                                    
-1     0000c024  _PhaseIncrement                           
-1     0000c026  _PhaseValue                               
+0     00009e30  _PIE_RESERVED_ISR                         
+1     00019280  _PI_iq                                    
+1     0000c122  _PhaseIncrement                           
+1     0000c124  _PhaseValue                               
 1     00000ce0  _PieCtrlRegs                              
 1     00000d00  _PieVectTable                             
 1     0000a800  _PieVectTableInit                         
-1     0000c004  _PwmFrequency                             
-1     0000c005  _PwmFrequencyIncrement                    
-0     00009e1a  _RAM_ACCESS_VIOLATION_ISR                 
-0     00009e10  _RAM_CORRECTABLE_ERROR_ISR                
-1     0000c02a  _RL_Load_Operation                        
-0     00009e06  _RTOS_ISR                                 
-1     0000c007  _ReadDrv8305RegistersFlag                 
-0     0000a23c  _ReleaseFlashPump                         
+1     0000c103  _PwmFrequency                             
+1     0000c104  _PwmFrequencyIncrement                    
+0     00009e26  _RAM_ACCESS_VIOLATION_ISR                 
+0     00009e1c  _RAM_CORRECTABLE_ERROR_ISR                
+1     0000c128  _RL_Load_Operation                        
+0     00009e12  _RTOS_ISR                                 
+1     0000c106  _ReadDrv8305RegistersFlag                 
+0     0000a248  _ReleaseFlashPump                         
 1     0005e608  _RomPrefetchRegs                          
 1     0005f540  _RomWaitStateRegs                         
-0     00008c42  _RunTimeProtectionControl__Fv             
-1     0000c738  _SCI                                      
-0     00009dfc  _SCIA_RX_ISR                              
-0     00009df2  _SCIA_TX_ISR                              
-0     00009de8  _SCIB_RX_ISR                              
-0     00009dde  _SCIB_TX_ISR                              
-0     00009dd4  _SCIC_RX_ISR                              
-0     00009dca  _SCIC_TX_ISR                              
-0     00009dc0  _SCID_RX_ISR                              
-0     00009db6  _SCID_TX_ISR                              
-0     00009dac  _SD1_ISR                                  
-0     00009da2  _SD2_ISR                                  
-1     0000c6ba  _SDFM                                     
-1     0000c71e  _SPI                                      
-0     00009d98  _SPIA_RX_ISR                              
-0     00009d8e  _SPIA_TX_ISR                              
-0     00009d84  _SPIB_RX_ISR                              
-0     00009d7a  _SPIB_TX_ISR                              
-0     00009d70  _SPIC_RX_ISR                              
-0     00009d66  _SPIC_TX_ISR                              
-0     000084fc  _SPI_Driver__FPV8SPI_REGSUi               
-0     0000a231  _STANDBY                                  
-0     00009d5c  _SYS_PLL_SLIP_ISR                         
+0     00008c2f  _RunTimeProtectionControl__Fv             
+1     0000c22a  _SCI                                      
+0     00009e08  _SCIA_RX_ISR                              
+0     00009dfe  _SCIA_TX_ISR                              
+0     00009df4  _SCIB_RX_ISR                              
+0     00009dea  _SCIB_TX_ISR                              
+0     00009de0  _SCIC_RX_ISR                              
+0     00009dd6  _SCIC_TX_ISR                              
+0     00009dcc  _SCID_RX_ISR                              
+0     00009dc2  _SCID_TX_ISR                              
+0     00009db8  _SD1_ISR                                  
+0     00009dae  _SD2_ISR                                  
+1     0000c212  _SDFM                                     
+1     0000c20a  _SPI                                      
+0     00009da4  _SPIA_RX_ISR                              
+0     00009d9a  _SPIA_TX_ISR                              
+0     00009d90  _SPIB_RX_ISR                              
+0     00009d86  _SPIB_TX_ISR                              
+0     00009d7c  _SPIC_RX_ISR                              
+0     00009d72  _SPIC_TX_ISR                              
+0     00008506  _SPI_Driver__FPV8SPI_REGSUi               
+0     0000a23d  _STANDBY                                  
+0     00009d68  _SYS_PLL_SLIP_ISR                         
 0     0001b4aa  _SciSendMultipleFloatWithTheTag__FPfUi    
 0     0001b487  _SciaBackgroundTask__Fv                   
 1     00007200  _SciaRegs                                 
@@ -1322,59 +1356,60 @@ abs   ffffffff  .text
 1     00007230  _ScidRegs                                 
 1     00005e00  _Sdfm1Regs                                
 1     00005e80  _Sdfm2Regs                                
-0     0000a21f  _SeizeFlashPump                           
-1     0000c01c  _SendOneInFour                            
-0     0000a211  _ServiceDog                               
+0     0000a22b  _SeizeFlashPump                           
+1     0000c11c  _SendOneInFour                            
+0     0000a21d  _ServiceDog                               
 0     0000a7fd  _SetDBGIER                                
-0     000086ea  _SetupCmpssProtections__Fv                
-0     000082a3  _SetupGPIOs__Fv                           
-1     0000c009  _SpeedRefArrayCount                       
-1     0000c020  _SpeedRefRPM                              
-1     0000c022  _SpeedRefRadSec                           
+0     000086f4  _SetupCmpssProtections__Fv                
+0     000082ad  _SetupGPIOs__Fv                           
+1     0000c108  _SpeedRefArrayCount                       
+1     00019294  _SpeedRefRPM                              
+1     0000c120  _SpeedRefRadSec                           
 1     00006100  _SpiaRegs                                 
 1     00006110  _SpibRegs                                 
 1     00006120  _SpicRegs                                 
-1     0000c016  _SvpwmSectorNumber                        
+1     0000c10a  _StartOperationCpu2                       
+1     0000c116  _SvpwmSectorNumber                        
 1     00007940  _SyncSocRegs                              
-0     0000a207  _SysIntOsc1Sel                            
-0     0000a1fd  _SysIntOsc2Sel                            
-0     0000a1f1  _SysXtalOscSel                            
-0     00009d52  _TIMER0_ISR                               
-0     00009d48  _TIMER1_ISR                               
-0     00009d3e  _TIMER2_ISR                               
-1     0000c680  _TRIP_SEL                                 
-0     00009d34  _UPPA_ISR                                 
-0     00009d2a  _USBA_ISR                                 
-0     00009d20  _USER10_ISR                               
-0     00009d16  _USER11_ISR                               
-0     00009d0c  _USER12_ISR                               
-0     00009d02  _USER1_ISR                                
-0     00009cf8  _USER2_ISR                                
-0     00009cee  _USER3_ISR                                
-0     00009ce4  _USER4_ISR                                
-0     00009cda  _USER5_ISR                                
-0     00009cd0  _USER6_ISR                                
-0     00009cc6  _USER7_ISR                                
-0     00009cbc  _USER8_ISR                                
-0     00009cb2  _USER9_ISR                                
+0     0000a213  _SysIntOsc1Sel                            
+0     0000a209  _SysIntOsc2Sel                            
+0     0000a1fd  _SysXtalOscSel                            
+0     00009d5e  _TIMER0_ISR                               
+0     00009d54  _TIMER1_ISR                               
+0     00009d4a  _TIMER2_ISR                               
+1     0000c180  _TRIP_SEL                                 
+0     00009d40  _UPPA_ISR                                 
+0     00009d36  _USBA_ISR                                 
+0     00009d2c  _USER10_ISR                               
+0     00009d22  _USER11_ISR                               
+0     00009d18  _USER12_ISR                               
+0     00009d0e  _USER1_ISR                                
+0     00009d04  _USER2_ISR                                
+0     00009cfa  _USER3_ISR                                
+0     00009cf0  _USER4_ISR                                
+0     00009ce6  _USER5_ISR                                
+0     00009cdc  _USER6_ISR                                
+0     00009cd2  _USER7_ISR                                
+0     00009cc8  _USER8_ISR                                
+0     00009cbe  _USER9_ISR                                
 1     00006200  _UppRegs                                  
-0     00009ca8  _VCU_ISR                                  
-0     00009c9e  _WAKE_ISR                                 
+0     00009cb4  _VCU_ISR                                  
+0     00009caa  _WAKE_ISR                                 
 1     00007000  _WdRegs                                   
-0     00009c94  _XINT1_ISR                                
-0     00009c8a  _XINT2_ISR                                
-0     00009c80  _XINT3_ISR                                
-0     00009c76  _XINT4_ISR                                
-0     00009c6c  _XINT5_ISR                                
+0     00009ca0  _XINT1_ISR                                
+0     00009c96  _XINT2_ISR                                
+0     00009c8c  _XINT3_ISR                                
+0     00009c82  _XINT4_ISR                                
+0     00009c78  _XINT5_ISR                                
 1     00007920  _XbarRegs                                 
-1     0000c01e  _Xint1Count                               
+1     0000c11e  _Xint1Count                               
 1     00007070  _XintRegs                                 
-0     00008db3  _ZeroiseModule1Parameters__Fv             
+0     00008da0  _ZeroiseModule1Parameters__Fv             
 1     00000600  __STACK_END                               
 abs   00000200  __STACK_SIZE                              
-1     0000c728  ___TI_cleanup_ptr                         
-1     0000c72a  ___TI_dtors_ptr                           
-1     0000c726  ___TI_enable_exit_profile_output          
+1     0000c21a  ___TI_cleanup_ptr                         
+1     0000c21c  ___TI_dtors_ptr                           
+1     0000c218  ___TI_enable_exit_profile_output          
 abs   ffffffff  ___TI_pprof_out_hndl                      
 abs   ffffffff  ___TI_prof_data_size                      
 abs   ffffffff  ___TI_prof_data_start                     
@@ -1384,28 +1419,28 @@ abs   ffffffff  ___c_args__
 abs   ffffffff  ___etext__                                
 abs   ffffffff  ___pinit__                                
 abs   ffffffff  ___text__                                 
-0     0001b776  __args_main                               
-1     0000c73c  __lock                                    
-0     0001b7b2  __nop                                     
-0     0001b7ae  __register_lock                           
-0     0001b7aa  __register_unlock                         
+0     0001b782  __args_main                               
+1     0000c1fe  __lock                                    
+0     0001b7be  __nop                                     
+0     0001b7ba  __register_lock                           
+0     0001b7b6  __register_unlock                         
 1     00000400  __stack                                   
 0     0001b719  __system_post_cinit                       
-0     0001b7b3  __system_pre_init                         
-1     0000c73e  __unlock                                  
+0     0001b7bf  __system_pre_init                         
+1     0000c22e  __unlock                                  
 0     0001b6c8  _abort                                    
-1     0000c580  _cSciaLibDataBuffer                       
-1     0000c69e  _cSendMultipleFloatArray                  
+1     0000c000  _cSciaLibDataBuffer                       
+1     0000c19e  _cSendMultipleFloatArray                  
 0     0001b639  _c_int00                                  
-0     0000a7d9  _copy_in                                  
-0     0001b799  _copysign                                 
-0     0001b799  _copysignf                                
-0     00009c33  _cpu_timer0_isr__Fv                       
-0     00009c19  _cpu_timer1_isr__Fv                       
-0     00009c07  _cpu_timer2_isr__Fv                       
-1     0000c740  _deviceOpen                               
-0     00009320  _epwm1_isr__Fv                            
-1     0000c741  _errno                                    
+0     0001b741  _copy_in                                  
+0     0001b7a5  _copysign                                 
+0     0001b7a5  _copysignf                                
+0     00009c3f  _cpu_timer0_isr__Fv                       
+0     00009c25  _cpu_timer1_isr__Fv                       
+0     00009c13  _cpu_timer2_isr__Fv                       
+1     0000c230  _deviceOpen                               
+0     00009313  _epwm1_isr__Fv                            
+1     0000c231  _errno                                    
 0     0001b6ca  _exit                                     
 0     0001b588  _floor                                    
 0     0001b588  _floorf                                   
@@ -1419,8 +1454,8 @@ abs   ffffffff  ___text__
 1     0003fc80  _g_usPutWriteIndexes                      
 0     0001b5e1  _ldexp                                    
 0     0001b5e1  _ldexpf                                   
-0     00008b29  _main                                     
-0     0001b741  _memcpy                                   
+0     00008b14  _main                                     
+0     0001b765  _memcpy                                   
 0     0001b000  _pow                                      
 0     0001b000  _powf                                     
 0     00008000  _ramper__FfN21                            
@@ -1430,14 +1465,14 @@ abs   ffffffff  ___text__
 0     0001b5e1  _scalbnf                                  
 0     0001b71a  _sqrt                                     
 0     0001b71a  _sqrtf                                    
-1     0000c57e  _tempSensor_scaleFactor                   
-1     0000c57c  _tempSensor_tempOffset                    
-1     0000c57a  _tempSensor_tempSlope                     
-1     0000c72f  _uiSciaLibBufferNumberOfMessages          
-1     0000c72d  _uiSciaLibReadFromBufferIndex             
-1     0000c72e  _uiSciaLibWriteToBufferIndex              
-1     0000c72c  _uiSciaRxBufferIndex                      
-0     000092b5  _xint1_isr__Fv                            
+1     0000c1be  _tempSensor_scaleFactor                   
+1     0000c1bc  _tempSensor_tempOffset                    
+1     0000c1ba  _tempSensor_tempSlope                     
+1     0000c221  _uiSciaLibBufferNumberOfMessages          
+1     0000c21f  _uiSciaLibReadFromBufferIndex             
+1     0000c220  _uiSciaLibWriteToBufferIndex              
+1     0000c21e  _uiSciaRxBufferIndex                      
+0     000092a4  _xint1_isr__Fv                            
 abs   ffffffff  binit                                     
 0     00000122  cinit                                     
 0     00000000  code_start                                
@@ -1452,221 +1487,224 @@ page  address   name
 0     00000000  code_start                                
 0     00000122  ___cinit__                                
 0     00000122  cinit                                     
-0     00000258  _F28x_usDelay                             
+0     00000260  _F28x_usDelay                             
 0     00000ce0  _Cla1SoftIntRegs                          
 0     00008000  _ramper__FfN21                            
-0     0000801c  _InitializeADCs__Fv                       
-0     000082a3  _SetupGPIOs__Fv                           
-0     00008325  _InitializeEpwm1Registers__Fv             
-0     000083b2  _InitializeEpwm2Registers__Fv             
-0     0000841f  _InitializeEpwm3Registers__Fv             
-0     0000848c  _InitSpiDrv8305Gpios__Fv                  
-0     000084c2  _InitSpiRegs_DRV830x__FPV8SPI_REGS        
-0     000084db  _InitDRV8305Regs__FP12DRV8305_Vars        
-0     000084fc  _SPI_Driver__FPV8SPI_REGSUi               
-0     00008502  _M1_DRV8305_SPI_Write__FP12DRV8305_VarsUi 
-0     0000851b  _M1_DRV8305_SPI_Read__FP12DRV8305_VarsUi  
-0     00008524  _M1_InitDRV8305__FP12DRV8305_Vars         
-0     000085f6  _M2_DRV8305_SPI_Write__FP12DRV8305_VarsUi 
-0     0000860f  _M2_DRV8305_SPI_Read__FP12DRV8305_VarsUi  
-0     00008618  _M2_InitDRV8305__FP12DRV8305_Vars         
-0     000086ea  _SetupCmpssProtections__Fv                
-0     00008829  _EQEPSetup__Fv                            
-0     00008879  _InitializationRoutine__Fv                
-0     000089c5  _M1_CalculateOffsetValue__Fv              
-0     00008a66  _M2_CalculateOffsetValue__Fv              
-0     00008b0f  _M1_ReadDRV8305Registers__FP12DRV8305_Vars
-0     00008b29  _main                                     
-0     00008c42  _RunTimeProtectionControl__Fv             
-0     00008cce  _GetEncoderReadings__FR16ModuleParameters 
-0     00008d72  _GetAdcReadings__FR16ModuleParameters     
-0     00008db3  _ZeroiseModule1Parameters__Fv             
-0     000090a0  _GetSvpwmDutyCycles__FfN41RfN26           
-0     00009245  _InitializePeripharelsForCpu2__Fv         
-0     00009251  _InitializeGpiosForCpu2__Fv               
-0     000092b5  _xint1_isr__Fv                            
-0     00009320  _epwm1_isr__Fv                            
-0     00009c07  _cpu_timer2_isr__Fv                       
-0     00009c19  _cpu_timer1_isr__Fv                       
-0     00009c33  _cpu_timer0_isr__Fv                       
-0     00009c6c  _XINT5_ISR                                
-0     00009c76  _XINT4_ISR                                
-0     00009c80  _XINT3_ISR                                
-0     00009c8a  _XINT2_ISR                                
-0     00009c94  _XINT1_ISR                                
-0     00009c9e  _WAKE_ISR                                 
-0     00009ca8  _VCU_ISR                                  
-0     00009cb2  _USER9_ISR                                
-0     00009cbc  _USER8_ISR                                
-0     00009cc6  _USER7_ISR                                
-0     00009cd0  _USER6_ISR                                
-0     00009cda  _USER5_ISR                                
-0     00009ce4  _USER4_ISR                                
-0     00009cee  _USER3_ISR                                
-0     00009cf8  _USER2_ISR                                
-0     00009d02  _USER1_ISR                                
-0     00009d0c  _USER12_ISR                               
-0     00009d16  _USER11_ISR                               
-0     00009d20  _USER10_ISR                               
-0     00009d2a  _USBA_ISR                                 
-0     00009d34  _UPPA_ISR                                 
-0     00009d3e  _TIMER2_ISR                               
-0     00009d48  _TIMER1_ISR                               
-0     00009d52  _TIMER0_ISR                               
-0     00009d5c  _SYS_PLL_SLIP_ISR                         
-0     00009d66  _SPIC_TX_ISR                              
-0     00009d70  _SPIC_RX_ISR                              
-0     00009d7a  _SPIB_TX_ISR                              
-0     00009d84  _SPIB_RX_ISR                              
-0     00009d8e  _SPIA_TX_ISR                              
-0     00009d98  _SPIA_RX_ISR                              
-0     00009da2  _SD2_ISR                                  
-0     00009dac  _SD1_ISR                                  
-0     00009db6  _SCID_TX_ISR                              
-0     00009dc0  _SCID_RX_ISR                              
-0     00009dca  _SCIC_TX_ISR                              
-0     00009dd4  _SCIC_RX_ISR                              
-0     00009dde  _SCIB_TX_ISR                              
-0     00009de8  _SCIB_RX_ISR                              
-0     00009df2  _SCIA_TX_ISR                              
-0     00009dfc  _SCIA_RX_ISR                              
-0     00009e06  _RTOS_ISR                                 
-0     00009e10  _RAM_CORRECTABLE_ERROR_ISR                
-0     00009e1a  _RAM_ACCESS_VIOLATION_ISR                 
-0     00009e24  _PIE_RESERVED_ISR                         
-0     00009e2e  _NOTUSED_ISR                              
-0     00009e38  _NMI_ISR                                  
-0     00009e42  _MCBSPB_TX_ISR                            
-0     00009e4c  _MCBSPB_RX_ISR                            
-0     00009e56  _MCBSPA_TX_ISR                            
-0     00009e60  _MCBSPA_RX_ISR                            
-0     00009e6a  _IPC3_ISR                                 
-0     00009e74  _IPC2_ISR                                 
-0     00009e7e  _IPC1_ISR                                 
-0     00009e88  _IPC0_ISR                                 
-0     00009e92  _ILLEGAL_ISR                              
-0     00009e9c  _I2CB_ISR                                 
-0     00009ea6  _I2CB_FIFO_ISR                            
-0     00009eb0  _I2CA_ISR                                 
-0     00009eba  _I2CA_FIFO_ISR                            
-0     00009ec4  _FPU_UNDERFLOW_ISR                        
-0     00009ece  _FPU_OVERFLOW_ISR                         
-0     00009ed8  _FLASH_CORRECTABLE_ERROR_ISR              
-0     00009ee2  _EQEP3_ISR                                
-0     00009eec  _EQEP2_ISR                                
-0     00009ef6  _EQEP1_ISR                                
-0     00009f00  _EPWM9_TZ_ISR                             
-0     00009f0a  _EPWM9_ISR                                
-0     00009f14  _EPWM8_TZ_ISR                             
-0     00009f1e  _EPWM8_ISR                                
-0     00009f28  _EPWM7_TZ_ISR                             
-0     00009f32  _EPWM7_ISR                                
-0     00009f3c  _EPWM6_TZ_ISR                             
-0     00009f46  _EPWM6_ISR                                
-0     00009f50  _EPWM5_TZ_ISR                             
-0     00009f5a  _EPWM5_ISR                                
-0     00009f64  _EPWM4_TZ_ISR                             
-0     00009f6e  _EPWM4_ISR                                
-0     00009f78  _EPWM3_TZ_ISR                             
-0     00009f82  _EPWM3_ISR                                
-0     00009f8c  _EPWM2_TZ_ISR                             
-0     00009f96  _EPWM2_ISR                                
-0     00009fa0  _EPWM1_TZ_ISR                             
-0     00009faa  _EPWM1_ISR                                
-0     00009fb4  _EPWM12_TZ_ISR                            
-0     00009fbe  _EPWM12_ISR                               
-0     00009fc8  _EPWM11_TZ_ISR                            
-0     00009fd2  _EPWM11_ISR                               
-0     00009fdc  _EPWM10_TZ_ISR                            
-0     00009fe6  _EPWM10_ISR                               
-0     00009ff0  _EMU_ISR                                  
-0     00009ffa  _EMPTY_ISR                                
-0     0000a007  _EMIF_ERROR_ISR                           
-0     0000a011  _ECAP6_ISR                                
-0     0000a01b  _ECAP5_ISR                                
-0     0000a025  _ECAP4_ISR                                
-0     0000a02f  _ECAP3_ISR                                
-0     0000a039  _ECAP2_ISR                                
-0     0000a043  _ECAP1_ISR                                
-0     0000a04d  _DMA_CH6_ISR                              
-0     0000a057  _DMA_CH5_ISR                              
-0     0000a061  _DMA_CH4_ISR                              
-0     0000a06b  _DMA_CH3_ISR                              
-0     0000a075  _DMA_CH2_ISR                              
-0     0000a07f  _DMA_CH1_ISR                              
-0     0000a089  _DATALOG_ISR                              
-0     0000a093  _CLA_UNDERFLOW_ISR                        
-0     0000a09d  _CLA_OVERFLOW_ISR                         
-0     0000a0a7  _CLA1_8_ISR                               
-0     0000a0b1  _CLA1_7_ISR                               
-0     0000a0bb  _CLA1_6_ISR                               
-0     0000a0c5  _CLA1_5_ISR                               
-0     0000a0cf  _CLA1_4_ISR                               
-0     0000a0d9  _CLA1_3_ISR                               
-0     0000a0e3  _CLA1_2_ISR                               
-0     0000a0ed  _CLA1_1_ISR                               
-0     0000a0f7  _CANB1_ISR                                
-0     0000a101  _CANB0_ISR                                
-0     0000a10b  _CANA1_ISR                                
-0     0000a115  _CANA0_ISR                                
-0     0000a11f  _AUX_PLL_SLIP_ISR                         
-0     0000a129  _ADCD_EVT_ISR                             
-0     0000a133  _ADCD4_ISR                                
-0     0000a13d  _ADCD3_ISR                                
-0     0000a147  _ADCD2_ISR                                
-0     0000a151  _ADCD1_ISR                                
-0     0000a15b  _ADCC_EVT_ISR                             
-0     0000a165  _ADCC4_ISR                                
-0     0000a16f  _ADCC3_ISR                                
-0     0000a179  _ADCC2_ISR                                
-0     0000a183  _ADCC1_ISR                                
-0     0000a18d  _ADCB_EVT_ISR                             
-0     0000a197  _ADCB4_ISR                                
-0     0000a1a1  _ADCB3_ISR                                
-0     0000a1ab  _ADCB2_ISR                                
-0     0000a1b5  _ADCB1_ISR                                
-0     0000a1bf  _ADCA_EVT_ISR                             
-0     0000a1c9  _ADCA4_ISR                                
-0     0000a1d3  _ADCA3_ISR                                
-0     0000a1dd  _ADCA2_ISR                                
-0     0000a1e7  _ADCA1_ISR                                
-0     0000a1f1  _SysXtalOscSel                            
-0     0000a1fd  _SysIntOsc2Sel                            
-0     0000a207  _SysIntOsc1Sel                            
-0     0000a211  _ServiceDog                               
-0     0000a21f  _SeizeFlashPump                           
-0     0000a231  _STANDBY                                  
-0     0000a23c  _ReleaseFlashPump                         
-0     0000a246  _InitSysPll                               
-0     0000a305  _DisableDog                               
-0     0000a312  _InitPeripheralClocks                     
-0     0000a3bb  _InitSysCtrl                              
-0     0000a3f3  _AuxAuxClkSel                             
-0     0000a3fd  _AuxXtalOscSel                            
-0     0000a40e  _AuxIntOsc2Sel                            
-0     0000a41b  _InitAuxPll                               
-0     0000a4f3  _IDLE                                     
-0     0000a4fc  _DisablePeripheralClocks                  
-0     0000a51a  _HIB                                      
-0     0000a539  _HALT                                     
-0     0000a552  _CsmUnlock                                
-0     0000a573  _InitGpio                                 
-0     0000a5e0  _GPIO_WritePin                            
-0     0000a5fa  _GPIO_SetupXINT5Gpio                      
-0     0000a601  _GPIO_SetupXINT4Gpio                      
-0     0000a608  _GPIO_SetupXINT3Gpio                      
-0     0000a60f  _GPIO_SetupXINT2Gpio                      
-0     0000a616  _GPIO_SetupXINT1Gpio                      
-0     0000a61d  _GPIO_SetupPinOptions                     
-0     0000a6a2  _GPIO_SetupPinMux                         
-0     0000a6f7  _GPIO_SetupLock                           
-0     0000a719  _GPIO_ReadPin                             
-0     0000a72d  _GPIO_EnableUnbondedIOPullupsFor176Pin    
-0     0000a746  _GPIO_EnableUnbondedIOPullupsFor100Pin    
-0     0000a76b  _GPIO_EnableUnbondedIOPullups             
-0     0000a77b  _InitCpuTimers                            
-0     0000a7b6  _ConfigCpuTimer                           
-0     0000a7d9  _copy_in                                  
+0     0000801c  _AssignGSRAMs__Fv                         
+0     00008026  _InitializeADCs__Fv                       
+0     000082ad  _SetupGPIOs__Fv                           
+0     0000832f  _InitializeEpwm1Registers__Fv             
+0     000083bc  _InitializeEpwm2Registers__Fv             
+0     00008429  _InitializeEpwm3Registers__Fv             
+0     00008496  _InitSpiDrv8305Gpios__Fv                  
+0     000084cc  _InitSpiRegs_DRV830x__FPV8SPI_REGS        
+0     000084e5  _InitDRV8305Regs__FP12DRV8305_Vars        
+0     00008506  _SPI_Driver__FPV8SPI_REGSUi               
+0     0000850c  _M1_DRV8305_SPI_Write__FP12DRV8305_VarsUi 
+0     00008525  _M1_DRV8305_SPI_Read__FP12DRV8305_VarsUi  
+0     0000852e  _M1_InitDRV8305__FP12DRV8305_Vars         
+0     00008600  _M2_DRV8305_SPI_Write__FP12DRV8305_VarsUi 
+0     00008619  _M2_DRV8305_SPI_Read__FP12DRV8305_VarsUi  
+0     00008622  _M2_InitDRV8305__FP12DRV8305_Vars         
+0     000086f4  _SetupCmpssProtections__Fv                
+0     00008833  _EQEPSetup__Fv                            
+0     00008883  _InitializationRoutine__Fv                
+0     000089b0  _M1_CalculateOffsetValue__Fv              
+0     00008a51  _M2_CalculateOffsetValue__Fv              
+0     00008afa  _M1_ReadDRV8305Registers__FP12DRV8305_Vars
+0     00008b14  _main                                     
+0     00008c2f  _RunTimeProtectionControl__Fv             
+0     00008cbb  _GetEncoderReadings__FR16ModuleParameters 
+0     00008d5f  _GetAdcReadings__FR16ModuleParameters     
+0     00008da0  _ZeroiseModule1Parameters__Fv             
+0     0000908f  _GetSvpwmDutyCycles__FfN41RfN26           
+0     00009234  _InitializePeripharelsForCpu2__Fv         
+0     00009240  _InitializeGpiosForCpu2__Fv               
+0     000092a4  _xint1_isr__Fv                            
+0     00009313  _epwm1_isr__Fv                            
+0     00009c13  _cpu_timer2_isr__Fv                       
+0     00009c25  _cpu_timer1_isr__Fv                       
+0     00009c3f  _cpu_timer0_isr__Fv                       
+0     00009c78  _XINT5_ISR                                
+0     00009c82  _XINT4_ISR                                
+0     00009c8c  _XINT3_ISR                                
+0     00009c96  _XINT2_ISR                                
+0     00009ca0  _XINT1_ISR                                
+0     00009caa  _WAKE_ISR                                 
+0     00009cb4  _VCU_ISR                                  
+0     00009cbe  _USER9_ISR                                
+0     00009cc8  _USER8_ISR                                
+0     00009cd2  _USER7_ISR                                
+0     00009cdc  _USER6_ISR                                
+0     00009ce6  _USER5_ISR                                
+0     00009cf0  _USER4_ISR                                
+0     00009cfa  _USER3_ISR                                
+0     00009d04  _USER2_ISR                                
+0     00009d0e  _USER1_ISR                                
+0     00009d18  _USER12_ISR                               
+0     00009d22  _USER11_ISR                               
+0     00009d2c  _USER10_ISR                               
+0     00009d36  _USBA_ISR                                 
+0     00009d40  _UPPA_ISR                                 
+0     00009d4a  _TIMER2_ISR                               
+0     00009d54  _TIMER1_ISR                               
+0     00009d5e  _TIMER0_ISR                               
+0     00009d68  _SYS_PLL_SLIP_ISR                         
+0     00009d72  _SPIC_TX_ISR                              
+0     00009d7c  _SPIC_RX_ISR                              
+0     00009d86  _SPIB_TX_ISR                              
+0     00009d90  _SPIB_RX_ISR                              
+0     00009d9a  _SPIA_TX_ISR                              
+0     00009da4  _SPIA_RX_ISR                              
+0     00009dae  _SD2_ISR                                  
+0     00009db8  _SD1_ISR                                  
+0     00009dc2  _SCID_TX_ISR                              
+0     00009dcc  _SCID_RX_ISR                              
+0     00009dd6  _SCIC_TX_ISR                              
+0     00009de0  _SCIC_RX_ISR                              
+0     00009dea  _SCIB_TX_ISR                              
+0     00009df4  _SCIB_RX_ISR                              
+0     00009dfe  _SCIA_TX_ISR                              
+0     00009e08  _SCIA_RX_ISR                              
+0     00009e12  _RTOS_ISR                                 
+0     00009e1c  _RAM_CORRECTABLE_ERROR_ISR                
+0     00009e26  _RAM_ACCESS_VIOLATION_ISR                 
+0     00009e30  _PIE_RESERVED_ISR                         
+0     00009e3a  _NOTUSED_ISR                              
+0     00009e44  _NMI_ISR                                  
+0     00009e4e  _MCBSPB_TX_ISR                            
+0     00009e58  _MCBSPB_RX_ISR                            
+0     00009e62  _MCBSPA_TX_ISR                            
+0     00009e6c  _MCBSPA_RX_ISR                            
+0     00009e76  _IPC3_ISR                                 
+0     00009e80  _IPC2_ISR                                 
+0     00009e8a  _IPC1_ISR                                 
+0     00009e94  _IPC0_ISR                                 
+0     00009e9e  _ILLEGAL_ISR                              
+0     00009ea8  _I2CB_ISR                                 
+0     00009eb2  _I2CB_FIFO_ISR                            
+0     00009ebc  _I2CA_ISR                                 
+0     00009ec6  _I2CA_FIFO_ISR                            
+0     00009ed0  _FPU_UNDERFLOW_ISR                        
+0     00009eda  _FPU_OVERFLOW_ISR                         
+0     00009ee4  _FLASH_CORRECTABLE_ERROR_ISR              
+0     00009eee  _EQEP3_ISR                                
+0     00009ef8  _EQEP2_ISR                                
+0     00009f02  _EQEP1_ISR                                
+0     00009f0c  _EPWM9_TZ_ISR                             
+0     00009f16  _EPWM9_ISR                                
+0     00009f20  _EPWM8_TZ_ISR                             
+0     00009f2a  _EPWM8_ISR                                
+0     00009f34  _EPWM7_TZ_ISR                             
+0     00009f3e  _EPWM7_ISR                                
+0     00009f48  _EPWM6_TZ_ISR                             
+0     00009f52  _EPWM6_ISR                                
+0     00009f5c  _EPWM5_TZ_ISR                             
+0     00009f66  _EPWM5_ISR                                
+0     00009f70  _EPWM4_TZ_ISR                             
+0     00009f7a  _EPWM4_ISR                                
+0     00009f84  _EPWM3_TZ_ISR                             
+0     00009f8e  _EPWM3_ISR                                
+0     00009f98  _EPWM2_TZ_ISR                             
+0     00009fa2  _EPWM2_ISR                                
+0     00009fac  _EPWM1_TZ_ISR                             
+0     00009fb6  _EPWM1_ISR                                
+0     00009fc0  _EPWM12_TZ_ISR                            
+0     00009fca  _EPWM12_ISR                               
+0     00009fd4  _EPWM11_TZ_ISR                            
+0     00009fde  _EPWM11_ISR                               
+0     00009fe8  _EPWM10_TZ_ISR                            
+0     00009ff2  _EPWM10_ISR                               
+0     00009ffc  _EMU_ISR                                  
+0     0000a006  _EMPTY_ISR                                
+0     0000a013  _EMIF_ERROR_ISR                           
+0     0000a01d  _ECAP6_ISR                                
+0     0000a027  _ECAP5_ISR                                
+0     0000a031  _ECAP4_ISR                                
+0     0000a03b  _ECAP3_ISR                                
+0     0000a045  _ECAP2_ISR                                
+0     0000a04f  _ECAP1_ISR                                
+0     0000a059  _DMA_CH6_ISR                              
+0     0000a063  _DMA_CH5_ISR                              
+0     0000a06d  _DMA_CH4_ISR                              
+0     0000a077  _DMA_CH3_ISR                              
+0     0000a081  _DMA_CH2_ISR                              
+0     0000a08b  _DMA_CH1_ISR                              
+0     0000a095  _DATALOG_ISR                              
+0     0000a09f  _CLA_UNDERFLOW_ISR                        
+0     0000a0a9  _CLA_OVERFLOW_ISR                         
+0     0000a0b3  _CLA1_8_ISR                               
+0     0000a0bd  _CLA1_7_ISR                               
+0     0000a0c7  _CLA1_6_ISR                               
+0     0000a0d1  _CLA1_5_ISR                               
+0     0000a0db  _CLA1_4_ISR                               
+0     0000a0e5  _CLA1_3_ISR                               
+0     0000a0ef  _CLA1_2_ISR                               
+0     0000a0f9  _CLA1_1_ISR                               
+0     0000a103  _CANB1_ISR                                
+0     0000a10d  _CANB0_ISR                                
+0     0000a117  _CANA1_ISR                                
+0     0000a121  _CANA0_ISR                                
+0     0000a12b  _AUX_PLL_SLIP_ISR                         
+0     0000a135  _ADCD_EVT_ISR                             
+0     0000a13f  _ADCD4_ISR                                
+0     0000a149  _ADCD3_ISR                                
+0     0000a153  _ADCD2_ISR                                
+0     0000a15d  _ADCD1_ISR                                
+0     0000a167  _ADCC_EVT_ISR                             
+0     0000a171  _ADCC4_ISR                                
+0     0000a17b  _ADCC3_ISR                                
+0     0000a185  _ADCC2_ISR                                
+0     0000a18f  _ADCC1_ISR                                
+0     0000a199  _ADCB_EVT_ISR                             
+0     0000a1a3  _ADCB4_ISR                                
+0     0000a1ad  _ADCB3_ISR                                
+0     0000a1b7  _ADCB2_ISR                                
+0     0000a1c1  _ADCB1_ISR                                
+0     0000a1cb  _ADCA_EVT_ISR                             
+0     0000a1d5  _ADCA4_ISR                                
+0     0000a1df  _ADCA3_ISR                                
+0     0000a1e9  _ADCA2_ISR                                
+0     0000a1f3  _ADCA1_ISR                                
+0     0000a1fd  _SysXtalOscSel                            
+0     0000a209  _SysIntOsc2Sel                            
+0     0000a213  _SysIntOsc1Sel                            
+0     0000a21d  _ServiceDog                               
+0     0000a22b  _SeizeFlashPump                           
+0     0000a23d  _STANDBY                                  
+0     0000a248  _ReleaseFlashPump                         
+0     0000a252  _InitSysPll                               
+0     0000a311  _DisableDog                               
+0     0000a31e  _InitPeripheralClocks                     
+0     0000a3c7  _InitSysCtrl                              
+0     0000a3ff  _AuxAuxClkSel                             
+0     0000a409  _AuxXtalOscSel                            
+0     0000a41a  _AuxIntOsc2Sel                            
+0     0000a427  _InitAuxPll                               
+0     0000a4ff  _IDLE                                     
+0     0000a508  _DisablePeripheralClocks                  
+0     0000a526  _HIB                                      
+0     0000a545  _HALT                                     
+0     0000a55e  _CsmUnlock                                
+0     0000a57f  _InitGpio                                 
+0     0000a5ec  _GPIO_WritePin                            
+0     0000a606  _GPIO_SetupXINT5Gpio                      
+0     0000a60d  _GPIO_SetupXINT4Gpio                      
+0     0000a614  _GPIO_SetupXINT3Gpio                      
+0     0000a61b  _GPIO_SetupXINT2Gpio                      
+0     0000a622  _GPIO_SetupXINT1Gpio                      
+0     0000a629  _GPIO_SetupPinOptions                     
+0     0000a6ae  _GPIO_SetupPinMux                         
+0     0000a703  _GPIO_SetupLock                           
+0     0000a725  _GPIO_ReadPin                             
+0     0000a739  _GPIO_EnableUnbondedIOPullupsFor176Pin    
+0     0000a752  _GPIO_EnableUnbondedIOPullupsFor100Pin    
+0     0000a777  _GPIO_EnableUnbondedIOPullups             
+0     0000a787  _InitCpuTimers                            
+0     0000a7c2  _ConfigCpuTimer                           
+0     0000a7e5  LL$$AND                                   
+0     0000a7ed  LL$$OR                                    
+0     0000a7f5  LL$$XOR                                   
 0     0000a7fd  _SetDBGIER                                
 0     0001b000  _pow                                      
 0     0001b000  _powf                                     
@@ -1694,18 +1732,16 @@ page  address   name
 0     0001b719  __system_post_cinit                       
 0     0001b71a  _sqrt                                     
 0     0001b71a  _sqrtf                                    
-0     0001b741  _memcpy                                   
-0     0001b75e  LL$$AND                                   
-0     0001b766  LL$$OR                                    
-0     0001b76e  LL$$XOR                                   
-0     0001b776  __args_main                               
-0     0001b788  _InitPieVectTable                         
-0     0001b799  _copysign                                 
-0     0001b799  _copysignf                                
-0     0001b7aa  __register_unlock                         
-0     0001b7ae  __register_lock                           
-0     0001b7b2  __nop                                     
-0     0001b7b3  __system_pre_init                         
+0     0001b741  _copy_in                                  
+0     0001b765  _memcpy                                   
+0     0001b782  __args_main                               
+0     0001b794  _InitPieVectTable                         
+0     0001b7a5  _copysign                                 
+0     0001b7a5  _copysignf                                
+0     0001b7b6  __register_unlock                         
+0     0001b7ba  __register_lock                           
+0     0001b7be  __nop                                     
+0     0001b7bf  __system_pre_init                         
 0     0003f800  _g_asIPCCPU2toCPU1Buffers                 
 0     0003f880  _g_usGetWriteIndexes                      
 0     0003f884  _g_usPutReadIndexes                       
@@ -1786,68 +1822,70 @@ page  address   name
 1     00007c00  _GpioCtrlRegs                             
 1     00007f00  _GpioDataRegs                             
 1     0000a800  _PieVectTableInit                         
-1     0000c000  _M1_StartOperation                        
-1     0000c001  _M1_OperationMode                         
-1     0000c002  _M1_OffsetCalculationIsDone               
-1     0000c003  _M2_OffsetCalculationIsDone               
-1     0000c004  _PwmFrequency                             
-1     0000c005  _PwmFrequencyIncrement                    
-1     0000c006  _ClockMod                                 
-1     0000c007  _ReadDrv8305RegistersFlag                 
-1     0000c008  _AngleHasBeenReset                        
-1     0000c009  _SpeedRefArrayCount                       
-1     0000c00a  _ByPass_SpeedMeasurement                  
-1     0000c00c  _M1_BlankCounter                          
-1     0000c00e  _M1_OffsetCalCounter                      
-1     0000c010  _M2_OffsetCalCounter                      
-1     0000c012  _K1                                       
-1     0000c014  _K2                                       
-1     0000c016  _SvpwmSectorNumber                        
-1     0000c018  _ControlISRCounter                        
-1     0000c01a  _AlignmentCounter                         
-1     0000c01c  _SendOneInFour                            
-1     0000c01e  _Xint1Count                               
-1     0000c020  _SpeedRefRPM                              
-1     0000c022  _SpeedRefRadSec                           
-1     0000c024  _PhaseIncrement                           
-1     0000c026  _PhaseValue                               
-1     0000c028  _FswDecided                               
-1     0000c02a  _RL_Load_Operation                        
-1     0000c02e  _PI_iq                                    
-1     0000c040  _M1_Device1Configuration                  
-1     0000c055  _M2_Device1Configuration                  
-1     0000c080  _Module1_Parameters                       
-1     0000c300  _Module2_Parameters                       
-1     0000c57a  _tempSensor_tempSlope                     
-1     0000c57c  _tempSensor_tempOffset                    
-1     0000c57e  _tempSensor_scaleFactor                   
-1     0000c580  _cSciaLibDataBuffer                       
-1     0000c680  _TRIP_SEL                                 
-1     0000c69e  _cSendMultipleFloatArray                  
-1     0000c6ba  _SDFM                                     
-1     0000c6c0  _EPWM                                     
-1     0000c6da  _CpuTimer0                                
-1     0000c6e2  _CpuTimer1                                
-1     0000c6ea  _CpuTimer2                                
-1     0000c6f2  _ECAP                                     
-1     0000c700  _DataToBeSent                             
-1     0000c70c  _ADC                                      
-1     0000c716  _EQEP                                     
-1     0000c71e  _SPI                                      
-1     0000c726  ___TI_enable_exit_profile_output          
-1     0000c728  ___TI_cleanup_ptr                         
-1     0000c72a  ___TI_dtors_ptr                           
-1     0000c72c  _uiSciaRxBufferIndex                      
-1     0000c72d  _uiSciaLibReadFromBufferIndex             
-1     0000c72e  _uiSciaLibWriteToBufferIndex              
-1     0000c72f  _uiSciaLibBufferNumberOfMessages          
-1     0000c730  _I2C                                      
-1     0000c734  _MCBSP                                    
-1     0000c738  _SCI                                      
-1     0000c73c  __lock                                    
-1     0000c73e  __unlock                                  
-1     0000c740  _deviceOpen                               
-1     0000c741  _errno                                    
+1     0000c000  _cSciaLibDataBuffer                       
+1     0000c100  _M1_StartOperation                        
+1     0000c101  _M1_OffsetCalculationIsDone               
+1     0000c102  _M2_OffsetCalculationIsDone               
+1     0000c103  _PwmFrequency                             
+1     0000c104  _PwmFrequencyIncrement                    
+1     0000c105  _ClockMod                                 
+1     0000c106  _ReadDrv8305RegistersFlag                 
+1     0000c107  _AngleHasBeenReset                        
+1     0000c108  _SpeedRefArrayCount                       
+1     0000c109  _ByPass_SpeedMeasurement                  
+1     0000c10a  _StartOperationCpu2                       
+1     0000c10c  _M1_BlankCounter                          
+1     0000c10e  _M1_OffsetCalCounter                      
+1     0000c110  _M2_OffsetCalCounter                      
+1     0000c112  _K1                                       
+1     0000c114  _K2                                       
+1     0000c116  _SvpwmSectorNumber                        
+1     0000c118  _ControlISRCounter                        
+1     0000c11a  _AlignmentCounter                         
+1     0000c11c  _SendOneInFour                            
+1     0000c11e  _Xint1Count                               
+1     0000c120  _SpeedRefRadSec                           
+1     0000c122  _PhaseIncrement                           
+1     0000c124  _PhaseValue                               
+1     0000c126  _FswDecided                               
+1     0000c128  _RL_Load_Operation                        
+1     0000c140  _M1_Device1Configuration                  
+1     0000c155  _M2_Device1Configuration                  
+1     0000c16a  _ECAP                                     
+1     0000c178  _EQEP                                     
+1     0000c180  _TRIP_SEL                                 
+1     0000c19e  _cSendMultipleFloatArray                  
+1     0000c1ba  _tempSensor_tempSlope                     
+1     0000c1bc  _tempSensor_tempOffset                    
+1     0000c1be  _tempSensor_scaleFactor                   
+1     0000c1c0  _EPWM                                     
+1     0000c1da  _CpuTimer0                                
+1     0000c1e2  _CpuTimer1                                
+1     0000c1ea  _CpuTimer2                                
+1     0000c1f2  _DataToBeSent                             
+1     0000c1fe  __lock                                    
+1     0000c200  _ADC                                      
+1     0000c20a  _SPI                                      
+1     0000c212  _SDFM                                     
+1     0000c218  ___TI_enable_exit_profile_output          
+1     0000c21a  ___TI_cleanup_ptr                         
+1     0000c21c  ___TI_dtors_ptr                           
+1     0000c21e  _uiSciaRxBufferIndex                      
+1     0000c21f  _uiSciaLibReadFromBufferIndex             
+1     0000c220  _uiSciaLibWriteToBufferIndex              
+1     0000c221  _uiSciaLibBufferNumberOfMessages          
+1     0000c222  _I2C                                      
+1     0000c226  _MCBSP                                    
+1     0000c22a  _SCI                                      
+1     0000c22e  __unlock                                  
+1     0000c230  _deviceOpen                               
+1     0000c231  _errno                                    
+1     00019000  _Module1_Parameters                       
+1     00019280  _PI_iq                                    
+1     00019292  _M1_OperationMode                         
+1     00019294  _SpeedRefRPM                              
+1     0001a000  _Module2_Parameters                       
+1     0001a27a  _M2_OperationMode                         
 1     0003fc00  _g_asIPCCPU1toCPU2Buffers                 
 1     0003fc80  _g_usPutWriteIndexes                      
 1     0003fc84  _g_usGetReadIndexes                       
@@ -1889,4 +1927,4 @@ abs   ffffffff  binit
 abs   ffffffff  etext                                     
 abs   ffffffff  pinit                                     
 
-[439 symbols]
+[442 symbols]

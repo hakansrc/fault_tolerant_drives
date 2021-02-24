@@ -7,12 +7,14 @@ PAGE 0 :
    BEGIN           	: origin = 0x000000, length = 0x000002
    RAMM0           	: origin = 0x000080, length = 0x000380
    RAMD0           	: origin = 0x00B000, length = 0x000800
-   RAMLS0          : origin = 0x008000, length = 0x000800
-   RAMLS1          	: origin = 0x008800, length = 0x000800
-   RAMLS2      		: origin = 0x009000, length = 0x000800
-   RAMLS3      		: origin = 0x009800, length = 0x000800
-   RAMLS4      		: origin = 0x00A000, length = 0x000800
+   RAMLS0          	: origin = 0x008000, length = 0x002800
+   //RAMLS1          	: origin = 0x008800, length = 0x000800
+   //RAMLS2      		: origin = 0x009000, length = 0x000800
+   //RAMLS3      		: origin = 0x009800, length = 0x000800
+   //RAMLS4      		: origin = 0x00A000, length = 0x000800
    RESET           : origin = 0x3FFFC0, length = 0x000002
+   RAMGS9      : origin = 0x015000, length = 0x001000
+
 
 PAGE 1 :
 
@@ -31,12 +33,26 @@ PAGE 1 :
    RAMGS6      : origin = 0x012000, length = 0x001000
    RAMGS7      : origin = 0x013000, length = 0x001000
    RAMGS8      : origin = 0x014000, length = 0x001000
-   RAMGS9      : origin = 0x015000, length = 0x001000
+   //RAMGS9      : origin = 0x015000, length = 0x001000
    RAMGS10     : origin = 0x016000, length = 0x001000
    RAMGS11     : origin = 0x017000, length = 0x001000
    RAMGS12     : origin = 0x018000, length = 0x001000     
-   RAMGS13     : origin = 0x019000, length = 0x001000     /*CPU1 is the owner of RAMGS13*/
-   RAMGS14     : origin = 0x01A000, length = 0x001000     /*CPU2 is the owner of RAMGS14*/ 
+   M1_PARAMS_ADDRESS_RAMGS13   : origin = 0x019000, length = 0x00027A
+   PI_IQ_ADDRESS_RAMGS13   : origin = 0x019280, length = 0x000012     
+   M1_OPERATION_MODE_RAMGS13   : origin = 0x019292, length = 0x000001
+   M1_SPEEDREF_RAMGS13   : origin = 0x019294, length = 0x000002
+   RAMGS13     : origin = 0x019296, length = 0x000D6A
+   //PI_IQ_ADDRESS_RAMGS13   : origin = 0x019000, length = 0x000012     
+   //M1_OPERATION_MODE_RAMGS13   : origin = 0x019012, length = 0x000001
+   //M1_SPEEDREF_RAMGS13   : origin = 0x019014, length = 0x000002
+   //M1_PARAMS_ADDRESS_RAMGS13   : origin = 0x019016, length = 0x00027A
+   //RAMGS13     : origin = 0x019290, length = 0x000D70
+   M2_PARAMS_ADDRESS_RAMGS14 : origin = 0x01A000, length = 0x00027A  
+   M2_OPERATION_MODE_RAMGS14 : origin = 0x01A27A, length = 0x000001  
+   RAMGS14     : origin = 0x01A27B, length = 0x000D85
+   
+   //RAMGS13     : origin = 0x019000, length = 0x001000     /*CPU1 is the owner of RAMGS13*/
+   //RAMGS14     : origin = 0x01A000, length = 0x001000     /*CPU2 is the owner of RAMGS14*/  
 
    CANA_MSG_RAM     : origin = 0x049000, length = 0x000800
    CANB_MSG_RAM     : origin = 0x04B000, length = 0x000800
@@ -49,7 +65,7 @@ PAGE 1 :
 SECTIONS
 {
    codestart        : > BEGIN,     PAGE = 0
-   .text            : >>RAMD0 |  RAMLS0 | RAMLS1 | RAMLS2 | RAMLS3 | RAMLS4,   PAGE = 0
+   .text            : >> RAMLS0 | RAMGS9,   PAGE = 0
    .cinit           : > RAMM0,     PAGE = 0
    .pinit           : > RAMM0,     PAGE = 0
    .switch          : > RAMM0,     PAGE = 0
@@ -59,6 +75,13 @@ SECTIONS
    .ebss            : > RAMLS5,     PAGE = 1
    .econst          : > RAMLS5,     PAGE = 1
    .esysmem         : > RAMLS5,     PAGE = 1
+
+   PI_IQ_LOCATION   : > PI_IQ_ADDRESS_RAMGS13, PAGE = 1
+   M1_OPERATION_MODE_LOCATION : > M1_OPERATION_MODE_RAMGS13, PAGE = 1
+   M1_SPEEDREF_LOCATION : > M1_SPEEDREF_RAMGS13, PAGE = 1
+   M1_PARAMS_ADDRESS_LOCATION : > M1_PARAMS_ADDRESS_RAMGS13, PAGE = 1
+   M2_PARAMS_ADDRESS_LOCATION : > M2_PARAMS_ADDRESS_RAMGS14, PAGE = 1
+   M2_OPERATION_MODE_LOCATION : > M2_OPERATION_MODE_RAMGS14, PAGE = 1
 
 #ifdef __TI_COMPILER_VERSION__
    #if __TI_COMPILER_VERSION__ >= 15009000

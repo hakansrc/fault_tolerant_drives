@@ -391,7 +391,7 @@ __interrupt void epwm4_isr(void)
 
     if ((M1_OperationMode == MODE_MPCCONTROLLER)&&(M2_OperationMode==MODE_MPCCONTROLLER))
     {
-        Module2_Parameters.Reference.Iq = PI_iq.Output/2;
+        Module2_Parameters.Reference.Iq = PI_iq.Output/((float)2);
         Module2_Parameters.Reference.Id = IDREF;
 
         Module2_Parameters.MinimumCostValue = (float)1e35;
@@ -585,8 +585,13 @@ void ZeroiseModule2Parameters(void)
 
 void GetEncoderReadings_Cpu2(ModuleParameters &moduleparams)
 {
+#if 0
     moduleparams.AngleRad.Mechanical = ((float)EQep1Regs.QPOSCNT)/((float)ENCODERMAXTICKCOUNT)* 2.0 * PI;
     moduleparams.AngleRad.Electrical =  moduleparams.AngleRad.Mechanical*POLEPAIRS;
+#else
+    moduleparams.AngleRad.Mechanical = Module1_Parameters.AngleRad.Mechanical;
+    moduleparams.AngleRad.Electrical = moduleparams.AngleRad.Mechanical*POLEPAIRS;
+#endif
 
     /*CPU1 already calculates the speed, therefore CPU2 just gets the speed reading from CPU1*/
     moduleparams.AngularSpeedRadSec.Mechanical  = Module1_Parameters.AngularSpeedRadSec.Mechanical;

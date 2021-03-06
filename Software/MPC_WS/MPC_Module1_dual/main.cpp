@@ -125,7 +125,7 @@ uint16_t    StartOperationCpu2 = 0; // when this is set to 1, cpu2 will start op
  * 5- Module1_Parameters
  * */
 
-
+float offsetval[3] = {0,0,0};
 
 int main(void)
 {
@@ -1678,25 +1678,50 @@ void M2_CalculateOffsetValue(void)
      * A_SOC5 & A_PPB2  -> Ic     (M2)
      *
      * */
+
+    EALLOW;
+    /* M2 Ia pin*/
+    AdccRegs.ADCSOC3CTL.bit.TRIGSEL = EPWM1_SOCA_TRG; /*ePWM4 SocA is the trigger*/
+    /* M2 Ib pin*/
+    AdcbRegs.ADCSOC3CTL.bit.TRIGSEL = EPWM1_SOCA_TRG; /*ePWM4 SocA is the trigger*/
+    /* M2 Ic pin*/
+    AdcaRegs.ADCSOC5CTL.bit.TRIGSEL = EPWM1_SOCA_TRG; /*ePWM4 SocA is the trigger*/
+    EDIS;
     for (M2_OffsetCalCounter = 0; M2_OffsetCalCounter < 50000;)
     {
-        AdccRegs.ADCSOCFRC1.bit.SOC3 = 1;
-        AdcbRegs.ADCSOCFRC1.bit.SOC3 = 1;
-        AdcaRegs.ADCSOCFRC1.bit.SOC5 = 1;
-        DELAY_US(100);
-        if (M2_OffsetCalCounter > 2500)
+        if (EPwm1Regs.ETFLG.bit.SOCA == 1)
         {
-            Module2_Parameters.OffsetValue.PhaseA = K1 * Module2_Parameters.OffsetValue.PhaseA + K2 * M2_ADCRESULT_IA * ADC_PU_SCALE_FACTOR; //Module1 : Phase A offset
-            Module2_Parameters.OffsetValue.PhaseB = K1 * Module2_Parameters.OffsetValue.PhaseB + K2 * M2_ADCRESULT_IB * ADC_PU_SCALE_FACTOR; //Module1 : Phase B offset
-            Module2_Parameters.OffsetValue.PhaseC = K1 * Module2_Parameters.OffsetValue.PhaseC + K2 * M2_ADCRESULT_IC * ADC_PU_SCALE_FACTOR; //Module1 : Phase C offset
+            if (M2_OffsetCalCounter > 2500)
+            {
+                Module2_Parameters.OffsetValue.PhaseA = K1 * Module2_Parameters.OffsetValue.PhaseA + K2 * M2_ADCRESULT_IA * ADC_PU_SCALE_FACTOR; //Module1 : Phase A offset
+                Module2_Parameters.OffsetValue.PhaseB = K1 * Module2_Parameters.OffsetValue.PhaseB + K2 * M2_ADCRESULT_IB * ADC_PU_SCALE_FACTOR; //Module1 : Phase B offset
+                Module2_Parameters.OffsetValue.PhaseC = K1 * Module2_Parameters.OffsetValue.PhaseC + K2 * M2_ADCRESULT_IC * ADC_PU_SCALE_FACTOR; //Module1 : Phase C offset
+                offsetval[0] = K1 * offsetval[0] + K2 * M2_ADCRESULT_IA * ADC_PU_SCALE_FACTOR; //Module1 : Phase A offset
+                offsetval[1] = K1 * offsetval[1] + K2 * M2_ADCRESULT_IB * ADC_PU_SCALE_FACTOR; //Module1 : Phase B offset
+                offsetval[2] = K1 * offsetval[2] + K2 * M2_ADCRESULT_IC * ADC_PU_SCALE_FACTOR; //Module1 : Phase C offset
+            }
+            EPwm1Regs.ETCLR.bit.SOCA = 1;
+            M2_OffsetCalCounter++;
         }
-        M2_OffsetCalCounter++;
+
     }
     EALLOW;
-    AdccRegs.ADCPPB2OFFREF = Module2_Parameters.OffsetValue.PhaseA * 4096.0;
-    AdcbRegs.ADCPPB2OFFREF = Module2_Parameters.OffsetValue.PhaseB * 4096.0;
-    AdcaRegs.ADCPPB2OFFREF = Module2_Parameters.OffsetValue.PhaseC * 4096.0;
+    AdccRegs.ADCPPB2OFFREF =  offsetval[0]  * 4096.0;
+    AdcbRegs.ADCPPB2OFFREF =  offsetval[1]  * 4096.0;
+    AdcaRegs.ADCPPB2OFFREF =  offsetval[2]  * 4096.0;
     EDIS;
+
+
+    EALLOW;
+    /* M2 Ia pin*/
+    AdccRegs.ADCSOC3CTL.bit.TRIGSEL = EPWM4_SOCA_TRG; /*ePWM4 SocA is the trigger*/
+    /* M2 Ib pin*/
+    AdcbRegs.ADCSOC3CTL.bit.TRIGSEL = EPWM4_SOCA_TRG; /*ePWM4 SocA is the trigger*/
+    /* M2 Ic pin*/
+    AdcaRegs.ADCSOC5CTL.bit.TRIGSEL = EPWM4_SOCA_TRG; /*ePWM4 SocA is the trigger*/
+    EDIS;
+
+
     M2_OffsetCalculationIsDone = 1;
 }
 

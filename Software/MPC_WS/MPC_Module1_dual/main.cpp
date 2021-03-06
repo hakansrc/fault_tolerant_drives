@@ -724,6 +724,9 @@ void InitializationRoutine(void)
     }
 #endif
 
+    InitializePeripharelsForCpu2();
+    InitializeGpiosForCpu2();
+
     SetupCmpssProtections();
     EQEPSetup();
 }

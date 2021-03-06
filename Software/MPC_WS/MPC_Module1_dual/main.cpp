@@ -258,7 +258,7 @@ __interrupt void cpu_timer0_isr(void)
 __interrupt void cpu_timer1_isr(void)
 {
     CpuTimer1.InterruptCount++;
-#if 0
+#if 1
     if(M1_OperationMode==MODE_MPCCONTROLLER)
     {
         if((CpuTimer1.InterruptCount%5)==0)
@@ -1937,12 +1937,12 @@ __interrupt void epwm1_isr(void)
 
     if (SendOneInFour % 4 == 0)
     {
-        DataToBeSent[0] = Module1_Parameters.Measured.Current.PhaseA;
-        DataToBeSent[1] = Module1_Parameters.Measured.Current.PhaseB;
-        DataToBeSent[2] = Module1_Parameters.Measured.Current.PhaseC;
-        DataToBeSent[3] = Module1_Parameters.AngularSpeedRPM.Mechanical;
-        DataToBeSent[4] = Module1_Parameters.Measured.Current.transformed.Dvalue; //;M1_IA_CURRENT_FLOAT;
-        DataToBeSent[5] = Module1_Parameters.Measured.Current.transformed.Qvalue;
+        DataToBeSent[0] = Module1_Parameters.AngularSpeedRPM.Mechanical;
+        DataToBeSent[1] = Module2_Parameters.OptimizationFsw[Module2_Parameters.MinimumCostIndex];
+        DataToBeSent[2] = Module1_Parameters.Measured.Current.transformed.Dvalue;
+        DataToBeSent[3] = Module1_Parameters.Measured.Current.transformed.Qvalue;
+        DataToBeSent[4] = Module2_Parameters.Measured.Current.transformed.Dvalue; //;M1_IA_CURRENT_FLOAT;
+        DataToBeSent[5] = Module2_Parameters.Measured.Current.transformed.Qvalue;
 
         SciSendMultipleFloatWithTheTag(DataToBeSent, 6);
     }

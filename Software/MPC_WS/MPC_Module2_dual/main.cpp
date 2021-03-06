@@ -47,6 +47,7 @@ void GetAdcReadings(ModuleParameters &moduleparams);
 inline void CalculateParkTransform(ModuleParameters &moduleparams);
 static inline void ExecuteFirstPrediction(ModuleParameters &moduleparams, unsigned int indexcount);
 static inline void ExecuteSecondPrediction(ModuleParameters &moduleparams, unsigned int indexcount);
+uint32_t    IPCWaitCounter = 0;
 
 
 int main(void)
@@ -83,12 +84,13 @@ int main(void)
 
     while(1)
     {
-        DELAY_US(1000000);
+        DELAY_US(10000);
         if(IpcRegs.IPCSTS.bit.IPC31==1) // cpu1 lets cpu2 go
         {
             IpcRegs.IPCACK.bit.IPC31 = 1;
             break;
         }
+        IPCWaitCounter ++ ;
     }
 
     InitializationRoutine();
@@ -114,7 +116,7 @@ int main(void)
     CpuSysRegs.PCLKCR0.bit.GTBCLKSYNC = 1;  /*start the global TimeBase clock */
     EDIS;
 #endif
-
+    M2_OperationMode = MODE_MPCCONTROLLER;
 
     EINT;  // Enable Global interrupt INTM
     ERTM;  // Enable Global realtime interrupt DBGM
@@ -481,18 +483,20 @@ void InitializationRoutine(void)
 }
 void RunTimeProtectionControl(void)
 {
-    if((fabsf(M1_IA_CURRENT_FLOAT)>M1_IA_RUNTIME_PROTECTION_VALUE)||(fabsf(M1_IB_CURRENT_FLOAT)>M1_IB_RUNTIME_PROTECTION_VALUE)||(fabsf(M1_IC_CURRENT_FLOAT)>M1_IC_RUNTIME_PROTECTION_VALUE))
+#if 0
+    if((fabsf(M2_IA_CURRENT_FLOAT)>M2_IA_RUNTIME_PROTECTION_VALUE)||(fabsf(M2_IB_CURRENT_FLOAT)>M2_IB_RUNTIME_PROTECTION_VALUE)||(fabsf(M2_IC_CURRENT_FLOAT)>M2_IC_RUNTIME_PROTECTION_VALUE))
     {
         EPwm4Regs.TZFRC.bit.DCAEVT1 = 1;
         EPwm5Regs.TZFRC.bit.DCAEVT1 = 1;
         EPwm6Regs.TZFRC.bit.DCAEVT1 = 1;
     }
-    if((M1_VDC_VOLTAGE_FLOAT>M1_VDC_UPPERBOUND_PROTECTION)||(M1_VDC_VOLTAGE_FLOAT<M1_VDC_LOWERBOUND_PROTECTION))
+    if((M2_VDC_VOLTAGE_FLOAT>M2_VDC_UPPERBOUND_PROTECTION)||(M2_VDC_VOLTAGE_FLOAT<M2_VDC_LOWERBOUND_PROTECTION))
     {
         EPwm4Regs.TZFRC.bit.DCAEVT1 = 1;
         EPwm5Regs.TZFRC.bit.DCAEVT1 = 1;
         EPwm6Regs.TZFRC.bit.DCAEVT1 = 1;
     }
+#endif
 }
 
 
@@ -614,7 +618,7 @@ inline void CalculateParkTransform(ModuleParameters &moduleparams)
 static inline void ExecuteFirstPrediction(ModuleParameters &moduleparams, unsigned int indexcount)
 {
     moduleparams.CurrentHorizon[indexcount].VdPrediction = moduleparams.FirstHorizon[indexcount].VdPrediction;  // First horizon prediction on the previous horizon is our current value now
-    moduleparams.CurrentHorizon[indexcount].VqPrediction = moduleparams.FirstHorizon[indexcount].VdPrediction;  // First horizon prediction on the previous horizon is our current value now
+    moduleparams.CurrentHorizon[indexcount].VqPrediction = moduleparams.FirstHorizon[indexcount].VqPrediction;  // First horizon prediction on the previous horizon is our current value now
 
     moduleparams.FirstHorizon[indexcount].IdPrediction = moduleparams.Measured.Current.transformed.Dvalue + (1.0 / moduleparams.OptimizationFsw[indexcount]) * (moduleparams.CurrentHorizon[indexcount].VdPrediction / LS_VALUE - RS_VALUE / LS_VALUE * moduleparams.Measured.Current.transformed.Dvalue + LS_VALUE / LS_VALUE * POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical * moduleparams.Measured.Current.transformed.Qvalue);
     moduleparams.FirstHorizon[indexcount].IqPrediction = moduleparams.Measured.Current.transformed.Qvalue + (1.0 / moduleparams.OptimizationFsw[indexcount]) * (moduleparams.CurrentHorizon[indexcount].VqPrediction / LS_VALUE - RS_VALUE / LS_VALUE * moduleparams.Measured.Current.transformed.Qvalue - LS_VALUE / LS_VALUE * POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical * moduleparams.Measured.Current.transformed.Dvalue - FLUX_VALUE * POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical / LS_VALUE);

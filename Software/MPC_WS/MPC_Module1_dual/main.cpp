@@ -23,7 +23,7 @@
  * */
 
 #pragma DATA_SECTION("M1_SPEEDREF_LOCATION")
-float       SpeedRefRPM = 20;
+float       SpeedRefRPM = 30;
 #pragma DATA_SECTION("M2_PARAMS_ADDRESS_LOCATION")
 ModuleParameters Module2_Parameters;
 #pragma DATA_SECTION("PI_IQ_LOCATION")
@@ -221,7 +221,7 @@ int main(void)
 
     DELAY_US(50);
     M1_CalculateOffsetValue();                 // Calculate the offset value of the current measurements.
-    //M2_CalculateOffsetValue();
+    M2_CalculateOffsetValue();
 
     M1_OperationMode = MODE_ALIGNMENT; // start with the selected mode
 
@@ -715,8 +715,8 @@ void InitializationRoutine(void)
     GPIO_WritePin(CPU2_ENABLEDRV8305_PIN, 1); // Enable DRV for module 2
     DELAY_US(50000);       // delay to allow DRV830x supplies to ramp up
     M1_InitDRV8305(&M1_Device1Configuration);
-    //M2_InitDRV8305(&M2_Device1Configuration);
-    M2_OffsetCalculationIsDone = 1;
+    M2_InitDRV8305(&M2_Device1Configuration);
+    //M2_OffsetCalculationIsDone = 1;
 #if 0
     while (M1_Device1Configuration.DRV_fault)
     {
@@ -1845,6 +1845,8 @@ __interrupt void epwm1_isr(void)
         EPwm1Regs.TBPRD = (Uint16 )(((float )SYSCLKFREQUENCY) / (Module1_Parameters.OptimizationFsw[Module1_Parameters.MinimumCostIndex] * 4.0));
         EPwm2Regs.TBPRD = (Uint16 )(((float )SYSCLKFREQUENCY) / (Module1_Parameters.OptimizationFsw[Module1_Parameters.MinimumCostIndex] * 4.0));
         EPwm3Regs.TBPRD = (Uint16 )(((float )SYSCLKFREQUENCY) / (Module1_Parameters.OptimizationFsw[Module1_Parameters.MinimumCostIndex] * 4.0));
+        M2_OperationMode = MODE_MPCCONTROLLER;
+        IpcRegs.IPCSET.bit.IPC31=1; // set this so that CPU2 will continue
     }
 #endif
 
@@ -1904,8 +1906,8 @@ __interrupt void epwm1_isr(void)
     {
         DataToBeSent[0] = Module1_Parameters.Measured.Current.PhaseA;
         DataToBeSent[1] = Module1_Parameters.Measured.Current.PhaseB;
-        DataToBeSent[2] = Module1_Parameters.AngularSpeedRPM.Mechanical;
-        DataToBeSent[3] = FswDecided;
+        DataToBeSent[2] = Module1_Parameters.Measured.Current.PhaseC;
+        DataToBeSent[3] = Module1_Parameters.AngularSpeedRPM.Mechanical;
         DataToBeSent[4] = Module1_Parameters.Measured.Current.transformed.Dvalue; //;M1_IA_CURRENT_FLOAT;
         DataToBeSent[5] = Module1_Parameters.Measured.Current.transformed.Qvalue;
 
@@ -1934,7 +1936,7 @@ __interrupt void xint1_isr(void)
 
     if(Xint1Count>=10)
     {
-        IpcRegs.IPCSET.bit.IPC31; // set this so that CPU2 will continue
+        IpcRegs.IPCSET.bit.IPC31=1; // set this so that CPU2 will continue
     }
     PieCtrlRegs.PIEACK.all = PIEACK_GROUP1;
 }

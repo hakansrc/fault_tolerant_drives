@@ -379,13 +379,14 @@ void InitializeEpwm6Registers(void)
 }
 __interrupt void epwm4_isr(void)
 {
+    IpcRegs.IPCSET.bit.IPC0 = 1;
     RunTimeProtectionControl();
     ControlISRCounter++;
     /*When CPU2 is activated, the CPU1 is already initialized everything*/
 
-    GetEncoderReadings_Cpu2(Module2_Parameters);
-
     GetAdcReadings(Module2_Parameters);
+
+    GetEncoderReadings_Cpu2(Module2_Parameters);
 
     CalculateParkTransform(Module2_Parameters);
 

@@ -57,6 +57,8 @@ __interrupt void cpu_timer2_isr(void);  /*prototype of the ISR functions*/
 __interrupt void epwm1_isr(void);       /*prototype of the ISR functions*/
 __interrupt void xint1_isr(void);       /*prototype of the ISR functions*/
 
+__interrupt void ipc0_isr(void);       /*prototype of the ISR functions*/
+
 void InitializationRoutine(void); /*all modules and gpios are initialized inside this function.*/
 void InitializeEpwm1Registers(void);
 void InitializeEpwm2Registers(void);
@@ -126,6 +128,7 @@ uint16_t    StartOperationCpu2 = 0; // when this is set to 1, cpu2 will start op
  * */
 
 float offsetval[3] = {0,0,0};
+uint32_t    Ipc0Counter = 0;
 
 int main(void)
 {
@@ -186,6 +189,7 @@ int main(void)
     PieVectTable.TIMER1_INT = &cpu_timer1_isr;  /*specify the interrupt service routine (ISR) address to the PIE table*/
     PieVectTable.TIMER2_INT = &cpu_timer2_isr;  /*specify the interrupt service routine (ISR) address to the PIE table*/
     PieVectTable.EPWM1_INT = &epwm1_isr;        /*specify the interrupt service routine (ISR) address to the PIE table*/
+    PieVectTable.IPC0_INT = &ipc0_isr;        /*specify the interrupt service routine (ISR) address to the PIE table*/
     EDIS;
 
 #if 1 // we are getting the index pin as external interrupt. This way we can easily obtain the alignment point
@@ -211,6 +215,7 @@ int main(void)
 
     PieCtrlRegs.PIECTRL.bit.ENPIE = 1;  // Enable the PIE block
     PieCtrlRegs.PIEIER1.bit.INTx7 = 1;  /*Enable the 7th interrupt of the Group 1, which is for timer 0 interrupt*/
+    PieCtrlRegs.PIEIER1.bit.INTx13 = 1;  /*Enable the 13th interrupt of the Group 1, which is for ipc 0 interrupt*/
     PieCtrlRegs.PIEIER3.bit.INTx1 = 1;  /*Enable the 1st interrupt of the Group 3, which is for epwm1 interrupt*/
     PieCtrlRegs.PIEIER1.bit.INTx4 = 1;  // Enable PIE Group 1 INT4
 
@@ -1966,6 +1971,13 @@ __interrupt void xint1_isr(void)
     {
         IpcRegs.IPCSET.bit.IPC31=1; // set this so that CPU2 will continue
     }
+    PieCtrlRegs.PIEACK.all = PIEACK_GROUP1;
+}
+__interrupt void ipc0_isr(void)
+{
+    Ipc0Counter++;
+    Module1_Parameters.AngleRad.Mechanical = ((float)EQep1Regs.QPOSCNT)/((float)ENCODERMAXTICKCOUNT)* 2.0 * PI;
+    IpcRegs.IPCACK.bit.IPC0 = 1;
     PieCtrlRegs.PIEACK.all = PIEACK_GROUP1;
 }
 void RunTimeProtectionControl(void)

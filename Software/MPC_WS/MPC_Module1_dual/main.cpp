@@ -594,7 +594,7 @@ inline void CalculateParkTransform(ModuleParameters &moduleparams)
 static inline void ExecuteFirstPrediction(ModuleParameters &moduleparams, unsigned int indexcount)
 {
     moduleparams.CurrentHorizon[indexcount].VdPrediction = moduleparams.FirstHorizon[indexcount].VdPrediction;  // First horizon prediction on the previous horizon is our current value now
-    moduleparams.CurrentHorizon[indexcount].VqPrediction = moduleparams.FirstHorizon[indexcount].VdPrediction;  // First horizon prediction on the previous horizon is our current value now
+    moduleparams.CurrentHorizon[indexcount].VqPrediction = moduleparams.FirstHorizon[indexcount].VqPrediction;  // First horizon prediction on the previous horizon is our current value now
 
     moduleparams.FirstHorizon[indexcount].IdPrediction = moduleparams.Measured.Current.transformed.Dvalue + (1.0 / moduleparams.OptimizationFsw[indexcount]) * (moduleparams.CurrentHorizon[indexcount].VdPrediction / LS_VALUE - RS_VALUE / LS_VALUE * moduleparams.Measured.Current.transformed.Dvalue + LS_VALUE / LS_VALUE * POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical * moduleparams.Measured.Current.transformed.Qvalue);
     moduleparams.FirstHorizon[indexcount].IqPrediction = moduleparams.Measured.Current.transformed.Qvalue + (1.0 / moduleparams.OptimizationFsw[indexcount]) * (moduleparams.CurrentHorizon[indexcount].VqPrediction / LS_VALUE - RS_VALUE / LS_VALUE * moduleparams.Measured.Current.transformed.Qvalue - LS_VALUE / LS_VALUE * POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical * moduleparams.Measured.Current.transformed.Dvalue - FLUX_VALUE * POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical / LS_VALUE);
@@ -1734,7 +1734,7 @@ __interrupt void epwm1_isr(void)
         PI_iq.Input = SpeedRefRadSec - Module1_Parameters.AngularSpeedRadSec.Mechanical;
         Run_PI_Controller(PI_iq);
 
-        Module1_Parameters.Reference.Iq = PI_iq.Output/2;
+        Module1_Parameters.Reference.Iq = PI_iq.Output/((float)2);
         Module1_Parameters.Reference.Id = IDREF;
 
         Module1_Parameters.MinimumCostValue = (float)1e35;

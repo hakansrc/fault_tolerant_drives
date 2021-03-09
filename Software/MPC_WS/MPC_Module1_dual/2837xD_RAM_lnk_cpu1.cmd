@@ -40,15 +40,17 @@ PAGE 1 :
    PI_IQ_ADDRESS_RAMGS13   : origin = 0x019280, length = 0x000012     
    M1_OPERATION_MODE_RAMGS13   : origin = 0x019292, length = 0x000001
    M1_SPEEDREF_RAMGS13   : origin = 0x019294, length = 0x000002
-   RAMGS13     : origin = 0x019296, length = 0x000D6A
+   M1_FSWDECIDED_RAMGS13   : origin = 0x019296, length = 0x000002
+   RAMGS13     : origin = 0x019298, length = 0x000D68
    //PI_IQ_ADDRESS_RAMGS13   : origin = 0x019000, length = 0x000012     
    //M1_OPERATION_MODE_RAMGS13   : origin = 0x019012, length = 0x000001
    //M1_SPEEDREF_RAMGS13   : origin = 0x019014, length = 0x000002
    //M1_PARAMS_ADDRESS_RAMGS13   : origin = 0x019016, length = 0x00027A
    //RAMGS13     : origin = 0x019290, length = 0x000D70
    M2_PARAMS_ADDRESS_RAMGS14 : origin = 0x01A000, length = 0x00027A  
-   M2_OPERATION_MODE_RAMGS14 : origin = 0x01A27A, length = 0x000001  
-   RAMGS14     : origin = 0x01A27B, length = 0x000D85
+   M2_FSWDECIDED_RAMGS14   : origin = 0x01A27A, length = 0x000002
+   M2_OPERATION_MODE_RAMGS14 : origin = 0x01A27C, length = 0x000001
+   RAMGS14     : origin = 0x01A27D, length = 0x000D83
    
    //RAMGS13     : origin = 0x019000, length = 0x001000     /*CPU1 is the owner of RAMGS13*/
    //RAMGS14     : origin = 0x01A000, length = 0x001000     /*CPU2 is the owner of RAMGS14*/  
@@ -85,6 +87,8 @@ SECTIONS
    M1_PARAMS_ADDRESS_LOCATION : > M1_PARAMS_ADDRESS_RAMGS13, PAGE = 1
    M2_PARAMS_ADDRESS_LOCATION : > M2_PARAMS_ADDRESS_RAMGS14, PAGE = 1
    M2_OPERATION_MODE_LOCATION : > M2_OPERATION_MODE_RAMGS14, PAGE = 1
+   M1_FSWDECIDED_LOCATION : > M1_FSWDECIDED_RAMGS13, PAGE = 1
+   M2_FSWDECIDED_LOCATION : > M2_FSWDECIDED_RAMGS14, PAGE = 1
 
 
 #ifdef __TI_COMPILER_VERSION__

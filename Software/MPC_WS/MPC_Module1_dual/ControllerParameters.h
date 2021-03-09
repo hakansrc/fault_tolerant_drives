@@ -37,15 +37,11 @@
 #define IDREFCOEFF 15.0
 #define FSWCOEFF 1250.0
 
-#define VD_VQ_KP LS_VALUE/2.0*moduleparams.OptimizationFsw[indexcount]
-#define VD_VQ_KI RS_VALUE/LS_VALUE
+#define M1_VD_VQ_KP M1_LS_VALUE/2.0*moduleparams.OptimizationFsw[indexcount]
+#define M1_VD_VQ_KI M1_RS_VALUE/M1_LS_VALUE
 
-
-
-
-
-
-
+#define M2_VD_VQ_KP M2_LS_VALUE/2.0*moduleparams.OptimizationFsw[indexcount]
+#define M2_VD_VQ_KI M2_RS_VALUE/M2_LS_VALUE
 
 
 #endif /* CONTROLLERPARAMETERS_H_ */

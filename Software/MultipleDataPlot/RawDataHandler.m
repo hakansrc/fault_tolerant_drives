@@ -3,7 +3,7 @@ clc
 close all
 FontSize = 16;
 % load('TestData/TestData301120212502.mat')
-load('TestData/TestDataAlignmentOnMachine_040121192802.mat')
+load('TestData/TestData_TwoModule_fsw1_fsw2_M1id_M1iq_M2id_M2iq_090321163055.mat')
 EnablePlotting = 1;
 TheTagValue = zeros(NumberOfFloatsPerPacket,4);
 TheSaveArrayScreened = RawDataArray;
@@ -37,8 +37,8 @@ figure
 subplot(3,2,1)
 plot((1:numel(TheDataConvertedValues(1,:)))/DataSampleRate,100*TheDataConvertedValues(1,:));
 title("Phase A Duty Cycle ")
-xlim([0 0.1])
-ylim([-10 110])
+% xlim([0 0.1])
+% ylim([-10 110])
 xlabel('Time (sec)','FontSize',FontSize,'FontWeight','bold');
 ylabel('Percent (%)','FontSize',FontSize,'FontWeight','bold');
 set(gca,'FontSize',FontSize,'FontWeight','bold')
@@ -46,7 +46,7 @@ set(gca,'FontSize',FontSize,'FontWeight','bold')
 subplot(3,2,2)
 plot((1:numel(TheDataConvertedValues(2,:)))/DataSampleRate,TheDataConvertedValues(2,:));
 title("Phase A Current")
-xlim([0 0.1])
+% xlim([0 0.1])
 % ylim([0 1.1])
 xlabel('Time (sec)','FontSize',FontSize,'FontWeight','bold');
 ylabel('Phase A Current (A)','FontSize',FontSize,'FontWeight','bold');
@@ -55,7 +55,7 @@ set(gca,'FontSize',FontSize,'FontWeight','bold')
 subplot(3,2,3)
 plot((1:numel(TheDataConvertedValues(3,:)))/DataSampleRate,TheDataConvertedValues(3,:));
 title("D current measured")
-xlim([0 0.1])
+% xlim([0 0.1])
 % ylim([0 1.1])
 xlabel('Time (sec)','FontSize',FontSize,'FontWeight','bold');
 ylabel('Current (A)','FontSize',FontSize,'FontWeight','bold');
@@ -64,7 +64,7 @@ set(gca,'FontSize',FontSize,'FontWeight','bold')
 subplot(3,2,4)
 plot((1:numel(TheDataConvertedValues(4,:)))/DataSampleRate,TheDataConvertedValues(4,:));
 title("Q current measured")
-xlim([0 0.1])
+% xlim([0 0.1])
 % ylim([0 1.1])
 xlabel('Time (sec)','FontSize',FontSize,'FontWeight','bold');
 ylabel('Current (A)','FontSize',FontSize,'FontWeight','bold');
@@ -73,7 +73,7 @@ set(gca,'FontSize',FontSize,'FontWeight','bold')
 subplot(3,2,5)
 plot((1:numel(TheDataConvertedValues(5,:)))/DataSampleRate,TheDataConvertedValues(5,:));
 title("Vdc Voltage")
-xlim([0 0.1])
+% xlim([0 0.1])
 % ylim([0 1.1])
 xlabel('Time (sec)','FontSize',FontSize,'FontWeight','bold');
 ylabel('Voltage (V)','FontSize',FontSize,'FontWeight','bold');
@@ -82,7 +82,7 @@ set(gca,'FontSize',FontSize,'FontWeight','bold')
 subplot(3,2,6)
 plot((1:numel(TheDataConvertedValues(6,:)))/DataSampleRate,TheDataConvertedValues(6,:));
 title("Measured speed (RPM)")
-xlim([0 0.1])
+% xlim([0 0.1])
 % ylim([0 1.1])
 xlabel('Time (sec)','FontSize',FontSize,'FontWeight','bold');
 ylabel('Speed (RPM)','FontSize',FontSize,'FontWeight','bold');

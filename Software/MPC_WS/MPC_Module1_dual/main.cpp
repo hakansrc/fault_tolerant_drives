@@ -36,9 +36,9 @@ unsigned int        M2_OperationMode = MODE_NO_OPERATION; /*this will be changed
 ModuleParameters Module1_Parameters;
 
 #pragma DATA_SECTION("M1_FSWDECIDED_LOCATION")
-float       M1_FswDecided = 0;
+float       M1_FswDecided = 1000;
 #pragma DATA_SECTION("M2_FSWDECIDED_LOCATION")
-float       M2_FswDecided = 0;
+float       M2_FswDecided = 1000;
 
 
 OpenLoopOperation   RL_Load_Operation = {25, 0.5}; // 0 hz, 0 magnitude
@@ -262,7 +262,7 @@ __interrupt void cpu_timer0_isr(void)
 __interrupt void cpu_timer1_isr(void)
 {
     CpuTimer1.InterruptCount++;
-#if 1
+#if 0
     if(M1_OperationMode==MODE_MPCCONTROLLER)
     {
         if((CpuTimer1.InterruptCount%5)==0)
@@ -618,7 +618,7 @@ static inline void ExecuteSecondPrediction(ModuleParameters &moduleparams, unsig
     moduleparams.SecondHorizon[indexcount].Valfa = sinf(moduleparams.AngleRad.Electrical) * moduleparams.FirstHorizon[indexcount].VdPrediction + cosf(moduleparams.AngleRad.Electrical) * moduleparams.FirstHorizon[indexcount].VqPrediction;
     moduleparams.SecondHorizon[indexcount].Vbeta =-cosf(moduleparams.AngleRad.Electrical) * moduleparams.FirstHorizon[indexcount].VdPrediction + sinf(moduleparams.AngleRad.Electrical) * moduleparams.FirstHorizon[indexcount].VqPrediction;
 
-    moduleparams.SecondHorizon[indexcount].VoltageVectorAngleRad = atan2f(moduleparams.SecondHorizon[indexcount].Vbeta, moduleparams.SecondHorizon[indexcount].Valfa) + 4.0*PI + 0*POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical/moduleparams.OptimizationFsw[indexcount];
+    moduleparams.SecondHorizon[indexcount].VoltageVectorAngleRad = atan2f(moduleparams.SecondHorizon[indexcount].Vbeta, moduleparams.SecondHorizon[indexcount].Valfa) + 4.0*PI + POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical * (1.0/moduleparams.OptimizationFsw[indexcount]+1.0/M1_FswDecided);
     moduleparams.SecondHorizon[indexcount].VoltageVectorAngleRad_Mod = fmodf(moduleparams.SecondHorizon[indexcount].VoltageVectorAngleRad, PI / 3.0);
 
     moduleparams.SecondHorizon[indexcount].ma = sqrtf(3)*moduleparams.SecondHorizon[indexcount].Magnitude / (moduleparams.Measured.Voltage.Vdc );
@@ -637,8 +637,8 @@ static inline void ExecuteSecondPrediction(ModuleParameters &moduleparams, unsig
 
     moduleparams.SecondHorizon[indexcount].Iq_Ripple_Prediction = moduleparams.SecondHorizon[indexcount].Iq_Delta_DuringT1 + moduleparams.SecondHorizon[indexcount].Iq_Delta_DuringT2 + moduleparams.SecondHorizon[indexcount].Iq_Delta_DuringT0;
 
-    moduleparams.SecondHorizon[indexcount].IdPrediction = moduleparams.FirstHorizon[indexcount].IdPrediction + (1.0 / moduleparams.OptimizationFsw[indexcount]) * (moduleparams.FirstHorizon[indexcount].VdPrediction / M1_LS_VALUE - M1_RS_VALUE / M1_LS_VALUE * moduleparams.FirstHorizon[indexcount].IdPrediction + M1_LS_VALUE / M1_LS_VALUE * POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical * moduleparams.FirstHorizon[indexcount].IqPrediction);
-    moduleparams.SecondHorizon[indexcount].IqPrediction = moduleparams.FirstHorizon[indexcount].IqPrediction + (1.0 / moduleparams.OptimizationFsw[indexcount]) * (moduleparams.FirstHorizon[indexcount].VqPrediction / M1_LS_VALUE - M1_RS_VALUE / M1_LS_VALUE * moduleparams.FirstHorizon[indexcount].IqPrediction - M1_LS_VALUE / M1_LS_VALUE * POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical * moduleparams.FirstHorizon[indexcount].IdPrediction - FLUX_VALUE * POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical / M1_LS_VALUE);
+    moduleparams.SecondHorizon[indexcount].IdPrediction = moduleparams.FirstHorizon[indexcount].IdPrediction + (0.5 / moduleparams.OptimizationFsw[indexcount]) * (moduleparams.FirstHorizon[indexcount].VdPrediction / M1_LS_VALUE - M1_RS_VALUE / M1_LS_VALUE * moduleparams.FirstHorizon[indexcount].IdPrediction + M1_LS_VALUE / M1_LS_VALUE * POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical * moduleparams.FirstHorizon[indexcount].IqPrediction);
+    moduleparams.SecondHorizon[indexcount].IqPrediction = moduleparams.FirstHorizon[indexcount].IqPrediction + (0.5 / moduleparams.OptimizationFsw[indexcount]) * (moduleparams.FirstHorizon[indexcount].VqPrediction / M1_LS_VALUE - M1_RS_VALUE / M1_LS_VALUE * moduleparams.FirstHorizon[indexcount].IqPrediction - M1_LS_VALUE / M1_LS_VALUE * POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical * moduleparams.FirstHorizon[indexcount].IdPrediction - FLUX_VALUE * POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical / M1_LS_VALUE);
 
     /*TODO add protection to cost*/
     moduleparams.Cost[indexcount] = IQRIPPLECOEFF * powf(moduleparams.SecondHorizon[indexcount].Iq_Ripple_Prediction / IQ_RATED, 2) + IQREFCOEFF * powf((moduleparams.Reference.Iq - moduleparams.SecondHorizon[indexcount].IqPrediction) / IQ_RATED, 2) + IDREFCOEFF * powf((moduleparams.Reference.Id - moduleparams.SecondHorizon[indexcount].IdPrediction)/IQ_RATED, 2) + FSWCOEFF * moduleparams.OptimizationFsw[indexcount] / OPT_FSW_MAX;
@@ -1941,8 +1941,8 @@ __interrupt void epwm1_isr(void)
 
     if (SendOneInFour % 4 == 0)
     {
-        DataToBeSent[0] = M1_FswDecided;
-        DataToBeSent[1] = M2_FswDecided;
+        DataToBeSent[0] = SpeedRefRPM;
+        DataToBeSent[1] = Module1_Parameters.AngularSpeedRPM.Mechanical;
         DataToBeSent[2] = Module1_Parameters.Measured.Current.transformed.Dvalue; // .Measured.Current.PhaseA;
         DataToBeSent[3] = Module1_Parameters.Measured.Current.transformed.Qvalue; // .Measured.Current.PhaseB;
         DataToBeSent[4] = Module2_Parameters.Measured.Current.transformed.Dvalue; // .Measured.Current.PhaseA; //;M1_IA_CURRENT_FLOAT;

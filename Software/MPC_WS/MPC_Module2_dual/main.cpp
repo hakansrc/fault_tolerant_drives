@@ -596,8 +596,17 @@ void GetEncoderReadings_Cpu2(ModuleParameters &moduleparams)
     moduleparams.AngleRad.Mechanical = ((float)EQep1Regs.QPOSCNT)/((float)ENCODERMAXTICKCOUNT)* 2.0 * PI;
     moduleparams.AngleRad.Electrical =  moduleparams.AngleRad.Mechanical*POLEPAIRS;
 #else
-    moduleparams.AngleRad.Mechanical = Module1_Parameters.AngleRad.Mechanical;
-    moduleparams.AngleRad.Electrical = moduleparams.AngleRad.Mechanical*POLEPAIRS;
+    if(IpcRegs.IPCSTS.bit.IPC30==1)
+    {
+        moduleparams.AngleRad.Mechanical = ((float)EQep2Regs.QPOSCNT)/((float)ENCODERMAXTICKCOUNT)* 2.0 * PI;
+        moduleparams.AngleRad.Electrical =  moduleparams.AngleRad.Mechanical*POLEPAIRS;
+    }
+    else
+    {
+        moduleparams.AngleRad.Mechanical = Module1_Parameters.AngleRad.Mechanical;
+        moduleparams.AngleRad.Electrical = moduleparams.AngleRad.Mechanical*POLEPAIRS;
+    }
+
 #endif
 
     /*CPU1 already calculates the speed, therefore CPU2 just gets the speed reading from CPU1*/

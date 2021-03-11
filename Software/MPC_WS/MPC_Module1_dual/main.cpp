@@ -222,6 +222,9 @@ int main(void)
     EALLOW;
     OutputXbarRegs.OUTPUT3MUX0TO15CFG.bit.MUX1 = 1; // this gets input from INPUTXBAR1, i.e. outputxbar3
     OutputXbarRegs.OUTPUT4MUX0TO15CFG.bit.MUX3 = 1; // this gets input from INPUTXBAR2, i.e. outputxbar4
+
+    OutputXbarRegs.OUTPUT3MUXENABLE.bit.MUX1 = 1;
+    OutputXbarRegs.OUTPUT4MUXENABLE.bit.MUX3 = 1;
     EDIS;
 
     EALLOW;
@@ -2091,8 +2094,8 @@ __interrupt void epwm1_isr(void)
 
     if (SendOneInFour % 4 == 0)
     {
-        DataToBeSent[0] = SpeedRefRPM;
-        DataToBeSent[1] = Module1_Parameters.AngularSpeedRPM.Mechanical;
+        DataToBeSent[0] = EQep1Regs.QPOSCNT;
+        DataToBeSent[1] = EQep2Regs.QPOSCNT;
         DataToBeSent[2] = Module1_Parameters.Measured.Current.transformed.Dvalue; // .Measured.Current.PhaseA;
         DataToBeSent[3] = Module1_Parameters.Measured.Current.transformed.Qvalue; // .Measured.Current.PhaseB;
         DataToBeSent[4] = Module2_Parameters.Measured.Current.transformed.Dvalue; // .Measured.Current.PhaseA; //;M1_IA_CURRENT_FLOAT;
@@ -2115,15 +2118,22 @@ __interrupt void xint1_isr(void)
     if(Xint1Count<2) // in the first two rotations, reset the encoder value so that we are aligned to the "sweetpoint"
     {
         EQep1Regs.QPOSCNT = ENCODER_SWEETPOINT_VALUE;
+        EQep2Regs.QPOSCNT = ENCODER_SWEETPOINT_VALUE;
         Module1_Parameters.AngleRadPrev.Mechanical = (float) EQep1Regs.QPOSCNT / (float) ENCODERMAXTICKCOUNT * 2.0 * PI;
         Module1_Parameters.AngleRadTemp.Mechanical = (float) EQep1Regs.QPOSCNT / (float) ENCODERMAXTICKCOUNT * 2.0 * PI;
         ByPass_SpeedMeasurement = 1;  // do not try to calculate speed at first two rotation. the speed measurements would be TOO wrong at first two rotations, therefore omit the speed calculation for two cycles,
 
     }
 
-    if(Xint1Count>=10)
+    if(Xint1Count>=3)
     {
-        IpcRegs.IPCSET.bit.IPC31=1; // set this so that CPU2 will continue
+        if(DevCfgRegs.CPUSEL2.bit.EQEP2==0) // if this belongs to cpu1, then give it to CPU2
+        {
+            EALLOW;
+            DevCfgRegs.CPUSEL2.bit.EQEP2 = 1; // EQep2 block is assigned to CPU2
+            EDIS;
+        }
+        IpcRegs.IPCSET.bit.IPC30=1; // set this so that CPU2 read the angle from EQEP2
     }
     PieCtrlRegs.PIEACK.all = PIEACK_GROUP1;
 }

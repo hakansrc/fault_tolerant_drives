@@ -6,13 +6,14 @@ extern "C" {
 #endif
 
 #include <stdint.h>
-
+#include "CLAmath.h"
 
 //
 // Globals
 //
 
-extern uint32_t    Cla1Task1_counter;
+extern uint32_t Cla1Task1_counter;
+extern float    Clacoscalc;
 
 //
 //Task 1 (C) Variables

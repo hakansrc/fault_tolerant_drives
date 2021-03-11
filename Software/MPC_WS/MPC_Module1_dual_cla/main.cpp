@@ -27,6 +27,9 @@
 #pragma DATA_SECTION("CLAData")
 uint32_t    Cla1Task1_counter = 0;
 
+#pragma DATA_SECTION("CLAData")
+float    Clacoscalc = 0;
+
 #pragma DATA_SECTION("M1_SPEEDREF_LOCATION")
 float       SpeedRefRPM = 33;
 #pragma DATA_SECTION("M2_PARAMS_ADDRESS_LOCATION")

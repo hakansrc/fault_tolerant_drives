@@ -1,0 +1,48 @@
+
+#include "cla_shared.h"
+
+
+__interrupt void Cla1Task1 ( void )
+{
+    Cla1Task1_counter++;
+    Clacoscalc = CLAcos((float)Cla1Task1_counter);
+}
+
+__interrupt void Cla1Task2 ( void )
+{
+
+}
+
+__interrupt void Cla1Task3 ( void )
+{
+
+}
+
+__interrupt void Cla1Task4 ( void )
+{
+
+}
+
+__interrupt void Cla1Task5 ( void )
+{
+
+}
+
+__interrupt void Cla1Task6 ( void )
+{
+
+}
+
+__interrupt void Cla1Task7 ( void )
+{
+
+}
+
+__interrupt void Cla1Task8 ( void )
+{
+
+}
+
+//
+// End of file
+//

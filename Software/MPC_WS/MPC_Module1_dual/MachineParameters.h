@@ -13,8 +13,8 @@
 #define M1_RS_VALUE                    0.539       //ohm
 #define M1_LS_VALUE                    0.00343     //henry
 
-#define M2_RS_VALUE                    0.539       //0.435       //ohm
-#define M2_LS_VALUE                    0.00343     //0.00325     //henry
+#define M2_RS_VALUE                    0.435       //ohm
+#define M2_LS_VALUE                    0.00325     //henry
 
 #define POLEPAIRS                   10.0
 #define FLUX_VALUE                  0.180       //webers

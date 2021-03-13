@@ -32,9 +32,10 @@ extern float                SpeedRefRadSec;
 extern float                SpeedRefRPM;
 extern unsigned int         M1_OperationMode;
 extern uint16_t             ByPass_SpeedMeasurement;
+extern float                M1_ElectricalAngle;
 
 float CLA_Power(float base, uint16_t power);
-float CLA_floating_modulus(float number,float modulus);
+float CLA_floating_modulus(float a,float b);
 void GetSvpwmDutyCycles_cla(float T1, float T2, float T0,float Ts,float VectorAngleRad, float *DutyA, float *DutyB, float *DutyC);
 void ExecuteFirstPrediction_cla(ModuleParameters *moduleparams, unsigned int indexcount);
 void ExecuteSecondPrediction_cla(ModuleParameters *moduleparams, unsigned int indexcount);
@@ -42,6 +43,9 @@ void Run_PI_Controller_cla(PID_Parameters *pidparams);
 void GetEncoderReadings_cla(ModuleParameters *moduleparams);
 void GetAdcReadings_cla(ModuleParameters *moduleparams);
 void CalculateParkTransform_cla(ModuleParameters *moduleparams);
+float CLA_fabsf(float value);
+
+
 __interrupt void Cla1Task1 ( void );
 /*
 __interrupt void Cla1Task2();

@@ -32,13 +32,13 @@ PID_Parameters      PI_iq_cla;
 #pragma DATA_SECTION("CLAData")
 float       SpeedRefRadSec = 0;
 #pragma DATA_SECTION("CLAData")
-float       SpeedRefRPM = 33;
+float       SpeedRefRPM = 80;
 #pragma DATA_SECTION("CLAData")
 unsigned int        M1_OperationMode = MODE_NO_OPERATION;
 #pragma DATA_SECTION("CLAData")
+float       M1_ElectricalAngle = 0;
+
 uint16_t    ByPass_SpeedMeasurement = 0;
-
-
 
 #pragma DATA_SECTION("M2_PARAMS_ADDRESS_LOCATION")
 ModuleParameters Module2_Parameters;
@@ -327,7 +327,7 @@ __interrupt void cpu_timer0_isr(void)
 __interrupt void cpu_timer1_isr(void)
 {
     CpuTimer1.InterruptCount++;
-#if 1
+#if 0
     if(M1_OperationMode==MODE_MPCCONTROLLER)
     {
         if((CpuTimer1.InterruptCount%5)==0)
@@ -752,6 +752,7 @@ void InitializationRoutine(void)
     for(i=0;i<NUMBEROFMPCLOOPS;i++)
     {
         Module1_Parameters.OptimizationFsw[i] = (i+1)*1000;
+        Module1_Parameters_cla.OptimizationFsw[i] = (i+1)*1000;
     }
 
     InitializeADCs();
@@ -1928,12 +1929,15 @@ void M2_CalculateOffsetValue(void)
 
 __interrupt void epwm1_isr(void)
 {
+    ControlISRCounter++;
+#if 1
     if (M1_OperationMode == MODE_CLA_MPCCONTROLLER)
     {
         EPwm1Regs.ETCLR.bit.INT = 1;
         PieCtrlRegs.PIEACK.all = PIEACK_GROUP3;
         return;
     }
+#endif
 
     GetEncoderReadings(Module1_Parameters);
     /*This will be the main control isr*/
@@ -1943,7 +1947,6 @@ __interrupt void epwm1_isr(void)
 
     RunTimeProtectionControl();
 
-    ControlISRCounter++;
 
 
 
@@ -2041,6 +2044,7 @@ __interrupt void epwm1_isr(void)
         if(AlignmentCounter>=((uint32_t)MPC_STARTCOUNTVALUE))
         {
             M1_OperationMode = MODE_CLA_MPCCONTROLLER;
+            //M1_OperationMode = MODE_MPCCONTROLLER;
             EPwm1Regs.ETCLR.bit.INT = 1;
             PieCtrlRegs.PIEACK.all = PIEACK_GROUP3;
             return;
@@ -2137,19 +2141,22 @@ __interrupt void epwm1_isr(void)
 
 
 
+#if 0
     if (SendOneInFour % 4 == 0)
     {
         DataToBeSent[0] = M1_FswDecided;
         DataToBeSent[1] = M2_FswDecided;
-        DataToBeSent[2] = Module1_Parameters.Measured.Current.transformed.Dvalue; // .Measured.Current.PhaseA;
-        DataToBeSent[3] = Module1_Parameters.AngularSpeedRPM.Mechanical; // .Measured.Current.PhaseB;
-        DataToBeSent[4] = Module2_Parameters.Measured.Current.transformed.Dvalue; // .Measured.Current.PhaseA; //;M1_IA_CURRENT_FLOAT;
-        DataToBeSent[5] = SpeedRefRPM; // .Measured.Current.PhaseB;
+        DataToBeSent[2] = Module1_Parameters_cla.Measured.Current.transformed.Dvalue; // .Measured.Current.PhaseA;
+        DataToBeSent[3] = Module1_Parameters_cla.Measured.Current.PhaseA;
+        DataToBeSent[4] = Module1_Parameters_cla.Measured.Current.PhaseB;
+        DataToBeSent[5] = Module1_Parameters_cla.Measured.Current.PhaseC;
 
         SciSendMultipleFloatWithTheTag(DataToBeSent, 6);
     }
 
     SendOneInFour++;
+
+#endif
 
 
 
@@ -2166,7 +2173,11 @@ __interrupt void xint1_isr(void)
         EQep2Regs.QPOSCNT = ENCODER_SWEETPOINT_VALUE;
         Module1_Parameters.AngleRadPrev.Mechanical = (float) EQep1Regs.QPOSCNT / (float) ENCODERMAXTICKCOUNT * 2.0 * PI;
         Module1_Parameters.AngleRadTemp.Mechanical = (float) EQep1Regs.QPOSCNT / (float) ENCODERMAXTICKCOUNT * 2.0 * PI;
+        Module1_Parameters_cla.AngleRadPrev.Mechanical = (float) EQep1Regs.QPOSCNT / (float) ENCODERMAXTICKCOUNT * 2.0 * PI;
+        Module1_Parameters_cla.AngleRadTemp.Mechanical = (float) EQep1Regs.QPOSCNT / (float) ENCODERMAXTICKCOUNT * 2.0 * PI;
+#if 0
         ByPass_SpeedMeasurement = 1;  // do not try to calculate speed at first two rotation. the speed measurements would be TOO wrong at first two rotations, therefore omit the speed calculation for two cycles,
+#endif
 
     }
 
@@ -2192,6 +2203,19 @@ __interrupt void ipc0_isr(void)
 __interrupt void CLATask1_PCC_Is_Done(void)
 {
     CLA1Task1End_counter++;
+    if (SendOneInFour % 4 == 0)
+    {
+        DataToBeSent[0] = Module1_Parameters_cla.Measured.Current.transformed.Dvalue; // .Measured.Current.PhaseA;
+        DataToBeSent[1] = Module1_Parameters_cla.Measured.Current.transformed.Qvalue; // .Measured.Current.PhaseA;
+        DataToBeSent[2] = M1_FswDecided_cla;
+        DataToBeSent[3] = Module1_Parameters_cla.Measured.Current.PhaseA;
+        DataToBeSent[4] = Module1_Parameters_cla.Measured.Current.PhaseB;
+        DataToBeSent[5] = Module1_Parameters_cla.Measured.Current.PhaseC;
+
+        SciSendMultipleFloatWithTheTag(DataToBeSent, 6);
+    }
+
+    SendOneInFour++;
     PieCtrlRegs.PIEACK.all = PIEACK_GROUP11;
 }
 void RunTimeProtectionControl(void)

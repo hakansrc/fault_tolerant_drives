@@ -155,13 +155,13 @@ enum
 
 struct DRV830x_SPI_WRITE_WORD_BITS
 {                       // bit    	description
-    Uint16 DATA : 11;   // 10:0		FIFO reset
-    Uint16 ADDRESS : 4; // 14:11	Enhancement enable
-    Uint16 R_W : 1;     // 15		R/W
+    uint16_t DATA : 11;   // 10:0		FIFO reset
+    uint16_t ADDRESS : 4; // 14:11	Enhancement enable
+    uint16_t R_W : 1;     // 15		R/W
 };
 union DRV830x_SPI_WRITE_WORD_REG
 {
-    Uint16 all;
+    uint16_t all;
     struct DRV830x_SPI_WRITE_WORD_BITS bit;
 };
 

@@ -15,10 +15,11 @@
 #define ENABLE_MPC  1
 
 
-#define MODE_MPCCONTROLLER  1
-#define MODE_ALIGNMENT      2
-#define MODE_RLLOAD         3
-#define MODE_NO_OPERATION   0
+#define MODE_MPCCONTROLLER      1
+#define MODE_CLA_MPCCONTROLLER  4
+#define MODE_ALIGNMENT          2
+#define MODE_RLLOAD             3
+#define MODE_NO_OPERATION       0
 
 #define INITIALPWMFREQ 10000      /*Hz*/
 #define INITIALPWMPRD  (1.0/((float)INITIALPWMFREQ))
@@ -42,6 +43,11 @@
 
 #define M2_VD_VQ_KP M2_LS_VALUE/2.0*moduleparams.OptimizationFsw[indexcount]
 #define M2_VD_VQ_KI M2_RS_VALUE/M2_LS_VALUE
+
+#define M1_VD_VQ_KP_CLA M1_LS_VALUE/2.0*moduleparams->OptimizationFsw[indexcount]
+#define M1_VD_VQ_KI_CLA M1_RS_VALUE/M1_LS_VALUE
+#define M2_VD_VQ_KP_CLA M2_LS_VALUE/2.0*moduleparams->OptimizationFsw[indexcount]
+#define M2_VD_VQ_KI_CLA M2_RS_VALUE/M2_LS_VALUE
 
 
 #endif /* CONTROLLERPARAMETERS_H_ */

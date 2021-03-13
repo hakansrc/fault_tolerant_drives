@@ -22,7 +22,7 @@ PAGE 0 :
    RAMD0           	: origin = 0x00B000, length = 0x000800
    RAMGS0123	      : origin = 0x00C000, length = 0x004000
 
-   RAMLS01_CLA_PRG_RAM  : origin = 0x008000, length = 0x001000
+   RAMLS012_CLA_PRG_RAM  : origin = 0x008000, length = 0x001800
    // RAMLS0          	   : origin = 0x008000, length = 0x000800
    // RAMLS1          	   : origin = 0x008800, length = 0x000800
    // RAMLS2      		   : origin = 0x009000, length = 0x000800
@@ -36,9 +36,9 @@ PAGE 1 :
    RAMM1           : origin = 0x000400, length = 0x000400     /* on-chip RAM block M1 */
    RAMD1           : origin = 0x00B800, length = 0x000800
 
-   RAMLS5      : origin = 0x00A800, length = 0x000800
+   //RAMLS5      : origin = 0x00A800, length = 0x000800
 
-   RAMLS23_CLA_DAT_RAM  : origin = 0x009000, length = 0x001000
+   RAMLS345_CLA_DAT_RAM  : origin = 0x009800, length = 0x001800
 
    //RAMGS01      : origin = 0x00C000, length = 0x002000
    //RAMGS1      : origin = 0x00D000, length = 0x001000
@@ -102,10 +102,10 @@ SECTIONS
    //ramgs0           : > RAMGS0,    PAGE = 1
    //ramgs1           : > RAMGS1,    PAGE = 1
 
-   Cla1Prog         : > RAMLS01_CLA_PRG_RAM, PAGE=0
+   Cla1Prog         : > RAMLS012_CLA_PRG_RAM, PAGE=0
 
-   CLAData		      : > RAMLS23_CLA_DAT_RAM, PAGE=1
-   CLA1mathTables    : > RAMLS23_CLA_DAT_RAM, PAGE = 1
+   CLAData		      : > RAMLS345_CLA_DAT_RAM, PAGE=1
+   CLA1mathTables    : > RAMLS345_CLA_DAT_RAM, PAGE = 1
 
    PI_IQ_LOCATION   : > PI_IQ_ADDRESS_RAMGS13, PAGE = 1
    M1_OPERATION_MODE_LOCATION : > M1_OPERATION_MODE_RAMGS13, PAGE = 1
@@ -133,11 +133,11 @@ SECTIONS
    CLAscratch       :
                      { *.obj(CLAscratch)
                      . += CLA_SCRATCHPAD_SIZE;
-                     *.obj(CLAscratch_end) } >  RAMLS23_CLA_DAT_RAM,  PAGE = 1
+                     *.obj(CLAscratch_end) } >  RAMLS345_CLA_DAT_RAM,  PAGE = 1
 
-   .scratchpad      : > RAMLS23_CLA_DAT_RAM,       PAGE = 1
-   .bss_cla		    : > RAMLS23_CLA_DAT_RAM,       PAGE = 1
-   .const_cla	    : > RAMLS23_CLA_DAT_RAM,       PAGE = 1
+   .scratchpad      : > RAMLS345_CLA_DAT_RAM,       PAGE = 1
+   .bss_cla		    : > RAMLS345_CLA_DAT_RAM,       PAGE = 1
+   .const_cla	    : > RAMLS345_CLA_DAT_RAM,       PAGE = 1
 #endif //CLA_C
 
    /* The following section definitions are required when using the IPC API Drivers */

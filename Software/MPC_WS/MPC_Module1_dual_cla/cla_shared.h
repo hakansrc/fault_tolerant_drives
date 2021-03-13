@@ -5,48 +5,43 @@
 extern "C" {
 #endif
 
+
+
 #include <stdint.h>
 #include "CLAmath.h"
+#include "MachineParameters.h"
+#include "ConstantParameters.h"
+#include "ControllerParameters.h"
+#include "CustomTypeDefs.h"
+#include "hw_types.h"
+#include "hw_memmap.h"
+#include "hw_epwm.h"
+#include "hw_eqep.h"
+#include "hw_adc.h"
 
 //
 // Globals
 //
 
-extern uint32_t Cla1Task1_counter;
-extern float    Clacoscalc;
+extern uint32_t             Cla1Task1_counter;
+extern float                Clacoscalc;
+extern float                M1_FswDecided_cla;
+extern ModuleParameters     Module1_Parameters_cla;
+extern PID_Parameters       PI_iq_cla;
+extern float                SpeedRefRadSec;
+extern float                SpeedRefRPM;
+extern unsigned int         M1_OperationMode;
+extern uint16_t             ByPass_SpeedMeasurement;
 
-//
-//Task 1 (C) Variables
-//
-
-//
-//Task 2 (C) Variables
-//
-
-//
-//Task 3 (C) Variables
-//
-
-//
-//Task 4 (C) Variables
-//
-
-//
-//Task 5 (C) Variables
-//
-
-//
-//Task 6 (C) Variables
-//
-
-//
-//Task 7 (C) Variables
-//
-
-//
-//Task 8 (C) Variables
-//
-
+float CLA_Power(float base, uint16_t power);
+float CLA_floating_modulus(float number,float modulus);
+void GetSvpwmDutyCycles_cla(float T1, float T2, float T0,float Ts,float VectorAngleRad, float *DutyA, float *DutyB, float *DutyC);
+void ExecuteFirstPrediction_cla(ModuleParameters *moduleparams, unsigned int indexcount);
+void ExecuteSecondPrediction_cla(ModuleParameters *moduleparams, unsigned int indexcount);
+void Run_PI_Controller_cla(PID_Parameters *pidparams);
+void GetEncoderReadings_cla(ModuleParameters *moduleparams);
+void GetAdcReadings_cla(ModuleParameters *moduleparams);
+void CalculateParkTransform_cla(ModuleParameters *moduleparams);
 __interrupt void Cla1Task1 ( void );
 /*
 __interrupt void Cla1Task2();

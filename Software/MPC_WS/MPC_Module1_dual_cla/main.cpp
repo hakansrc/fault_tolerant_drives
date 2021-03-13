@@ -10,15 +10,10 @@
 #include "MachineParameters.h"
 #include "ConstantParameters.h"
 #include "ControllerParameters.h"
-#include "DRV8305_defs.h"
-#include "MultipleFloatDataSender.h"
 #include "CustomTypeDefs.h"
+#include "MultipleFloatDataSender.h"
+#include "DRV8305_defs.h"
 
-/*      Before starting to using these code, followings must be tested
- * 1-   ADC     readings
- * 2-   Encoder reading
- * 3-   Control loop operation. (can be compared with the results of the algorithm.)
- * */
 
 /*TODO s
  *
@@ -26,18 +21,30 @@
 
 #pragma DATA_SECTION("CLAData")
 uint32_t    Cla1Task1_counter = 0;
-
 #pragma DATA_SECTION("CLAData")
 float    Clacoscalc = 0;
-
-#pragma DATA_SECTION("M1_SPEEDREF_LOCATION")
+#pragma DATA_SECTION("CLAData")
+float       M1_FswDecided_cla = 1000;
+#pragma DATA_SECTION("CLAData")
+ModuleParameters Module1_Parameters_cla;
+#pragma DATA_SECTION("CLAData")
+PID_Parameters      PI_iq_cla;
+#pragma DATA_SECTION("CLAData")
+float       SpeedRefRadSec = 0;
+#pragma DATA_SECTION("CLAData")
 float       SpeedRefRPM = 33;
+#pragma DATA_SECTION("CLAData")
+unsigned int        M1_OperationMode = MODE_NO_OPERATION;
+#pragma DATA_SECTION("CLAData")
+uint16_t    ByPass_SpeedMeasurement = 0;
+
+
+
 #pragma DATA_SECTION("M2_PARAMS_ADDRESS_LOCATION")
 ModuleParameters Module2_Parameters;
 #pragma DATA_SECTION("PI_IQ_LOCATION")
 PID_Parameters      PI_iq;
-#pragma DATA_SECTION("M1_OPERATION_MODE_LOCATION")
-unsigned int        M1_OperationMode = MODE_NO_OPERATION; /*this will be changed */
+
 #pragma DATA_SECTION("M2_OPERATION_MODE_LOCATION")
 unsigned int        M2_OperationMode = MODE_NO_OPERATION; /*this will be changed */
 #pragma DATA_SECTION("M1_PARAMS_ADDRESS_LOCATION")
@@ -121,7 +128,6 @@ float       DataToBeSent[6];
 uint32_t    SendOneInFour = 0;
 uint32_t    Xint1Count = 0;
 
-float       SpeedRefRadSec = 0;
 float       PhaseIncrement = 0;
 float       PhaseValue = 0;
 uint16_t    PwmFrequency = INITIALPWMFREQ;
@@ -131,7 +137,6 @@ uint16_t    ReadDrv8305RegistersFlag = 0;
 uint16_t    AngleHasBeenReset = 0;
 uint16_t    SpeedRefArrayCount = 0;
 float       SpeedRefArray[4] = {-35,80,35,-80};
-uint16_t    ByPass_SpeedMeasurement = 0;
 
 /*Following flag will be replaced with an IPC call*/
 uint16_t    StartOperationCpu2 = 0; // when this is set to 1, cpu2 will start operation & inverter2 will contribute to the traction
@@ -729,6 +734,16 @@ void InitializationRoutine(void)
     PI_iq.Output_prev = 0;
     PI_iq.SaturationMax = 2.0 * IQ_RATED;
     PI_iq.SaturationMin = -2.0 * IQ_RATED;
+
+    PI_iq_cla.I_coeff = I_COEFFICIENT;
+    PI_iq_cla.P_coeff = P_COEFFICIENT;
+    PI_iq_cla.Ts = PI_TS_COEFFICIENT;
+    PI_iq_cla.Input = 0;
+    PI_iq_cla.Input_prev = 0;
+    PI_iq_cla.Output = 0;
+    PI_iq_cla.Output_prev = 0;
+    PI_iq_cla.SaturationMax = 2.0 * IQ_RATED;
+    PI_iq_cla.SaturationMin = -2.0 * IQ_RATED;
 
     AssignGSRAMs();
 
@@ -1913,6 +1928,13 @@ void M2_CalculateOffsetValue(void)
 
 __interrupt void epwm1_isr(void)
 {
+    if (M1_OperationMode == MODE_CLA_MPCCONTROLLER)
+    {
+        EPwm1Regs.ETCLR.bit.INT = 1;
+        PieCtrlRegs.PIEACK.all = PIEACK_GROUP3;
+        return;
+    }
+
     GetEncoderReadings(Module1_Parameters);
     /*This will be the main control isr*/
     /*check ADCBSY register if  it makes here wait*/
@@ -2018,7 +2040,7 @@ __interrupt void epwm1_isr(void)
         }
         if(AlignmentCounter>=((uint32_t)MPC_STARTCOUNTVALUE))
         {
-            M1_OperationMode = MODE_MPCCONTROLLER;
+            M1_OperationMode = MODE_CLA_MPCCONTROLLER;
             EPwm1Regs.ETCLR.bit.INT = 1;
             PieCtrlRegs.PIEACK.all = PIEACK_GROUP3;
             return;
@@ -2063,11 +2085,11 @@ __interrupt void epwm1_isr(void)
     }
 #endif
 
-    M1_FswDecided = Module1_Parameters.OptimizationFsw[Module1_Parameters.MinimumCostIndex];
 
 #if ENABLE_MPC==1
     if(M1_OperationMode==MODE_MPCCONTROLLER)
     {
+        M1_FswDecided = Module1_Parameters.OptimizationFsw[Module1_Parameters.MinimumCostIndex];
         if(Module1_Parameters.PhaseADutyCycle>1.0)
             Module1_Parameters.PhaseADutyCycle = 1.0;
         if(Module1_Parameters.PhaseADutyCycle<0)
@@ -2380,17 +2402,23 @@ void CLA_configClaMemory(void)
     MemCfgRegs.LSxMSEL.bit.MSEL_LS1 = 1;
     MemCfgRegs.LSxCLAPGM.bit.CLAPGM_LS1 = 0;
 #else
-    /* LS0 and LS1 are PRG RAM for CLA
-     * LS2 and LS3 are DAT RAM for CLA*/
+    /* LS0, LS1 and LS2 are PRG RAM for CLA
+     * LS3, LS4 and LS5 are DAT RAM for CLA
+     *
+     */
     MemCfgRegs.LSxMSEL.bit.MSEL_LS0 = 1;    // memory is shared between cpu & cla
     MemCfgRegs.LSxMSEL.bit.MSEL_LS1 = 1;    // memory is shared between cpu & cla
     MemCfgRegs.LSxMSEL.bit.MSEL_LS2 = 1;    // memory is shared between cpu & cla
     MemCfgRegs.LSxMSEL.bit.MSEL_LS3 = 1;    // memory is shared between cpu & cla
+    MemCfgRegs.LSxMSEL.bit.MSEL_LS4 = 1;    // memory is shared between cpu & cla
+    MemCfgRegs.LSxMSEL.bit.MSEL_LS5 = 1;    // memory is shared between cpu & cla
 
     MemCfgRegs.LSxCLAPGM.bit.CLAPGM_LS0 = 1;    //LS0 is chosen as PRG RAM for CLA
     MemCfgRegs.LSxCLAPGM.bit.CLAPGM_LS1 = 1;    //LS1 is chosen as PRG RAM for CLA
-    MemCfgRegs.LSxCLAPGM.bit.CLAPGM_LS2 = 0;    //LS2 is chosen as DAT RAM for CLA
+    MemCfgRegs.LSxCLAPGM.bit.CLAPGM_LS2 = 1;    //LS2 is chosen as PRG RAM for CLA
     MemCfgRegs.LSxCLAPGM.bit.CLAPGM_LS3 = 0;    //LS3 is chosen as DAT RAM for CLA
+    MemCfgRegs.LSxCLAPGM.bit.CLAPGM_LS4 = 0;    //LS4 is chosen as DAT RAM for CLA
+    MemCfgRegs.LSxCLAPGM.bit.CLAPGM_LS5 = 0;    //LS5 is chosen as DAT RAM for CLA
 
 
 #endif
@@ -2453,3 +2481,4 @@ void CLA_initCpu1Cla1(void)
     PieCtrlRegs.PIEIER11.all = 0xFFFF;
     EDIS;
 }
+

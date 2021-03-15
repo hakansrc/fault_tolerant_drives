@@ -21,7 +21,7 @@ PAGE 0 :
    RAMM0           	: origin = 0x000122, length = 0x0002DE
    RAMD0           	: origin = 0x00B000, length = 0x000800
    RAMGS0123	    : origin = 0x00C000, length = 0x004000
-   RAMGS4567		: origin = 0x010000, length = 0x004000
+   //RAMGS4567		: origin = 0x010000, length = 0x004000
 
    RAMLS012_CLA_PRG_RAM  : origin = 0x008000, length = 0x001800
    // RAMLS0          	   : origin = 0x008000, length = 0x000800

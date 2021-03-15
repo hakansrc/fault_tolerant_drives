@@ -13,6 +13,7 @@
 #include "CustomTypeDefs.h"
 #include "MultipleFloatDataSender.h"
 #include "DRV8305_defs.h"
+#include "F2837xD_Ipc_drivers.h"
 
 
 /*TODO s
@@ -32,7 +33,7 @@ PID_Parameters      PI_iq_cla;
 #pragma DATA_SECTION("CLAData")
 float       SpeedRefRadSec = 0;
 #pragma DATA_SECTION("CLAData")
-float       SpeedRefRPM = 80;
+float       SpeedRefRPM = 33;
 #pragma DATA_SECTION("CLAData")
 unsigned int        M1_OperationMode = MODE_NO_OPERATION;
 #pragma DATA_SECTION("CLAData")
@@ -328,7 +329,7 @@ __interrupt void cpu_timer1_isr(void)
 {
     CpuTimer1.InterruptCount++;
 #if 0
-    if(M1_OperationMode==MODE_MPCCONTROLLER)
+    if((M1_OperationMode==MODE_MPCCONTROLLER)||(M1_OperationMode==MODE_CLA_MPCCONTROLLER))
     {
         if((CpuTimer1.InterruptCount%5)==0)
         {
@@ -2070,6 +2071,7 @@ __interrupt void epwm1_isr(void)
                 EDIS;
             }
             IpcRegs.IPCSET.bit.IPC31=1; // set this so that CPU2 will continue
+            //IPCBootCPU2(C1C2_BROM_BOOTMODE_BOOT_FROM_RAM);
             return;
         }
 

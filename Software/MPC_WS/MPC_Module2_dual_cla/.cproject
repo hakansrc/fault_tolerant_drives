@@ -92,7 +92,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="sources/F2837xD_Upp.c|sources/F2837xD_TempSensorConv.c|sources/F2837xD_Spi.c|sources/F2837xD_EQep.c|sources/F2837xD_EPwm.c|sources/F2837xD_ECap.c|2837xD_FLASH_lnk_cpu1.cmd" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="F2837xD_Headers_nonBIOS_cpu1.cmd|sources/F2837xD_Upp.c|sources/F2837xD_TempSensorConv.c|sources/F2837xD_Spi.c|sources/F2837xD_EQep.c|sources/F2837xD_EPwm.c|sources/F2837xD_ECap.c|2837xD_FLASH_lnk_cpu1.cmd" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>

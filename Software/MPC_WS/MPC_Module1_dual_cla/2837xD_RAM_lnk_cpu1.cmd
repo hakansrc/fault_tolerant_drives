@@ -20,14 +20,15 @@ PAGE 0 :
    BEGIN           	: origin = 0x000000, length = 0x000002
    RAMM0           	: origin = 0x000122, length = 0x0002DE
    RAMD0           	: origin = 0x00B000, length = 0x000800
-   RAMGS0123	      : origin = 0x00C000, length = 0x004000
+   RAMGS0123	    : origin = 0x00C000, length = 0x004000
+   RAMGS4567		: origin = 0x010000, length = 0x004000
 
    RAMLS012_CLA_PRG_RAM  : origin = 0x008000, length = 0x001800
    // RAMLS0          	   : origin = 0x008000, length = 0x000800
    // RAMLS1          	   : origin = 0x008800, length = 0x000800
    // RAMLS2      		   : origin = 0x009000, length = 0x000800
    // RAMLS3      		   : origin = 0x009800, length = 0x000800
-   RAMLS4      		   : origin = 0x00A000, length = 0x000800
+   // RAMLS4      		   : origin = 0x00A000, length = 0x000800
    RESET           	   : origin = 0x3FFFC0, length = 0x000002
 
 PAGE 1 :
@@ -40,14 +41,14 @@ PAGE 1 :
 
    RAMLS345_CLA_DAT_RAM  : origin = 0x009800, length = 0x001800
 
-   //RAMGS01      : origin = 0x00C000, length = 0x002000
+   //RAMGS0      : origin = 0x00C000, length = 0x001000
    //RAMGS1      : origin = 0x00D000, length = 0x001000
    //RAMGS2      : origin = 0x00E000, length = 0x001000
    //RAMGS3      : origin = 0x00F000, length = 0x001000
-   RAMGS4      : origin = 0x010000, length = 0x001000
-   RAMGS5      : origin = 0x011000, length = 0x001000
-   RAMGS6      : origin = 0x012000, length = 0x001000
-   RAMGS7      : origin = 0x013000, length = 0x001000
+   //RAMGS4      : origin = 0x010000, length = 0x001000
+   //RAMGS5      : origin = 0x011000, length = 0x001000
+   //RAMGS6      : origin = 0x012000, length = 0x001000
+   //RAMGS7      : origin = 0x013000, length = 0x001000
    RAMGS8      : origin = 0x014000, length = 0x001000
    RAMGS9      : origin = 0x015000, length = 0x001000
    RAMGS10     : origin = 0x016000, length = 0x001000
@@ -94,7 +95,7 @@ SECTIONS
    .reset           : > RESET,     PAGE = 0, TYPE = DSECT /* not used, */
 
    .stack           : > RAMM1,     PAGE = 1
-   .ebss            : > RAMGS4,    PAGE = 1
+   .ebss            : > RAMD1,    PAGE = 1
    .econst          : > RAMD1,    PAGE = 1
    .esysmem         : > RAMD1,    PAGE = 1
    //Filter_RegsFile  : > RAMGS4,	   PAGE = 1

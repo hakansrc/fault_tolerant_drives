@@ -6,6 +6,9 @@
 
 __interrupt void Cla1Task1 ( void )
 {
+    /* TODO: Protection will be added
+     *
+     * */
     Cla1Task1_counter++;
 
 
@@ -82,23 +85,20 @@ __interrupt void Cla1Task1 ( void )
         if(Module1_Parameters_cla.PhaseCDutyCycle<0)
             Module1_Parameters_cla.PhaseCDutyCycle = 0;
 
-
-
         M1_FswDecided_cla = Module1_Parameters_cla.OptimizationFsw[Module1_Parameters_cla.MinimumCostIndex];
     }
 
     if(M1_OperationMode==MODE_CLA_MPCCONTROLLER)
     {
-#if 1
+        /*apply the switching frequencies*/
         HWREGH(EPWM1_BASE+EPWM_O_TBPRD) = (uint16_t )(((float )SYSCLKFREQUENCY) / (Module1_Parameters_cla.OptimizationFsw[Module1_Parameters_cla.MinimumCostIndex] * 4.0));
         HWREGH(EPWM2_BASE+EPWM_O_TBPRD) = (uint16_t )(((float )SYSCLKFREQUENCY) / (Module1_Parameters_cla.OptimizationFsw[Module1_Parameters_cla.MinimumCostIndex] * 4.0));
         HWREGH(EPWM3_BASE+EPWM_O_TBPRD) = (uint16_t )(((float )SYSCLKFREQUENCY) / (Module1_Parameters_cla.OptimizationFsw[Module1_Parameters_cla.MinimumCostIndex] * 4.0));
-#endif
-#if 1
+
+        /*apply the duty cycles*/
         HWREG(EPWM1_BASE+EPWM_O_CMPA) = (((uint32_t)((Module1_Parameters_cla.PhaseADutyCycle*((float )SYSCLKFREQUENCY) / (Module1_Parameters_cla.OptimizationFsw[Module1_Parameters_cla.MinimumCostIndex] * 4.0))))<<16);
         HWREG(EPWM2_BASE+EPWM_O_CMPA) = (((uint32_t)((Module1_Parameters_cla.PhaseBDutyCycle*((float )SYSCLKFREQUENCY) / (Module1_Parameters_cla.OptimizationFsw[Module1_Parameters_cla.MinimumCostIndex] * 4.0))))<<16);
         HWREG(EPWM3_BASE+EPWM_O_CMPA) = (((uint32_t)((Module1_Parameters_cla.PhaseCDutyCycle*((float )SYSCLKFREQUENCY) / (Module1_Parameters_cla.OptimizationFsw[Module1_Parameters_cla.MinimumCostIndex] * 4.0))))<<16);
-#endif
     }
 
 

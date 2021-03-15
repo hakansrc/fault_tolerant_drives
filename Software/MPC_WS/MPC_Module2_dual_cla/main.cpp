@@ -5,12 +5,26 @@
 #include <F2837xD_Device.h>
 #include <F2837xD_Examples.h>
 
+#include "cla_shared.h"
+
 #include "MachineParameters.h"
 #include "ConstantParameters.h"
 #include "ControllerParameters.h"
 #include "DRV8305_defs.h"
 //#include "MultipleFloatDataSender.h" // float data sender will only work from CPU1
 #include "CustomTypeDefs.h"
+
+#pragma DATA_SECTION("CLAData")
+uint32_t    Cla1Task1_counter = 0;
+#pragma DATA_SECTION("CLAData")
+float       M2_FswDecided_cla = 1000;
+#pragma DATA_SECTION("CLAData")
+unsigned int        M2_OperationMode = MODE_NO_OPERATION; /*this will be changed */
+#pragma DATA_SECTION("CLAData")
+ModuleParameters Module2_Parameters_cla;
+#pragma DATA_SECTION("CLAData")
+PID_Parameters      PI_iq_cla;
+
 
 uint32_t    ControlISRCounter = 0;
 #pragma DATA_SECTION("M1_SPEEDREF_LOCATION")
@@ -21,8 +35,8 @@ ModuleParameters Module2_Parameters;
 PID_Parameters      PI_iq;
 #pragma DATA_SECTION("M1_OPERATION_MODE_LOCATION")
 unsigned int        M1_OperationMode = MODE_NO_OPERATION; /*this will be changed */
-#pragma DATA_SECTION("M2_OPERATION_MODE_LOCATION")
-unsigned int        M2_OperationMode = MODE_NO_OPERATION; /*this will be changed */
+//#pragma DATA_SECTION("M2_OPERATION_MODE_LOCATION")
+//unsigned int        M2_OperationMode = MODE_NO_OPERATION; /*this will be changed */
 #pragma DATA_SECTION("M1_PARAMS_ADDRESS_LOCATION")
 ModuleParameters Module1_Parameters;
 #pragma DATA_SECTION("M1_FSWDECIDED_LOCATION")
@@ -32,12 +46,18 @@ float       M2_FswDecided = 0;
 
 uint32_t    SvpwmSectorNumber = 0;
 
+uint32_t            CLA1Task1End_counter = 0;
+
+
 
 __interrupt void cpu_timer0_isr(void);  /*prototype of the ISR functions*/
 __interrupt void cpu_timer1_isr(void);  /*prototype of the ISR functions*/
 __interrupt void cpu_timer2_isr(void);  /*prototype of the ISR functions*/
 __interrupt void epwm4_isr(void);       /*prototype of the ISR functions*/
 
+__interrupt void CLATask1_PCC_Is_Done(void);
+
+__interrupt void ipc0_isr(void);       /*prototype of the ISR functions*/
 
 void InitializeEpwm4Registers(void);
 void InitializeEpwm5Registers(void);
@@ -46,12 +66,15 @@ void InitializationRoutine(void);
 void RunTimeProtectionControl(void);
 void GetSvpwmDutyCycles(float T1, float T2, float T0,float Ts,float VectorAngleRad, float &DutyA, float &DutyB, float &DutyC);
 void ZeroiseModule2Parameters(void);
-inline void GetEncoderReadings_Cpu2(ModuleParameters &moduleparams);
+void GetEncoderReadings_Cpu2(ModuleParameters &moduleparams);
 void GetAdcReadings(ModuleParameters &moduleparams);
-inline void CalculateParkTransform(ModuleParameters &moduleparams);
-static inline void ExecuteFirstPrediction(ModuleParameters &moduleparams, unsigned int indexcount);
-static inline void ExecuteSecondPrediction(ModuleParameters &moduleparams, unsigned int indexcount);
+void CalculateParkTransform(ModuleParameters &moduleparams);
+void ExecuteFirstPrediction(ModuleParameters &moduleparams, unsigned int indexcount);
+void ExecuteSecondPrediction(ModuleParameters &moduleparams, unsigned int indexcount);
 uint32_t    IPCWaitCounter = 0;
+
+void CLA_configClaMemory(void);
+void CLA_initCpu1Cla1(void);
 
 
 int main(void)
@@ -104,7 +127,16 @@ int main(void)
     PieVectTable.TIMER1_INT = &cpu_timer1_isr;  /*specify the interrupt service routine (ISR) address to the PIE table*/
     PieVectTable.TIMER2_INT = &cpu_timer2_isr;  /*specify the interrupt service routine (ISR) address to the PIE table*/
     PieVectTable.EPWM4_INT = &epwm4_isr;        /*specify the interrupt service routine (ISR) address to the PIE table*/
+    PieVectTable.IPC0_INT = &ipc0_isr;          /*specify the interrupt service routine (ISR) address to the PIE table*/
     EDIS;
+
+
+#if 1
+    CLA_configClaMemory();
+    CLA_initCpu1Cla1();
+    PieCtrlRegs.PIEIER11.bit.INTx1 = 1;  // Enable PIE Group 11 INT1, CLA1_1 interrupt
+    IER |= (M_INT11 );
+#endif
 
     IER |= M_INT1;  /*Enable the PIE group of Cpu timer 0 interrupt*/
     IER |= M_INT3;  /*Enable the PIE group of Epwm4 interrupt*/
@@ -113,6 +145,7 @@ int main(void)
     PieCtrlRegs.PIECTRL.bit.ENPIE = 1;  // Enable the PIE block
     PieCtrlRegs.PIEIER1.bit.INTx7 = 1;  /*Enable the 7th interrupt of the Group 1, which is for timer 0 interrupt*/
     PieCtrlRegs.PIEIER3.bit.INTx4 = 1;  /*Enable the 4th interrupt of the Group 3, which is for epwm4 interrupt*/
+    PieCtrlRegs.PIEIER1.bit.INTx13 = 1; /*Enable the 13th interrupt of the Group 1, which is for ipc 0 interrupt*/
 
 #if 0
     EALLOW;
@@ -120,7 +153,9 @@ int main(void)
     CpuSysRegs.PCLKCR0.bit.GTBCLKSYNC = 1;  /*start the global TimeBase clock */
     EDIS;
 #endif
-    M2_OperationMode = MODE_MPCCONTROLLER;
+
+    DELAY_US(1000);
+    M2_OperationMode = MODE_CLA_MPCCONTROLLER;
 
     EINT;  // Enable Global interrupt INTM
     ERTM;  // Enable Global realtime interrupt DBGM
@@ -383,10 +418,19 @@ void InitializeEpwm6Registers(void)
 }
 __interrupt void epwm4_isr(void)
 {
+    ControlISRCounter++;
+#if 1
+    if (M2_OperationMode == MODE_CLA_MPCCONTROLLER)
+    {
+        memcpy(&PI_iq_cla,&PI_iq,sizeof(PID_Parameters)); //get the reference from cpu1 to cla of cpu2
+        EPwm4Regs.ETCLR.bit.INT = 1;
+        PieCtrlRegs.PIEACK.all = PIEACK_GROUP3;
+        return;
+    }
+#endif
     GetEncoderReadings_Cpu2(Module2_Parameters);
     //IpcRegs.IPCSET.bit.IPC0 = 1;
     RunTimeProtectionControl();
-    ControlISRCounter++;
     /*When CPU2 is activated, the CPU1 is already initialized everything*/
 
     GetAdcReadings(Module2_Parameters);
@@ -476,6 +520,22 @@ __interrupt void epwm4_isr(void)
     EPwm4Regs.ETCLR.bit.INT = 1;
     PieCtrlRegs.PIEACK.all = PIEACK_GROUP3;
 }
+
+__interrupt void CLATask1_PCC_Is_Done(void)
+{
+    CLA1Task1End_counter++;
+    memcpy(&PI_iq_cla,&PI_iq,sizeof(PID_Parameters)); //get the reference from cpu1 to cla of cpu2
+    PieCtrlRegs.PIEACK.all = PIEACK_GROUP11;
+}
+
+__interrupt void ipc0_isr(void)
+{
+    /**/
+    EQep2Regs.QPOSCNT = ENCODER_SWEETPOINT_VALUE;
+    IpcRegs.IPCACK.bit.IPC0 = 1;
+    PieCtrlRegs.PIEACK.all = PIEACK_GROUP1;
+}
+
 void InitializationRoutine(void)
 {
     int i=0;
@@ -483,10 +543,14 @@ void InitializationRoutine(void)
     for(i=0;i<NUMBEROFMPCLOOPS;i++)
     {
         Module2_Parameters.OptimizationFsw[i] = (i+1)*1000;
+        Module2_Parameters_cla.OptimizationFsw[i] = (i+1)*1000;
     }
+
+
     InitializeEpwm4Registers();
     InitializeEpwm5Registers();
     InitializeEpwm6Registers();
+
 }
 void RunTimeProtectionControl(void)
 {
@@ -590,7 +654,7 @@ void ZeroiseModule2Parameters(void)
     Module2_Parameters.PhaseCDutyCycle = 0;
 }
 
-inline void GetEncoderReadings_Cpu2(ModuleParameters &moduleparams)
+void GetEncoderReadings_Cpu2(ModuleParameters &moduleparams)
 {
 #if 0
     moduleparams.AngleRad.Mechanical = ((float)EQep1Regs.QPOSCNT)/((float)ENCODERMAXTICKCOUNT)* 2.0 * PI;
@@ -623,7 +687,7 @@ void GetAdcReadings(ModuleParameters &moduleparams)
     moduleparams.Measured.Current.PhaseC = M2_IC_CURRENT_FLOAT;
     moduleparams.Measured.Voltage.Vdc = M2_VDC_VOLTAGE_FLOAT;
 }
-inline void CalculateParkTransform(ModuleParameters &moduleparams)
+void CalculateParkTransform(ModuleParameters &moduleparams)
 {
     moduleparams.Measured.Current.transformed.Dvalue = 0.66667 * (moduleparams.Measured.Current.PhaseA * sinf(moduleparams.AngleRad.Electrical) + moduleparams.Measured.Current.PhaseB * sinf(moduleparams.AngleRad.Electrical - 0.66667 * PI /*2*PI/3*/) + moduleparams.Measured.Current.PhaseC * sinf(moduleparams.AngleRad.Electrical + 0.66667 * PI /*2*PI/3*/));
     moduleparams.Measured.Current.transformed.Qvalue = 0.66667 * (moduleparams.Measured.Current.PhaseA * cosf(moduleparams.AngleRad.Electrical) + moduleparams.Measured.Current.PhaseB * cosf(moduleparams.AngleRad.Electrical - 0.66667 * PI /*2*PI/3*/) + moduleparams.Measured.Current.PhaseC * cosf(moduleparams.AngleRad.Electrical + 0.66667 * PI /*2*PI/3*/));
@@ -636,7 +700,7 @@ inline void CalculateParkTransform(ModuleParameters &moduleparams)
     //iqs =  2/3*(ias*cos(ref_frame_position)+ibs*cos(ref_frame_position-2*pi/3)+ics*cos(ref_frame_position+2*pi/3));
     //i0 = 2/3*1/2*(ias+ibs+ics);
 }
-static inline void ExecuteFirstPrediction(ModuleParameters &moduleparams, unsigned int indexcount)
+void ExecuteFirstPrediction(ModuleParameters &moduleparams, unsigned int indexcount)
 {
     moduleparams.CurrentHorizon[indexcount].VdPrediction = moduleparams.FirstHorizon[indexcount].VdPrediction;  // First horizon prediction on the previous horizon is our current value now
     moduleparams.CurrentHorizon[indexcount].VqPrediction = moduleparams.FirstHorizon[indexcount].VqPrediction;  // First horizon prediction on the previous horizon is our current value now
@@ -644,7 +708,7 @@ static inline void ExecuteFirstPrediction(ModuleParameters &moduleparams, unsign
     moduleparams.FirstHorizon[indexcount].IdPrediction = moduleparams.Measured.Current.transformed.Dvalue + (0.5 / M2_FswDecided)  * (moduleparams.CurrentHorizon[indexcount].VdPrediction / M2_LS_VALUE - M2_RS_VALUE / M2_LS_VALUE * moduleparams.Measured.Current.transformed.Dvalue + M2_LS_VALUE / M2_LS_VALUE * POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical * moduleparams.Measured.Current.transformed.Qvalue);
     moduleparams.FirstHorizon[indexcount].IqPrediction = moduleparams.Measured.Current.transformed.Qvalue + (0.5 / M2_FswDecided)  * (moduleparams.CurrentHorizon[indexcount].VqPrediction / M2_LS_VALUE - M2_RS_VALUE / M2_LS_VALUE * moduleparams.Measured.Current.transformed.Qvalue - M2_LS_VALUE / M2_LS_VALUE * POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical * moduleparams.Measured.Current.transformed.Dvalue - FLUX_VALUE * POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical / M2_LS_VALUE);
 }
-static inline void ExecuteSecondPrediction(ModuleParameters &moduleparams, unsigned int indexcount)
+void ExecuteSecondPrediction(ModuleParameters &moduleparams, unsigned int indexcount)
 {
     moduleparams.FirstHorizon[indexcount].VdPrediction = M2_VD_VQ_KP * (moduleparams.Reference.Id -  moduleparams.FirstHorizon[indexcount].IdPrediction) * (1.0 + M2_VD_VQ_KI / moduleparams.OptimizationFsw[indexcount]) + moduleparams.Measured.Current.transformed.Dvalue - POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical * M2_LS_VALUE * moduleparams.FirstHorizon[indexcount].IqPrediction;
     moduleparams.FirstHorizon[indexcount].VqPrediction = M2_VD_VQ_KP * (moduleparams.Reference.Iq -  moduleparams.FirstHorizon[indexcount].IqPrediction) * (1.0 + M2_VD_VQ_KI / moduleparams.OptimizationFsw[indexcount]) + moduleparams.Measured.Current.transformed.Qvalue + POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical * (M2_LS_VALUE * moduleparams.FirstHorizon[indexcount].IdPrediction+ FLUX_VALUE);
@@ -683,4 +747,111 @@ static inline void ExecuteSecondPrediction(ModuleParameters &moduleparams, unsig
         moduleparams.MinimumCostValue = moduleparams.Cost[indexcount];
         moduleparams.MinimumCostIndex = indexcount;
     }
+}
+
+//
+// CLA_configClaMemory - Configure CLA memory sections
+//
+void CLA_configClaMemory(void)
+{
+    extern uint32_t Cla1funcsRunStart, Cla1funcsLoadStart, Cla1funcsLoadSize;
+    EALLOW;
+
+#ifdef _FLASH
+    //
+    // Copy over code from FLASH to RAM
+    //
+    memcpy((uint32_t *)&Cla1funcsRunStart, (uint32_t *)&Cla1funcsLoadStart,
+           (uint32_t)&Cla1funcsLoadSize);
+#endif //_FLASH
+
+    //
+    // Initialize and wait for CLA1ToCPUMsgRAM
+    //
+    MemCfgRegs.MSGxINIT.bit.INIT_CLA1TOCPU = 1;
+    while(MemCfgRegs.MSGxINITDONE.bit.INITDONE_CLA1TOCPU != 1){};
+
+    //
+    // Initialize and wait for CPUToCLA1MsgRAM
+    //
+    MemCfgRegs.MSGxINIT.bit.INIT_CPUTOCLA1 = 1;
+    while(MemCfgRegs.MSGxINITDONE.bit.INITDONE_CPUTOCLA1 != 1){};
+
+    /* LS0, LS1 and LS2 are PRG RAM for CLA
+     * LS3, LS4 and LS5 are DAT RAM for CLA
+     *
+     */
+    MemCfgRegs.LSxMSEL.bit.MSEL_LS0 = 1;    // memory is shared between cpu & cla
+    MemCfgRegs.LSxMSEL.bit.MSEL_LS1 = 1;    // memory is shared between cpu & cla
+    MemCfgRegs.LSxMSEL.bit.MSEL_LS2 = 1;    // memory is shared between cpu & cla
+    MemCfgRegs.LSxMSEL.bit.MSEL_LS3 = 1;    // memory is shared between cpu & cla
+    MemCfgRegs.LSxMSEL.bit.MSEL_LS4 = 1;    // memory is shared between cpu & cla
+    MemCfgRegs.LSxMSEL.bit.MSEL_LS5 = 1;    // memory is shared between cpu & cla
+
+    MemCfgRegs.LSxCLAPGM.bit.CLAPGM_LS0 = 1;    //LS0 is chosen as PRG RAM for CLA
+    MemCfgRegs.LSxCLAPGM.bit.CLAPGM_LS1 = 1;    //LS1 is chosen as PRG RAM for CLA
+    MemCfgRegs.LSxCLAPGM.bit.CLAPGM_LS2 = 1;    //LS2 is chosen as PRG RAM for CLA
+    MemCfgRegs.LSxCLAPGM.bit.CLAPGM_LS3 = 0;    //LS3 is chosen as DAT RAM for CLA
+    MemCfgRegs.LSxCLAPGM.bit.CLAPGM_LS4 = 0;    //LS4 is chosen as DAT RAM for CLA
+    MemCfgRegs.LSxCLAPGM.bit.CLAPGM_LS5 = 0;    //LS5 is chosen as DAT RAM for CLA
+
+
+
+    EDIS;
+}
+
+//
+// CLA_initCpu1Cla1 - Initialize CLA1 task vectors and end of task interrupts
+//
+void CLA_initCpu1Cla1(void)
+{
+    //
+    // Compute all CLA task vectors
+    // On Type-1 CLAs the MVECT registers accept full 16-bit task addresses as
+    // opposed to offsets used on older Type-0 CLAs
+    //
+    EALLOW;
+    Cla1Regs.MVECT1 = (uint16_t)(&Cla1Task1);
+    /*
+    Cla1Regs.MVECT2 = (uint16_t)(&Cla1Task2);
+    Cla1Regs.MVECT3 = (uint16_t)(&Cla1Task3);
+    Cla1Regs.MVECT4 = (uint16_t)(&Cla1Task4);
+    Cla1Regs.MVECT5 = (uint16_t)(&Cla1Task5);
+    Cla1Regs.MVECT6 = (uint16_t)(&Cla1Task6);
+    Cla1Regs.MVECT7 = (uint16_t)(&Cla1Task7);
+    Cla1Regs.MVECT8 = (uint16_t)(&Cla1Task8);
+    */
+    //
+    // Enable the IACK instruction to start a task on CLA in software
+    // for all  8 CLA tasks. Also, globally enable all 8 tasks (or a
+    // subset of tasks) by writing to their respective bits in the
+    // MIER register
+    //
+    Cla1Regs.MCTL.bit.IACKE = 1;
+    Cla1Regs.MIER.all = 0x00FF;
+
+    //
+    // Configure the vectors for the end-of-task interrupt for all
+    // 8 tasks
+    //
+    PieVectTable.CLA1_1_INT = &CLATask1_PCC_Is_Done;
+    /*
+    PieVectTable.CLA1_2_INT = &cla1Isr2;
+    PieVectTable.CLA1_3_INT = &cla1Isr3;
+    PieVectTable.CLA1_4_INT = &cla1Isr4;
+    PieVectTable.CLA1_5_INT = &cla1Isr5;
+    PieVectTable.CLA1_6_INT = &cla1Isr6;
+    PieVectTable.CLA1_7_INT = &cla1Isr7;
+    PieVectTable.CLA1_8_INT = &cla1Isr8;
+    */
+
+
+    DmaClaSrcSelRegs.CLA1TASKSRCSEL1.bit.TASK1 = CLA_TRIG_EPWM4INT;
+
+
+    //
+    // Enable CLA interrupts at the group and subgroup levels
+    //
+    PieCtrlRegs.PIEIER11.all = 0xFFFF;
+    EDIS;
 }

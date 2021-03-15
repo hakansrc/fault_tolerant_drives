@@ -92,12 +92,12 @@ void SetupGPIOs(void);
 void EQEP1_Setup(void);
 void EQEP2_Setup(void);
 void AssignGSRAMs(void);
-inline void Run_PI_Controller(PID_Parameters &pidparams);
-inline void CalculateParkTransform(ModuleParameters &moduleparams);
-static inline void ExecuteFirstPrediction(ModuleParameters &moduleparams, unsigned int indexcount);
-static inline void ExecuteSecondPrediction(ModuleParameters &moduleparams, unsigned int indexcount);
+void Run_PI_Controller(PID_Parameters &pidparams);
+void CalculateParkTransform(ModuleParameters &moduleparams);
+void ExecuteFirstPrediction(ModuleParameters &moduleparams, unsigned int indexcount);
+void ExecuteSecondPrediction(ModuleParameters &moduleparams, unsigned int indexcount);
 
-inline void GetEncoderReadings(ModuleParameters &moduleparams);
+void GetEncoderReadings(ModuleParameters &moduleparams);
 void GetAdcReadings(ModuleParameters &moduleparams);
 void SetupCmpssProtections(void);
 void InitSpiDrv8305Gpios(void);
@@ -638,7 +638,7 @@ void SetupGPIOs(void)
     EDIS;
 }
 
-inline void Run_PI_Controller(PID_Parameters &pidparams)
+void Run_PI_Controller(PID_Parameters &pidparams)
 {
     pidparams.Output = pidparams.Output_prev + pidparams.P_coeff * (pidparams.Input - pidparams.Input_prev) + (pidparams.Ts) / 2.0 * pidparams.I_coeff * (pidparams.Input + pidparams.Input_prev);
     if (pidparams.Output > pidparams.SaturationMax)
@@ -652,7 +652,7 @@ inline void Run_PI_Controller(PID_Parameters &pidparams)
     pidparams.Output_prev = pidparams.Output;
     pidparams.Input_prev = pidparams.Input;
 }
-inline void CalculateParkTransform(ModuleParameters &moduleparams)
+void CalculateParkTransform(ModuleParameters &moduleparams)
 {
     moduleparams.Measured.Current.transformed.Dvalue = 0.66667 * (moduleparams.Measured.Current.PhaseA * sinf(moduleparams.AngleRad.Electrical) + moduleparams.Measured.Current.PhaseB * sinf(moduleparams.AngleRad.Electrical - 0.66667 * PI /*2*PI/3*/) + moduleparams.Measured.Current.PhaseC * sinf(moduleparams.AngleRad.Electrical + 0.66667 * PI /*2*PI/3*/));
     moduleparams.Measured.Current.transformed.Qvalue = 0.66667 * (moduleparams.Measured.Current.PhaseA * cosf(moduleparams.AngleRad.Electrical) + moduleparams.Measured.Current.PhaseB * cosf(moduleparams.AngleRad.Electrical - 0.66667 * PI /*2*PI/3*/) + moduleparams.Measured.Current.PhaseC * cosf(moduleparams.AngleRad.Electrical + 0.66667 * PI /*2*PI/3*/));
@@ -665,7 +665,7 @@ inline void CalculateParkTransform(ModuleParameters &moduleparams)
     //iqs =  2/3*(ias*cos(ref_frame_position)+ibs*cos(ref_frame_position-2*pi/3)+ics*cos(ref_frame_position+2*pi/3));
     //i0 = 2/3*1/2*(ias+ibs+ics);
 }
-static inline void ExecuteFirstPrediction(ModuleParameters &moduleparams, unsigned int indexcount)
+void ExecuteFirstPrediction(ModuleParameters &moduleparams, unsigned int indexcount)
 {
     moduleparams.CurrentHorizon[indexcount].VdPrediction = moduleparams.FirstHorizon[indexcount].VdPrediction;  // First horizon prediction on the previous horizon is our current value now
     moduleparams.CurrentHorizon[indexcount].VqPrediction = moduleparams.FirstHorizon[indexcount].VqPrediction;  // First horizon prediction on the previous horizon is our current value now
@@ -673,7 +673,7 @@ static inline void ExecuteFirstPrediction(ModuleParameters &moduleparams, unsign
     moduleparams.FirstHorizon[indexcount].IdPrediction = moduleparams.Measured.Current.transformed.Dvalue + (0.5 / M1_FswDecided) * (moduleparams.CurrentHorizon[indexcount].VdPrediction / M1_LS_VALUE - M1_RS_VALUE / M1_LS_VALUE * moduleparams.Measured.Current.transformed.Dvalue + M1_LS_VALUE / M1_LS_VALUE * POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical * moduleparams.Measured.Current.transformed.Qvalue);
     moduleparams.FirstHorizon[indexcount].IqPrediction = moduleparams.Measured.Current.transformed.Qvalue + (0.5 / M1_FswDecided) * (moduleparams.CurrentHorizon[indexcount].VqPrediction / M1_LS_VALUE - M1_RS_VALUE / M1_LS_VALUE * moduleparams.Measured.Current.transformed.Qvalue - M1_LS_VALUE / M1_LS_VALUE * POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical * moduleparams.Measured.Current.transformed.Dvalue - FLUX_VALUE * POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical / M1_LS_VALUE);
 }
-static inline void ExecuteSecondPrediction(ModuleParameters &moduleparams, unsigned int indexcount)
+void ExecuteSecondPrediction(ModuleParameters &moduleparams, unsigned int indexcount)
 {
     moduleparams.FirstHorizon[indexcount].VdPrediction = M1_VD_VQ_KP * (moduleparams.Reference.Id -  moduleparams.FirstHorizon[indexcount].IdPrediction) * (1.0 + M1_VD_VQ_KI / moduleparams.OptimizationFsw[indexcount]) + moduleparams.Measured.Current.transformed.Dvalue - POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical * M1_LS_VALUE * moduleparams.FirstHorizon[indexcount].IqPrediction;
     moduleparams.FirstHorizon[indexcount].VqPrediction = M1_VD_VQ_KP * (moduleparams.Reference.Iq -  moduleparams.FirstHorizon[indexcount].IqPrediction) * (1.0 + M1_VD_VQ_KI / moduleparams.OptimizationFsw[indexcount]) + moduleparams.Measured.Current.transformed.Qvalue + POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical * (M1_LS_VALUE * moduleparams.FirstHorizon[indexcount].IdPrediction+ FLUX_VALUE);
@@ -1117,6 +1117,12 @@ void AssignGSRAMs(void)
     EALLOW;
     MemCfgRegs.GSxMSEL.bit.MSEL_GS13 = 0;       /*CPU1 is the owner of RAMGS13*/
     MemCfgRegs.GSxMSEL.bit.MSEL_GS14 = 1;       /*CPU2 is the owner of RAMGS14*/
+
+    MemCfgRegs.GSxMSEL.bit.MSEL_GS4 = 1;       /*CPU2 is the owner of RAMGS4*/
+    MemCfgRegs.GSxMSEL.bit.MSEL_GS5 = 1;       /*CPU2 is the owner of RAMGS5*/
+    MemCfgRegs.GSxMSEL.bit.MSEL_GS6 = 1;       /*CPU2 is the owner of RAMGS6*/
+    MemCfgRegs.GSxMSEL.bit.MSEL_GS7 = 1;       /*CPU2 is the owner of RAMGS7*/
+
     EDIS;
 }
 void EQEP1_Setup(void)
@@ -1351,7 +1357,7 @@ void EQEP2_Setup(void)
     EQep2Regs.QEPCTL.bit.QPEN = 1; // eQEP position counter is enabled
 }
 
-inline void GetEncoderReadings(ModuleParameters &moduleparams)
+void GetEncoderReadings(ModuleParameters &moduleparams)
 {
     float AngleDifference = 0;
     moduleparams.AngleRad.Mechanical = ((float)EQep1Regs.QPOSCNT)/((float)ENCODERMAXTICKCOUNT)* 2.0 * PI;
@@ -1933,6 +1939,7 @@ __interrupt void epwm1_isr(void)
 #if 1
     if (M1_OperationMode == MODE_CLA_MPCCONTROLLER)
     {
+        memcpy(&PI_iq,&PI_iq_cla,sizeof(PID_Parameters));
         EPwm1Regs.ETCLR.bit.INT = 1;
         PieCtrlRegs.PIEACK.all = PIEACK_GROUP3;
         return;
@@ -2019,6 +2026,9 @@ __interrupt void epwm1_isr(void)
             EQep1Regs.QCLR.bit.IEL = 1;                     // Reset position cnt for QEP
             EQep1Regs.QCLR.bit.UTO = 1;                     // Reset position cnt for QEP
             EQep1Regs.QPOSCNT = 360;//((ENCODERMAXTICKCOUNT+1)/POLEPAIRS)/4;  // Reset position cnt for QEP
+            EQep2Regs.QCLR.bit.IEL = 1;                     // Reset position cnt for QEP
+            EQep2Regs.QCLR.bit.UTO = 1;                     // Reset position cnt for QEP
+            EQep2Regs.QPOSCNT = 360;//((ENCODERMAXTICKCOUNT+1)/POLEPAIRS)/4;  // Reset position cnt for QEP
         }
 
 
@@ -2034,6 +2044,10 @@ __interrupt void epwm1_isr(void)
             PI_iq.Input_prev = 0;
             PI_iq.Output = 0;
             PI_iq.Output_prev = 0;
+            PI_iq_cla.Input = 0;
+            PI_iq_cla.Input_prev = 0;
+            PI_iq_cla.Output = 0;
+            PI_iq_cla.Output_prev = 0;
 
             ZeroiseModule1Parameters();
 
@@ -2047,6 +2061,15 @@ __interrupt void epwm1_isr(void)
             //M1_OperationMode = MODE_MPCCONTROLLER;
             EPwm1Regs.ETCLR.bit.INT = 1;
             PieCtrlRegs.PIEACK.all = PIEACK_GROUP3;
+
+            /*eqep2 is now ready to go, cpu2 can use it now*/
+            if(DevCfgRegs.CPUSEL2.bit.EQEP2==0) // if this belongs to cpu1, then give it to CPU2
+            {
+                EALLOW;
+                DevCfgRegs.CPUSEL2.bit.EQEP2 = 1; // EQep2 block is assigned to CPU2
+                EDIS;
+            }
+            IpcRegs.IPCSET.bit.IPC31=1; // set this so that CPU2 will continue
             return;
         }
 
@@ -2085,7 +2108,7 @@ __interrupt void epwm1_isr(void)
         EPwm2Regs.TBPRD = (Uint16 )(((float )SYSCLKFREQUENCY) / (Module1_Parameters.OptimizationFsw[Module1_Parameters.MinimumCostIndex] * 4.0));
         EPwm3Regs.TBPRD = (Uint16 )(((float )SYSCLKFREQUENCY) / (Module1_Parameters.OptimizationFsw[Module1_Parameters.MinimumCostIndex] * 4.0));
         M2_OperationMode = MODE_MPCCONTROLLER;
-        IpcRegs.IPCSET.bit.IPC31=1; // set this so that CPU2 will continue
+        //IpcRegs.IPCSET.bit.IPC31=1; // set this so that CPU2 will continue
     }
 #endif
 
@@ -2170,7 +2193,10 @@ __interrupt void xint1_isr(void)
     if(Xint1Count<2) // in the first two rotations, reset the encoder value so that we are aligned to the "sweetpoint"
     {
         EQep1Regs.QPOSCNT = ENCODER_SWEETPOINT_VALUE;
-        EQep2Regs.QPOSCNT = ENCODER_SWEETPOINT_VALUE;
+
+        //EQep2Regs.QPOSCNT = ENCODER_SWEETPOINT_VALUE;
+        IpcRegs.IPCSET.bit.IPC0 = 1; // set this so that cpu2 will set eqep2 to sweetpoint
+
         Module1_Parameters.AngleRadPrev.Mechanical = (float) EQep1Regs.QPOSCNT / (float) ENCODERMAXTICKCOUNT * 2.0 * PI;
         Module1_Parameters.AngleRadTemp.Mechanical = (float) EQep1Regs.QPOSCNT / (float) ENCODERMAXTICKCOUNT * 2.0 * PI;
         Module1_Parameters_cla.AngleRadPrev.Mechanical = (float) EQep1Regs.QPOSCNT / (float) ENCODERMAXTICKCOUNT * 2.0 * PI;
@@ -2181,6 +2207,7 @@ __interrupt void xint1_isr(void)
 
     }
 
+#if 0
     if(Xint1Count>=3)
     {
         if(DevCfgRegs.CPUSEL2.bit.EQEP2==0) // if this belongs to cpu1, then give it to CPU2
@@ -2191,6 +2218,7 @@ __interrupt void xint1_isr(void)
         }
         IpcRegs.IPCSET.bit.IPC30=1; // set this so that CPU2 read the angle from EQEP2
     }
+#endif
     PieCtrlRegs.PIEACK.all = PIEACK_GROUP1;
 }
 __interrupt void ipc0_isr(void)
@@ -2203,6 +2231,7 @@ __interrupt void ipc0_isr(void)
 __interrupt void CLATask1_PCC_Is_Done(void)
 {
     CLA1Task1End_counter++;
+    memcpy(&PI_iq,&PI_iq_cla,sizeof(PID_Parameters)); // give the torque reference from cpu1cla to cpu2
     if (SendOneInFour % 4 == 0)
     {
         DataToBeSent[0] = Module1_Parameters_cla.Measured.Current.transformed.Dvalue; // .Measured.Current.PhaseA;
@@ -2314,6 +2343,22 @@ void ZeroiseModule1Parameters(void)
     Module1_Parameters.PhaseADutyCycle = 0;
     Module1_Parameters.PhaseBDutyCycle = 0;
     Module1_Parameters.PhaseCDutyCycle = 0;
+
+    memset(&Module1_Parameters_cla.Measured, 0, sizeof(MeasuredParams));
+    memset(&Module1_Parameters_cla.FirstHorizon, 0, sizeof(PredictionParameters));
+    memset(&Module1_Parameters_cla.SecondHorizon, 0, sizeof(PredictionParameters));
+    Module1_Parameters_cla.MinimumCostIndex = 0;
+    Module1_Parameters_cla.MinimumCostValue = 0;
+    memset(&Module1_Parameters_cla.Cost,0,sizeof(float)*NUMBEROFMPCLOOPS);
+    memset(&Module1_Parameters_cla.AngleRad,0,sizeof(Angle));
+    memset(&Module1_Parameters_cla.AngleRadPrev,0,sizeof(Angle));
+    memset(&Module1_Parameters_cla.AngleRadTemp,0,sizeof(Angle));
+    memset(&Module1_Parameters_cla.AngularSpeedRadSec,0,sizeof(AngularSpeed));
+    memset(&Module1_Parameters_cla.AngularSpeedRPM,0,sizeof(AngularSpeed));
+    memset(&Module1_Parameters_cla.OffsetValue,0,sizeof(Offset));
+    Module1_Parameters_cla.PhaseADutyCycle = 0;
+    Module1_Parameters_cla.PhaseBDutyCycle = 0;
+    Module1_Parameters_cla.PhaseCDutyCycle = 0;
 }
 // slew programmable ramper
 float ramper(float in, float out, float rampDelta)
@@ -2404,28 +2449,6 @@ void CLA_configClaMemory(void)
     MemCfgRegs.MSGxINIT.bit.INIT_CPUTOCLA1 = 1;
     while(MemCfgRegs.MSGxINITDONE.bit.INITDONE_CPUTOCLA1 != 1){};
 
-#if 0
-    //
-    // Select LS4RAM and LS5RAM to be the programming space for the CLA
-    // First configure the CLA to be the master for LS4 and LS5 and then
-    // set the space to be a program block
-    //
-    MemCfgRegs.LSxMSEL.bit.MSEL_LS4 = 1;
-    MemCfgRegs.LSxCLAPGM.bit.CLAPGM_LS4 = 1;
-    MemCfgRegs.LSxMSEL.bit.MSEL_LS5 = 1;
-    MemCfgRegs.LSxCLAPGM.bit.CLAPGM_LS5 = 1;
-
-    //
-    // Next configure LS0RAM and LS1RAM as data spaces for the CLA
-    // First configure the CLA to be the master for LS0(1) and then
-    // set the spaces to be code blocks
-    //
-    MemCfgRegs.LSxMSEL.bit.MSEL_LS0 = 1;
-    MemCfgRegs.LSxCLAPGM.bit.CLAPGM_LS0 = 0;
-
-    MemCfgRegs.LSxMSEL.bit.MSEL_LS1 = 1;
-    MemCfgRegs.LSxCLAPGM.bit.CLAPGM_LS1 = 0;
-#else
     /* LS0, LS1 and LS2 are PRG RAM for CLA
      * LS3, LS4 and LS5 are DAT RAM for CLA
      *
@@ -2445,7 +2468,6 @@ void CLA_configClaMemory(void)
     MemCfgRegs.LSxCLAPGM.bit.CLAPGM_LS5 = 0;    //LS5 is chosen as DAT RAM for CLA
 
 
-#endif
 
     EDIS;
 }

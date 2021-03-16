@@ -10,6 +10,7 @@ __interrupt void Cla1Task1 ( void )
      *
      * */
     Cla1Task1_counter++;
+    M2_OperationMode = MODE_CLA_MPCCONTROLLER;
 
 
 

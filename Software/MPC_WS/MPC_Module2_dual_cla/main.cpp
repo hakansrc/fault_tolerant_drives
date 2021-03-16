@@ -18,12 +18,14 @@
 uint32_t    Cla1Task1_counter = 0;
 #pragma DATA_SECTION("CLAData")
 float       M2_FswDecided_cla = 1000;
-#pragma DATA_SECTION("CLAData")
-unsigned int        M2_OperationMode = MODE_NO_OPERATION; /*this will be changed */
+
 #pragma DATA_SECTION("CLAData")
 ModuleParameters Module2_Parameters_cla;
 #pragma DATA_SECTION("CLAData")
 PID_Parameters      PI_iq_cla;
+
+#pragma DATA_SECTION("CLAData")
+unsigned int        M2_OperationMode = MODE_NO_OPERATION; /*this will be changed */
 
 
 uint32_t    ControlISRCounter = 0;
@@ -64,17 +66,21 @@ void InitializeEpwm5Registers(void);
 void InitializeEpwm6Registers(void);
 void InitializationRoutine(void);
 void RunTimeProtectionControl(void);
-void GetSvpwmDutyCycles(float T1, float T2, float T0,float Ts,float VectorAngleRad, float &DutyA, float &DutyB, float &DutyC);
 void ZeroiseModule2Parameters(void);
+#if 0
+void GetSvpwmDutyCycles(float T1, float T2, float T0,float Ts,float VectorAngleRad, float &DutyA, float &DutyB, float &DutyC);
 void GetEncoderReadings_Cpu2(ModuleParameters &moduleparams);
 void GetAdcReadings(ModuleParameters &moduleparams);
 void CalculateParkTransform(ModuleParameters &moduleparams);
 void ExecuteFirstPrediction(ModuleParameters &moduleparams, unsigned int indexcount);
 void ExecuteSecondPrediction(ModuleParameters &moduleparams, unsigned int indexcount);
+#endif
 uint32_t    IPCWaitCounter = 0;
 
 void CLA_configClaMemory(void);
 void CLA_initCpu1Cla1(void);
+
+uint16_t    Ipc0Counter=0;
 
 
 int main(void)
@@ -164,6 +170,7 @@ int main(void)
 
     while(1)
     {
+        M2_OperationMode = MODE_CLA_MPCCONTROLLER;
 
     }
 }
@@ -428,94 +435,6 @@ __interrupt void epwm4_isr(void)
         return;
     }
 #endif
-    GetEncoderReadings_Cpu2(Module2_Parameters);
-    //IpcRegs.IPCSET.bit.IPC0 = 1;
-    RunTimeProtectionControl();
-    /*When CPU2 is activated, the CPU1 is already initialized everything*/
-
-    GetAdcReadings(Module2_Parameters);
-
-
-    CalculateParkTransform(Module2_Parameters);
-
-    if ((M1_OperationMode == MODE_MPCCONTROLLER)&&(M2_OperationMode==MODE_MPCCONTROLLER))
-    {
-        Module2_Parameters.Reference.Iq = PI_iq.Output/((float)2);
-        Module2_Parameters.Reference.Id = IDREF;
-
-        Module2_Parameters.MinimumCostValue = (float)1e35;
-
-        ExecuteFirstPrediction(Module2_Parameters,0);
-        ExecuteSecondPrediction(Module2_Parameters,0);
-        ExecuteFirstPrediction(Module2_Parameters,1);
-        ExecuteSecondPrediction(Module2_Parameters,1);
-        ExecuteFirstPrediction(Module2_Parameters,2);
-        ExecuteSecondPrediction(Module2_Parameters,2);
-        ExecuteFirstPrediction(Module2_Parameters,3);
-        ExecuteSecondPrediction(Module2_Parameters,3);
-        ExecuteFirstPrediction(Module2_Parameters,4);
-        ExecuteSecondPrediction(Module2_Parameters,4);
-        ExecuteFirstPrediction(Module2_Parameters,5);
-        ExecuteSecondPrediction(Module2_Parameters,5);
-        ExecuteFirstPrediction(Module2_Parameters,6);
-        ExecuteSecondPrediction(Module2_Parameters,6);
-        ExecuteFirstPrediction(Module2_Parameters,7);
-        ExecuteSecondPrediction(Module2_Parameters,7);
-        ExecuteFirstPrediction(Module2_Parameters,8);
-        ExecuteSecondPrediction(Module2_Parameters,8);
-        ExecuteFirstPrediction(Module2_Parameters,9);
-        ExecuteSecondPrediction(Module2_Parameters,9);
-
-        GetSvpwmDutyCycles(Module2_Parameters.SecondHorizon[Module2_Parameters.MinimumCostIndex].SvpwmT1,\
-                           Module2_Parameters.SecondHorizon[Module2_Parameters.MinimumCostIndex].SvpwmT2,\
-                           Module2_Parameters.SecondHorizon[Module2_Parameters.MinimumCostIndex].SvpwmT0,\
-                           (1.0/((float)Module2_Parameters.OptimizationFsw[Module2_Parameters.MinimumCostIndex])),\
-                           Module2_Parameters.SecondHorizon[Module2_Parameters.MinimumCostIndex].VoltageVectorAngleRad,\
-                           Module2_Parameters.PhaseADutyCycle,\
-                           Module2_Parameters.PhaseBDutyCycle,\
-                           Module2_Parameters.PhaseCDutyCycle);
-
-        M2_FswDecided = Module2_Parameters.OptimizationFsw[Module2_Parameters.MinimumCostIndex];
-
-        EPwm4Regs.TBPRD = (Uint16 )(((float )SYSCLKFREQUENCY) / (Module2_Parameters.OptimizationFsw[Module2_Parameters.MinimumCostIndex] * 4.0));
-        EPwm5Regs.TBPRD = (Uint16 )(((float )SYSCLKFREQUENCY) / (Module2_Parameters.OptimizationFsw[Module2_Parameters.MinimumCostIndex] * 4.0));
-        EPwm6Regs.TBPRD = (Uint16 )(((float )SYSCLKFREQUENCY) / (Module2_Parameters.OptimizationFsw[Module2_Parameters.MinimumCostIndex] * 4.0));
-    }
-    else
-    {
-        Module2_Parameters.PhaseADutyCycle  = 0 ;
-        Module2_Parameters.PhaseBDutyCycle  = 0 ;
-        Module2_Parameters.PhaseCDutyCycle  = 0 ;
-    }
-
-
-
-    if ((M1_OperationMode == MODE_MPCCONTROLLER)&&(M2_OperationMode==MODE_MPCCONTROLLER))
-    {
-        if(Module2_Parameters.PhaseADutyCycle>1.0)
-            Module2_Parameters.PhaseADutyCycle = 1.0;
-        if(Module2_Parameters.PhaseADutyCycle<0)
-            Module2_Parameters.PhaseADutyCycle = 0;
-        if(Module2_Parameters.PhaseBDutyCycle>1.0)
-            Module2_Parameters.PhaseBDutyCycle = 1.0;
-        if(Module2_Parameters.PhaseBDutyCycle<0)
-            Module2_Parameters.PhaseBDutyCycle = 0;
-        if(Module2_Parameters.PhaseCDutyCycle>1.0)
-            Module2_Parameters.PhaseCDutyCycle = 1.0;
-        if(Module2_Parameters.PhaseCDutyCycle<0)
-            Module2_Parameters.PhaseCDutyCycle = 0;
-
-        EPwm4Regs.CMPA.bit.CMPA = (Uint16 )(Module2_Parameters.PhaseADutyCycle*((float )SYSCLKFREQUENCY) / (Module2_Parameters.OptimizationFsw[Module2_Parameters.MinimumCostIndex] * 4.0));
-        EPwm5Regs.CMPA.bit.CMPA = (Uint16 )(Module2_Parameters.PhaseBDutyCycle*((float )SYSCLKFREQUENCY) / (Module2_Parameters.OptimizationFsw[Module2_Parameters.MinimumCostIndex] * 4.0));
-        EPwm6Regs.CMPA.bit.CMPA = (Uint16 )(Module2_Parameters.PhaseCDutyCycle*((float )SYSCLKFREQUENCY) / (Module2_Parameters.OptimizationFsw[Module2_Parameters.MinimumCostIndex] * 4.0));
-    }
-    else
-    {
-        EPwm4Regs.CMPA.bit.CMPA = Module2_Parameters.PhaseADutyCycle*EPwm4Regs.TBPRD;
-        EPwm5Regs.CMPA.bit.CMPA = Module2_Parameters.PhaseBDutyCycle*EPwm5Regs.TBPRD;
-        EPwm6Regs.CMPA.bit.CMPA = Module2_Parameters.PhaseCDutyCycle*EPwm6Regs.TBPRD;
-    }
-
 
     EPwm4Regs.ETCLR.bit.INT = 1;
     PieCtrlRegs.PIEACK.all = PIEACK_GROUP3;
@@ -531,6 +450,7 @@ __interrupt void CLATask1_PCC_Is_Done(void)
 __interrupt void ipc0_isr(void)
 {
     /**/
+    Ipc0Counter++;
     EQep2Regs.QPOSCNT = ENCODER_SWEETPOINT_VALUE;
     IpcRegs.IPCACK.bit.IPC0 = 1;
     PieCtrlRegs.PIEACK.all = PIEACK_GROUP1;
@@ -554,87 +474,10 @@ void InitializationRoutine(void)
 }
 void RunTimeProtectionControl(void)
 {
-#if 0
-    if((fabsf(M2_IA_CURRENT_FLOAT)>M2_IA_RUNTIME_PROTECTION_VALUE)||(fabsf(M2_IB_CURRENT_FLOAT)>M2_IB_RUNTIME_PROTECTION_VALUE)||(fabsf(M2_IC_CURRENT_FLOAT)>M2_IC_RUNTIME_PROTECTION_VALUE))
-    {
-        EPwm4Regs.TZFRC.bit.DCAEVT1 = 1;
-        EPwm5Regs.TZFRC.bit.DCAEVT1 = 1;
-        EPwm6Regs.TZFRC.bit.DCAEVT1 = 1;
-    }
-    if((M2_VDC_VOLTAGE_FLOAT>M2_VDC_UPPERBOUND_PROTECTION)||(M2_VDC_VOLTAGE_FLOAT<M2_VDC_LOWERBOUND_PROTECTION))
-    {
-        EPwm4Regs.TZFRC.bit.DCAEVT1 = 1;
-        EPwm5Regs.TZFRC.bit.DCAEVT1 = 1;
-        EPwm6Regs.TZFRC.bit.DCAEVT1 = 1;
-    }
-#endif
+    return;
 }
 
 
-void GetSvpwmDutyCycles(float T1, float T2, float T0,float Ts,float VectorAngleRad, float &DutyA, float &DutyB, float &DutyC)
-{
-    if ((fmodf(VectorAngleRad,2.0*PI)<=PI/3.0)&&(fmodf(VectorAngleRad,2.0*PI)>=0))
-    {
-        SvpwmSectorNumber = 1;
-        DutyA = (T1+T2+T0/2)/Ts;
-        DutyB = (T2+T0/2)/Ts;
-        DutyC = (T0/2)/Ts;
-        return;
-    }
-
-    if ((fmodf(VectorAngleRad,2.0*PI)<=2*PI/3)&&(fmodf(VectorAngleRad,2.0*PI)>=PI/3.0))
-    {
-        SvpwmSectorNumber = 2;
-        DutyA = (T1+T0/2)/Ts;
-        DutyB = (T1+T2+T0/2)/Ts;
-        DutyC = (T0/2)/Ts;
-        return;
-    }
-
-    if ((fmodf(VectorAngleRad,2.0*PI)<=PI)&&(fmodf(VectorAngleRad,2.0*PI)>=2*PI/3.0))
-    {
-        SvpwmSectorNumber = 3;
-        if(fmodf(VectorAngleRad, PI)==0)
-        {
-            DutyA = (T0/2)/Ts;
-            DutyB = (T1+T0/2)/Ts;
-            DutyC = (T1+T2+T0/2)/Ts;
-        }
-        else
-        {
-            DutyA = (T0/2)/Ts;
-            DutyB = (T1+T2+T0/2)/Ts;
-            DutyC = (T2+T0/2)/Ts;
-        }
-        return;
-    }
-
-    if ((fmodf(VectorAngleRad,2.0*PI)<=4*PI/3.0)&&(fmodf(VectorAngleRad,2.0*PI)>=PI))
-    {
-        SvpwmSectorNumber = 4;
-        DutyA = (T0/2)/Ts;
-        DutyB = (T1+T0/2)/Ts;
-        DutyC = (T1+T2+T0/2)/Ts;
-        return;
-    }
-    if ((fmodf(VectorAngleRad,2.0*PI)<=5*PI/3.0)&&(fmodf(VectorAngleRad,2.0*PI)>=4*PI/3.0))
-    {
-        SvpwmSectorNumber = 5;
-        DutyA = (T2+T0/2)/Ts;
-        DutyB = (T0/2)/Ts;
-        DutyC = (T1+T2+T0/2)/Ts;
-        return;
-    }
-    if ((fmodf(VectorAngleRad,2.0*PI)<=2*PI)&&(fmodf(VectorAngleRad,2.0*PI)>=5*PI/3.0))
-    {
-        SvpwmSectorNumber = 6;
-        DutyA = (T1+T2+T0/2)/Ts;
-        DutyB = (T0/2)/Ts;
-        DutyC = (T1+T0/2)/Ts;
-        return;
-    }
-
-}
 void ZeroiseModule2Parameters(void)
 {
     memset(&Module2_Parameters.Measured, 0, sizeof(MeasuredParams));
@@ -654,100 +497,6 @@ void ZeroiseModule2Parameters(void)
     Module2_Parameters.PhaseCDutyCycle = 0;
 }
 
-void GetEncoderReadings_Cpu2(ModuleParameters &moduleparams)
-{
-#if 0
-    moduleparams.AngleRad.Mechanical = ((float)EQep1Regs.QPOSCNT)/((float)ENCODERMAXTICKCOUNT)* 2.0 * PI;
-    moduleparams.AngleRad.Electrical =  moduleparams.AngleRad.Mechanical*POLEPAIRS;
-#else
-    if(IpcRegs.IPCSTS.bit.IPC30==1)
-    {
-        moduleparams.AngleRad.Mechanical = ((float)EQep2Regs.QPOSCNT)/((float)ENCODERMAXTICKCOUNT)* 2.0 * PI;
-        moduleparams.AngleRad.Electrical =  moduleparams.AngleRad.Mechanical*POLEPAIRS;
-    }
-    else
-    {
-        moduleparams.AngleRad.Mechanical = Module1_Parameters.AngleRad.Mechanical;
-        moduleparams.AngleRad.Electrical = moduleparams.AngleRad.Mechanical*POLEPAIRS;
-    }
-
-#endif
-
-    /*CPU1 already calculates the speed, therefore CPU2 just gets the speed reading from CPU1*/
-    moduleparams.AngularSpeedRadSec.Mechanical  = Module1_Parameters.AngularSpeedRadSec.Mechanical;
-    moduleparams.AngularSpeedRadSec.Electrical  = Module1_Parameters.AngularSpeedRadSec.Electrical;
-    moduleparams.AngularSpeedRPM.Mechanical     = Module1_Parameters.AngularSpeedRPM.Mechanical;
-
-
-}
-void GetAdcReadings(ModuleParameters &moduleparams)
-{
-    moduleparams.Measured.Current.PhaseA = M2_IA_CURRENT_FLOAT;
-    moduleparams.Measured.Current.PhaseB = M2_IB_CURRENT_FLOAT;
-    moduleparams.Measured.Current.PhaseC = M2_IC_CURRENT_FLOAT;
-    moduleparams.Measured.Voltage.Vdc = M2_VDC_VOLTAGE_FLOAT;
-}
-void CalculateParkTransform(ModuleParameters &moduleparams)
-{
-    moduleparams.Measured.Current.transformed.Dvalue = 0.66667 * (moduleparams.Measured.Current.PhaseA * sinf(moduleparams.AngleRad.Electrical) + moduleparams.Measured.Current.PhaseB * sinf(moduleparams.AngleRad.Electrical - 0.66667 * PI /*2*PI/3*/) + moduleparams.Measured.Current.PhaseC * sinf(moduleparams.AngleRad.Electrical + 0.66667 * PI /*2*PI/3*/));
-    moduleparams.Measured.Current.transformed.Qvalue = 0.66667 * (moduleparams.Measured.Current.PhaseA * cosf(moduleparams.AngleRad.Electrical) + moduleparams.Measured.Current.PhaseB * cosf(moduleparams.AngleRad.Electrical - 0.66667 * PI /*2*PI/3*/) + moduleparams.Measured.Current.PhaseC * cosf(moduleparams.AngleRad.Electrical + 0.66667 * PI /*2*PI/3*/));
-#if 0
-    moduleparams.PhaseCurrent.ZeroValue = 0.66667*0.5*(moduleparams.Measured.Current.PhaseA\
-            +moduleparams.Measured.Current.PhaseB\
-            +moduleparams.Measured.Current.PhaseC);
-#endif
-    //ids = 2/3*(ias*sin(ref_frame_position)+ibs*sin(ref_frame_position-2*pi/3)+ics*sin(ref_frame_position+2*pi/3));
-    //iqs =  2/3*(ias*cos(ref_frame_position)+ibs*cos(ref_frame_position-2*pi/3)+ics*cos(ref_frame_position+2*pi/3));
-    //i0 = 2/3*1/2*(ias+ibs+ics);
-}
-void ExecuteFirstPrediction(ModuleParameters &moduleparams, unsigned int indexcount)
-{
-    moduleparams.CurrentHorizon[indexcount].VdPrediction = moduleparams.FirstHorizon[indexcount].VdPrediction;  // First horizon prediction on the previous horizon is our current value now
-    moduleparams.CurrentHorizon[indexcount].VqPrediction = moduleparams.FirstHorizon[indexcount].VqPrediction;  // First horizon prediction on the previous horizon is our current value now
-
-    moduleparams.FirstHorizon[indexcount].IdPrediction = moduleparams.Measured.Current.transformed.Dvalue + (0.5 / M2_FswDecided)  * (moduleparams.CurrentHorizon[indexcount].VdPrediction / M2_LS_VALUE - M2_RS_VALUE / M2_LS_VALUE * moduleparams.Measured.Current.transformed.Dvalue + M2_LS_VALUE / M2_LS_VALUE * POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical * moduleparams.Measured.Current.transformed.Qvalue);
-    moduleparams.FirstHorizon[indexcount].IqPrediction = moduleparams.Measured.Current.transformed.Qvalue + (0.5 / M2_FswDecided)  * (moduleparams.CurrentHorizon[indexcount].VqPrediction / M2_LS_VALUE - M2_RS_VALUE / M2_LS_VALUE * moduleparams.Measured.Current.transformed.Qvalue - M2_LS_VALUE / M2_LS_VALUE * POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical * moduleparams.Measured.Current.transformed.Dvalue - FLUX_VALUE * POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical / M2_LS_VALUE);
-}
-void ExecuteSecondPrediction(ModuleParameters &moduleparams, unsigned int indexcount)
-{
-    moduleparams.FirstHorizon[indexcount].VdPrediction = M2_VD_VQ_KP * (moduleparams.Reference.Id -  moduleparams.FirstHorizon[indexcount].IdPrediction) * (1.0 + M2_VD_VQ_KI / moduleparams.OptimizationFsw[indexcount]) + moduleparams.Measured.Current.transformed.Dvalue - POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical * M2_LS_VALUE * moduleparams.FirstHorizon[indexcount].IqPrediction;
-    moduleparams.FirstHorizon[indexcount].VqPrediction = M2_VD_VQ_KP * (moduleparams.Reference.Iq -  moduleparams.FirstHorizon[indexcount].IqPrediction) * (1.0 + M2_VD_VQ_KI / moduleparams.OptimizationFsw[indexcount]) + moduleparams.Measured.Current.transformed.Qvalue + POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical * (M2_LS_VALUE * moduleparams.FirstHorizon[indexcount].IdPrediction+ FLUX_VALUE);
-
-    moduleparams.SecondHorizon[indexcount].Magnitude = sqrtf(powf(moduleparams.FirstHorizon[indexcount].VdPrediction,2) + powf(moduleparams.FirstHorizon[indexcount].VqPrediction,2));
-
-    moduleparams.SecondHorizon[indexcount].Valfa = sinf(moduleparams.AngleRad.Electrical) * moduleparams.FirstHorizon[indexcount].VdPrediction + cosf(moduleparams.AngleRad.Electrical) * moduleparams.FirstHorizon[indexcount].VqPrediction;
-    moduleparams.SecondHorizon[indexcount].Vbeta =-cosf(moduleparams.AngleRad.Electrical) * moduleparams.FirstHorizon[indexcount].VdPrediction + sinf(moduleparams.AngleRad.Electrical) * moduleparams.FirstHorizon[indexcount].VqPrediction;
-
-    moduleparams.SecondHorizon[indexcount].VoltageVectorAngleRad = atan2f(moduleparams.SecondHorizon[indexcount].Vbeta, moduleparams.SecondHorizon[indexcount].Valfa) + 4.0*PI + POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical * (1.0/moduleparams.OptimizationFsw[indexcount]+0.0/M2_FswDecided);
-    moduleparams.SecondHorizon[indexcount].VoltageVectorAngleRad_Mod = fmodf(moduleparams.SecondHorizon[indexcount].VoltageVectorAngleRad, PI / 3.0);
-
-    moduleparams.SecondHorizon[indexcount].ma = sqrtf(3)*moduleparams.SecondHorizon[indexcount].Magnitude / (moduleparams.Measured.Voltage.Vdc );
-
-    moduleparams.SecondHorizon[indexcount].SvpwmT1 = (1.0 / moduleparams.OptimizationFsw[indexcount]) * moduleparams.SecondHorizon[indexcount].ma * sinf(PI / 3.0 - moduleparams.SecondHorizon[indexcount].VoltageVectorAngleRad_Mod);
-    moduleparams.SecondHorizon[indexcount].SvpwmT2 = (1.0 / moduleparams.OptimizationFsw[indexcount]) * moduleparams.SecondHorizon[indexcount].ma * sinf(moduleparams.SecondHorizon[indexcount].VoltageVectorAngleRad_Mod);
-    moduleparams.SecondHorizon[indexcount].SvpwmT0 = (1.0 / moduleparams.OptimizationFsw[indexcount]) - moduleparams.SecondHorizon[indexcount].SvpwmT1 - moduleparams.SecondHorizon[indexcount].SvpwmT2;
-
-    moduleparams.SecondHorizon[indexcount].VoltageDuring_SvpwmT1 = 0.66667 * moduleparams.Measured.Voltage.Vdc - moduleparams.SecondHorizon[indexcount].Magnitude;
-    moduleparams.SecondHorizon[indexcount].VoltageDuring_SvpwmT2 = 0.66667 * moduleparams.Measured.Voltage.Vdc - moduleparams.SecondHorizon[indexcount].Magnitude;
-    moduleparams.SecondHorizon[indexcount].VoltageDuring_SvpwmT0 = -moduleparams.SecondHorizon[indexcount].Magnitude;
-
-    moduleparams.SecondHorizon[indexcount].Iq_Delta_DuringT1 = moduleparams.SecondHorizon[indexcount].VoltageDuring_SvpwmT1 * moduleparams.SecondHorizon[indexcount].SvpwmT1 / M2_LS_VALUE;
-    moduleparams.SecondHorizon[indexcount].Iq_Delta_DuringT2 = moduleparams.SecondHorizon[indexcount].VoltageDuring_SvpwmT2 * moduleparams.SecondHorizon[indexcount].SvpwmT2 / M2_LS_VALUE;
-    moduleparams.SecondHorizon[indexcount].Iq_Delta_DuringT0 = -moduleparams.SecondHorizon[indexcount].VoltageDuring_SvpwmT0 * moduleparams.SecondHorizon[indexcount].SvpwmT0 / M2_LS_VALUE;
-
-    moduleparams.SecondHorizon[indexcount].Iq_Ripple_Prediction = moduleparams.SecondHorizon[indexcount].Iq_Delta_DuringT1 + moduleparams.SecondHorizon[indexcount].Iq_Delta_DuringT2 + moduleparams.SecondHorizon[indexcount].Iq_Delta_DuringT0;
-
-    moduleparams.SecondHorizon[indexcount].IdPrediction = moduleparams.FirstHorizon[indexcount].IdPrediction + (1.0f / moduleparams.OptimizationFsw[indexcount]) * (moduleparams.FirstHorizon[indexcount].VdPrediction / M2_LS_VALUE - M2_RS_VALUE / M2_LS_VALUE * moduleparams.FirstHorizon[indexcount].IdPrediction + M2_LS_VALUE / M2_LS_VALUE * POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical * moduleparams.FirstHorizon[indexcount].IqPrediction);
-    moduleparams.SecondHorizon[indexcount].IqPrediction = moduleparams.FirstHorizon[indexcount].IqPrediction + (1.0f / moduleparams.OptimizationFsw[indexcount]) * (moduleparams.FirstHorizon[indexcount].VqPrediction / M2_LS_VALUE - M2_RS_VALUE / M2_LS_VALUE * moduleparams.FirstHorizon[indexcount].IqPrediction - M2_LS_VALUE / M2_LS_VALUE * POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical * moduleparams.FirstHorizon[indexcount].IdPrediction - FLUX_VALUE * POLEPAIRS * moduleparams.AngularSpeedRadSec.Mechanical / M2_LS_VALUE);
-
-    /*TODO add protection to cost*/
-    moduleparams.Cost[indexcount] = IQRIPPLECOEFF * powf(moduleparams.SecondHorizon[indexcount].Iq_Ripple_Prediction / IQ_RATED, 2) + IQREFCOEFF * powf((moduleparams.Reference.Iq - moduleparams.SecondHorizon[indexcount].IqPrediction) / IQ_RATED, 2) + IDREFCOEFF * powf((moduleparams.Reference.Id - moduleparams.SecondHorizon[indexcount].IdPrediction)/IQ_RATED, 2) + FSWCOEFF * moduleparams.OptimizationFsw[indexcount] / OPT_FSW_MAX;
-    if (moduleparams.Cost[indexcount] < moduleparams.MinimumCostValue)
-    {
-        moduleparams.MinimumCostValue = moduleparams.Cost[indexcount];
-        moduleparams.MinimumCostIndex = indexcount;
-    }
-}
 
 //
 // CLA_configClaMemory - Configure CLA memory sections
@@ -778,7 +527,7 @@ void CLA_configClaMemory(void)
     while(MemCfgRegs.MSGxINITDONE.bit.INITDONE_CPUTOCLA1 != 1){};
 
     /* LS0, LS1 and LS2 are PRG RAM for CLA
-     * LS3, LS4 and LS5 are DAT RAM for CLA
+     * LS3, LS4         are DAT RAM for CLA
      *
      */
     MemCfgRegs.LSxMSEL.bit.MSEL_LS0 = 1;    // memory is shared between cpu & cla
@@ -786,14 +535,12 @@ void CLA_configClaMemory(void)
     MemCfgRegs.LSxMSEL.bit.MSEL_LS2 = 1;    // memory is shared between cpu & cla
     MemCfgRegs.LSxMSEL.bit.MSEL_LS3 = 1;    // memory is shared between cpu & cla
     MemCfgRegs.LSxMSEL.bit.MSEL_LS4 = 1;    // memory is shared between cpu & cla
-    MemCfgRegs.LSxMSEL.bit.MSEL_LS5 = 1;    // memory is shared between cpu & cla
 
     MemCfgRegs.LSxCLAPGM.bit.CLAPGM_LS0 = 1;    //LS0 is chosen as PRG RAM for CLA
     MemCfgRegs.LSxCLAPGM.bit.CLAPGM_LS1 = 1;    //LS1 is chosen as PRG RAM for CLA
     MemCfgRegs.LSxCLAPGM.bit.CLAPGM_LS2 = 1;    //LS2 is chosen as PRG RAM for CLA
     MemCfgRegs.LSxCLAPGM.bit.CLAPGM_LS3 = 0;    //LS3 is chosen as DAT RAM for CLA
     MemCfgRegs.LSxCLAPGM.bit.CLAPGM_LS4 = 0;    //LS4 is chosen as DAT RAM for CLA
-    MemCfgRegs.LSxCLAPGM.bit.CLAPGM_LS5 = 0;    //LS5 is chosen as DAT RAM for CLA
 
 
 

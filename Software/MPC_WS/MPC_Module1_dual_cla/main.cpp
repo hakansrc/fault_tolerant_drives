@@ -2238,10 +2238,10 @@ __interrupt void CLATask1_PCC_Is_Done(void)
     {
         DataToBeSent[0] = Module1_Parameters_cla.Measured.Current.transformed.Dvalue; // .Measured.Current.PhaseA;
         DataToBeSent[1] = Module1_Parameters_cla.Measured.Current.transformed.Qvalue; // .Measured.Current.PhaseA;
-        DataToBeSent[2] = M1_FswDecided_cla;
-        DataToBeSent[3] = Module1_Parameters_cla.Measured.Current.PhaseA;
-        DataToBeSent[4] = Module1_Parameters_cla.Measured.Current.PhaseB;
-        DataToBeSent[5] = Module1_Parameters_cla.Measured.Current.PhaseC;
+        DataToBeSent[2] = Module2_Parameters.Measured.Current.transformed.Dvalue; // .Measured.Current.PhaseA;
+        DataToBeSent[3] = Module2_Parameters.Measured.Current.transformed.Qvalue; // .Measured.Current.PhaseA;
+        DataToBeSent[4] = Module1_Parameters_cla.AngleRad.Mechanical;
+        DataToBeSent[5] = Module2_Parameters.AngleRad.Mechanical;
 
         SciSendMultipleFloatWithTheTag(DataToBeSent, 6);
     }

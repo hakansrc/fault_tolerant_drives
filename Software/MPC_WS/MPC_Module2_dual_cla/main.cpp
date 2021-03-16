@@ -27,6 +27,9 @@ PID_Parameters      PI_iq_cla;
 #pragma DATA_SECTION("CLAData")
 unsigned int        M2_OperationMode = MODE_NO_OPERATION; /*this will be changed */
 
+#pragma DATA_SECTION("CLAData")
+uint32_t    angleoffset = 0;
+
 
 uint32_t    ControlISRCounter = 0;
 #pragma DATA_SECTION("M1_SPEEDREF_LOCATION")
@@ -45,6 +48,8 @@ ModuleParameters Module1_Parameters;
 float       M1_FswDecided = 0;
 #pragma DATA_SECTION("M2_FSWDECIDED_LOCATION")
 float       M2_FswDecided = 0;
+
+
 
 uint32_t    SvpwmSectorNumber = 0;
 
@@ -444,6 +449,7 @@ __interrupt void CLATask1_PCC_Is_Done(void)
 {
     CLA1Task1End_counter++;
     memcpy(&PI_iq_cla,&PI_iq,sizeof(PID_Parameters)); //get the reference from cpu1 to cla of cpu2
+    memcpy(&Module2_Parameters,&Module2_Parameters_cla,sizeof(ModuleParameters)); //get the reference from cpu1 to cla of cpu2
     PieCtrlRegs.PIEACK.all = PIEACK_GROUP11;
 }
 

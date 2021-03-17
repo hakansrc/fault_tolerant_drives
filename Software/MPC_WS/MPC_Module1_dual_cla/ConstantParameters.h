@@ -9,6 +9,9 @@
 #define CONSTANTPARAMETERS_H_
 
 
+#define NO_FAULT    0x00
+#define YES_FAULT   0x01
+
 
 #define ENCODERRESOLUTION     3600
 #define NUMBEROFTICKSPERQAB   4

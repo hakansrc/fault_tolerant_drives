@@ -28,6 +28,7 @@ extern float                M2_FswDecided_cla;
 extern unsigned int         M2_OperationMode;
 extern ModuleParameters     Module2_Parameters_cla;
 extern PID_Parameters       PI_iq_cla;
+extern float                M2_minimumloss_iqref_cla;
 
 
 float CLA_Power(float base, uint16_t power);

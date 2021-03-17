@@ -31,7 +31,7 @@ __interrupt void Cla1Task1 ( void )
 
         Run_PI_Controller_cla(&PI_iq_cla);
 
-        Module1_Parameters_cla.Reference.Iq = PI_iq_cla.Output/((float)2);
+        Module1_Parameters_cla.Reference.Iq = M1_minimumloss_iqref; //PI_iq_cla.Output/((float)2);
         Module1_Parameters_cla.Reference.Id = IDREF;
 
 

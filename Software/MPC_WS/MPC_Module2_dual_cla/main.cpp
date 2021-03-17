@@ -27,8 +27,12 @@ PID_Parameters      PI_iq_cla;
 #pragma DATA_SECTION("CLAData")
 unsigned int        M2_OperationMode = MODE_NO_OPERATION; /*this will be changed */
 
+
 #pragma DATA_SECTION("CLAData")
-uint32_t    angleoffset = 0;
+float    M2_minimumloss_iqref_cla = 0;
+
+#pragma DATA_SECTION("M2_MINIMUMLOSS_IQ_LOCATION")
+float M2_minimumloss_iqref = 0.0f;
 
 
 uint32_t    ControlISRCounter = 0;
@@ -436,6 +440,7 @@ __interrupt void epwm4_isr(void)
     {
         memcpy(&PI_iq_cla,&PI_iq,sizeof(PID_Parameters)); //get the reference from cpu1 to cla of cpu2
         memcpy(&Module2_Parameters_cla.AngularSpeedRadSec,&Module1_Parameters.AngularSpeedRadSec,sizeof(AngularSpeed));
+        M2_minimumloss_iqref_cla = M2_minimumloss_iqref;
         EPwm4Regs.ETCLR.bit.INT = 1;
         PieCtrlRegs.PIEACK.all = PIEACK_GROUP3;
         return;

@@ -45,7 +45,7 @@ PAGE 1 :
    //RAMGS1      : origin = 0x00D000, length = 0x001000
    //RAMGS2      : origin = 0x00E000, length = 0x001000
    //RAMGS3      : origin = 0x00F000, length = 0x001000
-   //RAMGS4      : origin = 0x010000, length = 0x001000
+   RAMGS4      : origin = 0x010000, length = 0x001000
    //RAMGS5      : origin = 0x011000, length = 0x001000
    //RAMGS6      : origin = 0x012000, length = 0x001000
    //RAMGS7      : origin = 0x013000, length = 0x001000
@@ -59,13 +59,14 @@ PAGE 1 :
    M1_OPERATION_MODE_RAMGS13   : origin = 0x019292, length = 0x000001
    M1_SPEEDREF_RAMGS13   : origin = 0x019294, length = 0x000002
    M1_FSWDECIDED_RAMGS13   : origin = 0x019296, length = 0x000002
-   RAMGS13     : origin = 0x019298, length = 0x000D68
+   M2_MINIMUM_LOSS_IQ_RAMGS13  : origin = 0x019298, length = 0x000002
+   RAMGS13     : origin = 0x01929A, length = 0x000D66
    //PI_IQ_ADDRESS_RAMGS13   : origin = 0x019000, length = 0x000012     
    //M1_OPERATION_MODE_RAMGS13   : origin = 0x019012, length = 0x000001
    //M1_SPEEDREF_RAMGS13   : origin = 0x019014, length = 0x000002
    //M1_PARAMS_ADDRESS_RAMGS13   : origin = 0x019016, length = 0x00027A
    //RAMGS13     : origin = 0x019290, length = 0x000D70
-   M2_PARAMS_ADDRESS_RAMGS14 : origin = 0x01A000, length = 0x00027A  
+   M2_PARAMS_ADDRESS_RAMGS14 : origin = 0x01A000, length = 0x00027A
    M2_FSWDECIDED_RAMGS14   : origin = 0x01A27A, length = 0x000002
    M2_OPERATION_MODE_RAMGS14 : origin = 0x01A27C, length = 0x000001
    RAMGS14     : origin = 0x01A27D, length = 0x000D83
@@ -96,7 +97,7 @@ SECTIONS
 
    .stack           : > RAMM1,     PAGE = 1
    .ebss            : > RAMD1,    PAGE = 1
-   .econst          : > RAMD1,    PAGE = 1
+   .econst          : > RAMD1 | RAMGS4,    PAGE = 1
    .esysmem         : > RAMD1,    PAGE = 1
    //Filter_RegsFile  : > RAMGS4,	   PAGE = 1
 
@@ -116,7 +117,7 @@ SECTIONS
    M2_OPERATION_MODE_LOCATION : > M2_OPERATION_MODE_RAMGS14, PAGE = 1
    M1_FSWDECIDED_LOCATION : > M1_FSWDECIDED_RAMGS13, PAGE = 1
    M2_FSWDECIDED_LOCATION : > M2_FSWDECIDED_RAMGS14, PAGE = 1
-
+   M2_MINIMUMLOSS_IQ_LOCATION : > M2_MINIMUM_LOSS_IQ_RAMGS13, PAGE = 1
 
 #ifdef __TI_COMPILER_VERSION__
    #if __TI_COMPILER_VERSION__ >= 15009000

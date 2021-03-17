@@ -16,6 +16,34 @@
 #include "F2837xD_Ipc_drivers.h"
 
 
+#define TORQUE_DISTRIBUTION_STEP    100
+uint16_t    FaultFlag = NO_FAULT;
+void PerformTorqueDistribution(void);
+
+float M1_Possible_Iq = 0.0f;
+float M1_Possible_Id = 0.0f;
+float M2_Possible_Iq = 0.0f;
+float M2_Possible_Id = 0.0f;
+
+float M1_d_axis_flux = 0.0f;
+float M1_q_axis_flux = 0.0f;
+float M2_d_axis_flux = 0.0f;
+float M2_q_axis_flux = 0.0f;
+
+float M1_Candidate_Iqref[TORQUE_DISTRIBUTION_STEP];
+float M1_Candidate_Idref[TORQUE_DISTRIBUTION_STEP];
+float M2_Candidate_Iqref[TORQUE_DISTRIBUTION_STEP];
+float M2_Candidate_Idref[TORQUE_DISTRIBUTION_STEP];
+
+float M1_copper_loss = 0;
+float M2_copper_loss = 0;
+float M1_core_loss = 0;
+float M2_core_loss = 0;
+
+float TotalLoss[TORQUE_DISTRIBUTION_STEP];
+
+
+
 /*TODO s
  *
  * */
@@ -38,6 +66,12 @@ float       SpeedRefRPM = 33;
 unsigned int        M1_OperationMode = MODE_NO_OPERATION;
 #pragma DATA_SECTION("CLAData")
 float       M1_ElectricalAngle = 0;
+
+#pragma DATA_SECTION("CLAData")
+float M1_minimumloss_iqref = 0.0f;
+
+#pragma DATA_SECTION("M2_MINIMUMLOSS_IQ_LOCATION")
+float M2_minimumloss_iqref = 0.0f;
 
 uint16_t    ByPass_SpeedMeasurement = 0;
 
@@ -154,6 +188,12 @@ float offsetval[3] = {0,0,0};
 uint32_t    Ipc0Counter = 0;
 void CLA_configClaMemory(void);
 void CLA_initCpu1Cla1(void);
+
+uint64_t    torque_distributor_start = 0;
+uint64_t    torque_distributor_end = 0;
+uint64_t    torque_distributor_timedifference = 0;
+float       time_in_usec = 0.0f;
+
 
 int main(void)
 {
@@ -315,6 +355,10 @@ int main(void)
             M1_ReadDRV8305Registers(&M1_Device1Configuration);
             ReadDrv8305RegistersFlag = 0;
         }
+
+
+
+
     }
 }
 __interrupt void cpu_timer0_isr(void)
@@ -1937,6 +1981,12 @@ void M2_CalculateOffsetValue(void)
 __interrupt void epwm1_isr(void)
 {
     ControlISRCounter++;
+    torque_distributor_start = (uint64_t)IpcRegs.IPCCOUNTERL + (uint64_t)((uint64_t)IpcRegs.IPCCOUNTERH)*((uint64_t)4294967296);
+    PerformTorqueDistribution();
+    torque_distributor_end = (uint64_t)IpcRegs.IPCCOUNTERL + (uint64_t)((uint64_t)IpcRegs.IPCCOUNTERH)*((uint64_t)4294967296);
+
+    torque_distributor_timedifference = torque_distributor_end - torque_distributor_start;
+    time_in_usec = ((float)torque_distributor_timedifference)/((float)200);
 #if 1
     if (M1_OperationMode == MODE_CLA_MPCCONTROLLER)
     {
@@ -2529,5 +2579,87 @@ void CLA_initCpu1Cla1(void)
     //
     PieCtrlRegs.PIEIER11.all = 0xFFFF;
     EDIS;
+}
+
+void PerformTorqueDistribution(void)
+{
+    /*17/03/2021
+     * hakansrc: The execution time of this function is 1487 uS, which is NOT acceptable
+     * Need to do a study for reduction of the execution time (the aim is less than 100uS)
+     *
+     * */
+#define CFE 1.55f
+#define LAMBDA 1.55f
+
+    unsigned int uiIndex = 0;
+    float IqRef = PI_iq_cla.Output;
+    unsigned int minimumlossindex = 0;
+    float minimumlossvalue = 1e35;
+    /*we are assuming that the fault occured on phase A of module 1*/
+    if(FaultFlag==YES_FAULT)
+    {
+        M1_Possible_Iq =  0.6667f*sinf(0.6667f*PI)*(1.0f-cosf(2.0f*((float) EQep1Regs.QPOSCNT / (float) ENCODERMAXTICKCOUNT * 2.0 * PI)) );
+        M1_Possible_Id = -0.6667f*sinf(0.6667f*PI)*sinf(2.0f*((float) EQep1Regs.QPOSCNT / (float) ENCODERMAXTICKCOUNT * 2.0 * PI));
+        M2_Possible_Iq = 1;
+        M2_Possible_Id = 0;
+    }
+    else
+    {
+        M1_Possible_Iq = 1.0f;
+        M1_Possible_Id = 0.0f;
+        M2_Possible_Iq = 1.0f;
+        M2_Possible_Id = 0.0f;
+    }
+
+    for(uiIndex=0.0f;uiIndex<TORQUE_DISTRIBUTION_STEP;uiIndex++)
+    {
+        /*fault is on module1 phase a for now*/
+        if(FaultFlag==YES_FAULT)
+        {
+            M1_Candidate_Iqref[uiIndex] = IqRef*(1.0f/((float)TORQUE_DISTRIBUTION_STEP))*((float)uiIndex)*M1_Possible_Iq;
+            M1_Candidate_Idref[uiIndex] = IqRef*(1.0f/((float)TORQUE_DISTRIBUTION_STEP))*((float)uiIndex)*M1_Possible_Id;
+
+            /*M2 is the healthy module, therefore it can continue with id=0*/
+            M2_Candidate_Iqref[uiIndex] = IqRef - M1_Candidate_Iqref[uiIndex];
+            M2_Candidate_Idref[uiIndex] = 0.0f;
+        }
+        else
+        {
+            M1_Candidate_Iqref[uiIndex] = IqRef*(1.0f/((float)TORQUE_DISTRIBUTION_STEP))*((float)uiIndex);
+            M1_Candidate_Idref[uiIndex] = 0.0f;
+
+            M2_Candidate_Iqref[uiIndex] = (1.0f - (1.0f/((float)TORQUE_DISTRIBUTION_STEP))*((float)uiIndex)) * IqRef;
+            M2_Candidate_Idref[uiIndex] = 0.0f;
+
+        }
+
+        M1_d_axis_flux = M1_LS_VALUE*M1_Candidate_Idref[uiIndex] + FLUX_VALUE;
+        M1_q_axis_flux = M1_LS_VALUE*M1_Candidate_Iqref[uiIndex];
+        M2_d_axis_flux = M2_LS_VALUE*M2_Candidate_Idref[uiIndex] + FLUX_VALUE;
+        M2_q_axis_flux = M2_LS_VALUE*M2_Candidate_Iqref[uiIndex];
+
+
+        M1_copper_loss = 1.5f*M1_RS_VALUE*(powf(M1_Candidate_Iqref[uiIndex],2.0f)+powf(M1_Candidate_Idref[uiIndex],2.0f));
+        M1_core_loss =  CFE*powf(fabsf(Module1_Parameters.AngularSpeedRadSec.Electrical),LAMBDA)*(powf(M1_d_axis_flux,2.0f)+powf(M1_q_axis_flux,2.0f));
+
+        M2_copper_loss = 1.5f*M2_RS_VALUE*(powf(M2_Candidate_Iqref[uiIndex],2.0f)+powf(M2_Candidate_Idref[uiIndex],2.0f));
+        M2_core_loss =  CFE*powf(fabsf(Module1_Parameters.AngularSpeedRadSec.Electrical),LAMBDA)*(powf(M2_d_axis_flux,2.0f)+powf(M2_q_axis_flux,2.0f));
+
+
+        TotalLoss[uiIndex] = M1_copper_loss + M1_core_loss + M2_copper_loss + M2_core_loss;
+
+        if(minimumlossvalue>TotalLoss[uiIndex])
+        {
+            minimumlossvalue = TotalLoss[uiIndex];
+            minimumlossindex = uiIndex;
+        }
+
+
+
+    }
+
+    M1_minimumloss_iqref = M1_Candidate_Iqref[minimumlossindex];
+    M2_minimumloss_iqref = M2_Candidate_Iqref[minimumlossindex];
+
 }
 

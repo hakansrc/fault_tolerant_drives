@@ -33,6 +33,7 @@ extern float                SpeedRefRPM;
 extern unsigned int         M1_OperationMode;
 extern uint16_t             ByPass_SpeedMeasurement;
 extern float                M1_ElectricalAngle;
+extern float                M1_minimumloss_iqref;
 
 float CLA_Power(float base, uint16_t power);
 float CLA_floating_modulus(float a,float b);

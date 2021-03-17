@@ -23,7 +23,7 @@ __interrupt void Cla1Task1 ( void )
 
         CalculateParkTransform_cla(&Module2_Parameters_cla);
 
-        Module2_Parameters_cla.Reference.Iq = PI_iq_cla.Output/((float)2);
+        Module2_Parameters_cla.Reference.Iq = M2_minimumloss_iqref_cla; //PI_iq_cla.Output/((float)2);
         Module2_Parameters_cla.Reference.Id = IDREF;
 
         Module2_Parameters_cla.MinimumCostValue = (float)1e35;

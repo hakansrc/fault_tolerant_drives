@@ -2234,14 +2234,15 @@ __interrupt void CLATask1_PCC_Is_Done(void)
 {
     CLA1Task1End_counter++;
     memcpy(&PI_iq,&PI_iq_cla,sizeof(PID_Parameters)); // give the torque reference from cpu1cla to cpu2
+    memcpy(&Module1_Parameters,&Module1_Parameters_cla,sizeof(ModuleParameters));
     if (SendOneInFour % 4 == 0)
     {
         DataToBeSent[0] = Module1_Parameters_cla.Measured.Current.transformed.Dvalue; // .Measured.Current.PhaseA;
         DataToBeSent[1] = Module1_Parameters_cla.Measured.Current.transformed.Qvalue; // .Measured.Current.PhaseA;
         DataToBeSent[2] = Module2_Parameters.Measured.Current.transformed.Dvalue; // .Measured.Current.PhaseA;
         DataToBeSent[3] = Module2_Parameters.Measured.Current.transformed.Qvalue; // .Measured.Current.PhaseA;
-        DataToBeSent[4] = Module1_Parameters_cla.AngleRad.Mechanical;
-        DataToBeSent[5] = Module2_Parameters.AngleRad.Mechanical;
+        DataToBeSent[4] = Module1_Parameters_cla.AngularSpeedRPM.Mechanical;
+        DataToBeSent[5] = SpeedRefRPM;
 
         SciSendMultipleFloatWithTheTag(DataToBeSent, 6);
     }

@@ -435,6 +435,7 @@ __interrupt void epwm4_isr(void)
     if (M2_OperationMode == MODE_CLA_MPCCONTROLLER)
     {
         memcpy(&PI_iq_cla,&PI_iq,sizeof(PID_Parameters)); //get the reference from cpu1 to cla of cpu2
+        memcpy(&Module2_Parameters_cla.AngularSpeedRadSec,&Module1_Parameters.AngularSpeedRadSec,sizeof(AngularSpeed));
         EPwm4Regs.ETCLR.bit.INT = 1;
         PieCtrlRegs.PIEACK.all = PIEACK_GROUP3;
         return;

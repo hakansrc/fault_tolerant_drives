@@ -1,6 +1,6 @@
 clc
 clear
-% fclose(instrfind) % call this command for stopping callback function
+fclose(instrfind) % call this command for stopping callback function
 %% GLOBAL VARIABLES
 % global variables are used for communication between the main function and
 % the callback function
@@ -18,7 +18,7 @@ TheTagByteSize = 4;                             %the byte size of the tag
 NumberOfFloatsPerPacket = 6;                    %number of floats to be sent at one sending
 CallbackFunctionByteNumber=512;                 %the callback function is called when this amount of bytes are read from the channel
 %% VARIABLE DEFINITIONS
-EnableSaving = 0;                               %set 0 in order to disable saving of the received data (recommended to stay at 1)
+EnableSaving = 1;                               %set 0 in order to disable saving of the received data (recommended to stay at 1)
 ProcessRawDataThresholdInBytes = 2048*50*10;    %the received data will be saved and/or converted and plotted when ProcessRawDataThresholdInBytes bytes of data is received
 EnablePlotting = 1;                             %set 0 in order to disable plotting of taken variables (for live visualization)
 DataSampleRate = 2500;                          %this used for determinining the tag on the plots
@@ -91,7 +91,7 @@ while(1)
         end
         TheRawDataIsInProcessFlag = 0;
         if(EnableSaving==1)
-            FileName = sprintf("TestData/TestData_TwoModule_fsw1_fsw2_M1id_speedmeas_M2id_speedref_%s", datestr(now, 'ddmmyyHHMMSS'));
+            FileName = sprintf("TestData/TestData_TwoModule_id1_iq1_id2_id2_wmech_wref_%s", datestr(now, 'ddmmyyHHMMSS'));
             save(FileName,'RawDataArray','TheTag','TheTagByteSize','NumberOfFloatsPerPacket','DataSampleRate');
             RawDataArray = 0;
             TheRawDataIsInProcessFlag = 0;

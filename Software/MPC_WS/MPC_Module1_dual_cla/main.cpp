@@ -372,7 +372,7 @@ __interrupt void cpu_timer0_isr(void)
 __interrupt void cpu_timer1_isr(void)
 {
     CpuTimer1.InterruptCount++;
-#if 0
+#if 1
     if((M1_OperationMode==MODE_MPCCONTROLLER)||(M1_OperationMode==MODE_CLA_MPCCONTROLLER))
     {
         if((CpuTimer1.InterruptCount%5)==0)
@@ -1981,12 +1981,14 @@ void M2_CalculateOffsetValue(void)
 __interrupt void epwm1_isr(void)
 {
     ControlISRCounter++;
+#if 0
     torque_distributor_start = (uint64_t)IpcRegs.IPCCOUNTERL + (uint64_t)((uint64_t)IpcRegs.IPCCOUNTERH)*((uint64_t)4294967296);
     PerformTorqueDistribution();
     torque_distributor_end = (uint64_t)IpcRegs.IPCCOUNTERL + (uint64_t)((uint64_t)IpcRegs.IPCCOUNTERH)*((uint64_t)4294967296);
 
     torque_distributor_timedifference = torque_distributor_end - torque_distributor_start;
     time_in_usec = ((float)torque_distributor_timedifference)/((float)200);
+#endif
 #if 1
     if (M1_OperationMode == MODE_CLA_MPCCONTROLLER)
     {

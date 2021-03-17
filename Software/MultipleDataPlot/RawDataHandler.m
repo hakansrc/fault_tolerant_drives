@@ -3,7 +3,7 @@ clc
 close all
 FontSize = 16;
 % load('TestData/TestData301120212502.mat')
-load('TestData/TestData_TwoModule_fsw1_fsw2_M1id_M1iq_M2id_M2iq_090321163055.mat')
+load('TestData/TestData_TwoModule_id1_iq1_id2_id2_wmech_wref_170321192604.mat')
 EnablePlotting = 1;
 TheTagValue = zeros(NumberOfFloatsPerPacket,4);
 TheSaveArrayScreened = RawDataArray;
@@ -26,7 +26,7 @@ if(isempty(TheTagIndices)==0)
     for i=1:6
         subplot(3,2,i)
         plot((1:numel(TheDataConvertedValues(i,:)))/DataSampleRate,TheDataConvertedValues(i,:));
-         xlim([0 0.1]);
+%          xlim([0 0.1]);
         grid on
     end   
 end

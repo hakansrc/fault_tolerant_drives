@@ -19,16 +19,23 @@
 #define TORQUE_DISTRIBUTION_STEP    100
 uint16_t    FaultFlag = NO_FAULT;
 void PerformTorqueDistribution(void);
+static inline void CalculateLosses(float IqRef, unsigned int uiIndex);
 
 float M1_Possible_Iq = 0.0f;
 float M1_Possible_Id = 0.0f;
 float M2_Possible_Iq = 0.0f;
 float M2_Possible_Id = 0.0f;
 
+float M1_Iq_Candidate_Coefficient = 0.0f;
+float M1_Id_Candidate_Coefficient = 0.0f;
+
 float M1_d_axis_flux = 0.0f;
 float M1_q_axis_flux = 0.0f;
 float M2_d_axis_flux = 0.0f;
 float M2_q_axis_flux = 0.0f;
+
+unsigned int minimumlossindex = 0;
+float minimumlossvalue = 1e35;
 
 float M1_Candidate_Iqref[TORQUE_DISTRIBUTION_STEP];
 float M1_Candidate_Idref[TORQUE_DISTRIBUTION_STEP];
@@ -1981,7 +1988,7 @@ void M2_CalculateOffsetValue(void)
 __interrupt void epwm1_isr(void)
 {
     ControlISRCounter++;
-#if 0
+#if 1
     torque_distributor_start = (uint64_t)IpcRegs.IPCCOUNTERL + (uint64_t)((uint64_t)IpcRegs.IPCCOUNTERH)*((uint64_t)4294967296);
     PerformTorqueDistribution();
     torque_distributor_end = (uint64_t)IpcRegs.IPCCOUNTERL + (uint64_t)((uint64_t)IpcRegs.IPCCOUNTERH)*((uint64_t)4294967296);
@@ -2595,13 +2602,16 @@ void PerformTorqueDistribution(void)
 
     unsigned int uiIndex = 0;
     float IqRef = PI_iq_cla.Output;
-    unsigned int minimumlossindex = 0;
-    float minimumlossvalue = 1e35;
+    minimumlossvalue = 1e35;
+
+
+
+
     /*we are assuming that the fault occured on phase A of module 1*/
     if(FaultFlag==YES_FAULT)
     {
-        M1_Possible_Iq =  0.6667f*sinf(0.6667f*PI)*(1.0f-cosf(2.0f*((float) EQep1Regs.QPOSCNT / (float) ENCODERMAXTICKCOUNT * 2.0 * PI)) );
-        M1_Possible_Id = -0.6667f*sinf(0.6667f*PI)*sinf(2.0f*((float) EQep1Regs.QPOSCNT / (float) ENCODERMAXTICKCOUNT * 2.0 * PI));
+        M1_Possible_Iq =  0.6667f*sinf(0.6667f*PI)*(1.0f-cosf(2.0f*((float) EQep1Regs.QPOSCNT / (float) ENCODERMAXTICKCOUNT * 2.0f * PI)) );
+        M1_Possible_Id = -0.6667f*sinf(0.6667f*PI)*sinf(2.0f*((float) EQep1Regs.QPOSCNT / (float) ENCODERMAXTICKCOUNT * 2.0f * PI));
         M2_Possible_Iq = 1;
         M2_Possible_Id = 0;
     }
@@ -2613,40 +2623,46 @@ void PerformTorqueDistribution(void)
         M2_Possible_Id = 0.0f;
     }
 
+    M1_Iq_Candidate_Coefficient = IqRef*(1.0f/((float)TORQUE_DISTRIBUTION_STEP))*M1_Possible_Iq;
+    M1_Id_Candidate_Coefficient = IqRef*(1.0f/((float)TORQUE_DISTRIBUTION_STEP))*M1_Possible_Id;
+
+#if 0
     for(uiIndex=0.0f;uiIndex<TORQUE_DISTRIBUTION_STEP;uiIndex++)
     {
         /*fault is on module1 phase a for now*/
         if(FaultFlag==YES_FAULT)
         {
-            M1_Candidate_Iqref[uiIndex] = IqRef*(1.0f/((float)TORQUE_DISTRIBUTION_STEP))*((float)uiIndex)*M1_Possible_Iq;
-            M1_Candidate_Idref[uiIndex] = IqRef*(1.0f/((float)TORQUE_DISTRIBUTION_STEP))*((float)uiIndex)*M1_Possible_Id;
-
+            //M1_Candidate_Iqref[uiIndex] = IqRef*(1.0f/((float)TORQUE_DISTRIBUTION_STEP))*((float)uiIndex)*M1_Possible_Iq;
+            //M1_Candidate_Idref[uiIndex] = IqRef*(1.0f/((float)TORQUE_DISTRIBUTION_STEP))*((float)uiIndex)*M1_Possible_Id;
+            M1_Candidate_Iqref[uiIndex] = M1_Iq_Candidate_Coefficient*((float)uiIndex);
+            M1_Candidate_Idref[uiIndex] = M1_Id_Candidate_Coefficient*((float)uiIndex);
             /*M2 is the healthy module, therefore it can continue with id=0*/
             M2_Candidate_Iqref[uiIndex] = IqRef - M1_Candidate_Iqref[uiIndex];
             M2_Candidate_Idref[uiIndex] = 0.0f;
         }
         else
         {
+            /*
             M1_Candidate_Iqref[uiIndex] = IqRef*(1.0f/((float)TORQUE_DISTRIBUTION_STEP))*((float)uiIndex);
             M1_Candidate_Idref[uiIndex] = 0.0f;
-
             M2_Candidate_Iqref[uiIndex] = (1.0f - (1.0f/((float)TORQUE_DISTRIBUTION_STEP))*((float)uiIndex)) * IqRef;
             M2_Candidate_Idref[uiIndex] = 0.0f;
-
+            */
+            M1_Candidate_Iqref[uiIndex] = M1_Iq_Candidate_Coefficient*((float)uiIndex);
+            M1_Candidate_Idref[uiIndex] = 0.0f;
+            M2_Candidate_Iqref[uiIndex] = IqRef - M1_Candidate_Iqref[uiIndex];
+            M2_Candidate_Idref[uiIndex] = 0.0f;
         }
-
         M1_d_axis_flux = M1_LS_VALUE*M1_Candidate_Idref[uiIndex] + FLUX_VALUE;
         M1_q_axis_flux = M1_LS_VALUE*M1_Candidate_Iqref[uiIndex];
         M2_d_axis_flux = M2_LS_VALUE*M2_Candidate_Idref[uiIndex] + FLUX_VALUE;
         M2_q_axis_flux = M2_LS_VALUE*M2_Candidate_Iqref[uiIndex];
-
 
         M1_copper_loss = 1.5f*M1_RS_VALUE*(powf(M1_Candidate_Iqref[uiIndex],2.0f)+powf(M1_Candidate_Idref[uiIndex],2.0f));
         M1_core_loss =  CFE*powf(fabsf(Module1_Parameters.AngularSpeedRadSec.Electrical),LAMBDA)*(powf(M1_d_axis_flux,2.0f)+powf(M1_q_axis_flux,2.0f));
 
         M2_copper_loss = 1.5f*M2_RS_VALUE*(powf(M2_Candidate_Iqref[uiIndex],2.0f)+powf(M2_Candidate_Idref[uiIndex],2.0f));
         M2_core_loss =  CFE*powf(fabsf(Module1_Parameters.AngularSpeedRadSec.Electrical),LAMBDA)*(powf(M2_d_axis_flux,2.0f)+powf(M2_q_axis_flux,2.0f));
-
 
         TotalLoss[uiIndex] = M1_copper_loss + M1_core_loss + M2_copper_loss + M2_core_loss;
 
@@ -2658,10 +2674,161 @@ void PerformTorqueDistribution(void)
 
 
 
+
     }
+#elif 0
+    for(uiIndex=0.0f;uiIndex<TORQUE_DISTRIBUTION_STEP;uiIndex++)
+    {
+        CalculateLosses(IqRef, uiIndex);
+    }
+#elif 1
+    CalculateLosses(IqRef, 0);
+    CalculateLosses(IqRef, 1);
+    CalculateLosses(IqRef, 2);
+    CalculateLosses(IqRef, 3);
+    CalculateLosses(IqRef, 4);
+    CalculateLosses(IqRef, 5);
+    CalculateLosses(IqRef, 6);
+    CalculateLosses(IqRef, 7);
+    CalculateLosses(IqRef, 8);
+    CalculateLosses(IqRef, 9);
+
+    CalculateLosses(IqRef, 10);
+    CalculateLosses(IqRef, 11);
+    CalculateLosses(IqRef, 12);
+    CalculateLosses(IqRef, 13);
+    CalculateLosses(IqRef, 14);
+    CalculateLosses(IqRef, 15);
+    CalculateLosses(IqRef, 16);
+    CalculateLosses(IqRef, 17);
+    CalculateLosses(IqRef, 18);
+    CalculateLosses(IqRef, 19);
+
+    CalculateLosses(IqRef, 20);
+    CalculateLosses(IqRef, 21);
+    CalculateLosses(IqRef, 22);
+    CalculateLosses(IqRef, 23);
+    CalculateLosses(IqRef, 24);
+    CalculateLosses(IqRef, 25);
+    CalculateLosses(IqRef, 26);
+    CalculateLosses(IqRef, 27);
+    CalculateLosses(IqRef, 28);
+    CalculateLosses(IqRef, 29);
+
+    CalculateLosses(IqRef, 30);
+    CalculateLosses(IqRef, 31);
+    CalculateLosses(IqRef, 32);
+    CalculateLosses(IqRef, 33);
+    CalculateLosses(IqRef, 34);
+    CalculateLosses(IqRef, 35);
+    CalculateLosses(IqRef, 36);
+    CalculateLosses(IqRef, 37);
+    CalculateLosses(IqRef, 38);
+    CalculateLosses(IqRef, 39);
+
+    CalculateLosses(IqRef, 40);
+    CalculateLosses(IqRef, 41);
+    CalculateLosses(IqRef, 42);
+    CalculateLosses(IqRef, 43);
+    CalculateLosses(IqRef, 44);
+    CalculateLosses(IqRef, 45);
+    CalculateLosses(IqRef, 46);
+    CalculateLosses(IqRef, 47);
+    CalculateLosses(IqRef, 48);
+    CalculateLosses(IqRef, 49);
+
+    CalculateLosses(IqRef, 50);
+    CalculateLosses(IqRef, 51);
+    CalculateLosses(IqRef, 52);
+    CalculateLosses(IqRef, 53);
+    CalculateLosses(IqRef, 54);
+    CalculateLosses(IqRef, 55);
+    CalculateLosses(IqRef, 56);
+    CalculateLosses(IqRef, 57);
+    CalculateLosses(IqRef, 58);
+    CalculateLosses(IqRef, 59);
+
+    CalculateLosses(IqRef, 60);
+    CalculateLosses(IqRef, 61);
+    CalculateLosses(IqRef, 62);
+    CalculateLosses(IqRef, 63);
+    CalculateLosses(IqRef, 64);
+    CalculateLosses(IqRef, 65);
+    CalculateLosses(IqRef, 66);
+    CalculateLosses(IqRef, 67);
+    CalculateLosses(IqRef, 68);
+    CalculateLosses(IqRef, 69);
+
+    CalculateLosses(IqRef, 70);
+    CalculateLosses(IqRef, 71);
+    CalculateLosses(IqRef, 72);
+    CalculateLosses(IqRef, 73);
+    CalculateLosses(IqRef, 74);
+    CalculateLosses(IqRef, 75);
+    CalculateLosses(IqRef, 76);
+    CalculateLosses(IqRef, 77);
+    CalculateLosses(IqRef, 78);
+    CalculateLosses(IqRef, 79);
+
+    CalculateLosses(IqRef, 80);
+    CalculateLosses(IqRef, 81);
+    CalculateLosses(IqRef, 82);
+    CalculateLosses(IqRef, 83);
+    CalculateLosses(IqRef, 84);
+    CalculateLosses(IqRef, 85);
+    CalculateLosses(IqRef, 86);
+    CalculateLosses(IqRef, 87);
+    CalculateLosses(IqRef, 88);
+    CalculateLosses(IqRef, 89);
+
+    CalculateLosses(IqRef, 90);
+    CalculateLosses(IqRef, 91);
+    CalculateLosses(IqRef, 92);
+    CalculateLosses(IqRef, 93);
+    CalculateLosses(IqRef, 94);
+    CalculateLosses(IqRef, 95);
+    CalculateLosses(IqRef, 96);
+    CalculateLosses(IqRef, 97);
+    CalculateLosses(IqRef, 98);
+    CalculateLosses(IqRef, 99);
+
+
+#endif
 
     M1_minimumloss_iqref = M1_Candidate_Iqref[minimumlossindex];
     M2_minimumloss_iqref = M2_Candidate_Iqref[minimumlossindex];
 
 }
 
+static inline void CalculateLosses(float IqRef, unsigned int uiIndex)
+{
+    M1_Candidate_Iqref[uiIndex] = M1_Iq_Candidate_Coefficient*((float)uiIndex);
+    M1_Candidate_Idref[uiIndex] = M1_Id_Candidate_Coefficient*((float)uiIndex);
+
+    /*M2 is the healthy module, therefore it can continue with id=0*/
+    M2_Candidate_Iqref[uiIndex] = IqRef - M1_Candidate_Iqref[uiIndex];
+    M2_Candidate_Idref[uiIndex] = 0.0f;
+
+    M1_d_axis_flux = M1_LS_VALUE*M1_Candidate_Idref[uiIndex] + FLUX_VALUE;
+    M1_q_axis_flux = M1_LS_VALUE*M1_Candidate_Iqref[uiIndex];
+    M2_d_axis_flux = M2_LS_VALUE*M2_Candidate_Idref[uiIndex] + FLUX_VALUE;
+    M2_q_axis_flux = M2_LS_VALUE*M2_Candidate_Iqref[uiIndex];
+
+
+    M1_copper_loss = 1.5f*M1_RS_VALUE*(powf(M1_Candidate_Iqref[uiIndex],2.0f)+powf(M1_Candidate_Idref[uiIndex],2.0f));
+    M1_core_loss =  CFE*powf(fabsf(Module1_Parameters.AngularSpeedRadSec.Electrical),LAMBDA)*(powf(M1_d_axis_flux,2.0f)+powf(M1_q_axis_flux,2.0f));
+
+    M2_copper_loss = 1.5f*M2_RS_VALUE*(powf(M2_Candidate_Iqref[uiIndex],2.0f)+powf(M2_Candidate_Idref[uiIndex],2.0f));
+    M2_core_loss =  CFE*powf(fabsf(Module1_Parameters.AngularSpeedRadSec.Electrical),LAMBDA)*(powf(M2_d_axis_flux,2.0f)+powf(M2_q_axis_flux,2.0f));
+
+
+    TotalLoss[uiIndex] = M1_copper_loss + M1_core_loss + M2_copper_loss + M2_core_loss;
+
+    if(minimumlossvalue>TotalLoss[uiIndex])
+    {
+        minimumlossvalue = TotalLoss[uiIndex];
+        minimumlossindex = uiIndex;
+    }
+
+
+}

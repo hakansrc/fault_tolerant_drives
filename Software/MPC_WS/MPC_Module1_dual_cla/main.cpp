@@ -68,7 +68,7 @@ PID_Parameters      PI_iq_cla;
 #pragma DATA_SECTION("CLAData")
 float       SpeedRefRadSec = 0;
 #pragma DATA_SECTION("CLAData")
-float       SpeedRefRPM = 33;
+float       SpeedRefRPM = 90;
 #pragma DATA_SECTION("CLAData")
 unsigned int        M1_OperationMode = MODE_NO_OPERATION;
 #pragma DATA_SECTION("CLAData")
@@ -1988,7 +1988,7 @@ void M2_CalculateOffsetValue(void)
 __interrupt void epwm1_isr(void)
 {
     ControlISRCounter++;
-#if 1
+#if 0
     torque_distributor_start = (uint64_t)IpcRegs.IPCCOUNTERL + (uint64_t)((uint64_t)IpcRegs.IPCCOUNTERH)*((uint64_t)4294967296);
     PerformTorqueDistribution();
     torque_distributor_end = (uint64_t)IpcRegs.IPCCOUNTERL + (uint64_t)((uint64_t)IpcRegs.IPCCOUNTERH)*((uint64_t)4294967296);

@@ -26,6 +26,7 @@ extern "C" {
 extern uint32_t             Cla1Task1_counter;
 extern float                Clacoscalc;
 extern float                M1_FswDecided_cla;
+extern unsigned int         MinimumCostIndexDecided_cla;
 extern ModuleParameters     Module1_Parameters_cla;
 extern PID_Parameters       PI_iq_cla;
 extern float                SpeedRefRadSec;

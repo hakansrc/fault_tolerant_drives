@@ -62,6 +62,8 @@ float    Clacoscalc = 0;
 #pragma DATA_SECTION("CLAData")
 float       M1_FswDecided_cla = 1000;
 #pragma DATA_SECTION("CLAData")
+unsigned int MinimumCostIndexDecided_cla = 0;
+#pragma DATA_SECTION("CLAData")
 ModuleParameters Module1_Parameters_cla;
 #pragma DATA_SECTION("CLAData")
 PID_Parameters      PI_iq_cla;
@@ -76,6 +78,8 @@ float       M1_ElectricalAngle = 0;
 
 #pragma DATA_SECTION("CLAData")
 float M1_minimumloss_iqref = 0.0f;
+
+
 
 #pragma DATA_SECTION("M2_MINIMUMLOSS_IQ_LOCATION")
 float M2_minimumloss_iqref = 0.0f;

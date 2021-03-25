@@ -72,6 +72,7 @@ __interrupt void Cla1Task1 ( void )
             Module2_Parameters_cla.PhaseCDutyCycle = 0.0f;
 
         M2_FswDecided_cla = Module2_Parameters_cla.OptimizationFsw[Module2_Parameters_cla.MinimumCostIndex];
+        MinimumCostIndexDecided_cla = Module2_Parameters_cla.MinimumCostIndex;
     }
 
     if(M2_OperationMode==MODE_CLA_MPCCONTROLLER)
@@ -217,8 +218,8 @@ void GetSvpwmDutyCycles_cla(float T1, float T2, float T0,float Ts,float VectorAn
 }
 void ExecuteFirstPrediction_cla(ModuleParameters *moduleparams, unsigned int indexcount)
 {
-    moduleparams->CurrentHorizon[indexcount].VdPrediction = moduleparams->FirstHorizon[indexcount].VdPrediction;  // First horizon prediction on the previous horizon is our current value now
-    moduleparams->CurrentHorizon[indexcount].VqPrediction = moduleparams->FirstHorizon[indexcount].VqPrediction;  // First horizon prediction on the previous horizon is our current value now
+    moduleparams->CurrentHorizon[indexcount].VdPrediction = moduleparams->FirstHorizon[MinimumCostIndexDecided_cla].VdPrediction;  // First horizon prediction on the previous horizon is our current value now
+    moduleparams->CurrentHorizon[indexcount].VqPrediction = moduleparams->FirstHorizon[MinimumCostIndexDecided_cla].VqPrediction;  // First horizon prediction on the previous horizon is our current value now
 
     moduleparams->FirstHorizon[indexcount].IdPrediction = moduleparams->Measured.Current.transformed.Dvalue + (0.5f / M2_FswDecided_cla) * (moduleparams->CurrentHorizon[indexcount].VdPrediction / M2_LS_VALUE - M2_RS_VALUE / M2_LS_VALUE * moduleparams->Measured.Current.transformed.Dvalue + M2_LS_VALUE / M2_LS_VALUE * POLEPAIRS * moduleparams->AngularSpeedRadSec.Mechanical * moduleparams->Measured.Current.transformed.Qvalue);
     moduleparams->FirstHorizon[indexcount].IqPrediction = moduleparams->Measured.Current.transformed.Qvalue + (0.5f / M2_FswDecided_cla) * (moduleparams->CurrentHorizon[indexcount].VqPrediction / M2_LS_VALUE - M2_RS_VALUE / M2_LS_VALUE * moduleparams->Measured.Current.transformed.Qvalue - M2_LS_VALUE / M2_LS_VALUE * POLEPAIRS * moduleparams->AngularSpeedRadSec.Mechanical * moduleparams->Measured.Current.transformed.Dvalue - FLUX_VALUE * POLEPAIRS * moduleparams->AngularSpeedRadSec.Mechanical / M2_LS_VALUE);

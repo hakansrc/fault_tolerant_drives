@@ -18,8 +18,8 @@ TheTagByteSize = 4;                             %the byte size of the tag
 NumberOfFloatsPerPacket = 6;                    %number of floats to be sent at one sending
 CallbackFunctionByteNumber=512;                 %the callback function is called when this amount of bytes are read from the channel
 %% VARIABLE DEFINITIONS
-EnableSaving = 1;                               %set 0 in order to disable saving of the received data (recommended to stay at 1)
-ProcessRawDataThresholdInBytes = 2048*50*10;    %the received data will be saved and/or converted and plotted when ProcessRawDataThresholdInBytes bytes of data is received
+EnableSaving = 0;                               %set 0 in order to disable saving of the received data (recommended to stay at 1)
+ProcessRawDataThresholdInBytes = 2048*50*10/5;    %the received data will be saved and/or converted and plotted when ProcessRawDataThresholdInBytes bytes of data is received
 EnablePlotting = 1;                             %set 0 in order to disable plotting of taken variables (for live visualization)
 DataSampleRate = 2500;                          %this used for determinining the tag on the plots
 TheSerialChannelDevice = 'COM5';                %set the serial channel device, (this value can be found the device manager)
@@ -70,18 +70,8 @@ while(1)
                     end
                     subplot(3,2,i)
                     plot((1:numel(TheDataConvertedValues(i,:)))/DataSampleRate,TheDataConvertedValues(i,:));
-                    if(i==1)
-%                         ylim([0 30000]);
-                    end
-                    if(i==3)
-%                        ylim([-1 1]);
-                    end
-                    if(i==4)
-%                         ylim([0 2]);
-                    end
-                    if(i==6)
-%                         ylim([40 120]);
-                    end
+                    Text = sprintf('MeanValue: %f ',mean(TheDataConvertedValues(i,:)));
+                    text(0,double(mean(TheDataConvertedValues(i,:)))+0.1,Text, 'FontSize', 16,'FontWeight','bold')                    
                     grid on
                 end
                 TheDataConvertedValues = 0;

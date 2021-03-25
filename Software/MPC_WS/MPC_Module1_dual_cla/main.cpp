@@ -62,15 +62,13 @@ float    Clacoscalc = 0;
 #pragma DATA_SECTION("CLAData")
 float       M1_FswDecided_cla = 1000;
 #pragma DATA_SECTION("CLAData")
-unsigned int MinimumCostIndexDecided_cla = 0;
-#pragma DATA_SECTION("CLAData")
 ModuleParameters Module1_Parameters_cla;
 #pragma DATA_SECTION("CLAData")
 PID_Parameters      PI_iq_cla;
 #pragma DATA_SECTION("CLAData")
 float       SpeedRefRadSec = 0;
 #pragma DATA_SECTION("CLAData")
-float       SpeedRefRPM = 90;
+float       SpeedRefRPM = -90;
 #pragma DATA_SECTION("CLAData")
 unsigned int        M1_OperationMode = MODE_NO_OPERATION;
 #pragma DATA_SECTION("CLAData")
@@ -2255,7 +2253,7 @@ __interrupt void epwm1_isr(void)
 __interrupt void xint1_isr(void)
 {
     Xint1Count++;
-    if(Xint1Count<2) // in the first two rotations, reset the encoder value so that we are aligned to the "sweetpoint"
+    if(Xint1Count<5) // in the first two rotations, reset the encoder value so that we are aligned to the "sweetpoint"
     {
         EQep1Regs.QPOSCNT = ENCODER_SWEETPOINT_VALUE;
 
@@ -2271,6 +2269,7 @@ __interrupt void xint1_isr(void)
 #endif
 
     }
+
 
 #if 0
     if(Xint1Count>=3)

@@ -35,7 +35,7 @@
 
 #define IQRIPPLECOEFF 100000.0f
 #define IQREFCOEFF 10000.0f
-#define IDREFCOEFF 15.0f
+#define IDREFCOEFF 10000.0f
 #define FSWCOEFF 1250.0f
 
 #define M1_VD_VQ_KP M1_LS_VALUE/2.0f*moduleparams.OptimizationFsw[indexcount]

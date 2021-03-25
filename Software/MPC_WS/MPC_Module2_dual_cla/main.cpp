@@ -19,8 +19,6 @@ uint32_t    Cla1Task1_counter = 0;
 #pragma DATA_SECTION("CLAData")
 float       M2_FswDecided_cla = 1000;
 #pragma DATA_SECTION("CLAData")
-unsigned int MinimumCostIndexDecided_cla = 0;
-#pragma DATA_SECTION("CLAData")
 ModuleParameters Module2_Parameters_cla;
 #pragma DATA_SECTION("CLAData")
 PID_Parameters      PI_iq_cla;
@@ -91,6 +89,7 @@ void CLA_configClaMemory(void);
 void CLA_initCpu1Cla1(void);
 
 uint16_t    Ipc0Counter=0;
+
 
 
 int main(void)
@@ -457,6 +456,7 @@ __interrupt void CLATask1_PCC_Is_Done(void)
     CLA1Task1End_counter++;
     memcpy(&PI_iq_cla,&PI_iq,sizeof(PID_Parameters)); //get the reference from cpu1 to cla of cpu2
     memcpy(&Module2_Parameters,&Module2_Parameters_cla,sizeof(ModuleParameters)); //get the reference from cpu1 to cla of cpu2
+    M2_FswDecided = M2_FswDecided_cla;
     PieCtrlRegs.PIEACK.all = PIEACK_GROUP11;
 }
 
@@ -464,7 +464,7 @@ __interrupt void ipc0_isr(void)
 {
     /**/
     Ipc0Counter++;
-    EQep2Regs.QPOSCNT = ENCODER_SWEETPOINT_VALUE;
+    EQep2Regs.QPOSCNT = ENCODER_SWEETPOINT_VALUE-2+4;
     IpcRegs.IPCACK.bit.IPC0 = 1;
     PieCtrlRegs.PIEACK.all = PIEACK_GROUP1;
 }

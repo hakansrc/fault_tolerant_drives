@@ -3,7 +3,7 @@ clc
 %% Simulation parameters
 Sampling_time = 1e-6;
 ref_frequency = 100*pi;
-Tfinal = 1.5; %seconds
+Tfinal = 3; %seconds
 %% PMSM parameters
 MotorSpeed = 600; % rpm
 PolePairs = 10;
@@ -14,6 +14,8 @@ Rs = 539e-3; % Ohms
 VoltageConstant = EfRated*sqrt(6)/MotorSpeed*1e3;% Vll-peak/krpm
 Inertia = 1e-2; % kgm^2
 ViscousFriction = 1e-3; % Nms
+
+
 
 Module1Phase_A_600RPM_Vrms = 79.3;
 Module1Phase_B_600RPM_Vrms = 79.3;
@@ -73,7 +75,7 @@ MeanLd = (1/12)*(Module1Phase_A_Ld+Module1Phase_B_Ld+Module1Phase_C_Ld+...
 
 %% Inverter parameters
 DCLINK_Cap = 1000e-12;
-Vdc = 40;
+Vdc = 50;
 ma = 0.9;
 sw_frequency = 40000;
 intangle1 = 0;
@@ -86,12 +88,12 @@ iqrated = Trated/(1.5*PolePairs*FluxPM);
 %% Other parameters
 Load_Nominal_Freq = 50;
 THD_mean_frequency = 50;
-SpeedRef1 = 80; % RPM
+SpeedRef1 = 30; % RPM
 SpeedRef2 = 80;
-SpeedRefUpdateTime = 0.75;
-Tload1 = 20; %Nm
-Tload2 = 20;
-TloadUpdateTime = 0.75;
+SpeedRefUpdateTime = 0.5;
+Tload1 = 5; %Nm
+Tload2 = 25;
+TloadUpdateTime = 0.25;
 FaultTime = 50;
 PmaxPerModule = 2000;
 RPMmaxPerModule = 600;
@@ -101,3 +103,10 @@ I_normalize = IqmaxPerModule;
 whitenoisegain = 0;
 AlignmentPeriod = 1; % sec
 Fsw_Alignment = 10000;
+
+%%
+PI_Frequency = 5000;
+Ki = 12;
+Kp = 0.35;
+PI_Ts = 1/PI_Frequency;
+PI_Sat = iqrated*2;

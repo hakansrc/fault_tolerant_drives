@@ -3,7 +3,7 @@ clc
 %% Simulation parameters
 Sampling_time = 1e-6;
 ref_frequency = 100*pi;
-Tfinal = 3.5; %seconds
+Tfinal = 2.5; %seconds
 %% PMSM parameters
 MotorSpeed = 600; % rpm
 PolePairs = 10;
@@ -107,7 +107,7 @@ M2_FaultTime = 20;
 RefModeSelection = 3;
 %%
 PI_Frequency = 5000;
-Ki = 12;
-Kp = 0.35;
+Ki = 8;
+Kp = 0.8;
 PI_Ts = 1/PI_Frequency;
 PI_Sat = iqrated*2;

@@ -3,7 +3,7 @@ clc
 %% Simulation parameters
 Sampling_time = 1e-6;
 ref_frequency = 100*pi;
-Tfinal = 1; %seconds
+Tfinal = 1.5; %seconds
 %% PMSM parameters
 MotorSpeed = 600; % rpm
 PolePairs = 10;
@@ -82,7 +82,7 @@ MeanLd = (1/12)*(Module1Phase_A_Ld+Module1Phase_B_Ld+Module1Phase_C_Ld+...
 
 %% Inverter parameters
 DCLINK_Cap = 1000e-6;
-Vdc = 50;
+Vdc = 40;
 ma = 0.9;
 sw_frequency = 40000;
 intangle1 = 0;
@@ -95,16 +95,16 @@ iqrated = Trated/(1.5*PolePairs*FluxPM);
 %% Other parameters
 Load_Nominal_Freq = 50;
 THD_mean_frequency = 50;
-SpeedRef1 = 100; % RPM
-SpeedRef2 = 100;
-SpeedRefUpdateTime = 5.75;
+SpeedRef1 = 60; % RPM
+SpeedRef2 = 80;
+SpeedRefUpdateTime = 0.75;
 Tload1 = 10; %Nm
 Tload2 = 20;
-TloadUpdateTime = 55.5;
-M1_FaultTime = 0.4;
+TloadUpdateTime = 0.5;
+M1_FaultTime = 2.5;
 M2_FaultTime = 20;
 %%
-RefModeSelection = 2;
+RefModeSelection = 1;
 % % % % (selection==1)
 % % % % opt_cost;
 % % % % (selection==2)

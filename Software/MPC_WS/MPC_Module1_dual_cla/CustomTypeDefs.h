@@ -8,6 +8,14 @@
 #ifndef CUSTOMTYPEDEFS_H_
 #define CUSTOMTYPEDEFS_H_
 
+typedef struct
+{
+    uint64_t    Beginning;
+    uint64_t    End;
+    uint64_t    Difference;
+    float       fDifference;
+}TimingMeasurement;
+
 
 typedef struct
 {

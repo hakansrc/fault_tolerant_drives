@@ -7,12 +7,12 @@
 #include <math.h>
 
 
-#define MFDS_LIB_CPU_FREQ   200e6
-#define MFDS_THETAG              "hsrc"
-#define MFDS_THETAGBYTESIZE      4
-#define MFDS_SCILIBBUFFERLENGTH      256
-#define MFDS_SCIARXBUFFERSIZE        64
-#define MFDS_MULTIPLEFLOATARRAYSIZE (24+MFDS_THETAGBYTESIZE)
+#define MFDS_LIB_CPU_FREQ               200e6
+#define MFDS_THETAG                     "hsrc"
+#define MFDS_THETAGBYTESIZE             4
+#define MFDS_SCILIBBUFFERLENGTH         512
+#define MFDS_SCIARXBUFFERSIZE           64
+#define MFDS_MULTIPLEFLOATARRAYSIZE     (24+MFDS_THETAGBYTESIZE)
 
 unsigned char ucSciaRxBuffer[MFDS_SCIARXBUFFERSIZE];
 unsigned int uiSciaRxBufferIndex = 0;

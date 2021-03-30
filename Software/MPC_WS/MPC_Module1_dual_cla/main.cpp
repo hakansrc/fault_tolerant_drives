@@ -17,7 +17,7 @@
 
 
 
-#define TORQUE_DISTRIBUTION_STEP    100
+#define TORQUE_DISTRIBUTION_STEP    25
 uint16_t    FaultFlag = NO_FAULT;
 void PerformTorqueDistribution(void);
 static inline void CalculateLosses(float IqRef, unsigned int uiIndex);
@@ -38,17 +38,17 @@ float M2_q_axis_flux = 0.0f;
 unsigned int minimumlossindex = 0;
 float minimumlossvalue = 1e35;
 
-float M1_Candidate_Iqref[TORQUE_DISTRIBUTION_STEP];
-float M1_Candidate_Idref[TORQUE_DISTRIBUTION_STEP];
-float M2_Candidate_Iqref[TORQUE_DISTRIBUTION_STEP];
-float M2_Candidate_Idref[TORQUE_DISTRIBUTION_STEP];
+float M1_Candidate_Iqref[TORQUE_DISTRIBUTION_STEP+1];
+float M1_Candidate_Idref[TORQUE_DISTRIBUTION_STEP+1];
+float M2_Candidate_Iqref[TORQUE_DISTRIBUTION_STEP+1];
+float M2_Candidate_Idref[TORQUE_DISTRIBUTION_STEP+1];
 
 float M1_copper_loss = 0;
 float M2_copper_loss = 0;
 float M1_core_loss = 0;
 float M2_core_loss = 0;
 
-float TotalLoss[TORQUE_DISTRIBUTION_STEP];
+float TotalLoss[TORQUE_DISTRIBUTION_STEP+1];
 
 
 
@@ -215,6 +215,11 @@ uint64_t    torque_distributor_end = 0;
 uint64_t    torque_distributor_timedifference = 0;
 float       time_in_usec = 0.0f;
 
+uint16_t    Start_Torque_Distribution = 0;
+
+TimingMeasurement TorqueDistributor = {0,0,0,0};
+inline uint64_t    GetTime(void);
+
 
 int main(void)
 {
@@ -261,7 +266,7 @@ int main(void)
     DINT;
     /*Initialize cpu timers*/
     InitCpuTimers();
-    ConfigCpuTimer(&CpuTimer0, 200, 1000000); //1 seconds
+    ConfigCpuTimer(&CpuTimer0, 200, 1000000); //2000 Hz
     ConfigCpuTimer(&CpuTimer1, 200, 1000000); //1 seconds
     ConfigCpuTimer(&CpuTimer2, 200, 1000000); //1 seconds
     CpuTimer0Regs.TCR.all = 0x4000;           // enable cpu timer interrupt
@@ -367,16 +372,25 @@ int main(void)
     EDIS;
 
 
-    while (1)
+    while(1)
     {
-        DELAY_US(100);
+#if 0
+        //DELAY_US(100);
         SciaBackgroundTask();
         if(ReadDrv8305RegistersFlag==1)
         {
             M1_ReadDRV8305Registers(&M1_Device1Configuration);
             ReadDrv8305RegistersFlag = 0;
         }
-
+#endif
+        if(Start_Torque_Distribution==1)
+        {
+            TorqueDistributor.Beginning =  GetTime();
+            PerformTorqueDistribution();
+            TorqueDistributor.End =  GetTime();
+            SciaBackgroundTask();
+            Start_Torque_Distribution = 0;
+        }
 
 
 
@@ -385,8 +399,7 @@ int main(void)
 __interrupt void cpu_timer0_isr(void)
 {
     CpuTimer0.InterruptCount++;
-    GpioDataRegs.GPATOGGLE.bit.GPIO31 = 1;
-    GpioDataRegs.GPBTOGGLE.bit.GPIO34 = 1;
+    Start_Torque_Distribution = 1;  // torque distribution will start
     PieCtrlRegs.PIEACK.all = PIEACK_GROUP1;
 }
 
@@ -419,6 +432,8 @@ __interrupt void cpu_timer1_isr(void)
 __interrupt void cpu_timer2_isr(void)
 {
     CpuTimer2.InterruptCount++;
+    GpioDataRegs.GPATOGGLE.bit.GPIO31 = 1;
+    GpioDataRegs.GPBTOGGLE.bit.GPIO34 = 1;
 }
 void InitializeEpwm1Registers(void)
 {
@@ -2618,7 +2633,7 @@ void PerformTorqueDistribution(void)
 #define LAMBDA 1.55f
 
     unsigned int uiIndex = 0;
-    float IqRef = PI_iq_cla.Output;
+    float IqRef = PI_iq_cpu2.Output;
     minimumlossvalue = 1e35;
 
 
@@ -2640,8 +2655,8 @@ void PerformTorqueDistribution(void)
         M2_Possible_Id = 0.0f;
     }
 
-    M1_Iq_Candidate_Coefficient = IqRef*(1.0f/((float)TORQUE_DISTRIBUTION_STEP))*M1_Possible_Iq;
-    M1_Id_Candidate_Coefficient = IqRef*(1.0f/((float)TORQUE_DISTRIBUTION_STEP))*M1_Possible_Id;
+    M1_Iq_Candidate_Coefficient = IqRef*(1.0f/((float)TORQUE_DISTRIBUTION_STEP))*M1_Possible_Iq*0.5f;
+    M1_Id_Candidate_Coefficient = IqRef*(1.0f/((float)TORQUE_DISTRIBUTION_STEP))*M1_Possible_Id*0.5f;
 
 #if 0
     for(uiIndex=0.0f;uiIndex<TORQUE_DISTRIBUTION_STEP;uiIndex++)
@@ -2727,6 +2742,8 @@ void PerformTorqueDistribution(void)
     CalculateLosses(IqRef, 23);
     CalculateLosses(IqRef, 24);
     CalculateLosses(IqRef, 25);
+
+#if 0
     CalculateLosses(IqRef, 26);
     CalculateLosses(IqRef, 27);
     CalculateLosses(IqRef, 28);
@@ -2808,6 +2825,7 @@ void PerformTorqueDistribution(void)
     CalculateLosses(IqRef, 97);
     CalculateLosses(IqRef, 98);
     CalculateLosses(IqRef, 99);
+#endif
 
 
 #endif
@@ -2848,4 +2866,9 @@ static inline void CalculateLosses(float IqRef, unsigned int uiIndex)
     }
 
 
+}
+inline uint64_t    GetTime(void)
+{
+    uint64_t    timer_low = IpcRegs.IPCCOUNTERL;
+    return ((timer_low)+((uint64_t)IpcRegs.IPCCOUNTERH)*((uint64_t)4294967296));
 }

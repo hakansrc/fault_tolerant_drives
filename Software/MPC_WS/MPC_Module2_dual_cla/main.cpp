@@ -161,8 +161,8 @@ int main(void)
         IPCWaitCounter ++ ;
     }
 
-    PI_iq_cpu2.I_coeff = 12.0f;
-    PI_iq_cpu2.P_coeff = 0.35f;
+    PI_iq_cpu2.I_coeff = 3.0f;
+    PI_iq_cpu2.P_coeff = 0.6f;
     PI_iq_cpu2.Ts =  0.0002f;
     PI_iq_cpu2.Input = 0;
     PI_iq_cpu2.Input_prev = 0;

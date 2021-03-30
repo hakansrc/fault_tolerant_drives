@@ -68,7 +68,7 @@ ModuleParameters Module1_Parameters_cla;
 PID_Parameters      PI_iq_cla;
 #pragma DATA_SECTION("CLAData")
 float       SpeedRefRadSec = 0;
-#pragma DATA_SECTION("CLAData")
+#pragma DATA_SECTION("M1_SPEEDREF_LOCATION")
 float       SpeedRefRPM = 30.0f;
 #pragma DATA_SECTION("CLAData")
 unsigned int        M1_OperationMode = MODE_NO_OPERATION;

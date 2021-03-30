@@ -58,6 +58,31 @@ uint32_t    SvpwmSectorNumber = 0;
 
 uint32_t            CLA1Task1End_counter = 0;
 
+/*
+ typedef struct
+{
+    float P_coeff;
+    float I_coeff;
+    float Ts;
+    float Output;
+    float Output_prev;
+    float Input;
+    float Input_prev;
+    float SaturationMax;
+    float SaturationMin;
+} PID_Parameters; // = 18bytes for C2000 (this is because an address can hold 2 bytes in 28379d)
+ */
+
+//float SpeedRefRPM = 50.0f;
+float SpeedRefRadSec = 0.0f;
+#pragma DATA_SECTION("M2_PI_IQ_LOCATION")
+PID_Parameters PI_iq_cpu2;
+#pragma DATA_SECTION("M1_IQREF_LOCATION")
+float M1_Iqref = 0.0f;
+#pragma DATA_SECTION("M2_IQREF_LOCATION")
+float M2_Iqref = 0.0f;
+#pragma DATA_SECTION("CLAData")
+float M2_Iqref_cla = 0.0f;
 
 
 __interrupt void cpu_timer0_isr(void);  /*prototype of the ISR functions*/
@@ -75,6 +100,7 @@ void InitializeEpwm6Registers(void);
 void InitializationRoutine(void);
 void RunTimeProtectionControl(void);
 void ZeroiseModule2Parameters(void);
+void Run_PI_Controller(PID_Parameters &pidparams);
 #if 0
 void GetSvpwmDutyCycles(float T1, float T2, float T0,float Ts,float VectorAngleRad, float &DutyA, float &DutyB, float &DutyC);
 void GetEncoderReadings_Cpu2(ModuleParameters &moduleparams);
@@ -117,7 +143,7 @@ int main(void)
 
     /*Initialize cpu timers*/
     InitCpuTimers();
-    ConfigCpuTimer(&CpuTimer0, 200, 1000000); //1 seconds
+    ConfigCpuTimer(&CpuTimer0, 200, 1000000/5000); //1 seconds
     ConfigCpuTimer(&CpuTimer1, 200, 1000000); //1 seconds
     ConfigCpuTimer(&CpuTimer2, 200, 1000000); //1 seconds
     CpuTimer0Regs.TCR.all = 0x4000; // enable cpu timer interrupt
@@ -134,6 +160,16 @@ int main(void)
         }
         IPCWaitCounter ++ ;
     }
+
+    PI_iq_cpu2.I_coeff = 12.0f;
+    PI_iq_cpu2.P_coeff = 0.35f;
+    PI_iq_cpu2.Ts =  0.0002f;
+    PI_iq_cpu2.Input = 0;
+    PI_iq_cpu2.Input_prev = 0;
+    PI_iq_cpu2.Output = 0;
+    PI_iq_cpu2.Output_prev = 0;
+    PI_iq_cpu2.SaturationMax = 2.0f * IQ_RATED;
+    PI_iq_cpu2.SaturationMin = -2.0f * IQ_RATED;
 
     InitializationRoutine();
 
@@ -170,6 +206,12 @@ int main(void)
 #endif
 
     DELAY_US(1000);
+
+
+    PI_iq_cpu2.Input = 0;
+    PI_iq_cpu2.Input_prev = 0;
+    PI_iq_cpu2.Output = 0;
+    PI_iq_cpu2.Output_prev = 0;
     M2_OperationMode = MODE_CLA_MPCCONTROLLER;
 
     EINT;  // Enable Global interrupt INTM
@@ -186,6 +228,12 @@ int main(void)
 __interrupt void cpu_timer0_isr(void)
 {
     CpuTimer0.InterruptCount++;
+    if(M2_OperationMode==MODE_CLA_MPCCONTROLLER)
+    {
+        SpeedRefRadSec = SpeedRefRPM/60.0f*2.0f*PI;
+        PI_iq_cpu2.Input = SpeedRefRadSec - Module1_Parameters.AngularSpeedRadSec.Mechanical;
+        Run_PI_Controller(PI_iq_cpu2);
+    }
     PieCtrlRegs.PIEACK.all = PIEACK_GROUP1;
 }
 
@@ -438,7 +486,11 @@ __interrupt void epwm4_isr(void)
 #if 1
     if (M2_OperationMode == MODE_CLA_MPCCONTROLLER)
     {
+#if 0
         memcpy(&PI_iq_cla,&PI_iq,sizeof(PID_Parameters)); //get the reference from cpu1 to cla of cpu2
+#endif
+        M2_Iqref_cla = M2_Iqref;
+        memcpy(&PI_iq_cla,&PI_iq_cpu2,sizeof(PID_Parameters));
         memcpy(&Module2_Parameters_cla.AngularSpeedRadSec,&Module1_Parameters.AngularSpeedRadSec,sizeof(AngularSpeed));
         M2_minimumloss_iqref_cla = M2_minimumloss_iqref;
         EPwm4Regs.ETCLR.bit.INT = 1;
@@ -614,4 +666,19 @@ void CLA_initCpu1Cla1(void)
     //
     PieCtrlRegs.PIEIER11.all = 0xFFFF;
     EDIS;
+}
+
+void Run_PI_Controller(PID_Parameters &pidparams)
+{
+    pidparams.Output = pidparams.Output_prev + pidparams.P_coeff * (pidparams.Input - pidparams.Input_prev) + (pidparams.Ts) / 2.0 * pidparams.I_coeff * (pidparams.Input + pidparams.Input_prev);
+    if (pidparams.Output > pidparams.SaturationMax)
+    {
+        pidparams.Output = pidparams.SaturationMax;
+    }
+    if (pidparams.Output < pidparams.SaturationMin)
+    {
+        pidparams.Output = pidparams.SaturationMin;
+    }
+    pidparams.Output_prev = pidparams.Output;
+    pidparams.Input_prev = pidparams.Input;
 }

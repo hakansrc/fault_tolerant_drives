@@ -23,17 +23,20 @@ __interrupt void Cla1Task1 ( void )
 
         CalculateParkTransform_cla(&Module1_Parameters_cla);
 
-#if 1
+#if 0
         SpeedRefRadSec = SpeedRefRPM/60.0*2.0*PI;
-#endif
 
         PI_iq_cla.Input = SpeedRefRadSec - Module1_Parameters_cla.AngularSpeedRadSec.Mechanical;
 
         Run_PI_Controller_cla(&PI_iq_cla);
+#endif
 
+#if ENABLE_TORQUE_DISTRIBUTOR
+        Module1_Parameters_cla.Reference.Iq = M1_Iqref_cla;
+#else
         Module1_Parameters_cla.Reference.Iq = PI_iq_cla.Output/((float)2);
+#endif
         Module1_Parameters_cla.Reference.Id = IDREF;
-
 
         Module1_Parameters_cla.MinimumCostValue = (float)1e35;
 

@@ -69,7 +69,7 @@ PID_Parameters      PI_iq_cla;
 #pragma DATA_SECTION("CLAData")
 float       SpeedRefRadSec = 0;
 #pragma DATA_SECTION("CLAData")
-float       SpeedRefRPM = -90;
+float       SpeedRefRPM = 30.0f;
 #pragma DATA_SECTION("CLAData")
 unsigned int        M1_OperationMode = MODE_NO_OPERATION;
 #pragma DATA_SECTION("CLAData")
@@ -99,6 +99,17 @@ ModuleParameters Module1_Parameters;
 float       M1_FswDecided = 1000;
 #pragma DATA_SECTION("M2_FSWDECIDED_LOCATION")
 float       M2_FswDecided = 1000;
+
+
+#pragma DATA_SECTION("M2_PI_IQ_LOCATION")
+PID_Parameters PI_iq_cpu2;
+#pragma DATA_SECTION("M1_IQREF_LOCATION")
+float M1_Iqref = 0.0f;
+#pragma DATA_SECTION("M2_IQREF_LOCATION")
+float M2_Iqref = 0.0f;
+#pragma DATA_SECTION("CLAData")
+float M1_Iqref_cla = 0.0f;
+
 
 
 OpenLoopOperation   RL_Load_Operation = {25, 0.5}; // 0 hz, 0 magnitude
@@ -2002,7 +2013,9 @@ __interrupt void epwm1_isr(void)
 #if 1
     if (M1_OperationMode == MODE_CLA_MPCCONTROLLER)
     {
-        memcpy(&PI_iq,&PI_iq_cla,sizeof(PID_Parameters));
+        memcpy(&PI_iq_cla,&PI_iq_cpu2,sizeof(PID_Parameters));
+        M1_Iqref_cla = M1_Iqref;
+        //memcpy(&PI_iq,&PI_iq_cla,sizeof(PID_Parameters));
         EPwm1Regs.ETCLR.bit.INT = 1;
         PieCtrlRegs.PIEACK.all = PIEACK_GROUP3;
         return;

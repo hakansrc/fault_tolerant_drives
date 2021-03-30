@@ -8,6 +8,8 @@
 #ifndef CONSTANTPARAMETERS_H_
 #define CONSTANTPARAMETERS_H_
 
+#define ENABLE_TORQUE_DISTRIBUTOR   1
+
 
 #define NO_FAULT    0x00
 #define YES_FAULT   0x01

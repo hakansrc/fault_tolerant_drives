@@ -23,7 +23,12 @@ __interrupt void Cla1Task1 ( void )
 
         CalculateParkTransform_cla(&Module2_Parameters_cla);
 
+#if ENABLE_TORQUE_DISTRIBUTOR
+        Module2_Parameters_cla.Reference.Iq = M2_Iqref_cla;
+#else
         Module2_Parameters_cla.Reference.Iq = PI_iq_cla.Output/((float)2.0f);
+#endif
+
         Module2_Parameters_cla.Reference.Id = IDREF;
 
         Module2_Parameters_cla.MinimumCostValue = (float)1e35;

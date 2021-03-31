@@ -2841,10 +2841,21 @@ void PerformTorqueDistribution(void)
 
 #endif
 
-    M1_minimumloss_iqref = M1_Candidate_Iqref[minimumlossindex];
-    M2_minimumloss_iqref = M2_Candidate_Iqref[minimumlossindex];
-    M1_Iqref = M1_Candidate_Iqref[minimumlossindex];
-    M2_Iqref = M2_Candidate_Iqref[minimumlossindex];
+    if(FaultFlagLocal==YES_FAULT)
+    {
+        M1_minimumloss_iqref = M1_Candidate_Iqref[minimumlossindex];
+        M2_minimumloss_iqref = M2_Candidate_Iqref[minimumlossindex];
+        M1_Iqref = M1_Candidate_Iqref[minimumlossindex];
+        M2_Iqref = M2_Candidate_Iqref[minimumlossindex];
+    }
+    else
+    {
+        M1_minimumloss_iqref = PI_iq_cpu2.Output/2.0f;
+        M2_minimumloss_iqref = PI_iq_cpu2.Output/2.0f;
+        M1_Iqref = PI_iq_cpu2.Output/2.0f;
+        M2_Iqref = PI_iq_cpu2.Output/2.0f;
+    }
+
 
 }
 

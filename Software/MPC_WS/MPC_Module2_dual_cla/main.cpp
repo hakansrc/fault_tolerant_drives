@@ -33,8 +33,10 @@ float    M2_minimumloss_iqref_cla = 0;
 #pragma DATA_SECTION("M2_MINIMUMLOSS_IQ_LOCATION")
 float M2_minimumloss_iqref = 0.0f;
 
-#pragma DATA_SECTION("CLAData")
+#pragma DATA_SECTION("CpuToCla1MsgRAM")
 uint16_t    FaultFlagLocal = NO_FAULT;
+
+
 #pragma DATA_SECTION("GLOBAL_FAULT_FLAG_LOCATION")
 uint16_t    FaultFlagGlobal = NO_FAULT;
 

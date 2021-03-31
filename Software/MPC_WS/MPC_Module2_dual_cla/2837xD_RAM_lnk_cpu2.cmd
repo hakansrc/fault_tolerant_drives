@@ -94,6 +94,10 @@ PAGE 1 :
 
    CPU2TOCPU1RAM   : origin = 0x03F800, length = 0x000400
    CPU1TOCPU2RAM   : origin = 0x03FC00, length = 0x000400
+
+   CLA1_MSGRAMLOW   : origin = 0x001480, length = 0x000080
+   CLA1_MSGRAMHIGH  : origin = 0x001500, length = 0x000080
+
 }
 
 
@@ -115,6 +119,9 @@ SECTIONS
 
    CLAData		      : > RAMLS34_CLA_DAT_RAM, PAGE=1
    CLA1mathTables    : > RAMLS34_CLA_DAT_RAM, PAGE = 1
+
+   Cla1ToCpuMsgRAM  : > CLA1_MSGRAMLOW,   PAGE = 1
+   CpuToCla1MsgRAM  : > CLA1_MSGRAMHIGH,  PAGE = 1
 
    PI_IQ_LOCATION   : > PI_IQ_ADDRESS_RAMGS13, PAGE = 1
    M1_OPERATION_MODE_LOCATION : > M1_OPERATION_MODE_RAMGS13, PAGE = 1

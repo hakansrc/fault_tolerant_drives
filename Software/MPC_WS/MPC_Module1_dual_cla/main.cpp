@@ -18,8 +18,11 @@
 
 
 #define TORQUE_DISTRIBUTION_STEP    25
-#pragma DATA_SECTION("CLAData")
+
+#pragma DATA_SECTION("CpuToCla1MsgRAM")
 uint16_t    FaultFlagLocal = NO_FAULT;
+
+
 #pragma DATA_SECTION("GLOBAL_FAULT_FLAG_LOCATION")
 uint16_t    FaultFlagGlobal = NO_FAULT;
 void PerformTorqueDistribution(void);

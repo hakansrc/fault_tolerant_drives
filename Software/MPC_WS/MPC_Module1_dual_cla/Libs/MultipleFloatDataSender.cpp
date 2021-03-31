@@ -12,7 +12,7 @@
 #define MFDS_THETAGBYTESIZE             4
 #define MFDS_SCILIBBUFFERLENGTH         512
 #define MFDS_SCIARXBUFFERSIZE           64
-#define MFDS_MULTIPLEFLOATARRAYSIZE     (24+MFDS_THETAGBYTESIZE)
+#define MFDS_MULTIPLEFLOATARRAYSIZE     (48+MFDS_THETAGBYTESIZE)
 
 unsigned char ucSciaRxBuffer[MFDS_SCIARXBUFFERSIZE];
 unsigned int uiSciaRxBufferIndex = 0;
@@ -23,7 +23,6 @@ unsigned int uiSciaLibBufferNumberOfMessages=0;
 
 
 
-#define MFDS_MULTIPLEFLOATARRAYSIZE (24+MFDS_THETAGBYTESIZE)
 char cSendMultipleFloatArray[MFDS_MULTIPLEFLOATARRAYSIZE];
 
 
@@ -88,22 +87,31 @@ void InitializeSciaRegisters(float fSciBaudRate)
     {
         case 0:
             lspclkdivider = 1;
+            break;
         case 1:
             lspclkdivider = 2;
+            break;
         case 2:
             lspclkdivider = 4;
+            break;
         case 3:
             lspclkdivider = 6;
+            break;
         case 4:
             lspclkdivider = 8;
+            break;
         case 5:
             lspclkdivider = 10;
+            break;
         case 6:
             lspclkdivider = 12;
+            break;
         case 7:
             lspclkdivider = 14;
+            break;
         default:
             lspclkdivider = 4;
+            break;
     }
     lspclkfreq = ((float)MFDS_LIB_CPU_FREQ)/lspclkdivider;
 

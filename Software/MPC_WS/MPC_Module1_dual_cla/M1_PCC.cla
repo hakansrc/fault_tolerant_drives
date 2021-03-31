@@ -176,6 +176,23 @@ float CLA_floating_modulus(float a,float b)
 }
 void GetSvpwmDutyCycles_cla(float T1, float T2, float T0,float Ts,float VectorAngleRad, float *DutyA, float *DutyB, float *DutyC)
 {
+
+    if(FaultFlagLocal==YES_FAULT)
+    {
+        if (CLA_floating_modulus(VectorAngleRad, 2.0f*PI)<=PI)
+        {
+            *DutyB = (T1+T0/2.0f)/Ts;
+            *DutyC = (T0/2.0f)/Ts;
+        }
+        else
+        {
+            *DutyC = (T1+T0/2.0f)/Ts;
+            *DutyB = (T0/2.0f)/Ts;
+        }
+        *DutyA = 0;
+    }
+
+
     if ((CLA_floating_modulus(VectorAngleRad,2.0f*PI)<=PI/3.0f)&&(CLA_floating_modulus(VectorAngleRad,2.0f*PI)>=0))
     {
         *DutyA = (T1+T2+T0/2.0f)/Ts;
@@ -255,9 +272,18 @@ void ExecuteSecondPrediction_cla(ModuleParameters *moduleparams, unsigned int in
 
     moduleparams->SecondHorizon[indexcount].ma = CLAsqrt(3.0f)*moduleparams->SecondHorizon[indexcount].Magnitude / (moduleparams->Measured.Voltage.Vdc );
 
-    moduleparams->SecondHorizon[indexcount].SvpwmT1 = (1.0f / moduleparams->OptimizationFsw[indexcount]) * moduleparams->SecondHorizon[indexcount].ma * CLAsin(PI / 3.0f - moduleparams->SecondHorizon[indexcount].VoltageVectorAngleRad_Mod);
-    moduleparams->SecondHorizon[indexcount].SvpwmT2 = (1.0f / moduleparams->OptimizationFsw[indexcount]) * moduleparams->SecondHorizon[indexcount].ma * CLAsin(moduleparams->SecondHorizon[indexcount].VoltageVectorAngleRad_Mod);
-    moduleparams->SecondHorizon[indexcount].SvpwmT0 = (1.0f / moduleparams->OptimizationFsw[indexcount]) - moduleparams->SecondHorizon[indexcount].SvpwmT1 - moduleparams->SecondHorizon[indexcount].SvpwmT2;
+    if(FaultFlagLocal==YES_FAULT)
+    {
+        moduleparams->SecondHorizon[indexcount].SvpwmT1 = (1.0f / moduleparams->OptimizationFsw[indexcount])*moduleparams->SecondHorizon[indexcount].ma*CLAsin(CLA_floating_modulus(moduleparams->SecondHorizon[indexcount].VoltageVectorAngleRad,PI));
+        moduleparams->SecondHorizon[indexcount].SvpwmT2 = 0.0f;
+        moduleparams->SecondHorizon[indexcount].SvpwmT0 = (1.0f / moduleparams->OptimizationFsw[indexcount]) - moduleparams->SecondHorizon[indexcount].SvpwmT1 - moduleparams->SecondHorizon[indexcount].SvpwmT2;
+    }
+    else
+    {
+        moduleparams->SecondHorizon[indexcount].SvpwmT1 = (1.0f / moduleparams->OptimizationFsw[indexcount]) * moduleparams->SecondHorizon[indexcount].ma * CLAsin(PI / 3.0f - moduleparams->SecondHorizon[indexcount].VoltageVectorAngleRad_Mod);
+        moduleparams->SecondHorizon[indexcount].SvpwmT2 = (1.0f / moduleparams->OptimizationFsw[indexcount]) * moduleparams->SecondHorizon[indexcount].ma * CLAsin(moduleparams->SecondHorizon[indexcount].VoltageVectorAngleRad_Mod);
+        moduleparams->SecondHorizon[indexcount].SvpwmT0 = (1.0f / moduleparams->OptimizationFsw[indexcount]) - moduleparams->SecondHorizon[indexcount].SvpwmT1 - moduleparams->SecondHorizon[indexcount].SvpwmT2;
+    }
 
     moduleparams->SecondHorizon[indexcount].VoltageDuring_SvpwmT1 = 0.66667f * moduleparams->Measured.Voltage.Vdc - moduleparams->SecondHorizon[indexcount].Magnitude;
     moduleparams->SecondHorizon[indexcount].VoltageDuring_SvpwmT2 = 0.66667f * moduleparams->Measured.Voltage.Vdc - moduleparams->SecondHorizon[indexcount].Magnitude;

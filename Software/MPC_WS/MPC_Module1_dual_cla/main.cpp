@@ -18,7 +18,10 @@
 
 
 #define TORQUE_DISTRIBUTION_STEP    25
-uint16_t    FaultFlag = NO_FAULT;
+#pragma DATA_SECTION("CLAData")
+uint16_t    FaultFlagLocal = NO_FAULT;
+#pragma DATA_SECTION("GLOBAL_FAULT_FLAG_LOCATION")
+uint16_t    FaultFlagGlobal = NO_FAULT;
 void PerformTorqueDistribution(void);
 static inline void CalculateLosses(float IqRef, unsigned int uiIndex);
 
@@ -2037,6 +2040,7 @@ __interrupt void epwm1_isr(void)
     {
         memcpy(&PI_iq_cla,&PI_iq_cpu2,sizeof(PID_Parameters));
         M1_Iqref_cla = M1_Iqref;
+        FaultFlagLocal = FaultFlagGlobal;
         //memcpy(&PI_iq,&PI_iq_cla,sizeof(PID_Parameters));
         EPwm1Regs.ETCLR.bit.INT = 1;
         PieCtrlRegs.PIEACK.all = PIEACK_GROUP3;
@@ -2647,7 +2651,7 @@ void PerformTorqueDistribution(void)
 
 
     /*we are assuming that the fault occured on phase A of module 1*/
-    if(FaultFlag==YES_FAULT)
+    if(FaultFlagLocal==YES_FAULT)
     {
         M1_Possible_Iq =  0.6667f*sinf(0.6667f*PI)*(1.0f-cosf(2.0f*((float) EQep1Regs.QPOSCNT / (float) ENCODERMAXTICKCOUNT * 2.0f * PI)) );
         M1_Possible_Id = -0.6667f*sinf(0.6667f*PI)*sinf(2.0f*((float) EQep1Regs.QPOSCNT / (float) ENCODERMAXTICKCOUNT * 2.0f * PI));
@@ -2669,7 +2673,7 @@ void PerformTorqueDistribution(void)
     for(uiIndex=0.0f;uiIndex<TORQUE_DISTRIBUTION_STEP;uiIndex++)
     {
         /*fault is on module1 phase a for now*/
-        if(FaultFlag==YES_FAULT)
+        if(FaultFlagLocal==YES_FAULT)
         {
             //M1_Candidate_Iqref[uiIndex] = IqRef*(1.0f/((float)TORQUE_DISTRIBUTION_STEP))*((float)uiIndex)*M1_Possible_Iq;
             //M1_Candidate_Idref[uiIndex] = IqRef*(1.0f/((float)TORQUE_DISTRIBUTION_STEP))*((float)uiIndex)*M1_Possible_Id;
@@ -2850,7 +2854,7 @@ static inline void CalculateLosses(float IqRef, unsigned int uiIndex)
     M1_Candidate_Idref[uiIndex] = M1_Id_Candidate_Coefficient*((float)uiIndex);
 
     /*M2 is the healthy module, therefore it can continue with id=0*/
-    M2_Candidate_Iqref[uiIndex] = IqRef - M1_Candidate_Iqref[uiIndex];
+    M2_Candidate_Iqref[uiIndex] = 0.5f*(IqRef - M1_Candidate_Iqref[uiIndex]);
     M2_Candidate_Idref[uiIndex] = 0.0f;
 
     M1_d_axis_flux = M1_LS_VALUE*M1_Candidate_Idref[uiIndex] + FLUX_VALUE;

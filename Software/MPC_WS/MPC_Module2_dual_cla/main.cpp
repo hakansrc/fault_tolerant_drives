@@ -33,6 +33,10 @@ float    M2_minimumloss_iqref_cla = 0;
 #pragma DATA_SECTION("M2_MINIMUMLOSS_IQ_LOCATION")
 float M2_minimumloss_iqref = 0.0f;
 
+#pragma DATA_SECTION("CLAData")
+uint16_t    FaultFlagLocal = NO_FAULT;
+#pragma DATA_SECTION("GLOBAL_FAULT_FLAG_LOCATION")
+uint16_t    FaultFlagGlobal = NO_FAULT;
 
 uint32_t    ControlISRCounter = 0;
 #pragma DATA_SECTION("M1_SPEEDREF_LOCATION")
@@ -493,6 +497,7 @@ __interrupt void epwm4_isr(void)
         memcpy(&PI_iq_cla,&PI_iq_cpu2,sizeof(PID_Parameters));
         memcpy(&Module2_Parameters_cla.AngularSpeedRadSec,&Module1_Parameters.AngularSpeedRadSec,sizeof(AngularSpeed));
         M2_minimumloss_iqref_cla = M2_minimumloss_iqref;
+        FaultFlagLocal = FaultFlagGlobal;
         EPwm4Regs.ETCLR.bit.INT = 1;
         PieCtrlRegs.PIEACK.all = PIEACK_GROUP3;
         return;

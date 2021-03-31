@@ -30,6 +30,7 @@ extern ModuleParameters     Module2_Parameters_cla;
 extern PID_Parameters       PI_iq_cla;
 extern float                M2_minimumloss_iqref_cla;
 extern float                M2_Iqref_cla;
+extern uint16_t             FaultFlagLocal;
 
 
 float CLA_Power(float base, uint16_t power);

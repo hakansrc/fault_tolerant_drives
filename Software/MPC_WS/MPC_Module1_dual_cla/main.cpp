@@ -419,7 +419,7 @@ __interrupt void cpu_timer0_isr(void)
 __interrupt void cpu_timer1_isr(void)
 {
     CpuTimer1.InterruptCount++;
-#if 0
+#if 1
     if((M1_OperationMode==MODE_MPCCONTROLLER)||(M1_OperationMode==MODE_CLA_MPCCONTROLLER))
     {
         if((CpuTimer1.InterruptCount%5)==0)
@@ -2351,10 +2351,10 @@ __interrupt void CLATask1_PCC_Is_Done(void)
 
         DataToBeSent[6] = Module1_Parameters_cla.Measured.Current.PhaseA;
         DataToBeSent[7] = Module1_Parameters_cla.Measured.Current.PhaseB;
-        DataToBeSent[8] = Module1_Parameters_cla.Measured.Current.PhaseC;
+        DataToBeSent[8] = Module1_Parameters_cla.AngularSpeedRPM.Mechanical;
         DataToBeSent[9] =  Module2_Parameters.Measured.Current.PhaseA;
         DataToBeSent[10] = Module2_Parameters.Measured.Current.PhaseB;
-        DataToBeSent[11] = Module2_Parameters.Measured.Current.PhaseC;
+        DataToBeSent[11] = SpeedRefRPM;
 
         SciSendMultipleFloatWithTheTag(DataToBeSent, 12);
     }
@@ -2663,8 +2663,8 @@ void PerformTorqueDistribution(void)
     /*we are assuming that the fault occured on phase A of module 1*/
     if(FaultFlagLocal==YES_FAULT)
     {
-        M1_Possible_Iq =  0.6667f*sinf(0.6667f*PI)*(1.0f-cosf(2.0f*((float) EQep1Regs.QPOSCNT / (float) ENCODERMAXTICKCOUNT * 2.0f * PI)) );
-        M1_Possible_Id = -0.6667f*sinf(0.6667f*PI)*sinf(2.0f*((float) EQep1Regs.QPOSCNT / (float) ENCODERMAXTICKCOUNT * 2.0f * PI));
+        M1_Possible_Iq =  0.6667f*sinf(0.6667f*PI)*(1.0f-cosf(POLEPAIRS*2.0f*((float) EQep1Regs.QPOSCNT / (float) ENCODERMAXTICKCOUNT * 2.0f * PI)) );
+        M1_Possible_Id = -0.6667f*sinf(0.6667f*PI)*sinf(POLEPAIRS*2.0f*((float) EQep1Regs.QPOSCNT / (float) ENCODERMAXTICKCOUNT * 2.0f * PI));
         M2_Possible_Iq = 1;
         M2_Possible_Id = 0;
     }

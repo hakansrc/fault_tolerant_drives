@@ -2663,10 +2663,14 @@ void PerformTorqueDistribution(void)
     /*we are assuming that the fault occured on phase A of module 1*/
     if(FaultFlagLocal==YES_FAULT)
     {
+        /*
         M1_Possible_Iq =  0.6667f*sinf(0.6667f*PI)*(1.0f-cosf(POLEPAIRS*2.0f*((float) EQep1Regs.QPOSCNT / (float) ENCODERMAXTICKCOUNT * 2.0f * PI)) );
         M1_Possible_Id = -0.6667f*sinf(0.6667f*PI)*sinf(POLEPAIRS*2.0f*((float) EQep1Regs.QPOSCNT / (float) ENCODERMAXTICKCOUNT * 2.0f * PI));
-        M2_Possible_Iq = 1;
-        M2_Possible_Id = 0;
+        */
+        M1_Possible_Iq = (1.0f-cosf(POLEPAIRS*2.0f*((float) EQep1Regs.QPOSCNT / (float) ENCODERMAXTICKCOUNT * 2.0f * PI)) );
+        M1_Possible_Id = sinf(POLEPAIRS*2.0f*((float) EQep1Regs.QPOSCNT / (float) ENCODERMAXTICKCOUNT * 2.0f * PI));
+        M2_Possible_Iq = 1.0f;
+        M2_Possible_Id = 0.0f;
     }
     else
     {

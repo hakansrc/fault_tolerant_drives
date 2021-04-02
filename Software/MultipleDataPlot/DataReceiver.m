@@ -19,7 +19,7 @@ NumberOfFloatsPerPacket = 12;                    %number of floats to be sent at
 CallbackFunctionByteNumber=512;                 %the callback function is called when this amount of bytes are read from the channel
 %% VARIABLE DEFINITIONS
 EnableSaving = 0;                               %set 0 in order to disable saving of the received data (recommended to stay at 1)
-ProcessRawDataThresholdInBytes = 2048*50*10;    %the received data will be saved and/or converted and plotted when ProcessRawDataThresholdInBytes bytes of data is received
+ProcessRawDataThresholdInBytes = 2048*50;       %the received data will be saved and/or converted and plotted when ProcessRawDataThresholdInBytes bytes of data is received
 EnablePlotting = 1;                             %set 0 in order to disable plotting of taken variables (for live visualization)
 DataSampleRate = 1250;                          %this used for determinining the tag on the plots
 TheSerialChannelDevice = 'COM5';                %set the serial channel device, (this value can be found the device manager)
@@ -71,7 +71,7 @@ while(1)
                     subplot(4,3,i)
                     plot((1:numel(TheDataConvertedValues(i,:)))/DataSampleRate,TheDataConvertedValues(i,:));
                     Text = sprintf('MeanValue: %f ',mean(TheDataConvertedValues(i,:)));
-                    text(0,double(mean(TheDataConvertedValues(i,:)))+0.1,Text, 'FontSize', 16,'FontWeight','bold')                    
+                    text(0,double(mean(TheDataConvertedValues(i,:))),Text, 'FontSize', 16,'FontWeight','bold')                    
 %                     ylim([-4 4])
                     grid on
                 end

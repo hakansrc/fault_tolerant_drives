@@ -36,10 +36,10 @@ float M2_Possible_Id = 0.0f;
 float M1_Iq_Candidate_Coefficient = 0.0f;
 float M1_Id_Candidate_Coefficient = 0.0f;
 
-float M1_d_axis_flux = 0.0f;
-float M1_q_axis_flux = 0.0f;
-float M2_d_axis_flux = 0.0f;
-float M2_q_axis_flux = 0.0f;
+float M1_d_axis_flux[TORQUE_DISTRIBUTION_STEP+1];
+float M1_q_axis_flux[TORQUE_DISTRIBUTION_STEP+1];
+float M2_d_axis_flux[TORQUE_DISTRIBUTION_STEP+1];
+float M2_q_axis_flux[TORQUE_DISTRIBUTION_STEP+1];
 
 unsigned int minimumlossindex = 0;
 float minimumlossvalue = 1e35;
@@ -49,10 +49,10 @@ float M1_Candidate_Idref[TORQUE_DISTRIBUTION_STEP+1];
 float M2_Candidate_Iqref[TORQUE_DISTRIBUTION_STEP+1];
 float M2_Candidate_Idref[TORQUE_DISTRIBUTION_STEP+1];
 
-float M1_copper_loss = 0;
-float M2_copper_loss = 0;
-float M1_core_loss = 0;
-float M2_core_loss = 0;
+float M1_copper_loss[TORQUE_DISTRIBUTION_STEP+1];
+float M2_copper_loss[TORQUE_DISTRIBUTION_STEP+1];
+float M1_core_loss[TORQUE_DISTRIBUTION_STEP+1];
+float M2_core_loss[TORQUE_DISTRIBUTION_STEP+1];
 
 float TotalLoss[TORQUE_DISTRIBUTION_STEP+1];
 
@@ -75,7 +75,7 @@ PID_Parameters      PI_iq_cla;
 #pragma DATA_SECTION("CLAData")
 float       SpeedRefRadSec = 0;
 #pragma DATA_SECTION("M1_SPEEDREF_LOCATION")
-float       SpeedRefRPM = 30.0f;
+float       SpeedRefRPM = 60.0f;
 #pragma DATA_SECTION("CLAData")
 unsigned int        M1_OperationMode = MODE_NO_OPERATION;
 #pragma DATA_SECTION("CLAData")
@@ -226,6 +226,8 @@ uint16_t    Start_Torque_Distribution = 0;
 TimingMeasurement TorqueDistributor = {0,0,0,0};
 float   differencemax = 0.0f;
 inline uint64_t    GetTime(void);
+
+uint16_t    Case = 0;
 
 
 int main(void)
@@ -381,15 +383,6 @@ int main(void)
 
     while(1)
     {
-#if 0
-        //DELAY_US(100);
-        SciaBackgroundTask();
-        if(ReadDrv8305RegistersFlag==1)
-        {
-            M1_ReadDRV8305Registers(&M1_Device1Configuration);
-            ReadDrv8305RegistersFlag = 0;
-        }
-#endif
         if(Start_Torque_Distribution==1)
         {
             PerformTorqueDistribution();
@@ -400,6 +393,103 @@ int main(void)
             {
                 differencemax = TorqueDistributor.fDifference;
             }
+            if (SendOneInFour % 2 == 0)
+            {
+                if(Case==0)
+                {
+                    DataToBeSent[0]  =  M1_d_axis_flux[0];
+                    DataToBeSent[1]  =  M1_d_axis_flux[2];
+                    DataToBeSent[2]  =  M1_d_axis_flux[4];
+                    DataToBeSent[3]  =  M1_d_axis_flux[6];
+                    DataToBeSent[4]  =  M1_d_axis_flux[8];
+                    DataToBeSent[5]  =  M1_d_axis_flux[10];
+                    DataToBeSent[6]  =  M1_d_axis_flux[12];
+                    DataToBeSent[7]  =  M1_d_axis_flux[14];
+                    DataToBeSent[8]  =  M1_d_axis_flux[16];
+                    DataToBeSent[9]  =  M1_d_axis_flux[18];
+                    DataToBeSent[10] =  M1_d_axis_flux[20];
+                    DataToBeSent[11] =  M1_d_axis_flux[22];
+                }
+                if(Case==1)
+                {
+                    DataToBeSent[0]  =  M1_q_axis_flux[0];
+                    DataToBeSent[1]  =  M1_q_axis_flux[2];
+                    DataToBeSent[2]  =  M1_q_axis_flux[4];
+                    DataToBeSent[3]  =  M1_q_axis_flux[6];
+                    DataToBeSent[4]  =  M1_q_axis_flux[8];
+                    DataToBeSent[5]  =  M1_q_axis_flux[10];
+                    DataToBeSent[6]  =  M1_q_axis_flux[12];
+                    DataToBeSent[7]  =  M1_q_axis_flux[14];
+                    DataToBeSent[8]  =  M1_q_axis_flux[16];
+                    DataToBeSent[9]  =  M1_q_axis_flux[18];
+                    DataToBeSent[10] =  M1_q_axis_flux[20];
+                    DataToBeSent[11] =  M1_q_axis_flux[22];
+                }
+                if(Case==2)
+                {
+                    DataToBeSent[0]  =  M2_d_axis_flux[0];
+                    DataToBeSent[1]  =  M2_d_axis_flux[2];
+                    DataToBeSent[2]  =  M2_d_axis_flux[4];
+                    DataToBeSent[3]  =  M2_d_axis_flux[6];
+                    DataToBeSent[4]  =  M2_d_axis_flux[8];
+                    DataToBeSent[5]  =  M2_d_axis_flux[10];
+                    DataToBeSent[6]  =  M2_d_axis_flux[12];
+                    DataToBeSent[7]  =  M2_d_axis_flux[14];
+                    DataToBeSent[8]  =  M2_d_axis_flux[16];
+                    DataToBeSent[9]  =  M2_d_axis_flux[18];
+                    DataToBeSent[10] =  M2_d_axis_flux[20];
+                    DataToBeSent[11] =  M2_d_axis_flux[22];
+                }
+                if(Case==3)
+                {
+                    DataToBeSent[0]  =  M2_q_axis_flux[0];
+                    DataToBeSent[1]  =  M2_q_axis_flux[2];
+                    DataToBeSent[2]  =  M2_q_axis_flux[4];
+                    DataToBeSent[3]  =  M2_q_axis_flux[6];
+                    DataToBeSent[4]  =  M2_q_axis_flux[8];
+                    DataToBeSent[5]  =  M2_q_axis_flux[10];
+                    DataToBeSent[6]  =  M2_q_axis_flux[12];
+                    DataToBeSent[7]  =  M2_q_axis_flux[14];
+                    DataToBeSent[8]  =  M2_q_axis_flux[16];
+                    DataToBeSent[9]  =  M2_q_axis_flux[18];
+                    DataToBeSent[10] =  M2_q_axis_flux[20];
+                    DataToBeSent[11] =  M2_q_axis_flux[22];
+                }
+                if(Case==4)
+                {
+                    DataToBeSent[0]  = Module1_Parameters_cla.Measured.Current.transformed.Dvalue; // .Measured.Current.PhaseA;
+                    DataToBeSent[1]  = Module1_Parameters_cla.Measured.Current.transformed.Qvalue; // .Measured.Current.PhaseA;
+                    DataToBeSent[2]  = M1_Iqref;
+                    DataToBeSent[3]  = Module2_Parameters.Measured.Current.transformed.Dvalue;
+                    DataToBeSent[4]  = Module2_Parameters.Measured.Current.transformed.Qvalue;
+                    DataToBeSent[5]  = M2_Iqref;
+                    DataToBeSent[6]  = Module1_Parameters_cla.Measured.Current.PhaseA;
+                    DataToBeSent[7]  = Module1_Parameters_cla.Measured.Current.PhaseB;
+                    DataToBeSent[8]  = Module1_Parameters_cla.AngularSpeedRPM.Mechanical;
+                    DataToBeSent[9]  =  Module2_Parameters.Measured.Current.PhaseA;
+                    DataToBeSent[10] = Module2_Parameters.Measured.Current.PhaseB;
+                    DataToBeSent[11] = SpeedRefRPM;
+                }
+                if(Case==5)
+                {
+                    DataToBeSent[0]  =  TotalLoss[0];
+                    DataToBeSent[1]  =  TotalLoss[2];
+                    DataToBeSent[2]  =  TotalLoss[4];
+                    DataToBeSent[3]  =  TotalLoss[6];
+                    DataToBeSent[4]  =  TotalLoss[8];
+                    DataToBeSent[5]  =  TotalLoss[10];
+                    DataToBeSent[6]  =  TotalLoss[12];
+                    DataToBeSent[7]  =  TotalLoss[14];
+                    DataToBeSent[8]  =  TotalLoss[16];
+                    DataToBeSent[9]  =  TotalLoss[18];
+                    DataToBeSent[10] =  TotalLoss[20];
+                    DataToBeSent[11] =  TotalLoss[22];
+                }
+
+
+                SciSendMultipleFloatWithTheTag(DataToBeSent, 12);
+            }
+            SendOneInFour++;
             SciaBackgroundTask();
             Start_Torque_Distribution = 0;
         }
@@ -419,7 +509,7 @@ __interrupt void cpu_timer0_isr(void)
 __interrupt void cpu_timer1_isr(void)
 {
     CpuTimer1.InterruptCount++;
-#if 1
+#if 0
     if((M1_OperationMode==MODE_MPCCONTROLLER)||(M1_OperationMode==MODE_CLA_MPCCONTROLLER))
     {
         if((CpuTimer1.InterruptCount%5)==0)
@@ -2340,26 +2430,7 @@ __interrupt void CLATask1_PCC_Is_Done(void)
     CLA1Task1End_counter++;
     memcpy(&PI_iq,&PI_iq_cla,sizeof(PID_Parameters)); // give the torque reference from cpu1cla to cpu2
     memcpy(&Module1_Parameters,&Module1_Parameters_cla,sizeof(ModuleParameters));
-    if (SendOneInFour % 8 == 0)
-    {
-        DataToBeSent[0] = Module1_Parameters_cla.Measured.Current.transformed.Dvalue; // .Measured.Current.PhaseA;
-        DataToBeSent[1] = Module1_Parameters_cla.Measured.Current.transformed.Qvalue; // .Measured.Current.PhaseA;
-        DataToBeSent[2] = M1_Iqref;
-        DataToBeSent[3] = Module2_Parameters.Measured.Current.transformed.Dvalue;
-        DataToBeSent[4] = Module2_Parameters.Measured.Current.transformed.Qvalue;
-        DataToBeSent[5] = M2_Iqref;
 
-        DataToBeSent[6] = Module1_Parameters_cla.Measured.Current.PhaseA;
-        DataToBeSent[7] = Module1_Parameters_cla.Measured.Current.PhaseB;
-        DataToBeSent[8] = Module1_Parameters_cla.AngularSpeedRPM.Mechanical;
-        DataToBeSent[9] =  Module2_Parameters.Measured.Current.PhaseA;
-        DataToBeSent[10] = Module2_Parameters.Measured.Current.PhaseB;
-        DataToBeSent[11] = SpeedRefRPM;
-
-        SciSendMultipleFloatWithTheTag(DataToBeSent, 12);
-    }
-
-    SendOneInFour++;
     PieCtrlRegs.PIEACK.all = PIEACK_GROUP11;
 }
 void RunTimeProtectionControl(void)
@@ -2864,10 +2935,10 @@ void PerformTorqueDistribution(void)
     }
     else
     {
-        M1_minimumloss_iqref = PI_iq_cpu2.Output/2.0f;
-        M2_minimumloss_iqref = PI_iq_cpu2.Output/2.0f;
-        M1_Iqref = PI_iq_cpu2.Output/2.0f;
-        M2_Iqref = PI_iq_cpu2.Output/2.0f;
+        M1_minimumloss_iqref = M1_Candidate_Iqref[minimumlossindex];
+        M2_minimumloss_iqref = M2_Candidate_Iqref[minimumlossindex];
+        M1_Iqref = M1_Candidate_Iqref[minimumlossindex];
+        M2_Iqref = M2_Candidate_Iqref[minimumlossindex];
     }
 
 
@@ -2882,20 +2953,20 @@ static inline void CalculateLosses(float IqRef, unsigned int uiIndex)
     M2_Candidate_Iqref[uiIndex] = 0.5f*(IqRef - M1_Candidate_Iqref[uiIndex]);
     M2_Candidate_Idref[uiIndex] = 0.0f;
 
-    M1_d_axis_flux = M1_LS_VALUE*M1_Candidate_Idref[uiIndex] + FLUX_VALUE;
-    M1_q_axis_flux = M1_LS_VALUE*M1_Candidate_Iqref[uiIndex];
-    M2_d_axis_flux = M2_LS_VALUE*M2_Candidate_Idref[uiIndex] + FLUX_VALUE;
-    M2_q_axis_flux = M2_LS_VALUE*M2_Candidate_Iqref[uiIndex];
+    M1_d_axis_flux[uiIndex] = M1_LS_VALUE*M1_Candidate_Idref[uiIndex] + FLUX_VALUE;
+    M1_q_axis_flux[uiIndex] = M1_LS_VALUE*M1_Candidate_Iqref[uiIndex];
+    M2_d_axis_flux[uiIndex] = M2_LS_VALUE*M2_Candidate_Idref[uiIndex] + FLUX_VALUE;
+    M2_q_axis_flux[uiIndex] = M2_LS_VALUE*M2_Candidate_Iqref[uiIndex];
 
 
-    M1_copper_loss = 1.5f*M1_RS_VALUE*(powf(M1_Candidate_Iqref[uiIndex],2.0f)+powf(M1_Candidate_Idref[uiIndex],2.0f));
-    M1_core_loss =  CFE*powf(fabsf(Module1_Parameters.AngularSpeedRadSec.Electrical),LAMBDA)*(powf(M1_d_axis_flux,2.0f)+powf(M1_q_axis_flux,2.0f));
+    M1_copper_loss[uiIndex] = 1.5f*M1_RS_VALUE*(powf(M1_Candidate_Iqref[uiIndex],2.0f)+powf(M1_Candidate_Idref[uiIndex],2.0f));
+    M1_core_loss[uiIndex] =  CFE*powf(fabsf(Module1_Parameters.AngularSpeedRadSec.Electrical),LAMBDA)*(powf(M1_d_axis_flux[uiIndex],2.0f)+powf(M1_q_axis_flux[uiIndex],2.0f));
 
-    M2_copper_loss = 1.5f*M2_RS_VALUE*(powf(M2_Candidate_Iqref[uiIndex],2.0f)+powf(M2_Candidate_Idref[uiIndex],2.0f));
-    M2_core_loss =  CFE*powf(fabsf(Module1_Parameters.AngularSpeedRadSec.Electrical),LAMBDA)*(powf(M2_d_axis_flux,2.0f)+powf(M2_q_axis_flux,2.0f));
+    M2_copper_loss[uiIndex] = 1.5f*M2_RS_VALUE*(powf(M2_Candidate_Iqref[uiIndex],2.0f)+powf(M2_Candidate_Idref[uiIndex],2.0f));
+    M2_core_loss[uiIndex] =  CFE*powf(fabsf(Module1_Parameters.AngularSpeedRadSec.Electrical),LAMBDA)*(powf(M2_d_axis_flux[uiIndex],2.0f)+powf(M2_q_axis_flux[uiIndex],2.0f));
 
 
-    TotalLoss[uiIndex] = M1_copper_loss + M1_core_loss + M2_copper_loss + M2_core_loss;
+    TotalLoss[uiIndex] = M1_copper_loss[uiIndex] + M1_core_loss[uiIndex] + M2_copper_loss[uiIndex] + M2_core_loss[uiIndex];
 
     if(minimumlossvalue>TotalLoss[uiIndex])
     {

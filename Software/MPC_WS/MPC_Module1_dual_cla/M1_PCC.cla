@@ -177,7 +177,7 @@ float CLA_floating_modulus(float a,float b)
 void GetSvpwmDutyCycles_cla(float T1, float T2, float T0,float Ts,float VectorAngleRad, float *DutyA, float *DutyB, float *DutyC)
 {
 
-#if 0
+#if 1
     if(FaultFlagLocal==YES_FAULT)
     {
         if (CLA_floating_modulus(VectorAngleRad, 2.0f*PI)<=PI)
@@ -277,8 +277,8 @@ void ExecuteSecondPrediction_cla(ModuleParameters *moduleparams, unsigned int in
 
     if(FaultFlagLocal==YES_FAULT)
     {
-        moduleparams->SecondHorizon[indexcount].SvpwmT1 = (1.0f / moduleparams->OptimizationFsw[indexcount]) * moduleparams->SecondHorizon[indexcount].ma * CLAsin(PI / 3.0f - moduleparams->SecondHorizon[indexcount].VoltageVectorAngleRad_Mod);
-        moduleparams->SecondHorizon[indexcount].SvpwmT2 = (1.0f / moduleparams->OptimizationFsw[indexcount]) * moduleparams->SecondHorizon[indexcount].ma * CLAsin(moduleparams->SecondHorizon[indexcount].VoltageVectorAngleRad_Mod);
+        moduleparams->SecondHorizon[indexcount].SvpwmT1 = (1.0f / moduleparams->OptimizationFsw[indexcount]) * moduleparams->SecondHorizon[indexcount].ma * CLAsin(CLA_floating_modulus(moduleparams->SecondHorizon[indexcount].VoltageVectorAngleRad, PI));
+        moduleparams->SecondHorizon[indexcount].SvpwmT2 = 0;
         moduleparams->SecondHorizon[indexcount].SvpwmT0 = (1.0f / moduleparams->OptimizationFsw[indexcount]) - moduleparams->SecondHorizon[indexcount].SvpwmT1 - moduleparams->SecondHorizon[indexcount].SvpwmT2;
     }
     else

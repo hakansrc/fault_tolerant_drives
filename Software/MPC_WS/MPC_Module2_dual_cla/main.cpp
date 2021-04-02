@@ -122,6 +122,7 @@ void CLA_initCpu1Cla1(void);
 
 uint16_t    Ipc0Counter=0;
 
+float IqRefByPass = 6.0f;
 
 
 int main(void)
@@ -239,6 +240,7 @@ __interrupt void cpu_timer0_isr(void)
         SpeedRefRadSec = SpeedRefRPM/60.0f*2.0f*PI;
         PI_iq_cpu2.Input = SpeedRefRadSec - Module1_Parameters.AngularSpeedRadSec.Mechanical;
         Run_PI_Controller(PI_iq_cpu2);
+        //PI_iq_cpu2.Output = IqRefByPass;
     }
     PieCtrlRegs.PIEACK.all = PIEACK_GROUP1;
 }

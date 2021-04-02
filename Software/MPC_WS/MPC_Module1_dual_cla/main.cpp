@@ -226,8 +226,9 @@ uint16_t    Start_Torque_Distribution = 0;
 TimingMeasurement TorqueDistributor = {0,0,0,0};
 float   differencemax = 0.0f;
 inline uint64_t    GetTime(void);
+int16_t GetAbsoluteVal(int16_t value);
 
-uint16_t    Case = 0;
+uint16_t    Case = 4;
 
 
 int main(void)
@@ -466,24 +467,30 @@ int main(void)
                     DataToBeSent[6]  = Module1_Parameters_cla.Measured.Current.PhaseA;
                     DataToBeSent[7]  = Module1_Parameters_cla.Measured.Current.PhaseB;
                     DataToBeSent[8]  = Module1_Parameters_cla.AngularSpeedRPM.Mechanical;
-                    DataToBeSent[9]  =  Module2_Parameters.Measured.Current.PhaseA;
+#if 1
+                    DataToBeSent[9]  = Module2_Parameters.Measured.Current.PhaseA;
                     DataToBeSent[10] = Module2_Parameters.Measured.Current.PhaseB;
-                    DataToBeSent[11] = SpeedRefRPM;
+                    DataToBeSent[11] = M1_copper_loss[minimumlossindex];
+#else
+                    DataToBeSent[9]  = minimumlossindex;
+                    DataToBeSent[10] = M1_core_loss[minimumlossindex];
+                    DataToBeSent[11] = M2_core_loss[minimumlossindex];
+#endif
                 }
                 if(Case==5)
                 {
-                    DataToBeSent[0]  =  TotalLoss[0];
-                    DataToBeSent[1]  =  TotalLoss[2];
-                    DataToBeSent[2]  =  TotalLoss[4];
-                    DataToBeSent[3]  =  TotalLoss[6];
-                    DataToBeSent[4]  =  TotalLoss[8];
-                    DataToBeSent[5]  =  TotalLoss[10];
-                    DataToBeSent[6]  =  TotalLoss[12];
-                    DataToBeSent[7]  =  TotalLoss[14];
-                    DataToBeSent[8]  =  TotalLoss[16];
-                    DataToBeSent[9]  =  TotalLoss[18];
-                    DataToBeSent[10] =  TotalLoss[20];
-                    DataToBeSent[11] =  TotalLoss[22];
+                    DataToBeSent[0]  =  M1_core_loss[0];
+                    DataToBeSent[1]  =  M1_core_loss[2];
+                    DataToBeSent[2]  =  M1_core_loss[4];
+                    DataToBeSent[3]  =  M1_core_loss[6];
+                    DataToBeSent[4]  =  M1_core_loss[8];
+                    DataToBeSent[5]  =  M1_core_loss[10];
+                    DataToBeSent[6]  =  M1_core_loss[12];
+                    DataToBeSent[7]  =  M1_core_loss[14];
+                    DataToBeSent[8]  =  M1_core_loss[16];
+                    DataToBeSent[9]  =  M1_core_loss[18];
+                    DataToBeSent[10] =  M1_core_loss[20];
+                    DataToBeSent[11] =  M1_core_loss[22];
                 }
 
 
@@ -2721,8 +2728,8 @@ void PerformTorqueDistribution(void)
      * Need to do a study for reduction of the execution time (the aim is less than 100uS)
      *
      * */
-#define CFE 1.55f
-#define LAMBDA 1.55f
+#define CFE 1.15f
+#define LAMBDA 1.15f
 
     unsigned int uiIndex = 0;
     float IqRef = PI_iq_cpu2.Output;
@@ -2754,62 +2761,6 @@ void PerformTorqueDistribution(void)
     M1_Iq_Candidate_Coefficient = IqRef*(1.0f/((float)TORQUE_DISTRIBUTION_STEP))*M1_Possible_Iq*0.5f;
     M1_Id_Candidate_Coefficient = IqRef*(1.0f/((float)TORQUE_DISTRIBUTION_STEP))*M1_Possible_Id*0.5f;
 
-#if 0
-    for(uiIndex=0.0f;uiIndex<TORQUE_DISTRIBUTION_STEP;uiIndex++)
-    {
-        /*fault is on module1 phase a for now*/
-        if(FaultFlagLocal==YES_FAULT)
-        {
-            //M1_Candidate_Iqref[uiIndex] = IqRef*(1.0f/((float)TORQUE_DISTRIBUTION_STEP))*((float)uiIndex)*M1_Possible_Iq;
-            //M1_Candidate_Idref[uiIndex] = IqRef*(1.0f/((float)TORQUE_DISTRIBUTION_STEP))*((float)uiIndex)*M1_Possible_Id;
-            M1_Candidate_Iqref[uiIndex] = M1_Iq_Candidate_Coefficient*((float)uiIndex);
-            M1_Candidate_Idref[uiIndex] = M1_Id_Candidate_Coefficient*((float)uiIndex);
-            /*M2 is the healthy module, therefore it can continue with id=0*/
-            M2_Candidate_Iqref[uiIndex] = IqRef - M1_Candidate_Iqref[uiIndex];
-            M2_Candidate_Idref[uiIndex] = 0.0f;
-        }
-        else
-        {
-            /*
-            M1_Candidate_Iqref[uiIndex] = IqRef*(1.0f/((float)TORQUE_DISTRIBUTION_STEP))*((float)uiIndex);
-            M1_Candidate_Idref[uiIndex] = 0.0f;
-            M2_Candidate_Iqref[uiIndex] = (1.0f - (1.0f/((float)TORQUE_DISTRIBUTION_STEP))*((float)uiIndex)) * IqRef;
-            M2_Candidate_Idref[uiIndex] = 0.0f;
-            */
-            M1_Candidate_Iqref[uiIndex] = M1_Iq_Candidate_Coefficient*((float)uiIndex);
-            M1_Candidate_Idref[uiIndex] = 0.0f;
-            M2_Candidate_Iqref[uiIndex] = IqRef - M1_Candidate_Iqref[uiIndex];
-            M2_Candidate_Idref[uiIndex] = 0.0f;
-        }
-        M1_d_axis_flux = M1_LS_VALUE*M1_Candidate_Idref[uiIndex] + FLUX_VALUE;
-        M1_q_axis_flux = M1_LS_VALUE*M1_Candidate_Iqref[uiIndex];
-        M2_d_axis_flux = M2_LS_VALUE*M2_Candidate_Idref[uiIndex] + FLUX_VALUE;
-        M2_q_axis_flux = M2_LS_VALUE*M2_Candidate_Iqref[uiIndex];
-
-        M1_copper_loss = 1.5f*M1_RS_VALUE*(powf(M1_Candidate_Iqref[uiIndex],2.0f)+powf(M1_Candidate_Idref[uiIndex],2.0f));
-        M1_core_loss =  CFE*powf(fabsf(Module1_Parameters.AngularSpeedRadSec.Electrical),LAMBDA)*(powf(M1_d_axis_flux,2.0f)+powf(M1_q_axis_flux,2.0f));
-
-        M2_copper_loss = 1.5f*M2_RS_VALUE*(powf(M2_Candidate_Iqref[uiIndex],2.0f)+powf(M2_Candidate_Idref[uiIndex],2.0f));
-        M2_core_loss =  CFE*powf(fabsf(Module1_Parameters.AngularSpeedRadSec.Electrical),LAMBDA)*(powf(M2_d_axis_flux,2.0f)+powf(M2_q_axis_flux,2.0f));
-
-        TotalLoss[uiIndex] = M1_copper_loss + M1_core_loss + M2_copper_loss + M2_core_loss;
-
-        if(minimumlossvalue>TotalLoss[uiIndex])
-        {
-            minimumlossvalue = TotalLoss[uiIndex];
-            minimumlossindex = uiIndex;
-        }
-
-
-
-
-    }
-#elif 0
-    for(uiIndex=0.0f;uiIndex<TORQUE_DISTRIBUTION_STEP;uiIndex++)
-    {
-        CalculateLosses(IqRef, uiIndex);
-    }
-#elif 1
     CalculateLosses(IqRef, 0);
     CalculateLosses(IqRef, 1);
     CalculateLosses(IqRef, 2);
@@ -2839,93 +2790,6 @@ void PerformTorqueDistribution(void)
     CalculateLosses(IqRef, 24);
     CalculateLosses(IqRef, 25);
 
-#if 0
-    CalculateLosses(IqRef, 26);
-    CalculateLosses(IqRef, 27);
-    CalculateLosses(IqRef, 28);
-    CalculateLosses(IqRef, 29);
-
-    CalculateLosses(IqRef, 30);
-    CalculateLosses(IqRef, 31);
-    CalculateLosses(IqRef, 32);
-    CalculateLosses(IqRef, 33);
-    CalculateLosses(IqRef, 34);
-    CalculateLosses(IqRef, 35);
-    CalculateLosses(IqRef, 36);
-    CalculateLosses(IqRef, 37);
-    CalculateLosses(IqRef, 38);
-    CalculateLosses(IqRef, 39);
-
-    CalculateLosses(IqRef, 40);
-    CalculateLosses(IqRef, 41);
-    CalculateLosses(IqRef, 42);
-    CalculateLosses(IqRef, 43);
-    CalculateLosses(IqRef, 44);
-    CalculateLosses(IqRef, 45);
-    CalculateLosses(IqRef, 46);
-    CalculateLosses(IqRef, 47);
-    CalculateLosses(IqRef, 48);
-    CalculateLosses(IqRef, 49);
-
-    CalculateLosses(IqRef, 50);
-    CalculateLosses(IqRef, 51);
-    CalculateLosses(IqRef, 52);
-    CalculateLosses(IqRef, 53);
-    CalculateLosses(IqRef, 54);
-    CalculateLosses(IqRef, 55);
-    CalculateLosses(IqRef, 56);
-    CalculateLosses(IqRef, 57);
-    CalculateLosses(IqRef, 58);
-    CalculateLosses(IqRef, 59);
-
-    CalculateLosses(IqRef, 60);
-    CalculateLosses(IqRef, 61);
-    CalculateLosses(IqRef, 62);
-    CalculateLosses(IqRef, 63);
-    CalculateLosses(IqRef, 64);
-    CalculateLosses(IqRef, 65);
-    CalculateLosses(IqRef, 66);
-    CalculateLosses(IqRef, 67);
-    CalculateLosses(IqRef, 68);
-    CalculateLosses(IqRef, 69);
-
-    CalculateLosses(IqRef, 70);
-    CalculateLosses(IqRef, 71);
-    CalculateLosses(IqRef, 72);
-    CalculateLosses(IqRef, 73);
-    CalculateLosses(IqRef, 74);
-    CalculateLosses(IqRef, 75);
-    CalculateLosses(IqRef, 76);
-    CalculateLosses(IqRef, 77);
-    CalculateLosses(IqRef, 78);
-    CalculateLosses(IqRef, 79);
-
-    CalculateLosses(IqRef, 80);
-    CalculateLosses(IqRef, 81);
-    CalculateLosses(IqRef, 82);
-    CalculateLosses(IqRef, 83);
-    CalculateLosses(IqRef, 84);
-    CalculateLosses(IqRef, 85);
-    CalculateLosses(IqRef, 86);
-    CalculateLosses(IqRef, 87);
-    CalculateLosses(IqRef, 88);
-    CalculateLosses(IqRef, 89);
-
-    CalculateLosses(IqRef, 90);
-    CalculateLosses(IqRef, 91);
-    CalculateLosses(IqRef, 92);
-    CalculateLosses(IqRef, 93);
-    CalculateLosses(IqRef, 94);
-    CalculateLosses(IqRef, 95);
-    CalculateLosses(IqRef, 96);
-    CalculateLosses(IqRef, 97);
-    CalculateLosses(IqRef, 98);
-    CalculateLosses(IqRef, 99);
-#endif
-
-
-#endif
-
     if(FaultFlagLocal==YES_FAULT)
     {
         M1_minimumloss_iqref = M1_Candidate_Iqref[minimumlossindex];
@@ -2935,11 +2799,13 @@ void PerformTorqueDistribution(void)
     }
     else
     {
-        M1_minimumloss_iqref = M1_Candidate_Iqref[minimumlossindex];
-        M2_minimumloss_iqref = M2_Candidate_Iqref[minimumlossindex];
-        M1_Iqref = M1_Candidate_Iqref[minimumlossindex];
-        M2_Iqref = M2_Candidate_Iqref[minimumlossindex];
+        M1_minimumloss_iqref = PI_iq_cpu2.Output/2.0f;
+        M2_minimumloss_iqref = PI_iq_cpu2.Output/2.0f;
+        M1_Iqref = PI_iq_cpu2.Output/2.0f;
+        M2_Iqref = PI_iq_cpu2.Output/2.0f;
     }
+
+
 
 
 }
@@ -2950,7 +2816,7 @@ static inline void CalculateLosses(float IqRef, unsigned int uiIndex)
     M1_Candidate_Idref[uiIndex] = M1_Id_Candidate_Coefficient*((float)uiIndex);
 
     /*M2 is the healthy module, therefore it can continue with id=0*/
-    M2_Candidate_Iqref[uiIndex] = 0.5f*(IqRef - M1_Candidate_Iqref[uiIndex]);
+    M2_Candidate_Iqref[uiIndex] = (0.5f*IqRef - M1_Candidate_Iqref[uiIndex]);
     M2_Candidate_Idref[uiIndex] = 0.0f;
 
     M1_d_axis_flux[uiIndex] = M1_LS_VALUE*M1_Candidate_Idref[uiIndex] + FLUX_VALUE;
@@ -2980,4 +2846,12 @@ inline uint64_t    GetTime(void)
 {
     uint64_t    timer_low = IpcRegs.IPCCOUNTERL;
     return ((timer_low)+((uint64_t)IpcRegs.IPCCOUNTERH)*((uint64_t)4294967296));
+}
+int16_t GetAbsoluteVal(int16_t value)
+{
+    if(value<((int16_t)0))
+    {
+        return ((int16_t)-1)*value;
+    }
+    return value;
 }

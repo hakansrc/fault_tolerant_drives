@@ -97,11 +97,11 @@ Load_Nominal_Freq = 50;
 THD_mean_frequency = 50;
 SpeedRef1 = 60; % RPM
 SpeedRef2 = 80;
-SpeedRefUpdateTime = 0.75;
-Tload1 = 10; %Nm
+SpeedRefUpdateTime = 5.75;
+Tload1 = 11; %Nm
 Tload2 = 20;
-TloadUpdateTime = 0.5;
-M1_FaultTime = 2.5;
+TloadUpdateTime = 5.5;
+M1_FaultTime = 0.5;
 M2_FaultTime = 20;
 %%
 RefModeSelection = 1;

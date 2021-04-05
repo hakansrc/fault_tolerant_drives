@@ -230,6 +230,15 @@ int16_t GetAbsoluteVal(int16_t value);
 
 uint16_t    Case = 4;
 
+float M1Torque=0;
+float M2Torque=0;
+float PowerOutTotalMechanical=0;
+float M1PowerElectrical=0;
+float M2PowerElectrical=0;
+float M1CopperLoss = 0;
+float M2CopperLoss = 0;
+
+
 
 int main(void)
 {
@@ -500,6 +509,10 @@ int main(void)
             SciaBackgroundTask();
             Start_Torque_Distribution = 0;
         }
+
+
+
+
 
 
 
@@ -2437,6 +2450,15 @@ __interrupt void CLATask1_PCC_Is_Done(void)
     CLA1Task1End_counter++;
     memcpy(&PI_iq,&PI_iq_cla,sizeof(PID_Parameters)); // give the torque reference from cpu1cla to cpu2
     memcpy(&Module1_Parameters,&Module1_Parameters_cla,sizeof(ModuleParameters));
+
+    M1Torque = 3.0f/2.0f*POLEPAIRS*(Module1_Parameters_cla.Measured.Current.transformed.Qvalue*FLUX_VALUE);
+    M2Torque = 3.0f/2.0f*POLEPAIRS*(Module2_Parameters.Measured.Current.transformed.Qvalue*FLUX_VALUE);
+    PowerOutTotalMechanical = M1Torque*Module1_Parameters_cla.AngularSpeedRadSec.Mechanical + M2Torque*Module1_Parameters_cla.AngularSpeedRadSec.Mechanical;
+    M1PowerElectrical = (sqrtf(powf(Module1_Parameters_cla.FirstHorizon[Module1_Parameters_cla.MinimumCostIndex].VdPrediction,2) + powf(Module1_Parameters_cla.FirstHorizon[Module1_Parameters_cla.MinimumCostIndex].VqPrediction,2)))*sqrtf(powf(Module1_Parameters_cla.Measured.Current.transformed.Dvalue, 2.0f)+powf(Module1_Parameters_cla.Measured.Current.transformed.Qvalue, 2.0f));
+    M2PowerElectrical = (sqrtf(powf(Module2_Parameters.FirstHorizon[Module2_Parameters.MinimumCostIndex].VdPrediction,2) + powf(Module2_Parameters.FirstHorizon[Module2_Parameters.MinimumCostIndex].VqPrediction,2)))*sqrtf(powf(Module2_Parameters.Measured.Current.transformed.Dvalue, 2.0f)+powf(Module2_Parameters.Measured.Current.transformed.Qvalue, 2.0f));
+
+    M1CopperLoss = 1.5f*M1_RS_VALUE*(powf(Module1_Parameters_cla.Measured.Current.transformed.Qvalue,2.0f)+powf(Module1_Parameters_cla.Measured.Current.transformed.Dvalue,2.0f));
+    M2CopperLoss = 1.5f*M1_RS_VALUE*(powf(Module2_Parameters.Measured.Current.transformed.Qvalue,2.0f)+powf(Module2_Parameters.Measured.Current.transformed.Dvalue,2.0f));
 
     PieCtrlRegs.PIEACK.all = PIEACK_GROUP11;
 }

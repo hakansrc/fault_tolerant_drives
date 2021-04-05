@@ -111,7 +111,7 @@ SECTIONS
 
    .stack           : > RAMM1,     PAGE = 1
    .ebss            : > RAMD1,    PAGE = 1
-   .econst          : > RAMD1 | RAMGS4,    PAGE = 1
+   .econst          : > RAMD1 | RAMGS8,    PAGE = 1
    .esysmem         : > RAMD1,    PAGE = 1
    //Filter_RegsFile  : > RAMGS4,	   PAGE = 1
 

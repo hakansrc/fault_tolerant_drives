@@ -198,7 +198,7 @@ uint16_t    ClockMod = 1000;
 uint16_t    ReadDrv8305RegistersFlag = 0;
 uint16_t    AngleHasBeenReset = 0;
 uint16_t    SpeedRefArrayCount = 0;
-float       SpeedRefArray[4] = {-35,80,35,-80};
+float       SpeedRefArray[4] = {-70,-70,70,70};
 
 /*Following flag will be replaced with an IPC call*/
 uint16_t    StartOperationCpu2 = 0; // when this is set to 1, cpu2 will start operation & inverter2 will contribute to the traction
@@ -405,102 +405,49 @@ int main(void)
             }
             if (SendOneInFour % 2 == 0)
             {
-                if(Case==0)
-                {
-                    DataToBeSent[0]  =  M1_d_axis_flux[0];
-                    DataToBeSent[1]  =  M1_d_axis_flux[2];
-                    DataToBeSent[2]  =  M1_d_axis_flux[4];
-                    DataToBeSent[3]  =  M1_d_axis_flux[6];
-                    DataToBeSent[4]  =  M1_d_axis_flux[8];
-                    DataToBeSent[5]  =  M1_d_axis_flux[10];
-                    DataToBeSent[6]  =  M1_d_axis_flux[12];
-                    DataToBeSent[7]  =  M1_d_axis_flux[14];
-                    DataToBeSent[8]  =  M1_d_axis_flux[16];
-                    DataToBeSent[9]  =  M1_d_axis_flux[18];
-                    DataToBeSent[10] =  M1_d_axis_flux[20];
-                    DataToBeSent[11] =  M1_d_axis_flux[22];
-                }
-                if(Case==1)
-                {
-                    DataToBeSent[0]  =  M1_q_axis_flux[0];
-                    DataToBeSent[1]  =  M1_q_axis_flux[2];
-                    DataToBeSent[2]  =  M1_q_axis_flux[4];
-                    DataToBeSent[3]  =  M1_q_axis_flux[6];
-                    DataToBeSent[4]  =  M1_q_axis_flux[8];
-                    DataToBeSent[5]  =  M1_q_axis_flux[10];
-                    DataToBeSent[6]  =  M1_q_axis_flux[12];
-                    DataToBeSent[7]  =  M1_q_axis_flux[14];
-                    DataToBeSent[8]  =  M1_q_axis_flux[16];
-                    DataToBeSent[9]  =  M1_q_axis_flux[18];
-                    DataToBeSent[10] =  M1_q_axis_flux[20];
-                    DataToBeSent[11] =  M1_q_axis_flux[22];
-                }
-                if(Case==2)
-                {
-                    DataToBeSent[0]  =  M2_d_axis_flux[0];
-                    DataToBeSent[1]  =  M2_d_axis_flux[2];
-                    DataToBeSent[2]  =  M2_d_axis_flux[4];
-                    DataToBeSent[3]  =  M2_d_axis_flux[6];
-                    DataToBeSent[4]  =  M2_d_axis_flux[8];
-                    DataToBeSent[5]  =  M2_d_axis_flux[10];
-                    DataToBeSent[6]  =  M2_d_axis_flux[12];
-                    DataToBeSent[7]  =  M2_d_axis_flux[14];
-                    DataToBeSent[8]  =  M2_d_axis_flux[16];
-                    DataToBeSent[9]  =  M2_d_axis_flux[18];
-                    DataToBeSent[10] =  M2_d_axis_flux[20];
-                    DataToBeSent[11] =  M2_d_axis_flux[22];
-                }
-                if(Case==3)
-                {
-                    DataToBeSent[0]  =  M2_q_axis_flux[0];
-                    DataToBeSent[1]  =  M2_q_axis_flux[2];
-                    DataToBeSent[2]  =  M2_q_axis_flux[4];
-                    DataToBeSent[3]  =  M2_q_axis_flux[6];
-                    DataToBeSent[4]  =  M2_q_axis_flux[8];
-                    DataToBeSent[5]  =  M2_q_axis_flux[10];
-                    DataToBeSent[6]  =  M2_q_axis_flux[12];
-                    DataToBeSent[7]  =  M2_q_axis_flux[14];
-                    DataToBeSent[8]  =  M2_q_axis_flux[16];
-                    DataToBeSent[9]  =  M2_q_axis_flux[18];
-                    DataToBeSent[10] =  M2_q_axis_flux[20];
-                    DataToBeSent[11] =  M2_q_axis_flux[22];
-                }
-                if(Case==4)
-                {
-                    DataToBeSent[0]  = Module1_Parameters_cla.Measured.Current.transformed.Dvalue; // .Measured.Current.PhaseA;
-                    DataToBeSent[1]  = Module1_Parameters_cla.Measured.Current.transformed.Qvalue; // .Measured.Current.PhaseA;
-                    DataToBeSent[2]  = M1_Iqref;
-                    DataToBeSent[3]  = Module2_Parameters.Measured.Current.transformed.Dvalue;
-                    DataToBeSent[4]  = Module2_Parameters.Measured.Current.transformed.Qvalue;
-                    DataToBeSent[5]  = M2_Iqref;
-                    DataToBeSent[6]  = Module1_Parameters_cla.Measured.Current.PhaseA;
-                    DataToBeSent[7]  = Module1_Parameters_cla.Measured.Current.PhaseB;
-                    DataToBeSent[8]  = Module1_Parameters_cla.AngularSpeedRPM.Mechanical;
-#if 1
-                    DataToBeSent[9]  = Module2_Parameters.Measured.Current.PhaseA;
-                    DataToBeSent[10] = Module2_Parameters.Measured.Current.PhaseB;
-                    DataToBeSent[11] = M1_copper_loss[minimumlossindex];
+#if 0
+                DataToBeSent[0]  = Module1_Parameters_cla.Measured.Current.transformed.Dvalue; // .Measured.Current.PhaseA;
+                DataToBeSent[1]  = Module1_Parameters_cla.Measured.Current.transformed.Qvalue; // .Measured.Current.PhaseA;
+                DataToBeSent[2]  = M1_Iqref;
+                DataToBeSent[3]  = Module2_Parameters.Measured.Current.transformed.Dvalue;
+                DataToBeSent[4]  = Module2_Parameters.Measured.Current.transformed.Qvalue;
+                DataToBeSent[5]  = M2_Iqref;
+                DataToBeSent[6]  = M1Torque;
+                DataToBeSent[7]  = M2Torque;
+                DataToBeSent[8]  = PowerOutTotalMechanical;
+                DataToBeSent[9]  = M1PowerElectrical;
+                DataToBeSent[10] = M1CopperLoss;
+                DataToBeSent[11] = M2CopperLoss;
 #else
-                    DataToBeSent[9]  = minimumlossindex;
-                    DataToBeSent[10] = M1_core_loss[minimumlossindex];
-                    DataToBeSent[11] = M2_core_loss[minimumlossindex];
+                DataToBeSent[0]  = Module1_Parameters_cla.Measured.Current.transformed.Dvalue; // .Measured.Current.PhaseA;
+                DataToBeSent[1]  = Module1_Parameters_cla.Measured.Current.transformed.Qvalue; // .Measured.Current.PhaseA;
+                DataToBeSent[2]  = M1_Iqref;
+                DataToBeSent[3]  = Module2_Parameters.Measured.Current.transformed.Dvalue;
+                DataToBeSent[4]  = Module2_Parameters.Measured.Current.transformed.Qvalue;
+                DataToBeSent[5]  = M2_Iqref;
+                DataToBeSent[6]  = Module1_Parameters_cla.Measured.Current.PhaseA;
+                DataToBeSent[7]  = Module1_Parameters_cla.Measured.Current.PhaseB;
+                DataToBeSent[8]  = Module1_Parameters_cla.AngularSpeedRPM.Mechanical;
+#if 1
+                DataToBeSent[9]  = M1_FswDecided_cla;
+                DataToBeSent[10] = M2_FswDecided;
+                DataToBeSent[11] = SpeedRefRPM;
+#else
+                DataToBeSent[9]  = minimumlossindex;
+                DataToBeSent[10] = M1_core_loss[minimumlossindex];
+                DataToBeSent[11] = M2_core_loss[minimumlossindex];
 #endif
-                }
-                if(Case==5)
-                {
-                    DataToBeSent[0]  =  M1_core_loss[0];
-                    DataToBeSent[1]  =  M1_core_loss[2];
-                    DataToBeSent[2]  =  M1_core_loss[4];
-                    DataToBeSent[3]  =  M1_core_loss[6];
-                    DataToBeSent[4]  =  M1_core_loss[8];
-                    DataToBeSent[5]  =  M1_core_loss[10];
-                    DataToBeSent[6]  =  M1_core_loss[12];
-                    DataToBeSent[7]  =  M1_core_loss[14];
-                    DataToBeSent[8]  =  M1_core_loss[16];
-                    DataToBeSent[9]  =  M1_core_loss[18];
-                    DataToBeSent[10] =  M1_core_loss[20];
-                    DataToBeSent[11] =  M1_core_loss[22];
-                }
+#endif
+
+                /*
+float M1Torque=0;
+float M2Torque=0;
+float PowerOutTotalMechanical=0;
+float M1PowerElectrical=0;
+float M2PowerElectrical=0;
+float M1CopperLoss = 0;
+float M2CopperLoss = 0;
+                 * */
 
 
                 SciSendMultipleFloatWithTheTag(DataToBeSent, 12);
@@ -529,7 +476,7 @@ __interrupt void cpu_timer0_isr(void)
 __interrupt void cpu_timer1_isr(void)
 {
     CpuTimer1.InterruptCount++;
-#if 0
+#if 1
     if((M1_OperationMode==MODE_MPCCONTROLLER)||(M1_OperationMode==MODE_CLA_MPCCONTROLLER))
     {
         if((CpuTimer1.InterruptCount%5)==0)

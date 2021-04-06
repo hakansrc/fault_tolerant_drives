@@ -3,13 +3,13 @@ clc
 %% Simulation parameters
 Sampling_time = 1e-6;
 ref_frequency = 100*pi;
-Tfinal = 1.5; %seconds
+Tfinal = 3; %seconds
 %% PMSM parameters
 MotorSpeed = 600; % rpm
 PolePairs = 10;
 EfRated = 80.3; % Volts
-Ls = 3.51e-3; % Henries
-Rs = 321e-3; % Ohms
+Ls = 3.43e-3; % Henries
+Rs = 539e-3; % Ohms
 VoltageConstant = EfRated*sqrt(6)/MotorSpeed*1e3;% Vll-peak/krpm
 Inertia = 1e-2; % kgm^2
 ViscousFriction = 1e-3; % Nms
@@ -95,13 +95,13 @@ iqrated = Trated/(1.5*PolePairs*FluxPM);
 %% Other parameters
 Load_Nominal_Freq = 50;
 THD_mean_frequency = 50;
-SpeedRef1 = 60; % RPM
+SpeedRef1 = 80; % RPM
 SpeedRef2 = 80;
 SpeedRefUpdateTime = 5.75;
-Tload1 = 11; %Nm
-Tload2 = 20;
+Tload1 = 45; %Nm
+Tload2 = 45;
 TloadUpdateTime = 5.5;
-M1_FaultTime = 0.5;
+M1_FaultTime = 0.75;
 M2_FaultTime = 20;
 %%
 RefModeSelection = 1;

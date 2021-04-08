@@ -718,5 +718,5 @@ void Run_PI_Controller(PID_Parameters &pidparams)
 inline uint64_t    GetTimeFloat(void)
 {
     uint64_t    timer_low = IpcRegs.IPCCOUNTERL;
-    return  (float)(((float)((timer_low)+((uint64_t)IpcRegs.IPCCOUNTERH)*((uint64_t)4294967296)))/(float(200e6)));
+    return  (float)(((float)((timer_low)+((uint64_t)IpcRegs.IPCCOUNTERH)*((uint64_t)4294967296)))/(float(1.0f)));
 }

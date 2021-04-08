@@ -109,6 +109,7 @@ void RunTimeProtectionControl(void);
 void ZeroiseModule2Parameters(void);
 void Run_PI_Controller(PID_Parameters &pidparams);
 inline uint64_t    GetTimeFloat(void);
+inline uint64_t    GetTime(void);
 #if 0
 void GetSvpwmDutyCycles(float T1, float T2, float T0,float Ts,float VectorAngleRad, float &DutyA, float &DutyB, float &DutyC);
 void GetEncoderReadings_Cpu2(ModuleParameters &moduleparams);
@@ -127,19 +128,21 @@ uint16_t    Ipc0Counter=0;
 float IqRefByPass = 6.0f;
 
 #pragma DATA_SECTION("M1_INTERRUPT_MOMENT_LOCATION")
-float   M1_Interrupt_Moment = 0.0f;
+int64_t   M1_Interrupt_Moment = 0.0f;
 
 #pragma DATA_SECTION("CpuToCla1MsgRAM")
 float   M1_FswDecided_to_cla = 1000.0f;
 #pragma DATA_SECTION("CpuToCla1MsgRAM")
-float   M1_Interrupt_Moment_to_cla = 0.0f;
+int64_t   M1_Interrupt_Moment_to_cla = 0;
+
+
 #pragma DATA_SECTION("CpuToCla1MsgRAM")
-float   M2_Interrupt_Moment_to_cla = 0.0f;
+int64_t M2_Interrupt_Moment_to_cla = 0;
 
 #pragma DATA_SECTION("Cla1ToCpuMsgRAM")
-float   M1_Next_Interrupt_Moment = 0.0f;
+int64_t   M1_Next_Interrupt_Moment = 0;
 #pragma DATA_SECTION("Cla1ToCpuMsgRAM")
-float   M2_Next_Interrupt_Moment = 0.0f;
+int64_t   M2_Next_Interrupt_Moment = 0;
 
 
 #pragma DATA_SECTION("Cla1ToCpuMsgRAM")
@@ -510,7 +513,7 @@ void InitializeEpwm6Registers(void)
 }
 __interrupt void epwm4_isr(void)
 {
-    M2_Interrupt_Moment_to_cla = GetTimeFloat();
+    M2_Interrupt_Moment_to_cla = (int64_t) GetTime();
     M1_Interrupt_Moment_to_cla = M1_Interrupt_Moment;
     M1_FswDecided_to_cla = M1_FswDecided;
 
@@ -719,4 +722,9 @@ inline uint64_t    GetTimeFloat(void)
 {
     uint64_t    timer_low = IpcRegs.IPCCOUNTERL;
     return  (float)(((float)((timer_low)+((uint64_t)IpcRegs.IPCCOUNTERH)*((uint64_t)4294967296)))/(float(200e6)));
+}
+inline uint64_t    GetTime(void)
+{
+    uint64_t    timer_low = IpcRegs.IPCCOUNTERL;
+    return ((timer_low)+((uint64_t)IpcRegs.IPCCOUNTERH)*((uint64_t)4294967296));
 }

@@ -65,7 +65,7 @@ PAGE 1 :
 
    M1_IQREF_ADDRESS_RAMGS13 : origin = 0x0195F2, length = 0x000002
    M2_IQREF_ADDRESS_RAMGS13 : origin = 0x0195F4, length = 0x000002
-   M1_INTERRUPT_MOMENT_ADDRESS_RAMGS13 : origin = 0x0195F6, length = 0x000002
+   M1_INTERRUPT_MOMENT_ADDRESS_RAMGS13 : origin = 0x0195F6, length = 0x000004
 
    //RAMGS13     : origin = 0x01929A, length = 0x000D66
 

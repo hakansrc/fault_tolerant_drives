@@ -246,7 +246,7 @@ float M2CopperLoss = 0;
 
 
 #pragma DATA_SECTION("M1_INTERRUPT_MOMENT_LOCATION")
-float   M1_Interrupt_Moment = 0.0f;
+int64_t   M1_Interrupt_Moment = 0;
 
 
 
@@ -2096,7 +2096,7 @@ void M2_CalculateOffsetValue(void)
 
 __interrupt void epwm1_isr(void)
 {
-    M1_Interrupt_Moment = GetTimeFloat();
+    M1_Interrupt_Moment = (int64_t)GetTime();
     M1_FswDecided = M1_FswDecided_cla;
 
 

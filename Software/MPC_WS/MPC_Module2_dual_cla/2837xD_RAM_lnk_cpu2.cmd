@@ -85,7 +85,7 @@ PAGE 1 :
 
    M1_IQREF_ADDRESS_RAMGS14 : origin = 0x01A5F2, length = 0x000002
    M2_IQREF_ADDRESS_RAMGS14 : origin = 0x01A5F4, length = 0x000002
-   M1_INTERRUPT_MOMENT_ADDRESS_RAMGS13 : origin = 0x0195F6, length = 0x000002
+   M1_INTERRUPT_MOMENT_ADDRESS_RAMGS13 : origin = 0x0195F6, length = 0x000004
 
    //RAMGS13     : origin = 0x019000, length = 0x001000     /*CPU1 is the owner of RAMGS13*/
    //RAMGS14     : origin = 0x01A000, length = 0x001000     /*CPU2 is the owner of RAMGS14*/  

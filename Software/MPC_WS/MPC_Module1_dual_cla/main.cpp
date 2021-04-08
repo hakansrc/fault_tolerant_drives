@@ -80,6 +80,10 @@ float       SpeedRefRPM = 60.0f;
 unsigned int        M1_OperationMode = MODE_NO_OPERATION;
 #pragma DATA_SECTION("CLAData")
 float       M1_ElectricalAngle = 0;
+#pragma DATA_SECTION("CLAData")
+unsigned int index_value = 0;
+#pragma DATA_SECTION("CLAData")
+unsigned int index_value_prev = 0;
 
 #pragma DATA_SECTION("CLAData")
 float M1_minimumloss_iqref = 0.0f;

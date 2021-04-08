@@ -89,7 +89,8 @@ float M1_Iqref = 0.0f;
 float M2_Iqref = 0.0f;
 #pragma DATA_SECTION("CLAData")
 float M2_Iqref_cla = 0.0f;
-
+#pragma DATA_SECTION("CLAData")
+unsigned int index_value_prev = 0;
 
 __interrupt void cpu_timer0_isr(void);  /*prototype of the ISR functions*/
 __interrupt void cpu_timer1_isr(void);  /*prototype of the ISR functions*/
@@ -175,8 +176,8 @@ int main(void)
     PI_iq_cpu2.Input_prev = 0;
     PI_iq_cpu2.Output = 0;
     PI_iq_cpu2.Output_prev = 0;
-    PI_iq_cpu2.SaturationMax = 2.0f * IQ_RATED;
-    PI_iq_cpu2.SaturationMin = -2.0f * IQ_RATED;
+    PI_iq_cpu2.SaturationMax = 4.0f * IQ_RATED;
+    PI_iq_cpu2.SaturationMin = -4.0f * IQ_RATED;
 
     InitializationRoutine();
 

@@ -36,6 +36,8 @@ extern float                M1_ElectricalAngle;
 extern float                M1_minimumloss_iqref;
 extern float                M1_Iqref_cla;
 extern uint16_t             FaultFlagLocal;
+extern unsigned int         index_value;
+extern unsigned int         index_value_prev;
 
 
 float CLA_Power(float base, uint16_t power);

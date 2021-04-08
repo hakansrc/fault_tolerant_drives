@@ -33,6 +33,7 @@ __interrupt void Cla1Task1 ( void )
 
         Module2_Parameters_cla.MinimumCostValue = (float)1e35;
 
+#if 0
         ExecuteFirstPrediction_cla(&Module2_Parameters_cla,0);
         ExecuteSecondPrediction_cla(&Module2_Parameters_cla,0);
         ExecuteFirstPrediction_cla(&Module2_Parameters_cla,1);
@@ -53,6 +54,31 @@ __interrupt void Cla1Task1 ( void )
         ExecuteSecondPrediction_cla(&Module2_Parameters_cla,8);
         ExecuteFirstPrediction_cla(&Module2_Parameters_cla,9);
         ExecuteSecondPrediction_cla(&Module2_Parameters_cla,9);
+#else
+        if(index_value_prev==0)
+        {
+            ExecuteFirstPrediction_cla(&Module2_Parameters_cla,0u);
+            ExecuteSecondPrediction_cla(&Module2_Parameters_cla,0u);
+            ExecuteFirstPrediction_cla(&Module2_Parameters_cla,1u);
+            ExecuteSecondPrediction_cla(&Module2_Parameters_cla,1u);
+        }
+        else if(index_value_prev==9)
+        {
+            ExecuteFirstPrediction_cla(&Module2_Parameters_cla,8u);
+            ExecuteSecondPrediction_cla(&Module2_Parameters_cla,8u);
+            ExecuteFirstPrediction_cla(&Module2_Parameters_cla,9u);
+            ExecuteSecondPrediction_cla(&Module2_Parameters_cla,9u);
+        }
+        else
+        {
+            ExecuteFirstPrediction_cla(&Module2_Parameters_cla,index_value_prev-1u);
+            ExecuteSecondPrediction_cla(&Module2_Parameters_cla,index_value_prev-1u);
+            ExecuteFirstPrediction_cla(&Module2_Parameters_cla,index_value_prev);
+            ExecuteSecondPrediction_cla(&Module2_Parameters_cla,index_value_prev);
+            ExecuteFirstPrediction_cla(&Module2_Parameters_cla,index_value_prev+1u);
+            ExecuteSecondPrediction_cla(&Module2_Parameters_cla,index_value_prev+1u);
+        }
+#endif
 
         GetSvpwmDutyCycles_cla(Module2_Parameters_cla.SecondHorizon[Module2_Parameters_cla.MinimumCostIndex].SvpwmT1,\
                            Module2_Parameters_cla.SecondHorizon[Module2_Parameters_cla.MinimumCostIndex].SvpwmT2,\
@@ -77,6 +103,7 @@ __interrupt void Cla1Task1 ( void )
             Module2_Parameters_cla.PhaseCDutyCycle = 0.0f;
 
         M2_FswDecided_cla = Module2_Parameters_cla.OptimizationFsw[Module2_Parameters_cla.MinimumCostIndex];
+        index_value_prev= Module2_Parameters_cla.MinimumCostIndex;
     }
 
     if(M2_OperationMode==MODE_CLA_MPCCONTROLLER)

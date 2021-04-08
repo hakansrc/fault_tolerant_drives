@@ -33,6 +33,8 @@ __interrupt void Cla1Task1 ( void )
 
         Module2_Parameters_cla.MinimumCostValue = (float)1e35;
 
+        M1_Next_Interrupt_Moment = M1_Interrupt_Moment_to_cla + 1.0f/M1_FswDecided_to_cla;
+
 #if 0
         ExecuteFirstPrediction_cla(&Module2_Parameters_cla,0);
         ExecuteSecondPrediction_cla(&Module2_Parameters_cla,0);
@@ -289,6 +291,28 @@ void ExecuteSecondPrediction_cla(ModuleParameters *moduleparams, unsigned int in
 
     moduleparams->SecondHorizon[indexcount].ma = CLAsqrt(3.0f)*moduleparams->SecondHorizon[indexcount].Magnitude / (moduleparams->Measured.Voltage.Vdc );
 
+    M2_Next_Interrupt_Moment = M2_Interrupt_Moment_to_cla + 1.0f/moduleparams->OptimizationFsw[indexcount];
+
+    if ((((CLA_fabsf(M2_Next_Interrupt_Moment-M1_Next_Interrupt_Moment))*M1_FswDecided_to_cla) > 0.74) && (((CLA_fabsf(M2_Next_Interrupt_Moment-M1_Next_Interrupt_Moment))*M1_FswDecided_to_cla) < 0.76))
+    {
+        fsw_cost_multipler = 1.0f;
+    }
+    else
+    {
+        fsw_cost_multipler = 3.0f;
+    }
+
+
+    /*
+    if (((abs(M2_Next_Int_Moment-M1_Next_Int_Moment))*M1_fsw) > 0.74) && (((abs(M2_Next_Int_Moment-M1_Next_Int_Moment))*M1_fsw) < 0.76)
+
+    else
+
+        FswCoeff(i) = 1250*3;
+%                 IqRippleCoeff = 100000;
+    end
+    */
+
 #if 0
     if(FaultFlagLocal==YES_FAULT)
     {
@@ -322,7 +346,7 @@ void ExecuteSecondPrediction_cla(ModuleParameters *moduleparams, unsigned int in
     moduleparams->SecondHorizon[indexcount].IqPrediction = moduleparams->FirstHorizon[indexcount].IqPrediction + (1.0f / moduleparams->OptimizationFsw[indexcount]) * (moduleparams->FirstHorizon[indexcount].VqPrediction / M2_LS_VALUE - M2_RS_VALUE / M2_LS_VALUE * moduleparams->FirstHorizon[indexcount].IqPrediction - M2_LS_VALUE / M2_LS_VALUE * POLEPAIRS * moduleparams->AngularSpeedRadSec.Mechanical * moduleparams->FirstHorizon[indexcount].IdPrediction - FLUX_VALUE * POLEPAIRS * moduleparams->AngularSpeedRadSec.Mechanical / M2_LS_VALUE);
 
     /*TODO add protection to cost*/
-    moduleparams->Cost[indexcount] = IQRIPPLECOEFF * CLA_Power(moduleparams->SecondHorizon[indexcount].Iq_Ripple_Prediction / IQ_RATED, 2) + IQREFCOEFF * CLA_Power((moduleparams->Reference.Iq - moduleparams->SecondHorizon[indexcount].IqPrediction) / IQ_RATED, 2) + IDREFCOEFF * CLA_Power((moduleparams->Reference.Id - moduleparams->SecondHorizon[indexcount].IdPrediction)/IQ_RATED, 2) + FSWCOEFF * moduleparams->OptimizationFsw[indexcount] / OPT_FSW_MAX;
+    moduleparams->Cost[indexcount] = IQRIPPLECOEFF * CLA_Power(moduleparams->SecondHorizon[indexcount].Iq_Ripple_Prediction / IQ_RATED, 2) + IQREFCOEFF * CLA_Power((moduleparams->Reference.Iq - moduleparams->SecondHorizon[indexcount].IqPrediction) / IQ_RATED, 2) + IDREFCOEFF * CLA_Power((moduleparams->Reference.Id - moduleparams->SecondHorizon[indexcount].IdPrediction)/IQ_RATED, 2) + fsw_cost_multipler * FSWCOEFF * moduleparams->OptimizationFsw[indexcount] / OPT_FSW_MAX;
     if (moduleparams->Cost[indexcount] < moduleparams->MinimumCostValue)
     {
         moduleparams->MinimumCostValue = moduleparams->Cost[indexcount];

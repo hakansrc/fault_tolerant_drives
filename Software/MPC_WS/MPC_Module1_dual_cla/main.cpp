@@ -231,6 +231,7 @@ TimingMeasurement TorqueDistributor = {0,0,0,0};
 TimingMeasurement PCC_Timing = {0,0,0,0};
 float   differencemax = 0.0f;
 inline uint64_t    GetTime(void);
+inline uint64_t    GetTimeFloat(void);
 int16_t GetAbsoluteVal(int16_t value);
 
 uint16_t    Case = 4;
@@ -242,6 +243,10 @@ float M1PowerElectrical=0;
 float M2PowerElectrical=0;
 float M1CopperLoss = 0;
 float M2CopperLoss = 0;
+
+
+#pragma DATA_SECTION("M1_INTERRUPT_MOMENT_LOCATION")
+float   M1_Interrupt_Moment = 0.0f;
 
 
 
@@ -2091,6 +2096,10 @@ void M2_CalculateOffsetValue(void)
 
 __interrupt void epwm1_isr(void)
 {
+    M1_Interrupt_Moment = GetTimeFloat();
+    M1_FswDecided = M1_FswDecided_cla;
+
+
     PCC_Timing.Beginning = GetTime();
     ControlISRCounter++;
 #if 0
@@ -2400,6 +2409,7 @@ __interrupt void ipc0_isr(void)
 }
 __interrupt void CLATask1_PCC_Is_Done(void)
 {
+    M1_FswDecided = M1_FswDecided_cla;
     CLA1Task1End_counter++;
     memcpy(&PI_iq,&PI_iq_cla,sizeof(PID_Parameters)); // give the torque reference from cpu1cla to cpu2
     memcpy(&Module1_Parameters,&Module1_Parameters_cla,sizeof(ModuleParameters));
@@ -2845,4 +2855,9 @@ int16_t GetAbsoluteVal(int16_t value)
         return ((int16_t)-1)*value;
     }
     return value;
+}
+inline uint64_t    GetTimeFloat(void)
+{
+    uint64_t    timer_low = IpcRegs.IPCCOUNTERL;
+    return  (float)(((float)((timer_low)+((uint64_t)IpcRegs.IPCCOUNTERH)*((uint64_t)4294967296)))/(float(200e6)));
 }

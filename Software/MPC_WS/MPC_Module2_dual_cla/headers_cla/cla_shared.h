@@ -32,7 +32,12 @@ extern float                M2_minimumloss_iqref_cla;
 extern float                M2_Iqref_cla;
 extern uint16_t             FaultFlagLocal;
 extern unsigned int         index_value_prev;
-
+extern float                M1_FswDecided_to_cla;
+extern float                M1_Interrupt_Moment_to_cla;
+extern float                M2_Interrupt_Moment_to_cla;
+extern float                M1_Next_Interrupt_Moment;
+extern float                M2_Next_Interrupt_Moment;
+extern float                fsw_cost_multipler;
 
 float CLA_Power(float base, uint16_t power);
 float CLA_floating_modulus(float a,float b);

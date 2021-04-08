@@ -228,6 +228,7 @@ float       time_in_usec = 0.0f;
 uint16_t    Start_Torque_Distribution = 0;
 
 TimingMeasurement TorqueDistributor = {0,0,0,0};
+TimingMeasurement PCC_Timing = {0,0,0,0};
 float   differencemax = 0.0f;
 inline uint64_t    GetTime(void);
 int16_t GetAbsoluteVal(int16_t value);
@@ -429,8 +430,8 @@ int main(void)
                 DataToBeSent[3]  = Module2_Parameters.Measured.Current.transformed.Dvalue;
                 DataToBeSent[4]  = Module2_Parameters.Measured.Current.transformed.Qvalue;
                 DataToBeSent[5]  = M2_Iqref;
-                DataToBeSent[6]  = Module1_Parameters_cla.Measured.Current.PhaseA;
-                DataToBeSent[7]  = Module1_Parameters_cla.Measured.Current.PhaseB;
+                DataToBeSent[6]  = TorqueDistributor.fDifference;
+                DataToBeSent[7]  = PCC_Timing.fDifference;
                 DataToBeSent[8]  = Module1_Parameters_cla.AngularSpeedRPM.Mechanical;
 #if 1
                 DataToBeSent[9]  = M1_FswDecided_cla;
@@ -2090,6 +2091,7 @@ void M2_CalculateOffsetValue(void)
 
 __interrupt void epwm1_isr(void)
 {
+    PCC_Timing.Beginning = GetTime();
     ControlISRCounter++;
 #if 0
     torque_distributor_start = (uint64_t)IpcRegs.IPCCOUNTERL + (uint64_t)((uint64_t)IpcRegs.IPCCOUNTERH)*((uint64_t)4294967296);
@@ -2401,6 +2403,11 @@ __interrupt void CLATask1_PCC_Is_Done(void)
     CLA1Task1End_counter++;
     memcpy(&PI_iq,&PI_iq_cla,sizeof(PID_Parameters)); // give the torque reference from cpu1cla to cpu2
     memcpy(&Module1_Parameters,&Module1_Parameters_cla,sizeof(ModuleParameters));
+
+    PCC_Timing.End = GetTime();
+    PCC_Timing.Difference = PCC_Timing.End - PCC_Timing.Beginning;
+    PCC_Timing.fDifference = ((float)PCC_Timing.Difference)*5.0f/((float)1000.0f);
+
 
     M1Torque = 3.0f/2.0f*POLEPAIRS*(Module1_Parameters_cla.Measured.Current.transformed.Qvalue*FLUX_VALUE);
     M2Torque = 3.0f/2.0f*POLEPAIRS*(Module2_Parameters.Measured.Current.transformed.Qvalue*FLUX_VALUE);
@@ -2792,6 +2799,7 @@ static inline void CalculateLosses(float IqRef, unsigned int uiIndex)
     M2_Candidate_Iqref[uiIndex] = (0.5f*IqRef - M1_Candidate_Iqref[uiIndex]);
     M2_Candidate_Idref[uiIndex] = 0.0f;
 
+#if 0
     M1_d_axis_flux[uiIndex] = M1_LS_VALUE*M1_Candidate_Idref[uiIndex] + FLUX_VALUE;
     M1_q_axis_flux[uiIndex] = M1_LS_VALUE*M1_Candidate_Iqref[uiIndex];
     M2_d_axis_flux[uiIndex] = M2_LS_VALUE*M2_Candidate_Idref[uiIndex] + FLUX_VALUE;
@@ -2806,6 +2814,16 @@ static inline void CalculateLosses(float IqRef, unsigned int uiIndex)
 
 
     TotalLoss[uiIndex] = M1_copper_loss[uiIndex] + M1_core_loss[uiIndex] + M2_copper_loss[uiIndex] + M2_core_loss[uiIndex];
+#else
+
+    M1_copper_loss[uiIndex] = 1.5f*M1_RS_VALUE*(powf(M1_Candidate_Iqref[uiIndex],2.0f)+powf(M1_Candidate_Idref[uiIndex],2.0f));
+
+    M2_copper_loss[uiIndex] = 1.5f*M2_RS_VALUE*(powf(M2_Candidate_Iqref[uiIndex],2.0f)+powf(M2_Candidate_Idref[uiIndex],2.0f));
+
+
+    TotalLoss[uiIndex] = M1_copper_loss[uiIndex] + M2_copper_loss[uiIndex];
+
+#endif
 
     if(minimumlossvalue>TotalLoss[uiIndex])
     {

@@ -103,7 +103,7 @@ __interrupt void Cla1Task1 ( void )
             Module2_Parameters_cla.PhaseCDutyCycle = 0.0f;
 
         M2_FswDecided_cla = Module2_Parameters_cla.OptimizationFsw[Module2_Parameters_cla.MinimumCostIndex];
-        index_value_prev= Module2_Parameters_cla.MinimumCostIndex;
+        index_value_prev = Module2_Parameters_cla.MinimumCostIndex;
     }
 
     if(M2_OperationMode==MODE_CLA_MPCCONTROLLER)

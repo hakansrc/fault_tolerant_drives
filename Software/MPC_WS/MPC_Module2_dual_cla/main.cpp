@@ -89,7 +89,7 @@ float M1_Iqref = 0.0f;
 float M2_Iqref = 0.0f;
 #pragma DATA_SECTION("CLAData")
 float M2_Iqref_cla = 0.0f;
-#pragma DATA_SECTION("CLAData")
+#pragma DATA_SECTION("Cla1ToCpuMsgRAM")
 unsigned int index_value_prev = 0;
 
 __interrupt void cpu_timer0_isr(void);  /*prototype of the ISR functions*/

@@ -2859,5 +2859,5 @@ int16_t GetAbsoluteVal(int16_t value)
 inline uint64_t    GetTimeFloat(void)
 {
     uint64_t    timer_low = IpcRegs.IPCCOUNTERL;
-    return  (float)(((float)((timer_low)+((uint64_t)IpcRegs.IPCCOUNTERH)*((uint64_t)4294967296)))/(float(200e6)));
+    return  (float)(((float)((timer_low)+((uint64_t)IpcRegs.IPCCOUNTERH)*((uint64_t)4294967296)))/(float(1.0f)));
 }

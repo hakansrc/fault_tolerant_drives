@@ -293,7 +293,7 @@ void ExecuteSecondPrediction_cla(ModuleParameters *moduleparams, unsigned int in
 
     M2_Next_Interrupt_Moment = M2_Interrupt_Moment_to_cla + 1.0f/moduleparams->OptimizationFsw[indexcount];
 
-    if ((((CLA_fabsf(M2_Next_Interrupt_Moment-M1_Next_Interrupt_Moment))*M1_FswDecided_to_cla) > 0.74) && (((CLA_fabsf(M2_Next_Interrupt_Moment-M1_Next_Interrupt_Moment))*M1_FswDecided_to_cla) < 0.76))
+    if ((((CLA_fabsf(M2_Next_Interrupt_Moment-M1_Next_Interrupt_Moment))*M1_FswDecided_to_cla) > 0.74f) && (((CLA_fabsf(M2_Next_Interrupt_Moment-M1_Next_Interrupt_Moment))*M1_FswDecided_to_cla) < 0.76f))
     {
         fsw_cost_multipler = 1.0f;
     }

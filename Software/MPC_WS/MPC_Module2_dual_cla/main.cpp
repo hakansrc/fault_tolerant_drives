@@ -136,13 +136,13 @@ float   M1_Interrupt_Moment_to_cla = 0.0f;
 #pragma DATA_SECTION("CpuToCla1MsgRAM")
 float   M2_Interrupt_Moment_to_cla = 0.0f;
 
-#pragma DATA_SECTION("CpuToCla1MsgRAM")
+#pragma DATA_SECTION("Cla1ToCpuMsgRAM")
 float   M1_Next_Interrupt_Moment = 0.0f;
-#pragma DATA_SECTION("CpuToCla1MsgRAM")
+#pragma DATA_SECTION("Cla1ToCpuMsgRAM")
 float   M2_Next_Interrupt_Moment = 0.0f;
 
 
-#pragma DATA_SECTION("CpuToCla1MsgRAM")
+#pragma DATA_SECTION("Cla1ToCpuMsgRAM")
 float   fsw_cost_multipler = 1.0f;
 
 int main(void)

@@ -145,6 +145,12 @@ float   M1fsw_M2fsw_PhaseDifference_prediction = 0;
 #pragma DATA_SECTION("CpuToCla1MsgRAM")
 int64_t M2_Interrupt_Moment_to_cla = 0;
 
+#pragma DATA_SECTION("CpuToCla1MsgRAM")
+float somecoeff = 0.5f;
+
+#pragma DATA_SECTION("CpuToCla1MsgRAM")
+float phase_cost_coeff = 10000.0f;
+
 #pragma DATA_SECTION("Cla1ToCpuMsgRAM")
 int64_t   M1_Next_Interrupt_Moment = 0;
 #pragma DATA_SECTION("Cla1ToCpuMsgRAM")
@@ -197,6 +203,8 @@ int main(void)
         IPCWaitCounter ++ ;
     }
 
+
+
     PI_iq_cpu2.I_coeff = 3.0f;
     PI_iq_cpu2.P_coeff = 0.6f;
     PI_iq_cpu2.Ts =  0.0002f;
@@ -224,6 +232,9 @@ int main(void)
     PieCtrlRegs.PIEIER11.bit.INTx1 = 1;  // Enable PIE Group 11 INT1, CLA1_1 interrupt
     IER |= (M_INT11 );
 #endif
+
+    phase_cost_coeff = 10000.0f;
+    somecoeff = 0.5f;
 
     IER |= M_INT1;  /*Enable the PIE group of Cpu timer 0 interrupt*/
     IER |= M_INT3;  /*Enable the PIE group of Epwm4 interrupt*/
@@ -523,6 +534,7 @@ __interrupt void epwm4_isr(void)
     M1_Interrupt_Moment_to_cla = M1_Interrupt_Moment;
     M1fsw_M2fsw_PhaseDifference_to_cla = ((float)(M2_Interrupt_Moment_to_cla-M1_Interrupt_Moment_to_cla))/((float)200e6);
     M1_FswDecided_to_cla = M1_FswDecided;
+    GpioDataRegs.GPDTOGGLE.bit.GPIO104 = 1;
 
     ControlISRCounter++;
 #if 1

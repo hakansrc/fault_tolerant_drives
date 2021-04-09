@@ -12,6 +12,7 @@ __interrupt void Cla1Task1 ( void )
     Cla1Task1_counter++;
     M2_OperationMode = MODE_CLA_MPCCONTROLLER;
 
+    fsw_cost_multipler = 1.0f;
 
 
     if(M2_OperationMode==MODE_CLA_MPCCONTROLLER)
@@ -322,16 +323,18 @@ void ExecuteSecondPrediction_cla(ModuleParameters *moduleparams, unsigned int in
         }
     }
 #else
-    M1fsw_M2fsw_PhaseDifference_prediction = 1.0f/M1_FswDecided_to_cla - 1.0f/M1fsw_M2fsw_PhaseDifference_to_cla -1.0f/moduleparams->OptimizationFsw[indexcount];
+    M1fsw_M2fsw_PhaseDifference_prediction = 1.0f/M1_FswDecided_to_cla - M1fsw_M2fsw_PhaseDifference_to_cla -1.0f/moduleparams->OptimizationFsw[indexcount];
 
-    if(CLA_fabsf(M1fsw_M2fsw_PhaseDifference_prediction)<0.05f)
+#if 0
+    if(((CLA_fabsf(M1fsw_M2fsw_PhaseDifference_prediction)*M1_FswDecided_to_cla)<0.45f)&&((CLA_fabsf(M1fsw_M2fsw_PhaseDifference_prediction)*M1_FswDecided_to_cla)<0.55f))
     {
         fsw_cost_multipler = 1.0f;
     }
     else
     {
-        fsw_cost_multipler = 3.0f;
+        fsw_cost_multipler = 2.5f;
     }
+#endif
 #endif
 
 #if 0
@@ -389,7 +392,11 @@ void ExecuteSecondPrediction_cla(ModuleParameters *moduleparams, unsigned int in
     moduleparams->SecondHorizon[indexcount].IqPrediction = moduleparams->FirstHorizon[indexcount].IqPrediction + (1.0f / moduleparams->OptimizationFsw[indexcount]) * (moduleparams->FirstHorizon[indexcount].VqPrediction / M2_LS_VALUE - M2_RS_VALUE / M2_LS_VALUE * moduleparams->FirstHorizon[indexcount].IqPrediction - M2_LS_VALUE / M2_LS_VALUE * POLEPAIRS * moduleparams->AngularSpeedRadSec.Mechanical * moduleparams->FirstHorizon[indexcount].IdPrediction - FLUX_VALUE * POLEPAIRS * moduleparams->AngularSpeedRadSec.Mechanical / M2_LS_VALUE);
 
     /*TODO add protection to cost*/
-    moduleparams->Cost[indexcount] = IQRIPPLECOEFF * CLA_Power(moduleparams->SecondHorizon[indexcount].Iq_Ripple_Prediction / IQ_RATED, 2) + IQREFCOEFF * CLA_Power((moduleparams->Reference.Iq - moduleparams->SecondHorizon[indexcount].IqPrediction) / IQ_RATED, 2) + IDREFCOEFF * CLA_Power((moduleparams->Reference.Id - moduleparams->SecondHorizon[indexcount].IdPrediction)/IQ_RATED, 2) + fsw_cost_multipler * FSWCOEFF * moduleparams->OptimizationFsw[indexcount] / OPT_FSW_MAX;
+#if 1
+    moduleparams->Cost[indexcount] = phase_cost_coeff*CLA_fabsf((CLA_fabsf(M1fsw_M2fsw_PhaseDifference_prediction)*1.0f/moduleparams->OptimizationFsw[indexcount]- somecoeff)) + IQRIPPLECOEFF * CLA_Power(moduleparams->SecondHorizon[indexcount].Iq_Ripple_Prediction / IQ_RATED, 2) + IQREFCOEFF * CLA_Power((moduleparams->Reference.Iq - moduleparams->SecondHorizon[indexcount].IqPrediction) / IQ_RATED, 2) + IDREFCOEFF * CLA_Power((moduleparams->Reference.Id - moduleparams->SecondHorizon[indexcount].IdPrediction)/IQ_RATED, 2) + fsw_cost_multipler * FSWCOEFF * moduleparams->OptimizationFsw[indexcount] / OPT_FSW_MAX;
+#else
+    moduleparams->Cost[indexcount] = 0.0f*CLA_fabsf((CLA_fabsf(M1fsw_M2fsw_PhaseDifference_prediction)*M1_FswDecided_to_cla- 0.5f)) + IQRIPPLECOEFF * CLA_Power(moduleparams->SecondHorizon[indexcount].Iq_Ripple_Prediction / IQ_RATED, 2) + IQREFCOEFF * CLA_Power((moduleparams->Reference.Iq - moduleparams->SecondHorizon[indexcount].IqPrediction) / IQ_RATED, 2) + IDREFCOEFF * CLA_Power((moduleparams->Reference.Id - moduleparams->SecondHorizon[indexcount].IdPrediction)/IQ_RATED, 2) + fsw_cost_multipler * FSWCOEFF * moduleparams->OptimizationFsw[indexcount] / OPT_FSW_MAX;
+#endif
     if (moduleparams->Cost[indexcount] < moduleparams->MinimumCostValue)
     {
         moduleparams->MinimumCostValue = moduleparams->Cost[indexcount];

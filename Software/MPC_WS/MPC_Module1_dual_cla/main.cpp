@@ -251,7 +251,7 @@ int64_t   M1_Interrupt_Moment = 0;
 
 
 int main(void)
-{
+ {
 
     InitSysCtrl(); /*initialize the peripheral clocks*/
 
@@ -435,8 +435,8 @@ int main(void)
                 DataToBeSent[3]  = Module2_Parameters.Measured.Current.transformed.Dvalue;
                 DataToBeSent[4]  = Module2_Parameters.Measured.Current.transformed.Qvalue;
                 DataToBeSent[5]  = M2_Iqref;
-                DataToBeSent[6]  = TorqueDistributor.fDifference;
-                DataToBeSent[7]  = PCC_Timing.fDifference;
+                DataToBeSent[6]  = Module1_Parameters_cla.Measured.Current.PhaseA;
+                DataToBeSent[7]  = Module2_Parameters.Measured.Current.PhaseA;
                 DataToBeSent[8]  = Module1_Parameters_cla.AngularSpeedRPM.Mechanical;
 #if 1
                 DataToBeSent[9]  = M1_FswDecided_cla;
@@ -2099,7 +2099,7 @@ __interrupt void epwm1_isr(void)
     M1_Interrupt_Moment = (int64_t)GetTime();
     M1_FswDecided = M1_FswDecided_cla;
 
-
+    GpioDataRegs.GPDTOGGLE.bit.GPIO105 = 1;
     PCC_Timing.Beginning = GetTime();
     ControlISRCounter++;
 #if 0
@@ -2600,6 +2600,19 @@ void InitializeGpiosForCpu2(void)
     GpioCtrlRegs.GPACSEL2.bit.GPIO9 = 2;// GPIO6 is controlled by CPU2
     GpioCtrlRegs.GPACSEL2.bit.GPIO10 = 2;// GPIO6 is controlled by CPU2
     GpioCtrlRegs.GPACSEL2.bit.GPIO11 = 2;// GPIO6 is controlled by CPU2
+    EDIS;
+
+    EALLOW;
+    GpioCtrlRegs.GPDMUX1.bit.GPIO104 = 0;   // GPIO104 is GPIO
+    GpioCtrlRegs.GPDGMUX1.bit.GPIO104 = 0;  // GPIO104 is GPIO
+    GpioCtrlRegs.GPDDIR.bit.GPIO104 = 1;    // GPIO104 is output
+    GpioCtrlRegs.GPDCSEL2.bit.GPIO104 = 2;  // GPIO104 is controlled by CPU2
+    EDIS;
+
+    EALLOW;
+    GpioCtrlRegs.GPDMUX1.bit.GPIO105 = 0;   // GPIO105 is GPIO
+    GpioCtrlRegs.GPDGMUX1.bit.GPIO105 = 0;  // GPIO105 is GPIO
+    GpioCtrlRegs.GPDDIR.bit.GPIO105 = 1;    // GPIO105 is output
     EDIS;
 
 }

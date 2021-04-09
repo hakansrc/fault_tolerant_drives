@@ -40,6 +40,8 @@ extern int64_t              M2_Next_Interrupt_Moment;
 extern float                fsw_cost_multipler;
 extern float                M1fsw_M2fsw_PhaseDifference_to_cla;
 extern float                M1fsw_M2fsw_PhaseDifference_prediction;
+extern float                somecoeff;
+extern float                phase_cost_coeff;
 
 float CLA_Power(float base, uint16_t power);
 float CLA_floating_modulus(float a,float b);

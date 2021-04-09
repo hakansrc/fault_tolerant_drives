@@ -135,6 +135,12 @@ float   M1_FswDecided_to_cla = 1000.0f;
 #pragma DATA_SECTION("CpuToCla1MsgRAM")
 int64_t   M1_Interrupt_Moment_to_cla = 0;
 
+#pragma DATA_SECTION("CpuToCla1MsgRAM")
+float   M1fsw_M2fsw_PhaseDifference_to_cla = 0;
+
+#pragma DATA_SECTION("Cla1ToCpuMsgRAM")
+float   M1fsw_M2fsw_PhaseDifference_prediction = 0;
+
 
 #pragma DATA_SECTION("CpuToCla1MsgRAM")
 int64_t M2_Interrupt_Moment_to_cla = 0;
@@ -515,6 +521,7 @@ __interrupt void epwm4_isr(void)
 {
     M2_Interrupt_Moment_to_cla = (int64_t) GetTime();
     M1_Interrupt_Moment_to_cla = M1_Interrupt_Moment;
+    M1fsw_M2fsw_PhaseDifference_to_cla = ((float)(M2_Interrupt_Moment_to_cla-M1_Interrupt_Moment_to_cla))/((float)200e6);
     M1_FswDecided_to_cla = M1_FswDecided;
 
     ControlISRCounter++;

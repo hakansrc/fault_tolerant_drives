@@ -292,6 +292,7 @@ void ExecuteSecondPrediction_cla(ModuleParameters *moduleparams, unsigned int in
     moduleparams->SecondHorizon[indexcount].ma = CLAsqrt(3.0f)*moduleparams->SecondHorizon[indexcount].Magnitude / (moduleparams->Measured.Voltage.Vdc );
 
 #if 0
+#if 0
     M2_Next_Interrupt_Moment = M2_Interrupt_Moment_to_cla + 1.0f/moduleparams->OptimizationFsw[indexcount];
 #else
     M2_Next_Interrupt_Moment = M2_Interrupt_Moment_to_cla + 200000/(indexcount+1);
@@ -320,6 +321,18 @@ void ExecuteSecondPrediction_cla(ModuleParameters *moduleparams, unsigned int in
             fsw_cost_multipler = 3.0f;
         }
     }
+#else
+    M1fsw_M2fsw_PhaseDifference_prediction = 1.0f/M1_FswDecided_to_cla - 1.0f/M1fsw_M2fsw_PhaseDifference_to_cla -1.0f/moduleparams->OptimizationFsw[indexcount];
+
+    if(CLA_fabsf(M1fsw_M2fsw_PhaseDifference_prediction)<0.05f)
+    {
+        fsw_cost_multipler = 1.0f;
+    }
+    else
+    {
+        fsw_cost_multipler = 3.0f;
+    }
+#endif
 
 #if 0
     if ((((CLA_fabsf(M2_Next_Interrupt_Moment-M1_Next_Interrupt_Moment))*M1_FswDecided_to_cla) > 0.74f) && (((CLA_fabsf(M2_Next_Interrupt_Moment-M1_Next_Interrupt_Moment))*M1_FswDecided_to_cla) < 0.76f))

@@ -33,11 +33,13 @@ extern float                M2_Iqref_cla;
 extern uint16_t             FaultFlagLocal;
 extern unsigned int         index_value_prev;
 extern float                M1_FswDecided_to_cla;
-extern int64_t                M1_Interrupt_Moment_to_cla;
-extern int64_t                M2_Interrupt_Moment_to_cla;
-extern int64_t                M1_Next_Interrupt_Moment;
-extern int64_t                M2_Next_Interrupt_Moment;
+extern int64_t              M1_Interrupt_Moment_to_cla;
+extern int64_t              M2_Interrupt_Moment_to_cla;
+extern int64_t              M1_Next_Interrupt_Moment;
+extern int64_t              M2_Next_Interrupt_Moment;
 extern float                fsw_cost_multipler;
+extern float                M1fsw_M2fsw_PhaseDifference_to_cla;
+extern float                M1fsw_M2fsw_PhaseDifference_prediction;
 
 float CLA_Power(float base, uint16_t power);
 float CLA_floating_modulus(float a,float b);

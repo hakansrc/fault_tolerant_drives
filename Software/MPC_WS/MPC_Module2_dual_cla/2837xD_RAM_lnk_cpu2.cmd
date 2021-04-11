@@ -54,10 +54,12 @@ PAGE 1 :
    RAMGS6      : origin = 0x012000, length = 0x001000
    RAMGS7      : origin = 0x013000, length = 0x001000
    */
+   /*
    RAMGS8      : origin = 0x014000, length = 0x001000
    RAMGS9      : origin = 0x015000, length = 0x001000
    RAMGS10     : origin = 0x016000, length = 0x001000
    RAMGS11     : origin = 0x017000, length = 0x001000
+   */
    RAMGS12     : origin = 0x018000, length = 0x001000     
    M1_PARAMS_ADDRESS_RAMGS13   : origin = 0x019000, length = 0x00027A
    PI_IQ_ADDRESS_RAMGS13   : origin = 0x019280, length = 0x000012     

@@ -16,6 +16,32 @@ typedef struct
     float       fDifference;
 }TimingMeasurement;
 
+typedef struct
+{
+    float IqRipple;
+    float IqReference;
+    float IdReference;
+    float Fsw;
+    float M1FswChange;
+    float M2FswPhase;
+    float M2DifferentFsw;
+}CostFunctionCoefficients;
+
+typedef struct
+{
+    float   M1_Candidate_IqRef[TORQUE_DISTRIBUTION_STEP+1];
+    float   M1_Candidate_IdRef[TORQUE_DISTRIBUTION_STEP+1];
+    float   M2_Candidate_IqRef[TORQUE_DISTRIBUTION_STEP+1];
+    float   M2_Candidate_IdRef[TORQUE_DISTRIBUTION_STEP+1];
+    float   M1_copper_loss[TORQUE_DISTRIBUTION_STEP+1];
+    float   M2_copper_loss[TORQUE_DISTRIBUTION_STEP+1];
+    float   TotalLoss[TORQUE_DISTRIBUTION_STEP+1];
+    float   M1_Iq_Candidate_Coefficient;
+    float   M1_Id_Candidate_Coefficient;
+    float   MinimumLossValue;
+    unsigned int MinimumLossIndex;
+}TorqueDistributorVariables;
+
 
 typedef struct
 {

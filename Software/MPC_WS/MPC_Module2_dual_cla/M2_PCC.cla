@@ -393,9 +393,13 @@ void ExecuteSecondPrediction_cla(ModuleParameters *moduleparams, unsigned int in
 
     /*TODO add protection to cost*/
 #if 0
+#if 0
     moduleparams->Cost[indexcount] = phase_cost_coeff*CLA_fabsf((CLA_fabsf(M1fsw_M2fsw_PhaseDifference_prediction)*M1_FswDecided_to_cla - somecoeff)*(CLA_fabsf(M1fsw_M2fsw_PhaseDifference_prediction)*M1_FswDecided_to_cla - somecoeff)) + IQRIPPLECOEFF * CLA_Power(moduleparams->SecondHorizon[indexcount].Iq_Ripple_Prediction / IQ_RATED, 2) + IQREFCOEFF * CLA_Power((moduleparams->Reference.Iq - moduleparams->SecondHorizon[indexcount].IqPrediction) / IQ_RATED, 2) + IDREFCOEFF * CLA_Power((moduleparams->Reference.Id - moduleparams->SecondHorizon[indexcount].IdPrediction)/IQ_RATED, 2) + fsw_cost_multipler * FSWCOEFF * moduleparams->OptimizationFsw[indexcount] / OPT_FSW_MAX;
 #else
     moduleparams->Cost[indexcount] = 0.0f*CLA_fabsf((CLA_fabsf(M1fsw_M2fsw_PhaseDifference_prediction)*M1_FswDecided_to_cla- 0.5f)) + IQRIPPLECOEFF * CLA_Power(moduleparams->SecondHorizon[indexcount].Iq_Ripple_Prediction / IQ_RATED, 2) + IQREFCOEFF * CLA_Power((moduleparams->Reference.Iq - moduleparams->SecondHorizon[indexcount].IqPrediction) / IQ_RATED, 2) + IDREFCOEFF * CLA_Power((moduleparams->Reference.Id - moduleparams->SecondHorizon[indexcount].IdPrediction)/IQ_RATED, 2) + fsw_cost_multipler * FSWCOEFF * moduleparams->OptimizationFsw[indexcount] / OPT_FSW_MAX;
+#endif
+#else
+    moduleparams->Cost[indexcount] = CostFunctionCoeff.M2FswPhase*CLA_fabsf((CLA_fabsf(M1fsw_M2fsw_PhaseDifference_prediction)*M1_FswDecided_to_cla - somecoeff)*(CLA_fabsf(M1fsw_M2fsw_PhaseDifference_prediction)*M1_FswDecided_to_cla - somecoeff)) + CostFunctionCoeff.IqRipple * CLA_Power(moduleparams->SecondHorizon[indexcount].Iq_Ripple_Prediction / IQ_RATED, 2) + CostFunctionCoeff.IqReference * CLA_Power((moduleparams->Reference.Iq - moduleparams->SecondHorizon[indexcount].IqPrediction) / IQ_RATED, 2) + CostFunctionCoeff.IdReference * CLA_Power((moduleparams->Reference.Id - moduleparams->SecondHorizon[indexcount].IdPrediction)/IQ_RATED, 2) + CostFunctionCoeff.Fsw * FSWCOEFF * moduleparams->OptimizationFsw[indexcount] / OPT_FSW_MAX;
 #endif
     if (moduleparams->Cost[indexcount] < moduleparams->MinimumCostValue)
     {

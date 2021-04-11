@@ -17,7 +17,6 @@
 
 
 
-#define TORQUE_DISTRIBUTION_STEP    25
 
 #pragma DATA_SECTION("CpuToCla1MsgRAM")
 uint16_t    FaultFlagLocal = NO_FAULT;
@@ -33,17 +32,23 @@ float M1_Possible_Id = 0.0f;
 float M2_Possible_Iq = 0.0f;
 float M2_Possible_Id = 0.0f;
 
+#if 0
 float M1_Iq_Candidate_Coefficient = 0.0f;
 float M1_Id_Candidate_Coefficient = 0.0f;
+#endif
 
 float M1_d_axis_flux[TORQUE_DISTRIBUTION_STEP+1];
 float M1_q_axis_flux[TORQUE_DISTRIBUTION_STEP+1];
 float M2_d_axis_flux[TORQUE_DISTRIBUTION_STEP+1];
 float M2_q_axis_flux[TORQUE_DISTRIBUTION_STEP+1];
 
+#if 0
 unsigned int minimumlossindex = 0;
 float minimumlossvalue = 1e35;
+#endif
 
+
+#if 0
 float M1_Candidate_Iqref[TORQUE_DISTRIBUTION_STEP+1];
 float M1_Candidate_Idref[TORQUE_DISTRIBUTION_STEP+1];
 float M2_Candidate_Iqref[TORQUE_DISTRIBUTION_STEP+1];
@@ -55,7 +60,13 @@ float M1_core_loss[TORQUE_DISTRIBUTION_STEP+1];
 float M2_core_loss[TORQUE_DISTRIBUTION_STEP+1];
 
 float TotalLoss[TORQUE_DISTRIBUTION_STEP+1];
+#else
+TorqueDistributorVariables  TD_Variables;
+#endif
 
+
+#pragma DATA_SECTION("CpuToCla1MsgRAM")
+CostFunctionCoefficients    CostFunctionCoeff;
 
 
 /*TODO s
@@ -906,6 +917,16 @@ void InitializationRoutine(void)
     PI_iq_cla.SaturationMax = 2.0 * IQ_RATED;
     PI_iq_cla.SaturationMin = -2.0 * IQ_RATED;
 
+    CostFunctionCoeff.IqRipple       = IQRIPPLECOEFF;
+    CostFunctionCoeff.IqReference    = IQREFCOEFF;
+    CostFunctionCoeff.IdReference    = IDREFCOEFF;
+    CostFunctionCoeff.Fsw            = FSWCOEFF;
+    CostFunctionCoeff.M1FswChange    = M1_FSW_CHANGE_COEFF;
+    CostFunctionCoeff.M2FswPhase     = M2_FSW_PHASE_COEFF;
+    CostFunctionCoeff.M2DifferentFsw = M2_DIFFERENT_FSW_COEFF;
+
+
+
     AssignGSRAMs();
 
 
@@ -1283,6 +1304,8 @@ void AssignGSRAMs(void)
     MemCfgRegs.GSxMSEL.bit.MSEL_GS5 = 1;       /*CPU2 is the owner of RAMGS5*/
     MemCfgRegs.GSxMSEL.bit.MSEL_GS6 = 1;       /*CPU2 is the owner of RAMGS6*/
     MemCfgRegs.GSxMSEL.bit.MSEL_GS7 = 1;       /*CPU2 is the owner of RAMGS7*/
+
+    /*CPU1 is the owner of RAMGS8, RAMGS9, RAMGS10, RAMGS11 */
 
     EDIS;
 }
@@ -2736,7 +2759,7 @@ void PerformTorqueDistribution(void)
 
     unsigned int uiIndex = 0;
     float IqRef = PI_iq_cpu2.Output;
-    minimumlossvalue = 1e35;
+    TD_Variables.MinimumLossValue = 1e35;
 
 
 
@@ -2761,8 +2784,8 @@ void PerformTorqueDistribution(void)
         M2_Possible_Id = 0.0f;
     }
 
-    M1_Iq_Candidate_Coefficient = IqRef*(1.0f/((float)TORQUE_DISTRIBUTION_STEP))*M1_Possible_Iq*0.5f;
-    M1_Id_Candidate_Coefficient = IqRef*(1.0f/((float)TORQUE_DISTRIBUTION_STEP))*M1_Possible_Id*0.5f;
+    TD_Variables.M1_Iq_Candidate_Coefficient = IqRef*(1.0f/((float)TORQUE_DISTRIBUTION_STEP))*M1_Possible_Iq*0.5f;
+    TD_Variables.M1_Id_Candidate_Coefficient = IqRef*(1.0f/((float)TORQUE_DISTRIBUTION_STEP))*M1_Possible_Id*0.5f;
 
     CalculateLosses(IqRef, 0);
     CalculateLosses(IqRef, 1);
@@ -2792,13 +2815,97 @@ void PerformTorqueDistribution(void)
     CalculateLosses(IqRef, 23);
     CalculateLosses(IqRef, 24);
     CalculateLosses(IqRef, 25);
+    CalculateLosses(IqRef, 26);
+    CalculateLosses(IqRef, 27);
+    CalculateLosses(IqRef, 28);
+    CalculateLosses(IqRef, 29);
+
+    CalculateLosses(IqRef, 30);
+    CalculateLosses(IqRef, 31);
+    CalculateLosses(IqRef, 32);
+    CalculateLosses(IqRef, 33);
+    CalculateLosses(IqRef, 34);
+    CalculateLosses(IqRef, 35);
+    CalculateLosses(IqRef, 36);
+    CalculateLosses(IqRef, 37);
+    CalculateLosses(IqRef, 38);
+    CalculateLosses(IqRef, 39);
+
+    CalculateLosses(IqRef, 40);
+    CalculateLosses(IqRef, 41);
+    CalculateLosses(IqRef, 42);
+    CalculateLosses(IqRef, 43);
+    CalculateLosses(IqRef, 44);
+    CalculateLosses(IqRef, 45);
+    CalculateLosses(IqRef, 46);
+    CalculateLosses(IqRef, 47);
+    CalculateLosses(IqRef, 48);
+    CalculateLosses(IqRef, 49);
+
+    CalculateLosses(IqRef, 50);
+    CalculateLosses(IqRef, 51);
+    CalculateLosses(IqRef, 52);
+    CalculateLosses(IqRef, 53);
+    CalculateLosses(IqRef, 54);
+    CalculateLosses(IqRef, 55);
+    CalculateLosses(IqRef, 56);
+    CalculateLosses(IqRef, 57);
+    CalculateLosses(IqRef, 58);
+    CalculateLosses(IqRef, 59);
+
+    CalculateLosses(IqRef, 60);
+    CalculateLosses(IqRef, 61);
+    CalculateLosses(IqRef, 62);
+    CalculateLosses(IqRef, 63);
+    CalculateLosses(IqRef, 64);
+    CalculateLosses(IqRef, 65);
+    CalculateLosses(IqRef, 66);
+    CalculateLosses(IqRef, 67);
+    CalculateLosses(IqRef, 68);
+    CalculateLosses(IqRef, 69);
+
+    CalculateLosses(IqRef, 70);
+    CalculateLosses(IqRef, 71);
+    CalculateLosses(IqRef, 72);
+    CalculateLosses(IqRef, 73);
+    CalculateLosses(IqRef, 74);
+    CalculateLosses(IqRef, 75);
+    CalculateLosses(IqRef, 76);
+    CalculateLosses(IqRef, 77);
+    CalculateLosses(IqRef, 78);
+    CalculateLosses(IqRef, 79);
+
+    CalculateLosses(IqRef, 80);
+    CalculateLosses(IqRef, 81);
+    CalculateLosses(IqRef, 82);
+    CalculateLosses(IqRef, 83);
+    CalculateLosses(IqRef, 84);
+    CalculateLosses(IqRef, 85);
+    CalculateLosses(IqRef, 86);
+    CalculateLosses(IqRef, 87);
+    CalculateLosses(IqRef, 88);
+    CalculateLosses(IqRef, 89);
+
+    CalculateLosses(IqRef, 90);
+    CalculateLosses(IqRef, 91);
+    CalculateLosses(IqRef, 92);
+    CalculateLosses(IqRef, 93);
+    CalculateLosses(IqRef, 94);
+    CalculateLosses(IqRef, 95);
+    CalculateLosses(IqRef, 96);
+    CalculateLosses(IqRef, 97);
+    CalculateLosses(IqRef, 98);
+    CalculateLosses(IqRef, 99);
+
+    CalculateLosses(IqRef, 100);
+
 
     if(FaultFlagLocal==YES_FAULT)
     {
-        M1_minimumloss_iqref = M1_Candidate_Iqref[minimumlossindex];
-        M2_minimumloss_iqref = M2_Candidate_Iqref[minimumlossindex];
-        M1_Iqref = M1_Candidate_Iqref[minimumlossindex];
-        M2_Iqref = M2_Candidate_Iqref[minimumlossindex];
+        M1_minimumloss_iqref = TD_Variables.M1_Candidate_IqRef[TD_Variables.MinimumLossIndex];
+        M2_minimumloss_iqref = TD_Variables.M2_Candidate_IqRef[TD_Variables.MinimumLossIndex];
+        M1_Iqref = TD_Variables.M1_Candidate_IqRef[TD_Variables.MinimumLossIndex];
+        M2_Iqref = TD_Variables.M2_Candidate_IqRef[TD_Variables.MinimumLossIndex];
     }
     else
     {
@@ -2815,12 +2922,13 @@ void PerformTorqueDistribution(void)
 
 static inline void CalculateLosses(float IqRef, unsigned int uiIndex)
 {
-    M1_Candidate_Iqref[uiIndex] = M1_Iq_Candidate_Coefficient*((float)uiIndex);
-    M1_Candidate_Idref[uiIndex] = M1_Id_Candidate_Coefficient*((float)uiIndex);
+    TD_Variables.M1_Candidate_IqRef[uiIndex] = TD_Variables.M1_Iq_Candidate_Coefficient*((float)uiIndex);
+    TD_Variables.M1_Candidate_IdRef[uiIndex] = TD_Variables.M1_Id_Candidate_Coefficient*((float)uiIndex);
+
 
     /*M2 is the healthy module, therefore it can continue with id=0*/
-    M2_Candidate_Iqref[uiIndex] = (0.5f*IqRef - M1_Candidate_Iqref[uiIndex]);
-    M2_Candidate_Idref[uiIndex] = 0.0f;
+    TD_Variables.M2_Candidate_IqRef[uiIndex] = (0.5f*IqRef - TD_Variables.M1_Candidate_IqRef[uiIndex]);
+    TD_Variables.M2_Candidate_IdRef[uiIndex] = 0.0f;
 
 #if 0
     M1_d_axis_flux[uiIndex] = M1_LS_VALUE*M1_Candidate_Idref[uiIndex] + FLUX_VALUE;
@@ -2839,19 +2947,19 @@ static inline void CalculateLosses(float IqRef, unsigned int uiIndex)
     TotalLoss[uiIndex] = M1_copper_loss[uiIndex] + M1_core_loss[uiIndex] + M2_copper_loss[uiIndex] + M2_core_loss[uiIndex];
 #else
 
-    M1_copper_loss[uiIndex] = 1.5f*M1_RS_VALUE*(powf(M1_Candidate_Iqref[uiIndex],2.0f)+powf(M1_Candidate_Idref[uiIndex],2.0f));
+    TD_Variables.M1_copper_loss[uiIndex] = 1.5f*M1_RS_VALUE*(powf(TD_Variables.M1_Candidate_IqRef[uiIndex],2.0f)+powf(TD_Variables.M1_Candidate_IdRef[uiIndex],2.0f));
 
-    M2_copper_loss[uiIndex] = 1.5f*M2_RS_VALUE*(powf(M2_Candidate_Iqref[uiIndex],2.0f)+powf(M2_Candidate_Idref[uiIndex],2.0f));
+    TD_Variables.M2_copper_loss[uiIndex] = 1.5f*M2_RS_VALUE*(powf(TD_Variables.M2_Candidate_IqRef[uiIndex],2.0f)+powf(TD_Variables.M2_Candidate_IdRef[uiIndex],2.0f));
 
 
-    TotalLoss[uiIndex] = M1_copper_loss[uiIndex] + M2_copper_loss[uiIndex];
+    TD_Variables.TotalLoss[uiIndex] = TD_Variables.M1_copper_loss[uiIndex] + TD_Variables.M2_copper_loss[uiIndex];
 
 #endif
 
-    if(minimumlossvalue>TotalLoss[uiIndex])
+    if(TD_Variables.MinimumLossValue>TD_Variables.TotalLoss[uiIndex])
     {
-        minimumlossvalue = TotalLoss[uiIndex];
-        minimumlossindex = uiIndex;
+        TD_Variables.MinimumLossValue = TD_Variables.TotalLoss[uiIndex];
+        TD_Variables.MinimumLossIndex = uiIndex;
     }
 
 

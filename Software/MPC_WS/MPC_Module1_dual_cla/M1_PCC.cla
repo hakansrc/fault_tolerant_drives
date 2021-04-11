@@ -414,7 +414,11 @@ void ExecuteSecondPrediction_cla(ModuleParameters *moduleparams, unsigned int in
     moduleparams->SecondHorizon[indexcount].IqPrediction = moduleparams->FirstHorizon[indexcount].IqPrediction + (1.0f / moduleparams->OptimizationFsw[indexcount]) * (moduleparams->FirstHorizon[indexcount].VqPrediction / M1_LS_VALUE - M1_RS_VALUE / M1_LS_VALUE * moduleparams->FirstHorizon[indexcount].IqPrediction - M1_LS_VALUE / M1_LS_VALUE * POLEPAIRS * moduleparams->AngularSpeedRadSec.Mechanical * moduleparams->FirstHorizon[indexcount].IdPrediction - FLUX_VALUE * POLEPAIRS * moduleparams->AngularSpeedRadSec.Mechanical / M1_LS_VALUE);
 
     /*TODO add protection to cost*/
+#if 0
     moduleparams->Cost[indexcount] = M1_FSW_CHANGE_COEFF*CLA_fabsf(M1_FswDecided_cla-moduleparams->OptimizationFsw[indexcount])/OPT_FSW_MAX  + IQRIPPLECOEFF * CLA_Power(moduleparams->SecondHorizon[indexcount].Iq_Ripple_Prediction / IQ_RATED, 2) + IQREFCOEFF * CLA_Power((moduleparams->Reference.Iq - moduleparams->SecondHorizon[indexcount].IqPrediction) / IQ_RATED, 2) + IDREFCOEFF * CLA_Power((moduleparams->Reference.Id - moduleparams->SecondHorizon[indexcount].IdPrediction)/IQ_RATED, 2) + FSWCOEFF * moduleparams->OptimizationFsw[indexcount] / OPT_FSW_MAX;
+#else
+    moduleparams->Cost[indexcount] = CostFunctionCoeff.M1FswChange*CLA_fabsf(M1_FswDecided_cla-moduleparams->OptimizationFsw[indexcount])/OPT_FSW_MAX  + CostFunctionCoeff.IqRipple * CLA_Power(moduleparams->SecondHorizon[indexcount].Iq_Ripple_Prediction / IQ_RATED, 2) + CostFunctionCoeff.IqReference * CLA_Power((moduleparams->Reference.Iq - moduleparams->SecondHorizon[indexcount].IqPrediction) / IQ_RATED, 2) + CostFunctionCoeff.IdReference * CLA_Power((moduleparams->Reference.Id - moduleparams->SecondHorizon[indexcount].IdPrediction)/IQ_RATED, 2) + CostFunctionCoeff.Fsw * moduleparams->OptimizationFsw[indexcount] / OPT_FSW_MAX;
+#endif
     if (moduleparams->Cost[indexcount] < moduleparams->MinimumCostValue)
     {
         moduleparams->MinimumCostValue = moduleparams->Cost[indexcount];

@@ -160,6 +160,9 @@ int64_t   M2_Next_Interrupt_Moment = 0;
 #pragma DATA_SECTION("Cla1ToCpuMsgRAM")
 float   fsw_cost_multipler = 1.0f;
 
+#pragma DATA_SECTION("CpuToCla1MsgRAM")
+CostFunctionCoefficients    CostFunctionCoeff;
+
 int main(void)
 {
 
@@ -203,6 +206,14 @@ int main(void)
         IPCWaitCounter ++ ;
     }
 
+    CostFunctionCoeff.IqRipple       = IQRIPPLECOEFF;
+    CostFunctionCoeff.IqReference    = IQREFCOEFF;
+    CostFunctionCoeff.IdReference    = IDREFCOEFF;
+    CostFunctionCoeff.Fsw            = FSWCOEFF;
+    CostFunctionCoeff.M1FswChange    = M1_FSW_CHANGE_COEFF;
+    CostFunctionCoeff.M2FswPhase     = M2_FSW_PHASE_COEFF;
+    CostFunctionCoeff.M2DifferentFsw = M2_DIFFERENT_FSW_COEFF;
+
 
 
     PI_iq_cpu2.I_coeff = 3.0f;
@@ -234,7 +245,7 @@ int main(void)
 #endif
 
     phase_cost_coeff = 10000.0f;
-    somecoeff = 0.5f;
+    somecoeff = 0.25f;
 
     IER |= M_INT1;  /*Enable the PIE group of Cpu timer 0 interrupt*/
     IER |= M_INT3;  /*Enable the PIE group of Epwm4 interrupt*/

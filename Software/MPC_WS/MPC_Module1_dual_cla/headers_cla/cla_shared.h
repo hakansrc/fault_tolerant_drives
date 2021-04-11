@@ -38,6 +38,7 @@ extern float                M1_Iqref_cla;
 extern uint16_t             FaultFlagLocal;
 extern unsigned int         index_value;
 extern unsigned int         index_value_prev;
+extern CostFunctionCoefficients    CostFunctionCoeff;
 
 
 float CLA_Power(float base, uint16_t power);

@@ -32,37 +32,10 @@ float M1_Possible_Id = 0.0f;
 float M2_Possible_Iq = 0.0f;
 float M2_Possible_Id = 0.0f;
 
-#if 0
-float M1_Iq_Candidate_Coefficient = 0.0f;
-float M1_Id_Candidate_Coefficient = 0.0f;
-#endif
-
-float M1_d_axis_flux[TORQUE_DISTRIBUTION_STEP+1];
-float M1_q_axis_flux[TORQUE_DISTRIBUTION_STEP+1];
-float M2_d_axis_flux[TORQUE_DISTRIBUTION_STEP+1];
-float M2_q_axis_flux[TORQUE_DISTRIBUTION_STEP+1];
-
-#if 0
-unsigned int minimumlossindex = 0;
-float minimumlossvalue = 1e35;
-#endif
 
 
-#if 0
-float M1_Candidate_Iqref[TORQUE_DISTRIBUTION_STEP+1];
-float M1_Candidate_Idref[TORQUE_DISTRIBUTION_STEP+1];
-float M2_Candidate_Iqref[TORQUE_DISTRIBUTION_STEP+1];
-float M2_Candidate_Idref[TORQUE_DISTRIBUTION_STEP+1];
 
-float M1_copper_loss[TORQUE_DISTRIBUTION_STEP+1];
-float M2_copper_loss[TORQUE_DISTRIBUTION_STEP+1];
-float M1_core_loss[TORQUE_DISTRIBUTION_STEP+1];
-float M2_core_loss[TORQUE_DISTRIBUTION_STEP+1];
-
-float TotalLoss[TORQUE_DISTRIBUTION_STEP+1];
-#else
 TorqueDistributorVariables  TD_Variables;
-#endif
 
 
 #pragma DATA_SECTION("CpuToCla1MsgRAM")
@@ -243,9 +216,7 @@ TimingMeasurement PCC_Timing = {0,0,0,0};
 float   differencemax = 0.0f;
 inline uint64_t    GetTime(void);
 inline uint64_t    GetTimeFloat(void);
-int16_t GetAbsoluteVal(int16_t value);
 
-uint16_t    Case = 4;
 
 float M1Torque=0;
 float M2Torque=0;
@@ -426,20 +397,6 @@ int main(void)
             }
             if (SendOneInFour % 2 == 0)
             {
-#if 0
-                DataToBeSent[0]  = Module1_Parameters_cla.Measured.Current.transformed.Dvalue; // .Measured.Current.PhaseA;
-                DataToBeSent[1]  = Module1_Parameters_cla.Measured.Current.transformed.Qvalue; // .Measured.Current.PhaseA;
-                DataToBeSent[2]  = M1_Iqref;
-                DataToBeSent[3]  = Module2_Parameters.Measured.Current.transformed.Dvalue;
-                DataToBeSent[4]  = Module2_Parameters.Measured.Current.transformed.Qvalue;
-                DataToBeSent[5]  = M2_Iqref;
-                DataToBeSent[6]  = M1Torque;
-                DataToBeSent[7]  = M2Torque;
-                DataToBeSent[8]  = PowerOutTotalMechanical;
-                DataToBeSent[9]  = M1PowerElectrical;
-                DataToBeSent[10] = M1CopperLoss;
-                DataToBeSent[11] = M2CopperLoss;
-#else
                 DataToBeSent[0]  = Module1_Parameters_cla.Measured.Current.transformed.Dvalue; // .Measured.Current.PhaseA;
                 DataToBeSent[1]  = Module1_Parameters_cla.Measured.Current.transformed.Qvalue; // .Measured.Current.PhaseA;
                 DataToBeSent[2]  = M1_Iqref;
@@ -449,26 +406,9 @@ int main(void)
                 DataToBeSent[6]  = Module1_Parameters_cla.Measured.Current.PhaseA;
                 DataToBeSent[7]  = Module2_Parameters.Measured.Current.PhaseA;
                 DataToBeSent[8]  = Module1_Parameters_cla.AngularSpeedRPM.Mechanical;
-#if 1
                 DataToBeSent[9]  = M1_FswDecided_cla;
                 DataToBeSent[10] = M2_FswDecided;
                 DataToBeSent[11] = SpeedRefRPM;
-#else
-                DataToBeSent[9]  = minimumlossindex;
-                DataToBeSent[10] = M1_core_loss[minimumlossindex];
-                DataToBeSent[11] = M2_core_loss[minimumlossindex];
-#endif
-#endif
-
-                /*
-float M1Torque=0;
-float M2Torque=0;
-float PowerOutTotalMechanical=0;
-float M1PowerElectrical=0;
-float M2PowerElectrical=0;
-float M1CopperLoss = 0;
-float M2CopperLoss = 0;
-                 * */
 
 
                 SciSendMultipleFloatWithTheTag(DataToBeSent, 12);
@@ -2757,7 +2697,6 @@ void PerformTorqueDistribution(void)
 #define CFE 1.15f
 #define LAMBDA 1.15f
 
-    unsigned int uiIndex = 0;
     float IqRef = PI_iq_cpu2.Output;
     TD_Variables.MinimumLossValue = 1e35;
 
@@ -2931,11 +2870,6 @@ static inline void CalculateLosses(float IqRef, unsigned int uiIndex)
     TD_Variables.M2_Candidate_IdRef[uiIndex] = 0.0f;
 
 #if 0
-    M1_d_axis_flux[uiIndex] = M1_LS_VALUE*M1_Candidate_Idref[uiIndex] + FLUX_VALUE;
-    M1_q_axis_flux[uiIndex] = M1_LS_VALUE*M1_Candidate_Iqref[uiIndex];
-    M2_d_axis_flux[uiIndex] = M2_LS_VALUE*M2_Candidate_Idref[uiIndex] + FLUX_VALUE;
-    M2_q_axis_flux[uiIndex] = M2_LS_VALUE*M2_Candidate_Iqref[uiIndex];
-
 
     M1_copper_loss[uiIndex] = 1.5f*M1_RS_VALUE*(powf(M1_Candidate_Iqref[uiIndex],2.0f)+powf(M1_Candidate_Idref[uiIndex],2.0f));
     M1_core_loss[uiIndex] =  CFE*powf(fabsf(Module1_Parameters.AngularSpeedRadSec.Electrical),LAMBDA)*(powf(M1_d_axis_flux[uiIndex],2.0f)+powf(M1_q_axis_flux[uiIndex],2.0f));
@@ -2968,14 +2902,6 @@ inline uint64_t    GetTime(void)
 {
     uint64_t    timer_low = IpcRegs.IPCCOUNTERL;
     return ((timer_low)+((uint64_t)IpcRegs.IPCCOUNTERH)*((uint64_t)4294967296));
-}
-int16_t GetAbsoluteVal(int16_t value)
-{
-    if(value<((int16_t)0))
-    {
-        return ((int16_t)-1)*value;
-    }
-    return value;
 }
 inline uint64_t    GetTimeFloat(void)
 {

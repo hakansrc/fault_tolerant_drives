@@ -43,6 +43,7 @@ extern float                M1fsw_M2fsw_PhaseDifference_prediction;
 extern float                somecoeff;
 extern float                phase_cost_coeff;
 extern CostFunctionCoefficients    CostFunctionCoeff;
+extern float                M2_FswDecided_prev_cla;
 
 float CLA_Power(float base, uint16_t power);
 float CLA_floating_modulus(float a,float b);

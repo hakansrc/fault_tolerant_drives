@@ -39,7 +39,7 @@ extern uint16_t             FaultFlagLocal;
 extern unsigned int         index_value;
 extern unsigned int         index_value_prev;
 extern CostFunctionCoefficients    CostFunctionCoeff;
-
+extern float                M1_FswDecided_prev_cla;
 
 float CLA_Power(float base, uint16_t power);
 float CLA_floating_modulus(float a,float b);

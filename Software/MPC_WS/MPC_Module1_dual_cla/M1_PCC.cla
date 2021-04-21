@@ -199,7 +199,10 @@ __interrupt void Cla1Task1 ( void )
         if(Module1_Parameters_cla.PhaseCDutyCycle<0.0f)
             Module1_Parameters_cla.PhaseCDutyCycle = 0.0f;
 
-        M1_FswDecided_cla = Module1_Parameters_cla.OptimizationFsw[Module1_Parameters_cla.MinimumCostIndex];
+#if HALF_SAMPLING_COMPENSATION==1
+        M1_FswDecided_prev_cla  = M1_FswDecided_cla;
+#endif
+        M1_FswDecided_cla       = Module1_Parameters_cla.OptimizationFsw[Module1_Parameters_cla.MinimumCostIndex];
         index_value_prev = Module1_Parameters_cla.MinimumCostIndex;
     }
 
@@ -369,8 +372,13 @@ void ExecuteFirstPrediction_cla(ModuleParameters *moduleparams, unsigned int ind
     moduleparams->CurrentHorizon[indexcount].VdPrediction = moduleparams->FirstHorizon[indexcount].VdPrediction;  // First horizon prediction on the previous horizon is our current value now
     moduleparams->CurrentHorizon[indexcount].VqPrediction = moduleparams->FirstHorizon[indexcount].VqPrediction;  // First horizon prediction on the previous horizon is our current value now
 
+#if HALF_SAMPLING_COMPENSATION==0
     moduleparams->FirstHorizon[indexcount].IdPrediction = moduleparams->Measured.Current.transformed.Dvalue + (0.5f / M1_FswDecided_cla) * (moduleparams->CurrentHorizon[indexcount].VdPrediction / M1_LS_VALUE - M1_RS_VALUE / M1_LS_VALUE * moduleparams->Measured.Current.transformed.Dvalue + M1_LS_VALUE / M1_LS_VALUE * POLEPAIRS * moduleparams->AngularSpeedRadSec.Mechanical * moduleparams->Measured.Current.transformed.Qvalue);
     moduleparams->FirstHorizon[indexcount].IqPrediction = moduleparams->Measured.Current.transformed.Qvalue + (0.5f / M1_FswDecided_cla) * (moduleparams->CurrentHorizon[indexcount].VqPrediction / M1_LS_VALUE - M1_RS_VALUE / M1_LS_VALUE * moduleparams->Measured.Current.transformed.Qvalue - M1_LS_VALUE / M1_LS_VALUE * POLEPAIRS * moduleparams->AngularSpeedRadSec.Mechanical * moduleparams->Measured.Current.transformed.Dvalue - FLUX_VALUE * POLEPAIRS * moduleparams->AngularSpeedRadSec.Mechanical / M1_LS_VALUE);
+#else
+    moduleparams->FirstHorizon[indexcount].IdPrediction = moduleparams->Measured.Current.transformed.Dvalue + (1.0f / M1_FswDecided_cla) * (moduleparams->CurrentHorizon[indexcount].VdPrediction / M1_LS_VALUE - M1_RS_VALUE / M1_LS_VALUE * moduleparams->Measured.Current.transformed.Dvalue + M1_LS_VALUE / M1_LS_VALUE * POLEPAIRS * moduleparams->AngularSpeedRadSec.Mechanical * moduleparams->Measured.Current.transformed.Qvalue);
+    moduleparams->FirstHorizon[indexcount].IqPrediction = moduleparams->Measured.Current.transformed.Qvalue + (1.0f / M1_FswDecided_cla) * (moduleparams->CurrentHorizon[indexcount].VqPrediction / M1_LS_VALUE - M1_RS_VALUE / M1_LS_VALUE * moduleparams->Measured.Current.transformed.Qvalue - M1_LS_VALUE / M1_LS_VALUE * POLEPAIRS * moduleparams->AngularSpeedRadSec.Mechanical * moduleparams->Measured.Current.transformed.Dvalue - FLUX_VALUE * POLEPAIRS * moduleparams->AngularSpeedRadSec.Mechanical / M1_LS_VALUE);
+#endif
 }
 void ExecuteSecondPrediction_cla(ModuleParameters *moduleparams, unsigned int indexcount)
 {
@@ -503,6 +511,21 @@ void CalculateParkTransform_cla(ModuleParameters *moduleparams)
     //ids = 2/3*(ias*sin(ref_frame_position)+ibs*sin(ref_frame_position-2*pi/3)+ics*sin(ref_frame_position+2*pi/3));
     //iqs =  2/3*(ias*cos(ref_frame_position)+ibs*cos(ref_frame_position-2*pi/3)+ics*cos(ref_frame_position+2*pi/3));
     //i0 = 2/3*1/2*(ias+ibs+ics);
+
+#if HALF_SAMPLING_COMPENSATION==1
+    moduleparams->CurrentHorizon[Module1_Parameters_cla.MinimumCostIndex].VdPrediction = moduleparams->FirstHorizon[Module1_Parameters_cla.MinimumCostIndex].VdPrediction;  // First horizon prediction on the previous horizon is our current value now
+    moduleparams->CurrentHorizon[Module1_Parameters_cla.MinimumCostIndex].VqPrediction = moduleparams->FirstHorizon[Module1_Parameters_cla.MinimumCostIndex].VqPrediction;  // First horizon prediction on the previous horizon is our current value now
+
+    moduleparams->Measured.Current.transformed.Dvalue = moduleparams->Measured.Current.transformed.Dvalue + (0.5f / M1_FswDecided_prev_cla) * (moduleparams->CurrentHorizon[Module1_Parameters_cla.MinimumCostIndex].VdPrediction / M1_LS_VALUE - M1_RS_VALUE / M1_LS_VALUE * moduleparams->Measured.Current.transformed.Dvalue + M1_LS_VALUE / M1_LS_VALUE * POLEPAIRS * moduleparams->AngularSpeedRadSec.Mechanical * moduleparams->Measured.Current.transformed.Qvalue);
+    moduleparams->Measured.Current.transformed.Qvalue = moduleparams->Measured.Current.transformed.Qvalue + (0.5f / M1_FswDecided_prev_cla) * (moduleparams->CurrentHorizon[Module1_Parameters_cla.MinimumCostIndex].VqPrediction / M1_LS_VALUE - M1_RS_VALUE / M1_LS_VALUE * moduleparams->Measured.Current.transformed.Qvalue - M1_LS_VALUE / M1_LS_VALUE * POLEPAIRS * moduleparams->AngularSpeedRadSec.Mechanical * moduleparams->Measured.Current.transformed.Dvalue - FLUX_VALUE * POLEPAIRS * moduleparams->AngularSpeedRadSec.Mechanical / M1_LS_VALUE);
+#if 0
+    moduleparams->CurrentHorizon[indexcount].VdPrediction = moduleparams->FirstHorizon[indexcount].VdPrediction;  // First horizon prediction on the previous horizon is our current value now
+    moduleparams->CurrentHorizon[indexcount].VqPrediction = moduleparams->FirstHorizon[indexcount].VqPrediction;  // First horizon prediction on the previous horizon is our current value now
+
+    moduleparams->FirstHorizon[indexcount].IdPrediction = moduleparams->Measured.Current.transformed.Dvalue + (0.5f / M1_FswDecided_cla) * (moduleparams->CurrentHorizon[indexcount].VdPrediction / M1_LS_VALUE - M1_RS_VALUE / M1_LS_VALUE * moduleparams->Measured.Current.transformed.Dvalue + M1_LS_VALUE / M1_LS_VALUE * POLEPAIRS * moduleparams->AngularSpeedRadSec.Mechanical * moduleparams->Measured.Current.transformed.Qvalue);
+    moduleparams->FirstHorizon[indexcount].IqPrediction = moduleparams->Measured.Current.transformed.Qvalue + (0.5f / M1_FswDecided_cla) * (moduleparams->CurrentHorizon[indexcount].VqPrediction / M1_LS_VALUE - M1_RS_VALUE / M1_LS_VALUE * moduleparams->Measured.Current.transformed.Qvalue - M1_LS_VALUE / M1_LS_VALUE * POLEPAIRS * moduleparams->AngularSpeedRadSec.Mechanical * moduleparams->Measured.Current.transformed.Dvalue - FLUX_VALUE * POLEPAIRS * moduleparams->AngularSpeedRadSec.Mechanical / M1_LS_VALUE);
+#endif
+#endif
 }
 float CLA_fabsf(float value)
 {

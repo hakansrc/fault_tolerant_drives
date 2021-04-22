@@ -25,6 +25,7 @@ extern "C" {
 
 extern uint32_t             Cla1Task1_counter;
 extern float                M2_FswDecided_cla;
+extern float                M2_FswDecided_prev_cla;
 extern unsigned int         M2_OperationMode;
 extern ModuleParameters     Module2_Parameters_cla;
 extern PID_Parameters       PI_iq_cla;

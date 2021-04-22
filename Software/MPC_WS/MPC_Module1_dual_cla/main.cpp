@@ -51,6 +51,8 @@ uint32_t    Cla1Task1_counter = 0;
 #pragma DATA_SECTION("CLAData")
 float    Clacoscalc = 0;
 #pragma DATA_SECTION("CLAData")
+float       M1_FswDecided_prev_cla = 1000;
+#pragma DATA_SECTION("CLAData")
 float       M1_FswDecided_cla = 1000;
 #pragma DATA_SECTION("CLAData")
 ModuleParameters Module1_Parameters_cla;

@@ -206,13 +206,6 @@ int main(void)
         IPCWaitCounter ++ ;
     }
 
-    CostFunctionCoeff.IqRipple       = IQRIPPLECOEFF;
-    CostFunctionCoeff.IqReference    = IQREFCOEFF;
-    CostFunctionCoeff.IdReference    = IDREFCOEFF;
-    CostFunctionCoeff.Fsw            = FSWCOEFF;
-    CostFunctionCoeff.M1FswChange    = M1_FSW_CHANGE_COEFF;
-    CostFunctionCoeff.M2FswPhase     = M2_FSW_PHASE_COEFF;
-    CostFunctionCoeff.M2DifferentFsw = M2_DIFFERENT_FSW_COEFF;
 
 
 
@@ -242,6 +235,14 @@ int main(void)
     CLA_initCpu1Cla1();
     PieCtrlRegs.PIEIER11.bit.INTx1 = 1;  // Enable PIE Group 11 INT1, CLA1_1 interrupt
     IER |= (M_INT11 );
+    CostFunctionCoeff.IqRipple       = IQRIPPLECOEFF;
+    CostFunctionCoeff.IqReference    = IQREFCOEFF;
+    CostFunctionCoeff.IdReference    = IDREFCOEFF;
+    CostFunctionCoeff.Fsw            = FSWCOEFF;
+    CostFunctionCoeff.M1FswChange    = M1_FSW_CHANGE_COEFF;
+    CostFunctionCoeff.M2FswPhase     = M2_FSW_PHASE_COEFF;
+    CostFunctionCoeff.M2DifferentFsw = M2_DIFFERENT_FSW_COEFF;
+
 #endif
 
     phase_cost_coeff = 10000.0f;

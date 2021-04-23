@@ -577,6 +577,7 @@ __interrupt void CLATask1_PCC_Is_Done(void)
     CLA1Task1End_counter++;
     memcpy(&PI_iq_cla,&PI_iq,sizeof(PID_Parameters)); //get the reference from cpu1 to cla of cpu2
     memcpy(&Module2_Parameters,&Module2_Parameters_cla,sizeof(ModuleParameters)); //get the reference from cpu1 to cla of cpu2
+    Module2_Parameters.AngleRadPrev.Electrical = fabsf(M1fsw_M2fsw_PhaseDifference_prediction)*M1_FswDecided_to_cla;
     M2_FswDecided = M2_FswDecided_cla;
     PieCtrlRegs.PIEACK.all = PIEACK_GROUP11;
 }

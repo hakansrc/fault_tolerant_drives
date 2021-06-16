@@ -4,7 +4,7 @@
 
 SHELL = cmd.exe
 
-CG_TOOL_ROOT := C:/ti/ccs1010/ccs/tools/compiler/ti-cgt-c2000_20.2.1.LTS
+CG_TOOL_ROOT := C:/ti/ccs1031/ccs/tools/compiler/ti-cgt-c2000_20.2.4.LTS
 
 GEN_OPTS__FLAG := 
 GEN_CMDS__FLAG := 
@@ -164,15 +164,15 @@ all: IDDK_PM_Servo_F2837x-v2.out
 IDDK_PM_Servo_F2837x-v2.out: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
 	@echo 'Building target: "$@"'
 	@echo 'Invoking: C2000 Linker'
-	"C:/ti/ccs1010/ccs/tools/compiler/ti-cgt-c2000_20.2.1.LTS/bin/cl2000" -v28 -ml -mt --float_support=fpu32 --tmu_support=tmu0 --vcu_support=vcu2 --cla_support=cla0 -O1 --opt_for_speed=5 --fp_mode=relaxed -g --define="_DEBUG" --define="CPU1" --define="LARGE_MODEL" --quiet --diag_warning=225 -k --asm_listing -z -m"IDDK_PM_Servo_F2837x-v2.map" --stack_size=0x380 --warn_sections -i"C:/ti/ccs1010/ccs/tools/compiler/ti-cgt-c2000_20.2.1.LTS/lib" -i"C:/ti/controlSUITE/libs/dsp/VCU/v2_10_00_00/lib" -i"C:/ti/controlSUITE/libs/math/IQmath/v160/lib" -i"C:/ti/controlSUITE/libs/app_libs/position_manager/v01_00_00_00/bissc/Float/lib" -i"C:/ti/controlSUITE/libs/app_libs/position_manager/v01_00_00_00/endat22/Float/lib" -i"C:/ti/ccs1010/ccs/tools/compiler/ti-cgt-c2000_20.2.1.LTS/include" -i"C:/ti/controlSUITE/libs/app_libs/motor_control/libs/resolver/v101/lib" --reread_libs --xml_link_info="IDDK_PM_Servo_F2837x-v2.xml" --rom_model -o "IDDK_PM_Servo_F2837x-v2.out" $(ORDERED_OBJS)
+	"C:/ti/ccs1031/ccs/tools/compiler/ti-cgt-c2000_20.2.4.LTS/bin/cl2000" -v28 -ml -mt --float_support=fpu32 --tmu_support=tmu0 --vcu_support=vcu2 --cla_support=cla0 -O1 --opt_for_speed=5 --fp_mode=relaxed -g --define="_DEBUG" --define="CPU1" --define="LARGE_MODEL" --quiet --diag_warning=225 -k --asm_listing -z -m"IDDK_PM_Servo_F2837x-v2.map" --stack_size=0x380 --warn_sections -i"C:/ti/ccs1031/ccs/tools/compiler/ti-cgt-c2000_20.2.4.LTS/lib" -i"C:/ti/controlSUITE/libs/dsp/VCU/v2_10_00_00/lib" -i"C:/ti/controlSUITE/libs/math/IQmath/v160/lib" -i"C:/ti/controlSUITE/libs/app_libs/position_manager/v01_00_00_00/bissc/Float/lib" -i"C:/ti/controlSUITE/libs/app_libs/position_manager/v01_00_00_00/endat22/Float/lib" -i"C:/ti/ccs1031/ccs/tools/compiler/ti-cgt-c2000_20.2.4.LTS/include" -i"C:/ti/controlSUITE/libs/app_libs/motor_control/libs/resolver/v101/lib" --reread_libs --xml_link_info="IDDK_PM_Servo_F2837x-v2.xml" --rom_model -o "IDDK_PM_Servo_F2837x-v2.out" $(ORDERED_OBJS)
 	@echo 'Finished building target: "$@"'
 	@echo ' '
 
 IDDK_PM_Servo_F2837x-v2.hex: $(EXE_OUTPUTS)
-	@echo 'Building files: $(strip $(EXE_OUTPUTS__QUOTED))'
+	@echo 'Building secondary target: "$@"'
 	@echo 'Invoking: C2000 Hex Utility'
-	"C:/ti/ccs1010/ccs/tools/compiler/ti-cgt-c2000_20.2.1.LTS/bin/hex2000"  -o "IDDK_PM_Servo_F2837x-v2.hex" $(EXE_OUTPUTS__QUOTED)
-	@echo 'Finished building: $(strip $(EXE_OUTPUTS__QUOTED))'
+	"C:/ti/ccs1031/ccs/tools/compiler/ti-cgt-c2000_20.2.4.LTS/bin/hex2000" --diag_wrap=off -o "IDDK_PM_Servo_F2837x-v2.hex" $(EXE_OUTPUTS__QUOTED)
+	@echo 'Finished building secondary target: "$@"'
 	@echo ' '
 
 # Other Targets

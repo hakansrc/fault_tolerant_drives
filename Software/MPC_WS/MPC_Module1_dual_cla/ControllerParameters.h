@@ -38,7 +38,7 @@
 #define IDREFCOEFF              10000.0f
 #define FSWCOEFF                1250.0f
 #define M1_FSW_CHANGE_COEFF     750.0f
-#define M2_FSW_PHASE_COEFF      50000.0f
+#define M2_FSW_PHASE_COEFF      500.0f
 #define M2_DIFFERENT_FSW_COEFF  500.0f
 
 #define M1_VD_VQ_KP M1_LS_VALUE/2.0f*moduleparams.OptimizationFsw[indexcount]

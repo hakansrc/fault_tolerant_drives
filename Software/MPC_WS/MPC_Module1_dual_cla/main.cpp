@@ -176,7 +176,7 @@ void InitializeGpiosForCpu2(void);
 uint32_t    SvpwmSectorNumber = 0;
 uint32_t    ControlISRCounter = 0;
 uint32_t    AlignmentCounter = 0;
-float       DataToBeSent[12];
+float       DataToBeSent[16];
 uint32_t    SendOneInFour = 0;
 uint32_t    Xint1Count = 0;
 
@@ -279,7 +279,7 @@ int main(void)
     DINT;
     /*Initialize cpu timers*/
     InitCpuTimers();
-    ConfigCpuTimer(&CpuTimer0, 200, 1000000/2000); //2000 Hz
+    ConfigCpuTimer(&CpuTimer0, 200, 1000000/1250); //1250 Hz
     ConfigCpuTimer(&CpuTimer1, 200, 1000000); //1 seconds
     ConfigCpuTimer(&CpuTimer2, 200, 1000000); //1 seconds
     CpuTimer0Regs.TCR.all = 0x4000;           // enable cpu timer interrupt
@@ -404,25 +404,6 @@ int main(void)
             {
                 differencemax = TorqueDistributor.fDifference;
             }
-            if (SendOneInFour % 2 == 0)
-            {
-                DataToBeSent[0]  = Module1_Parameters_cla.Measured.Current.transformed.Dvalue; // .Measured.Current.PhaseA;
-                DataToBeSent[1]  = Module1_Parameters_cla.Measured.Current.transformed.Qvalue; // .Measured.Current.PhaseA;
-                DataToBeSent[2]  = M1_Iqref;
-                DataToBeSent[3]  = Module2_Parameters.Measured.Current.transformed.Dvalue;
-                DataToBeSent[4]  = Module2_Parameters.Measured.Current.transformed.Qvalue;
-                DataToBeSent[5]  = M2_Iqref;
-                DataToBeSent[6]  = Module1_Parameters_cla.Measured.Current.PhaseA;
-                DataToBeSent[7]  = Module2_Parameters.Measured.Current.PhaseA;
-                DataToBeSent[8]  = Module1_Parameters_cla.AngularSpeedRPM.Mechanical;
-                DataToBeSent[9]  = M1_FswDecided_cla;
-                DataToBeSent[10] = M2_FswDecided;
-                DataToBeSent[11] = Module2_Parameters.AngleRadPrev.Electrical;
-
-
-                SciSendMultipleFloatWithTheTag(DataToBeSent, 12);
-            }
-            SendOneInFour++;
             SciaBackgroundTask();
             Start_Torque_Distribution = 0;
         }
@@ -440,13 +421,36 @@ __interrupt void cpu_timer0_isr(void)
     CpuTimer0.InterruptCount++;
     TorqueDistributor.Beginning =  GetTime();
     Start_Torque_Distribution = 1;  // torque distribution will start
+    if (SendOneInFour % 1 == 0)
+    {
+        DataToBeSent[0]  = Module1_Parameters_cla.Measured.Current.transformed.Dvalue; // .Measured.Current.PhaseA;
+        DataToBeSent[1]  = Module1_Parameters_cla.Measured.Current.transformed.Qvalue; // .Measured.Current.PhaseA;
+        DataToBeSent[2]  = M1_Iqref;
+        DataToBeSent[3]  = Module2_Parameters.Measured.Current.transformed.Dvalue;
+        DataToBeSent[4]  = Module2_Parameters.Measured.Current.transformed.Qvalue;
+        DataToBeSent[5]  = M2_Iqref;
+        DataToBeSent[6]  = Module1_Parameters_cla.Measured.Current.PhaseA;
+        DataToBeSent[7]  = Module2_Parameters.Measured.Current.PhaseA;
+        DataToBeSent[8]  = Module1_Parameters_cla.AngularSpeedRPM.Mechanical;
+        DataToBeSent[9]  = M1_FswDecided_cla;
+        DataToBeSent[10] = M2_FswDecided;
+        DataToBeSent[11] = SpeedRefRPM;
+        DataToBeSent[12] = CpuTimer2.InterruptCount;
+        DataToBeSent[13] = Module2_Parameters.AngleRadPrev.Electrical;
+        DataToBeSent[14] = Module2_Parameters.AngleRadPrev.Electrical;
+        DataToBeSent[15] = Module2_Parameters.AngleRadPrev.Electrical;
+
+
+        SciSendMultipleFloatWithTheTag(DataToBeSent, 16);
+    }
+    SendOneInFour++;
     PieCtrlRegs.PIEACK.all = PIEACK_GROUP1;
 }
 
 __interrupt void cpu_timer1_isr(void)
 {
     CpuTimer1.InterruptCount++;
-#if 0
+#if 1
     if((M1_OperationMode==MODE_MPCCONTROLLER)||(M1_OperationMode==MODE_CLA_MPCCONTROLLER))
     {
         if((CpuTimer1.InterruptCount%5)==0)

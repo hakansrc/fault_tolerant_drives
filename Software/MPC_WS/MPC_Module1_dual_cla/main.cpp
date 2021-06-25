@@ -106,6 +106,8 @@ float M2_Iqref = 0.0f;
 #pragma DATA_SECTION("CLAData")
 float M1_Iqref_cla = 0.0f;
 
+float M1_Idref = 0.0f;
+float M2_Idref = 0.0f;
 
 
 OpenLoopOperation   RL_Load_Operation = {25, 0.5}; // 0 hz, 0 magnitude
@@ -423,6 +425,7 @@ __interrupt void cpu_timer0_isr(void)
     Start_Torque_Distribution = 1;  // torque distribution will start
     if (SendOneInFour % 1 == 0)
     {
+#if 0
         DataToBeSent[0]  = Module1_Parameters_cla.Measured.Current.transformed.Dvalue; // .Measured.Current.PhaseA;
         DataToBeSent[1]  = Module1_Parameters_cla.Measured.Current.transformed.Qvalue; // .Measured.Current.PhaseA;
         DataToBeSent[2]  = M1_Iqref;
@@ -439,6 +442,25 @@ __interrupt void cpu_timer0_isr(void)
         DataToBeSent[13] = Module2_Parameters.AngleRadPrev.Electrical;
         DataToBeSent[14] = Module2_Parameters.AngleRadPrev.Electrical;
         DataToBeSent[15] = Module2_Parameters.AngleRadPrev.Electrical;
+#else
+        DataToBeSent[0]  = SpeedRefRPM;
+        DataToBeSent[1]  = Module1_Parameters_cla.AngularSpeedRPM.Mechanical; // .Measured.Current.PhaseA;
+        DataToBeSent[2]  = Module1_Parameters_cla.Measured.Current.transformed.Dvalue;
+        DataToBeSent[3]  = Module2_Parameters.Measured.Current.transformed.Dvalue;
+        DataToBeSent[4]  = Module1_Parameters_cla.Measured.Current.transformed.Qvalue;
+        DataToBeSent[5]  = Module2_Parameters.Measured.Current.transformed.Qvalue;
+        DataToBeSent[6]  = M1_FswDecided_cla;
+        DataToBeSent[7]  = M2_FswDecided;
+        DataToBeSent[8]  = M1_Iqref_cla;
+        DataToBeSent[9]  = M2_Iqref;
+        DataToBeSent[10] = M1_Idref;
+        DataToBeSent[11] = 55;  //execution time of PI
+        DataToBeSent[12] = 55;  //execution time of TD
+        DataToBeSent[13] = 55;  //execution time of MPC1
+        DataToBeSent[14] = 55;  // execution time of MPC2
+        DataToBeSent[15] = 55;  //phases of fsws
+
+#endif
 
 
         SciSendMultipleFloatWithTheTag(DataToBeSent, 16);
@@ -2847,17 +2869,17 @@ void PerformTorqueDistribution(void)
 
     if(FaultFlagLocal==YES_FAULT)
     {
-        M1_minimumloss_iqref = TD_Variables.M1_Candidate_IqRef[TD_Variables.MinimumLossIndex];
-        M2_minimumloss_iqref = TD_Variables.M2_Candidate_IqRef[TD_Variables.MinimumLossIndex];
         M1_Iqref = TD_Variables.M1_Candidate_IqRef[TD_Variables.MinimumLossIndex];
         M2_Iqref = TD_Variables.M2_Candidate_IqRef[TD_Variables.MinimumLossIndex];
+        M1_Idref = TD_Variables.M1_Candidate_IdRef[TD_Variables.MinimumLossIndex];
+        M2_Idref = 0;
     }
     else
     {
-        M1_minimumloss_iqref = PI_iq_cpu2.Output/2.0f;
-        M2_minimumloss_iqref = PI_iq_cpu2.Output/2.0f;
         M1_Iqref = PI_iq_cpu2.Output/2.0f;
         M2_Iqref = PI_iq_cpu2.Output/2.0f;
+        M1_Idref = 0;
+        M2_Idref = 0;
     }
 
 

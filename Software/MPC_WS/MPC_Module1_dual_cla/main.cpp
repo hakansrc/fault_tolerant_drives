@@ -61,7 +61,7 @@ PID_Parameters      PI_iq_cla;
 #pragma DATA_SECTION("CLAData")
 float       SpeedRefRadSec = 0;
 #pragma DATA_SECTION("M1_SPEEDREF_LOCATION")
-float       SpeedRefRPM = 15.0f;
+float       SpeedRefRPM = 30.0f;
 #pragma DATA_SECTION("CLAData")
 unsigned int        M1_OperationMode = MODE_NO_OPERATION;
 #pragma DATA_SECTION("CLAData")
@@ -193,7 +193,7 @@ uint16_t    ClockMod = 1000;
 uint16_t    ReadDrv8305RegistersFlag = 0;
 uint16_t    AngleHasBeenReset = 0;
 uint16_t    SpeedRefArrayCount = 0;
-float       SpeedRefArray[4] = {-35,60,35,-60};
+float       SpeedRefArray[4] = {30,-30,30,-30};
 
 /*Following flag will be replaced with an IPC call*/
 uint16_t    StartOperationCpu2 = 0; // when this is set to 1, cpu2 will start operation & inverter2 will contribute to the traction
@@ -481,7 +481,7 @@ __interrupt void cpu_timer0_isr(void)
 __interrupt void cpu_timer1_isr(void)
 {
     CpuTimer1.InterruptCount++;
-#if 0
+#if 1
     if((M1_OperationMode==MODE_MPCCONTROLLER)||(M1_OperationMode==MODE_CLA_MPCCONTROLLER))
     {
         if((CpuTimer1.InterruptCount%5)==0)

@@ -60,7 +60,10 @@ float       M1_FswDecided = 0;
 #pragma DATA_SECTION("M2_FSWDECIDED_LOCATION")
 float       M2_FswDecided = 0;
 
-
+#pragma DATA_SECTION("M2_PI_TIMING_LOCATION")
+TimingMeasurement PI_Timing = {0,0,0,0};
+#pragma DATA_SECTION("M2_MPC_TIMING_LOCATION")
+TimingMeasurement PCC_Module2_Timing= {0,0,0,0};
 
 uint32_t    SvpwmSectorNumber = 0;
 
@@ -137,6 +140,10 @@ float   M1_FswDecided_to_cla = 1000.0f;
 #pragma DATA_SECTION("CpuToCla1MsgRAM")
 int64_t   M1_Interrupt_Moment_to_cla = 0;
 
+
+#pragma DATA_SECTION("M1M2_FSW_PHASE_DIFFERENCE_TO_CPU1_LOCATION")
+float   M1fsw_M2fsw_PhaseDifference_to_cpu1 = 0;
+
 #pragma DATA_SECTION("CpuToCla1MsgRAM")
 float   M1fsw_M2fsw_PhaseDifference_to_cla = 0;
 
@@ -211,8 +218,8 @@ int main(void)
 
 
 
-    PI_iq_cpu2.I_coeff = 3.0f;
-    PI_iq_cpu2.P_coeff = 0.6f;
+    PI_iq_cpu2.I_coeff = 10.0f;
+    PI_iq_cpu2.P_coeff = 1.8f;
     PI_iq_cpu2.Ts =  0.0002f;
     PI_iq_cpu2.Input = 0;
     PI_iq_cpu2.Input_prev = 0;
@@ -291,9 +298,13 @@ __interrupt void cpu_timer0_isr(void)
     CpuTimer0.InterruptCount++;
     if(M2_OperationMode==MODE_CLA_MPCCONTROLLER)
     {
+        PI_Timing.Beginning = GetTime();
         SpeedRefRadSec = SpeedRefRPM/60.0f*2.0f*PI;
         PI_iq_cpu2.Input = SpeedRefRadSec - Module1_Parameters.AngularSpeedRadSec.Mechanical;
         Run_PI_Controller(PI_iq_cpu2);
+        PI_Timing.End = GetTime();
+        PI_Timing.Difference = PI_Timing.End - PI_Timing.Beginning;
+        PI_Timing.fDifference = ((float)PI_Timing.Difference)*5.0f/((float)1000.0f);
         //PI_iq_cpu2.Output = IqRefByPass;
     }
     PieCtrlRegs.PIEACK.all = PIEACK_GROUP1;
@@ -547,8 +558,10 @@ __interrupt void epwm4_isr(void)
     M2_Interrupt_Moment_to_cla = (int64_t) GetTime();
     M1_Interrupt_Moment_to_cla = M1_Interrupt_Moment;
     M1fsw_M2fsw_PhaseDifference_to_cla = ((float)(M2_Interrupt_Moment_to_cla-M1_Interrupt_Moment_to_cla))/((float)200e6);
+    M1fsw_M2fsw_PhaseDifference_to_cpu1 = M1fsw_M2fsw_PhaseDifference_to_cla;
     M1_FswDecided_to_cla = M1_FswDecided;
     GpioDataRegs.GPDTOGGLE.bit.GPIO104 = 1;
+    PCC_Module2_Timing.Beginning = GetTime();
 
     ControlISRCounter++;
 #if 1
@@ -579,6 +592,9 @@ __interrupt void CLATask1_PCC_Is_Done(void)
     memcpy(&Module2_Parameters,&Module2_Parameters_cla,sizeof(ModuleParameters)); //get the reference from cpu1 to cla of cpu2
     Module2_Parameters.AngleRadPrev.Electrical = fabsf(M1fsw_M2fsw_PhaseDifference_prediction)*M1_FswDecided_to_cla;
     M2_FswDecided = M2_FswDecided_cla;
+    PCC_Module2_Timing.End = GetTime();
+    PCC_Module2_Timing.Difference = PCC_Module2_Timing.End - PCC_Module2_Timing.Beginning;
+    PCC_Module2_Timing.fDifference = ((float)PCC_Module2_Timing.Difference)*5.0f/((float)1000.0f);
     PieCtrlRegs.PIEACK.all = PIEACK_GROUP11;
 }
 

@@ -106,6 +106,9 @@ float M2_Iqref = 0.0f;
 #pragma DATA_SECTION("CLAData")
 float M1_Iqref_cla = 0.0f;
 
+#pragma DATA_SECTION("M1M2_FSW_PHASE_DIFFERENCE_TO_CPU1_LOCATION")
+float   M1fsw_M2fsw_PhaseDifference_to_cpu1 = 0;
+
 float M1_Idref = 0.0f;
 float M2_Idref = 0.0f;
 
@@ -215,8 +218,14 @@ float       time_in_usec = 0.0f;
 
 uint16_t    Start_Torque_Distribution = 0;
 
+#pragma DATA_SECTION("M2_PI_TIMING_LOCATION")
+TimingMeasurement PI_Timing = {0,0,0,0};
+#pragma DATA_SECTION("M2_MPC_TIMING_LOCATION")
+TimingMeasurement PCC_Module2_Timing= {0,0,0,0};
+
+
 TimingMeasurement TorqueDistributor = {0,0,0,0};
-TimingMeasurement PCC_Timing = {0,0,0,0};
+TimingMeasurement PCC_Module1_Timing = {0,0,0,0};
 float   differencemax = 0.0f;
 inline uint64_t    GetTime(void);
 inline uint64_t    GetTimeFloat(void);
@@ -398,6 +407,7 @@ int main(void)
     {
         if(Start_Torque_Distribution==1)
         {
+            TorqueDistributor.Beginning =  GetTime();
             PerformTorqueDistribution();
             TorqueDistributor.End =  GetTime();
             TorqueDistributor.Difference = TorqueDistributor.End - TorqueDistributor.Beginning;
@@ -421,7 +431,6 @@ int main(void)
 __interrupt void cpu_timer0_isr(void)
 {
     CpuTimer0.InterruptCount++;
-    TorqueDistributor.Beginning =  GetTime();
     Start_Torque_Distribution = 1;  // torque distribution will start
     if (SendOneInFour % 1 == 0)
     {
@@ -454,11 +463,11 @@ __interrupt void cpu_timer0_isr(void)
         DataToBeSent[8]  = M1_Iqref_cla;
         DataToBeSent[9]  = M2_Iqref;
         DataToBeSent[10] = M1_Idref;
-        DataToBeSent[11] = 55;  //execution time of PI
-        DataToBeSent[12] = 55;  //execution time of TD
-        DataToBeSent[13] = 55;  //execution time of MPC1
-        DataToBeSent[14] = 55;  // execution time of MPC2
-        DataToBeSent[15] = 55;  //phases of fsws
+        DataToBeSent[11] = PI_Timing.fDifference;  //execution time of PI
+        DataToBeSent[12] = TorqueDistributor.fDifference;  //execution time of TD
+        DataToBeSent[13] = PCC_Module1_Timing.fDifference;  //execution time of MPC1
+        DataToBeSent[14] = PCC_Module2_Timing.fDifference;  // execution time of MPC2
+        DataToBeSent[15] = M1fsw_M2fsw_PhaseDifference_to_cpu1;  //phases of fsws
 
 #endif
 
@@ -472,7 +481,7 @@ __interrupt void cpu_timer0_isr(void)
 __interrupt void cpu_timer1_isr(void)
 {
     CpuTimer1.InterruptCount++;
-#if 1
+#if 0
     if((M1_OperationMode==MODE_MPCCONTROLLER)||(M1_OperationMode==MODE_CLA_MPCCONTROLLER))
     {
         if((CpuTimer1.InterruptCount%5)==0)
@@ -2091,7 +2100,7 @@ __interrupt void epwm1_isr(void)
     M1_FswDecided = M1_FswDecided_cla;
 
     GpioDataRegs.GPDTOGGLE.bit.GPIO105 = 1;
-    PCC_Timing.Beginning = GetTime();
+    PCC_Module1_Timing.Beginning = GetTime();
     ControlISRCounter++;
 #if 0
     torque_distributor_start = (uint64_t)IpcRegs.IPCCOUNTERL + (uint64_t)((uint64_t)IpcRegs.IPCCOUNTERH)*((uint64_t)4294967296);
@@ -2405,11 +2414,12 @@ __interrupt void CLATask1_PCC_Is_Done(void)
     memcpy(&PI_iq,&PI_iq_cla,sizeof(PID_Parameters)); // give the torque reference from cpu1cla to cpu2
     memcpy(&Module1_Parameters,&Module1_Parameters_cla,sizeof(ModuleParameters));
 
-    PCC_Timing.End = GetTime();
-    PCC_Timing.Difference = PCC_Timing.End - PCC_Timing.Beginning;
-    PCC_Timing.fDifference = ((float)PCC_Timing.Difference)*5.0f/((float)1000.0f);
+    PCC_Module1_Timing.End = GetTime();
+    PCC_Module1_Timing.Difference = PCC_Module1_Timing.End - PCC_Module1_Timing.Beginning;
+    PCC_Module1_Timing.fDifference = ((float)PCC_Module1_Timing.Difference)*5.0f/((float)1000.0f);
 
 
+#if 0
     M1Torque = 3.0f/2.0f*POLEPAIRS*(Module1_Parameters_cla.Measured.Current.transformed.Qvalue*FLUX_VALUE);
     M2Torque = 3.0f/2.0f*POLEPAIRS*(Module2_Parameters.Measured.Current.transformed.Qvalue*FLUX_VALUE);
     PowerOutTotalMechanical = M1Torque*Module1_Parameters_cla.AngularSpeedRadSec.Mechanical + M2Torque*Module1_Parameters_cla.AngularSpeedRadSec.Mechanical;
@@ -2418,7 +2428,7 @@ __interrupt void CLATask1_PCC_Is_Done(void)
 
     M1CopperLoss = 1.5f*M1_RS_VALUE*(powf(Module1_Parameters_cla.Measured.Current.transformed.Qvalue,2.0f)+powf(Module1_Parameters_cla.Measured.Current.transformed.Dvalue,2.0f));
     M2CopperLoss = 1.5f*M1_RS_VALUE*(powf(Module2_Parameters.Measured.Current.transformed.Qvalue,2.0f)+powf(Module2_Parameters.Measured.Current.transformed.Dvalue,2.0f));
-
+#endif
     PieCtrlRegs.PIEACK.all = PIEACK_GROUP11;
 }
 void RunTimeProtectionControl(void)

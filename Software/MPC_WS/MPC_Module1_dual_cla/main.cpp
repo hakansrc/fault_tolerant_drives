@@ -193,7 +193,7 @@ uint16_t    ClockMod = 1000;
 uint16_t    ReadDrv8305RegistersFlag = 0;
 uint16_t    AngleHasBeenReset = 0;
 uint16_t    SpeedRefArrayCount = 0;
-float       SpeedRefArray[4] = {30,-30,30,-30};
+float       SpeedRefArray[4] = {30,50,30,50};
 
 /*Following flag will be replaced with an IPC call*/
 uint16_t    StartOperationCpu2 = 0; // when this is set to 1, cpu2 will start operation & inverter2 will contribute to the traction

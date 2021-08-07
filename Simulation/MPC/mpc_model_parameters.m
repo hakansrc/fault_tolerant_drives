@@ -3,7 +3,7 @@ clc
 %% Simulation parameters
 Sampling_time = 1e-6;
 ref_frequency = 100*pi;
-Tfinal = 3; %seconds
+Tfinal = 1.5; %seconds
 %% PMSM parameters
 MotorSpeed = 600; % rpm
 PolePairs = 10;
@@ -88,12 +88,12 @@ iqrated = Trated/(1.5*PolePairs*FluxPM);
 %% Other parameters
 Load_Nominal_Freq = 50;
 THD_mean_frequency = 50;
-SpeedRef1 = 30; % RPM
+SpeedRef1 = 20; % RPM
 SpeedRef2 = 80;
 SpeedRefUpdateTime = 0.5;
-Tload1 = 5; %Nm
-Tload2 = 25;
-TloadUpdateTime = 0.25;
+Tload1 = Trated/4; %Nm
+Tload2 = 3*Trated/4;
+TloadUpdateTime = 1;
 FaultTime = 50;
 PmaxPerModule = 2000;
 RPMmaxPerModule = 600;

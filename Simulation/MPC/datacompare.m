@@ -62,6 +62,6 @@ legend(first,second)
 figure(45)
 title('iq error')
 hold on
-plot(out.Simout_PhaseCurrents_dq.iqs-out.Simout_PhaseCurrents_dq.iqref)
+plot(out.Simout_PhaseCurrents_dq.iqref - out.Simout_PhaseCurrents_dq.iqs)
 legend(first,second)
-
+grid on

@@ -2,12 +2,18 @@
 
 % Simulation parameters
 Ts = 1000e-9; % sec
-Tfinal = 8; % sec
+Sampling_time = Ts;
+Tfinal = 2; % sec
 Ripth = 0.1; % sec 
 
 % PMSM parameters
-MotorSpeed = 600; % rpm
+Pout = 2e3; % W
 PolePairs = 10;
+FluxPM = 0.1808;
+wrated = 600*2*pi/60;
+Trated = Pout/wrated;
+iqrated = Trated/(1.5*PolePairs*FluxPM);
+MotorSpeed = 600; % rpm
 EfRated = 80; % Volts
 Ls = 3.51e-3; % Henries
 Rs = 321e-3; % Ohms
@@ -15,14 +21,18 @@ VoltageConstant = EfRated*sqrt(6)/MotorSpeed*1e3;% Vll-peak/krpm
 Inertia = 1e-2; % kgm^2
 ViscousFriction = 1e-3; % Nms
 MotorSpeedRad = MotorSpeed*pi/30; % rad/sec
-LoadTorque1 = 2; % Nm
-LoadTorque2 = 2; % Nm
-LoadTorqueStepTime = 3; % s
+LoadTorque1 = Trated/4; %Nm; % Nm
+LoadTorque2 = 3*Trated/4; %Nm; % Nm
+LoadTorqueStepTime = 1.4; % s
+% Control parameters
+SpeedRef1 = 40; % rpm
+SpeedRef2 = 80; % rpm
+SpeedRefStepTime = .8; % s
 
 % Drive parameters
-fsw = 40e3; % Hz
+fsw = 10e3; % Hz
 fout = 100; % Hz
-Vdc = 200; % Volts (200: series)
+Vdc = 40; % Volts (200: series)
 m = 3;
 np = 1;
 ns = 2;
@@ -38,20 +48,17 @@ Pout = 2e3; % W
 % Calculated parameters
 n = ns*np;
 
-% Control parameters
-SpeedRef1 = 200; % rpm
-SpeedRef2 = 100; % rpm
-SpeedRefStepTime = 6; % s
+
 
 IdrefM1 = 0;
 IdrefM2 = 0;
-SpeedPIDmax = 20;
-SpeedPIDmin = -20;
+SpeedPIDmax = 200;
+SpeedPIDmin = -200;
 IrefOverTref = MotorSpeedRad/(EfRated*3);
-IdPIDmax = Vdcm/5;
-IdPIDmin = -Vdcm/5;
-IqPIDmax = Vdcm-10;
-IqPIDmin = -(Vdcm-10);
+IdPIDmax = 100*Vdcm/5;
+IdPIDmin = 100*-Vdcm/5;
+IqPIDmax = 100*Vdcm-10;
+IqPIDmin = 100*-(Vdcm-10);
 
 % Input model
 Rin = 1e-3;
@@ -78,3 +85,18 @@ PMSMLoadResistance = 1e3; % Ohms
 % delta = acos(EfRated/Vt); % radians
 % deltad = delta*180/pi; % degrees
 % pf = cos(delta);
+%%
+CurrentController_P = 30;
+CurrentController_I = 80;
+%%
+PI_Frequency_Iq = 5000;
+Ki_Iq = 20;
+Kp_Iq = 2;
+PI_Ts_Iq = 1/PI_Frequency_Iq;
+PI_Sat_Iq = iqrated*2;
+%%
+PI_Frequency_Vq = fsw;
+Ki_Vq = 1000;
+Kp_Vq = 50;
+PI_Ts_Vq = 1/PI_Frequency_Vq;
+PI_Sat_Vq = 200;

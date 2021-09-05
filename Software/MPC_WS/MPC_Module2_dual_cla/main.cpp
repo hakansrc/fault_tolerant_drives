@@ -97,6 +97,15 @@ float M2_Iqref_cla = 0.0f;
 #pragma DATA_SECTION("Cla1ToCpuMsgRAM")
 unsigned int index_value_prev = 0;
 
+#pragma DATA_SECTION("CLAData")
+float SpeedRefRadSec_cla = 0.0f;
+
+#pragma DATA_SECTION("CLAData")
+float SpeedErrorRPM_cla = 0.0f;
+
+#pragma DATA_SECTION("CLAData")
+float SpeedErrorRPM_filtered_cla = 0.0f;
+
 __interrupt void cpu_timer0_isr(void);  /*prototype of the ISR functions*/
 __interrupt void cpu_timer1_isr(void);  /*prototype of the ISR functions*/
 __interrupt void cpu_timer2_isr(void);  /*prototype of the ISR functions*/
@@ -244,13 +253,13 @@ int main(void)
     CLA_initCpu1Cla1();
     PieCtrlRegs.PIEIER11.bit.INTx1 = 1;  // Enable PIE Group 11 INT1, CLA1_1 interrupt
     IER |= (M_INT11 );
-    CostFunctionCoeff.IqRipple       = IQRIPPLECOEFF;
-    CostFunctionCoeff.IqReference    = IQREFCOEFF;
-    CostFunctionCoeff.IdReference    = IDREFCOEFF;
-    CostFunctionCoeff.Fsw            = FSWCOEFF;
-    CostFunctionCoeff.M1FswChange    = M1_FSW_CHANGE_COEFF;
-    CostFunctionCoeff.M2FswPhase     = M2_FSW_PHASE_COEFF;
-    CostFunctionCoeff.M2DifferentFsw = M2_DIFFERENT_FSW_COEFF;
+    CostFunctionCoeff.IqRipple       = 100000.0f;//IQRIPPLECOEFF;
+    CostFunctionCoeff.IqReference    = 1000000.0f;//IQREFCOEFF;
+    CostFunctionCoeff.IdReference    = 1000000.0f;//IDREFCOEFF;
+    CostFunctionCoeff.Fsw            = 125.0f;//FSWCOEFF;
+    CostFunctionCoeff.M1FswChange    = 750.0f;//M1_FSW_CHANGE_COEFF;
+    CostFunctionCoeff.M2FswPhase     = 5000.0f;//M2_FSW_PHASE_COEFF;
+    CostFunctionCoeff.M2DifferentFsw = 0.0f;//M2_DIFFERENT_FSW_COEFF;
 
 #endif
 
@@ -300,6 +309,7 @@ __interrupt void cpu_timer0_isr(void)
     {
         PI_Timing.Beginning = GetTime();
         SpeedRefRadSec = SpeedRefRPM/60.0f*2.0f*PI;
+        SpeedRefRadSec_cla = SpeedRefRadSec;
         PI_iq_cpu2.Input = SpeedRefRadSec - Module1_Parameters.AngularSpeedRadSec.Mechanical;
         Run_PI_Controller(PI_iq_cpu2);
         PI_Timing.End = GetTime();

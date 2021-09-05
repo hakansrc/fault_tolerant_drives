@@ -11,7 +11,9 @@ __interrupt void Cla1Task1 ( void )
      * */
     Cla1Task1_counter++;
 
-
+    SpeedErrorRPM_cla = (SpeedRefRadSec_cla - Module1_Parameters_cla.AngularSpeedRadSec.Mechanical)/(2.0f*PI)*60.0f;
+    SpeedErrorRPM_filtered_cla = SpeedErrorRPM_filtered_cla + SpeedErrorRPM_cla;
+    SpeedErrorRPM_filtered_cla = SpeedErrorRPM_filtered_cla - SpeedErrorRPM_filtered_cla/100.0f;
 
     //if(M1_OperationMode==MODE_MPCCONTROLLER)
     if(M1_OperationMode==MODE_CLA_MPCCONTROLLER)
@@ -22,6 +24,20 @@ __interrupt void Cla1Task1 ( void )
         GetAdcReadings_cla(&Module1_Parameters_cla);
 
         CalculateParkTransform_cla(&Module1_Parameters_cla);
+
+        if((CLA_fabsf(SpeedErrorRPM_cla)>5.0f)||((SpeedErrorRPM_filtered_cla/100.0f)>5.0f))
+        {
+            CostFunctionCoeff.IdReference = 1000000.0f*100.0f;
+            CostFunctionCoeff.IqReference = 1000000.0f*100.0f;
+        }
+        else
+        {
+            CostFunctionCoeff.IqRipple = 100000.0f;
+            CostFunctionCoeff.IdReference = 1000000.0f;
+            CostFunctionCoeff.IqReference = 1000000.0f;
+            CostFunctionCoeff.Fsw = 1250.0f;
+        }
+
 
 #if 0
         SpeedRefRadSec = SpeedRefRPM/60.0*2.0*PI;

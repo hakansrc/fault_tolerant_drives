@@ -15,6 +15,11 @@ __interrupt void Cla1Task1 ( void )
     fsw_cost_multipler = 1.0f;
 
 
+    SpeedErrorRPM_cla = (SpeedRefRadSec_cla - Module2_Parameters_cla.AngularSpeedRadSec.Mechanical)/(2.0f*PI)*60.0f;
+    SpeedErrorRPM_filtered_cla = SpeedErrorRPM_filtered_cla + SpeedErrorRPM_cla;
+    SpeedErrorRPM_filtered_cla = SpeedErrorRPM_filtered_cla - SpeedErrorRPM_filtered_cla/100.0f;
+
+
     if(M2_OperationMode==MODE_CLA_MPCCONTROLLER)
     {
 
@@ -23,6 +28,20 @@ __interrupt void Cla1Task1 ( void )
         GetAdcReadings_cla(&Module2_Parameters_cla);
 
         CalculateParkTransform_cla(&Module2_Parameters_cla);
+
+        if((CLA_fabsf(SpeedErrorRPM_cla)>5.0f)||((SpeedErrorRPM_filtered_cla/100.0f)>5.0f))
+        {
+            CostFunctionCoeff.IdReference = 1000000.0f*100.0f;
+            CostFunctionCoeff.IqReference = 1000000.0f*100.0f;
+            CostFunctionCoeff.M2FswPhase = 0.0f;
+        }
+        else
+        {
+            CostFunctionCoeff.IqRipple = 100000.0f;
+            CostFunctionCoeff.IdReference = 1000000.0f;
+            CostFunctionCoeff.IqReference = 1000000.0f;
+            CostFunctionCoeff.M2FswPhase = 5000.0f;
+        }
 
 #if ENABLE_TORQUE_DISTRIBUTOR
         Module2_Parameters_cla.Reference.Iq = M2_Iqref_cla;

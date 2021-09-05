@@ -74,6 +74,15 @@ unsigned int index_value_prev = 0;
 #pragma DATA_SECTION("CLAData")
 float M1_minimumloss_iqref = 0.0f;
 
+#pragma DATA_SECTION("CLAData")
+float SpeedRefRadSec_cla = 0.0f;
+
+#pragma DATA_SECTION("CLAData")
+float SpeedErrorRPM_cla = 0.0f;
+
+#pragma DATA_SECTION("CLAData")
+float SpeedErrorRPM_filtered_cla = 0.0f;
+
 
 
 #pragma DATA_SECTION("M2_MINIMUMLOSS_IQ_LOCATION")
@@ -365,13 +374,13 @@ int main(void)
     CLA_initCpu1Cla1();
     PieCtrlRegs.PIEIER11.bit.INTx1 = 1;  // Enable PIE Group 11 INT1, CLA1_1 interrupt
     IER |= (M_INT11 );
-    CostFunctionCoeff.IqRipple       = IQRIPPLECOEFF;
-    CostFunctionCoeff.IqReference    = IQREFCOEFF;
-    CostFunctionCoeff.IdReference    = IDREFCOEFF;
-    CostFunctionCoeff.Fsw            = FSWCOEFF;
-    CostFunctionCoeff.M1FswChange    = M1_FSW_CHANGE_COEFF;
-    CostFunctionCoeff.M2FswPhase     = M2_FSW_PHASE_COEFF;
-    CostFunctionCoeff.M2DifferentFsw = M2_DIFFERENT_FSW_COEFF;
+    CostFunctionCoeff.IqRipple       = 100000.0f;   //IQRIPPLECOEFF;
+    CostFunctionCoeff.IqReference    = 1000000.0f;  //IQREFCOEFF;
+    CostFunctionCoeff.IdReference    = 1000000.0f;  //IDREFCOEFF;
+    CostFunctionCoeff.Fsw            = 1250.0f;     //FSWCOEFF;
+    CostFunctionCoeff.M1FswChange    = 750.0f;      //M1_FSW_CHANGE_COEFF;
+    CostFunctionCoeff.M2FswPhase     = 5000.0f;     //M2_FSW_PHASE_COEFF;
+    CostFunctionCoeff.M2DifferentFsw = 0.0f;//M2_DIFFERENT_FSW_COEFF;
 
 #endif
 
@@ -2102,6 +2111,7 @@ __interrupt void epwm1_isr(void)
     GpioDataRegs.GPDTOGGLE.bit.GPIO105 = 1;
     PCC_Module1_Timing.Beginning = GetTime();
     ControlISRCounter++;
+    SpeedRefRadSec = SpeedRefRPM/60.0f*(2.0f*PI);
 #if 0
     torque_distributor_start = (uint64_t)IpcRegs.IPCCOUNTERL + (uint64_t)((uint64_t)IpcRegs.IPCCOUNTERH)*((uint64_t)4294967296);
     PerformTorqueDistribution();

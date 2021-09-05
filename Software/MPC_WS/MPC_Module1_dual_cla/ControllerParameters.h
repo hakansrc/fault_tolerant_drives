@@ -34,8 +34,8 @@
 #define OPT_FSW_STEP 1000.0f
 
 #define IQRIPPLECOEFF           100000.0f
-#define IQREFCOEFF              10000.0f
-#define IDREFCOEFF              10000.0f
+#define IQREFCOEFF              1000000.0f
+#define IDREFCOEFF              1000000.0f
 #define FSWCOEFF                1250.0f
 #define M1_FSW_CHANGE_COEFF     750.0f
 #define M2_FSW_PHASE_COEFF      500.0f

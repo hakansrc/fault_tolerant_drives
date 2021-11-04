@@ -3,7 +3,7 @@ clc
 %% Simulation parameters
 Sampling_time = 1e-6;
 ref_frequency = 100*pi;
-Tfinal = .5; %seconds
+Tfinal = 1.5; %seconds
 %% PMSM parameters
 MotorSpeed = 600; % rpm
 PolePairs = 10;
@@ -77,7 +77,7 @@ MeanLd = (1/12)*(Module1Phase_A_Ld+Module1Phase_B_Ld+Module1Phase_C_Ld+...
 DCLINK_Cap = 1000e-12;
 Vdc = 50;
 ma = 0.9;
-sw_frequency = 40000;
+sw_frequency = 20000;
 intangle1 = 0;
 Pout = 2e3; % W
 Rin = 1e-3;
@@ -88,12 +88,12 @@ iqrated = Trated/(1.5*PolePairs*FluxPM);
 %% Other parameters
 Load_Nominal_Freq = 50;
 THD_mean_frequency = 50;
-SpeedRef1 = -80; % RPM
-SpeedRef2 = 80;
-SpeedRefUpdateTime = 0.2;
-Tload1 = Trated/4; %Nm
-Tload2 = 3*Trated/4;
-TloadUpdateTime = 0.35;
+SpeedRef1 = 30; % RPM
+SpeedRef2 = 60;
+SpeedRefUpdateTime = 0.5;
+Tload1 = Trated/5; %Nm
+Tload2 = 4*Trated/5;
+TloadUpdateTime = 1;
 FaultTime = 50;
 PmaxPerModule = 2000;
 RPMmaxPerModule = 600;
@@ -106,7 +106,7 @@ Fsw_Alignment = 10000;
 
 %%
 PI_Frequency = 5000;
-Ki = 12;
-Kp = 0.35;
+Ki = 12*3;
+Kp = 0.35*4;
 PI_Ts = 1/PI_Frequency;
 PI_Sat = iqrated*2;

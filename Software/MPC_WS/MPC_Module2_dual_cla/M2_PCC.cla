@@ -37,10 +37,11 @@ __interrupt void Cla1Task1 ( void )
         }
         else
         {
-            CostFunctionCoeff.IqRipple = 100000.0f;
+            CostFunctionCoeff.IqRipple = 100000.0f*3.0f;
             CostFunctionCoeff.IdReference = 1000000.0f;
             CostFunctionCoeff.IqReference = 1000000.0f;
             CostFunctionCoeff.M2FswPhase = 5000.0f;
+            CostFunctionCoeff.Fsw = 1250.0f;
         }
 
 #if ENABLE_TORQUE_DISTRIBUTOR

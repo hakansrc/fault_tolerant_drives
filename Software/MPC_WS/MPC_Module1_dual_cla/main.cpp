@@ -476,7 +476,7 @@ __interrupt void cpu_timer0_isr(void)
         DataToBeSent[12] = TorqueDistributor.fDifference;  //execution time of TD
         DataToBeSent[13] = PCC_Module1_Timing.fDifference;  //execution time of MPC1
         DataToBeSent[14] = PCC_Module2_Timing.fDifference;  // execution time of MPC2
-        DataToBeSent[15] = M1fsw_M2fsw_PhaseDifference_to_cpu1;  //phases of fsws
+        DataToBeSent[15] = M1fsw_M2fsw_PhaseDifference_to_cpu1*M1_FswDecided_cla*360.0f;  //phases of fsws
 
 #endif
 

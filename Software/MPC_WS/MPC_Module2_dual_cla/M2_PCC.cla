@@ -350,6 +350,10 @@ void ExecuteSecondPrediction_cla(ModuleParameters *moduleparams, unsigned int in
 
     M1fsw_M2fsw_PhaseDifference_prediction = (M1fsw_M2fsw_PhaseDifference_to_cla*moduleparams->OptimizationFsw[indexcount]-0.25f)*(M1fsw_M2fsw_PhaseDifference_to_cla*moduleparams->OptimizationFsw[indexcount]-0.25f);
 
+    //M1fsw_M2fsw_PhaseDifference_prediction = abs(abs(M1fsw_M2fsw_PhaseDifference*FswOptions(i)-0.5)-0.25);
+
+    M1fsw_M2fsw_PhaseDifference_prediction = fabsf(fabsf(M1fsw_M2fsw_PhaseDifference_to_cla*moduleparams->OptimizationFsw[indexcount]-0.5)-0.25);
+
 #if 0
     if(((CLA_fabsf(M1fsw_M2fsw_PhaseDifference_prediction)*M1_FswDecided_to_cla)<0.45f)&&((CLA_fabsf(M1fsw_M2fsw_PhaseDifference_prediction)*M1_FswDecided_to_cla)<0.55f))
     {

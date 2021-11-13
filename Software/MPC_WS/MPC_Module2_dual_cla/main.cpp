@@ -181,6 +181,9 @@ float   fsw_cost_multipler = 1.0f;
 #pragma DATA_SECTION("CpuToCla1MsgRAM")
 CostFunctionCoefficients    CostFunctionCoeff;
 
+#pragma DATA_SECTION("CLAData")
+CostFunctionCoefficients    CostFunctionCoeff_cla;
+
 int main(void)
 {
 
@@ -228,7 +231,7 @@ int main(void)
 
 
     PI_iq_cpu2.I_coeff = 10.0f;
-    PI_iq_cpu2.P_coeff = 1.8f;
+    PI_iq_cpu2.P_coeff = 1.0f;
     PI_iq_cpu2.Ts =  0.0002f;
     PI_iq_cpu2.Input = 0;
     PI_iq_cpu2.Input_prev = 0;
@@ -256,8 +259,8 @@ int main(void)
     CostFunctionCoeff.IqRipple       = 100000.0f;//IQRIPPLECOEFF;
     CostFunctionCoeff.IqReference    = 1000000.0f;//IQREFCOEFF;
     CostFunctionCoeff.IdReference    = 1000000.0f;//IDREFCOEFF;
-    CostFunctionCoeff.Fsw            = 125.0f;//FSWCOEFF;
-    CostFunctionCoeff.M1FswChange    = 750.0f;//M1_FSW_CHANGE_COEFF;
+    CostFunctionCoeff.Fsw            = 25000.0f;//FSWCOEFF;
+    CostFunctionCoeff.M1FswChange    = 2500.0f;//M1_FSW_CHANGE_COEFF;
     CostFunctionCoeff.M2FswPhase     = 5000.0f;//M2_FSW_PHASE_COEFF;
     CostFunctionCoeff.M2DifferentFsw = 0.0f;//M2_DIFFERENT_FSW_COEFF;
 
@@ -605,6 +608,25 @@ __interrupt void CLATask1_PCC_Is_Done(void)
     PCC_Module2_Timing.End = GetTime();
     PCC_Module2_Timing.Difference = PCC_Module2_Timing.End - PCC_Module2_Timing.Beginning;
     PCC_Module2_Timing.fDifference = ((float)PCC_Module2_Timing.Difference)*5.0f/((float)1000.0f);
+
+    if(CLA1Task1End_counter>=50000)
+    {
+        if((fabsf(SpeedErrorRPM_cla)>15.0f)||((fabsf(SpeedErrorRPM_filtered_cla)/100.0f)>10.0f))
+        {
+            CostFunctionCoeff.IdReference = 1000000.0f*100.0f;
+            CostFunctionCoeff.IqReference = 1000000.0f*100.0f;
+            CostFunctionCoeff.M2FswPhase = 0.0f;
+        }
+        else
+        {
+            CostFunctionCoeff.IqRipple = 100000.0f*3.0f;
+            CostFunctionCoeff.IdReference = 1000000.0f;
+            CostFunctionCoeff.IqReference = 1000000.0f;
+            CostFunctionCoeff.M2FswPhase = 15000.0f;
+            CostFunctionCoeff.Fsw = 3000.0f;
+        }
+    }
+
     PieCtrlRegs.PIEACK.all = PIEACK_GROUP11;
 }
 
@@ -613,6 +635,7 @@ __interrupt void ipc0_isr(void)
     /**/
     Ipc0Counter++;
     EQep2Regs.QPOSCNT = ENCODER_SWEETPOINT_VALUE-2+4;
+    PI_iq_cpu2.I_coeff = 33.0f;
     IpcRegs.IPCACK.bit.IPC0 = 1;
     PieCtrlRegs.PIEACK.all = PIEACK_GROUP1;
 }

@@ -41,6 +41,9 @@ TorqueDistributorVariables  TD_Variables;
 #pragma DATA_SECTION("CpuToCla1MsgRAM")
 CostFunctionCoefficients    CostFunctionCoeff;
 
+#pragma DATA_SECTION("CLAData")
+CostFunctionCoefficients    CostFunctionCoeff_cla;
+
 
 /*TODO s
  *
@@ -202,7 +205,7 @@ uint16_t    ClockMod = 1000;
 uint16_t    ReadDrv8305RegistersFlag = 0;
 uint16_t    AngleHasBeenReset = 0;
 uint16_t    SpeedRefArrayCount = 0;
-float       SpeedRefArray[4] = {30,50,30,50};
+float       SpeedRefArray[4] = {33,-33,33,-33};
 
 /*Following flag will be replaced with an IPC call*/
 uint16_t    StartOperationCpu2 = 0; // when this is set to 1, cpu2 will start operation & inverter2 will contribute to the traction
@@ -377,8 +380,8 @@ int main(void)
     CostFunctionCoeff.IqRipple       = 100000.0f;   //IQRIPPLECOEFF;
     CostFunctionCoeff.IqReference    = 1000000.0f;  //IQREFCOEFF;
     CostFunctionCoeff.IdReference    = 1000000.0f;  //IDREFCOEFF;
-    CostFunctionCoeff.Fsw            = 1250.0f;     //FSWCOEFF;
-    CostFunctionCoeff.M1FswChange    = 750.0f;      //M1_FSW_CHANGE_COEFF;
+    CostFunctionCoeff.Fsw            = 2500.0f;     //FSWCOEFF;
+    CostFunctionCoeff.M1FswChange    = 2500.0f;      //M1_FSW_CHANGE_COEFF;
     CostFunctionCoeff.M2FswPhase     = 5000.0f;     //M2_FSW_PHASE_COEFF;
     CostFunctionCoeff.M2DifferentFsw = 0.0f;//M2_DIFFERENT_FSW_COEFF;
 
@@ -460,7 +463,7 @@ __interrupt void cpu_timer0_isr(void)
         DataToBeSent[13] = Module2_Parameters.AngleRadPrev.Electrical;
         DataToBeSent[14] = Module2_Parameters.AngleRadPrev.Electrical;
         DataToBeSent[15] = Module2_Parameters.AngleRadPrev.Electrical;
-#else
+#elif 1
         DataToBeSent[0]  = SpeedRefRPM;
         DataToBeSent[1]  = Module1_Parameters_cla.AngularSpeedRPM.Mechanical; // .Measured.Current.PhaseA;
         DataToBeSent[2]  = Module1_Parameters_cla.Measured.Current.transformed.Dvalue;
@@ -472,13 +475,31 @@ __interrupt void cpu_timer0_isr(void)
         DataToBeSent[8]  = M1_Iqref_cla;
         DataToBeSent[9]  = M2_Iqref;
         DataToBeSent[10] = M1_Idref;
-        DataToBeSent[11] = PI_Timing.fDifference;  //execution time of PI
-        DataToBeSent[12] = TorqueDistributor.fDifference;  //execution time of TD
+        DataToBeSent[11] = CostFunctionCoeff.IqReference;  //execution time of PI
+        DataToBeSent[12] = CostFunctionCoeff.IdReference;  //execution time of TD
+        DataToBeSent[13] = SpeedErrorRPM_cla;  //execution time of MPC1
+        DataToBeSent[14] = SpeedErrorRPM_filtered_cla/100.0f;  // execution time of MPC2
+        DataToBeSent[15] = M1fsw_M2fsw_PhaseDifference_to_cpu1*M1_FswDecided_cla*360.0f;  //phases of fsws
+#else
+        DataToBeSent[0]  = SpeedRefRPM;
+        DataToBeSent[1]  = Module1_Parameters_cla.Measured.Current.PhaseA; // .Measured.Current.PhaseA;
+        DataToBeSent[2]  = Module1_Parameters_cla.Measured.Current.PhaseB;
+        DataToBeSent[3]  = Module1_Parameters_cla.Measured.Current.PhaseC;
+        DataToBeSent[4]  = Module2_Parameters.Measured.Current.PhaseA;
+        DataToBeSent[5]  = Module2_Parameters.Measured.Current.PhaseB;
+        DataToBeSent[6]  = Module2_Parameters.Measured.Current.PhaseC;
+        DataToBeSent[7]  = Module1_Parameters.PhaseADutyCycle;
+        DataToBeSent[8]  = Module1_Parameters.PhaseBDutyCycle;
+        DataToBeSent[9]  = Module1_Parameters.PhaseCDutyCycle;
+        DataToBeSent[10] = Module2_Parameters.PhaseADutyCycle;
+        DataToBeSent[11] = Module2_Parameters.PhaseBDutyCycle;  //execution time of PI
+        DataToBeSent[12] = Module2_Parameters.PhaseCDutyCycle;  //execution time of TD
         DataToBeSent[13] = PCC_Module1_Timing.fDifference;  //execution time of MPC1
         DataToBeSent[14] = PCC_Module2_Timing.fDifference;  // execution time of MPC2
         DataToBeSent[15] = M1fsw_M2fsw_PhaseDifference_to_cpu1*M1_FswDecided_cla*360.0f;  //phases of fsws
 
 #endif
+
 
 
         SciSendMultipleFloatWithTheTag(DataToBeSent, 16);
@@ -1315,7 +1336,7 @@ void EQEP1_Setup(void)
     /*the formula will be X/(t(k)-t(k-1)) at low  speeds, can be used with UPEVNT */
     /*the formula will be (x(k)-x(k-1))/T at high speeds, can be used with eqep unit timer or CAPCLK */
 
-    EQep1Regs.QUPRD = 2000000; // Unit Timer for 100 Hz at 200 MHz
+    EQep1Regs.QUPRD = 200000; // Unit Timer for 1000 Hz at 200 MHz
 
     // Quadrature Decoder Unit (QDU) Registers
     EQep1Regs.QDECCTL.all = 0x00;    // Quadrature Decoder Control
@@ -2108,10 +2129,15 @@ __interrupt void epwm1_isr(void)
     M1_Interrupt_Moment = (int64_t)GetTime();
     M1_FswDecided = M1_FswDecided_cla;
 
+
+
+
+
     GpioDataRegs.GPDTOGGLE.bit.GPIO105 = 1;
     PCC_Module1_Timing.Beginning = GetTime();
     ControlISRCounter++;
     SpeedRefRadSec = SpeedRefRPM/60.0f*(2.0f*PI);
+    SpeedRefRadSec_cla =SpeedRefRadSec;
 #if 0
     torque_distributor_start = (uint64_t)IpcRegs.IPCCOUNTERL + (uint64_t)((uint64_t)IpcRegs.IPCCOUNTERH)*((uint64_t)4294967296);
     PerformTorqueDistribution();
@@ -2427,6 +2453,24 @@ __interrupt void CLATask1_PCC_Is_Done(void)
     PCC_Module1_Timing.End = GetTime();
     PCC_Module1_Timing.Difference = PCC_Module1_Timing.End - PCC_Module1_Timing.Beginning;
     PCC_Module1_Timing.fDifference = ((float)PCC_Module1_Timing.Difference)*5.0f/((float)1000.0f);
+
+#if 1
+    if(Xint1Count>5)
+    {
+        if((fabsf(SpeedErrorRPM_cla)>15.0f)||((fabsf(SpeedErrorRPM_filtered_cla)/100.0f)>10.0f))
+        {
+            CostFunctionCoeff.IdReference = 1000000.0f*100.0f;
+            CostFunctionCoeff.IqReference = 1000000.0f*100.0f;
+        }
+        else
+        {
+            CostFunctionCoeff.IqRipple = 100000.0f;
+            CostFunctionCoeff.IdReference = 1000000.0f;
+            CostFunctionCoeff.IqReference = 1000000.0f;
+            CostFunctionCoeff.Fsw = 3000.0f;
+        }
+    }
+#endif
 
 
 #if 0

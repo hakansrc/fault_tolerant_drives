@@ -44,6 +44,7 @@ extern float                M1fsw_M2fsw_PhaseDifference_prediction;
 extern float                somecoeff;
 extern float                phase_cost_coeff;
 extern CostFunctionCoefficients    CostFunctionCoeff;
+extern CostFunctionCoefficients    CostFunctionCoeff_cla;
 extern float                SpeedRefRadSec_cla;
 extern float                SpeedErrorRPM_cla;
 extern float                SpeedErrorRPM_filtered_cla;

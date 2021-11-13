@@ -11,13 +11,11 @@ __interrupt void Cla1Task1 ( void )
      * */
     Cla1Task1_counter++;
     M2_OperationMode = MODE_CLA_MPCCONTROLLER;
-
-    fsw_cost_multipler = 1.0f;
-
-
     SpeedErrorRPM_cla = (SpeedRefRadSec_cla - Module2_Parameters_cla.AngularSpeedRadSec.Mechanical)/(2.0f*PI)*60.0f;
     SpeedErrorRPM_filtered_cla = SpeedErrorRPM_filtered_cla + SpeedErrorRPM_cla;
     SpeedErrorRPM_filtered_cla = SpeedErrorRPM_filtered_cla - SpeedErrorRPM_filtered_cla/100.0f;
+
+    CostFunctionCoeff_cla = CostFunctionCoeff;
 
 
     if(M2_OperationMode==MODE_CLA_MPCCONTROLLER)
@@ -29,20 +27,7 @@ __interrupt void Cla1Task1 ( void )
 
         CalculateParkTransform_cla(&Module2_Parameters_cla);
 
-        if((CLA_fabsf(SpeedErrorRPM_cla)>5.0f)||((SpeedErrorRPM_filtered_cla/100.0f)>5.0f))
-        {
-            CostFunctionCoeff.IdReference = 1000000.0f*100.0f;
-            CostFunctionCoeff.IqReference = 1000000.0f*100.0f;
-            CostFunctionCoeff.M2FswPhase = 0.0f;
-        }
-        else
-        {
-            CostFunctionCoeff.IqRipple = 100000.0f*3.0f;
-            CostFunctionCoeff.IdReference = 1000000.0f;
-            CostFunctionCoeff.IqReference = 1000000.0f;
-            CostFunctionCoeff.M2FswPhase = 5000.0f;
-            CostFunctionCoeff.Fsw = 1250.0f;
-        }
+
 
 #if ENABLE_TORQUE_DISTRIBUTOR
         Module2_Parameters_cla.Reference.Iq = M2_Iqref_cla;
@@ -429,14 +414,14 @@ void ExecuteSecondPrediction_cla(ModuleParameters *moduleparams, unsigned int in
 #endif
 #elif 1
 
-    //moduleparams->Cost[indexcount] = CostFunctionCoeff.M2DifferentFsw*CLA_Power((moduleparams->OptimizationFsw[indexcount]-M1_FswDecided_to_cla)/OPT_FSW_MAX, 2) + CostFunctionCoeff.M2FswPhase*CLA_fabsf((CLA_fabsf(M1fsw_M2fsw_PhaseDifference_prediction)*M1_FswDecided_to_cla - somecoeff)*(CLA_fabsf(M1fsw_M2fsw_PhaseDifference_prediction)*M1_FswDecided_to_cla - somecoeff)) + CostFunctionCoeff.IqRipple * CLA_Power(moduleparams->SecondHorizon[indexcount].Iq_Ripple_Prediction / IQ_RATED, 2) + CostFunctionCoeff.IqReference * CLA_Power((moduleparams->Reference.Iq - moduleparams->SecondHorizon[indexcount].IqPrediction) / IQ_RATED, 2) + CostFunctionCoeff.IdReference * CLA_Power((moduleparams->Reference.Id - moduleparams->SecondHorizon[indexcount].IdPrediction)/IQ_RATED, 2) + CostFunctionCoeff.Fsw  * moduleparams->OptimizationFsw[indexcount] / OPT_FSW_MAX;
+    //moduleparams->Cost[indexcount] = CostFunctionCoeff_cla.M2DifferentFsw*CLA_Power((moduleparams->OptimizationFsw[indexcount]-M1_FswDecided_to_cla)/OPT_FSW_MAX, 2) + CostFunctionCoeff_cla.M2FswPhase*CLA_fabsf((CLA_fabsf(M1fsw_M2fsw_PhaseDifference_prediction)*M1_FswDecided_to_cla - somecoeff)*(CLA_fabsf(M1fsw_M2fsw_PhaseDifference_prediction)*M1_FswDecided_to_cla - somecoeff)) + CostFunctionCoeff_cla.IqRipple * CLA_Power(moduleparams->SecondHorizon[indexcount].Iq_Ripple_Prediction / IQ_RATED, 2) + CostFunctionCoeff_cla.IqReference * CLA_Power((moduleparams->Reference.Iq - moduleparams->SecondHorizon[indexcount].IqPrediction) / IQ_RATED, 2) + CostFunctionCoeff_cla.IdReference * CLA_Power((moduleparams->Reference.Id - moduleparams->SecondHorizon[indexcount].IdPrediction)/IQ_RATED, 2) + CostFunctionCoeff_cla.Fsw  * moduleparams->OptimizationFsw[indexcount] / OPT_FSW_MAX;
     //cost(i) = 50000*( abs(M1fsw_M2fsw_PhaseDifference_prediction) *  M1_fsw - .25)^2 + DifferentFswCost + 500*((FswOptions(i)-M1_fsw)/FswMax)^2+(IqRipplePredictionArray_2(i)/Iq_Rated)^2*IqRippleCoeff+IqRefCoeff*((iqref-IqPrediction_2)/Iq_Rated)^2+((idref-IdPrediction_2)/Iq_Rated)^2*IdRefCoeff+ProtectionConstant+FswOptions(i)/FswMax*FswCoeff(i);%+IqRipplePrediction_prev^2*100000000;
-    //moduleparams->Cost[indexcount] = CostFunctionCoeff.M2FswPhase*CLA_fabsf((CLA_fabsf(M1fsw_M2fsw_PhaseDifference_prediction)*M1_FswDecided_to_cla - somecoeff)*(CLA_fabsf(M1fsw_M2fsw_PhaseDifference_prediction)*M1_FswDecided_to_cla
-    moduleparams->Cost[indexcount] = CostFunctionCoeff.M1FswChange*CLA_fabsf(M2_FswDecided_cla-moduleparams->OptimizationFsw[indexcount])/OPT_FSW_MAX + M1fsw_M2fsw_PhaseDifference_prediction*CostFunctionCoeff.M2FswPhase + 0.0f*CostFunctionCoeff.M2FswPhase*(CLA_fabsf(M1fsw_M2fsw_PhaseDifference_prediction)*M1_FswDecided_to_cla - somecoeff)*(CLA_fabsf(M1fsw_M2fsw_PhaseDifference_prediction)*M1_FswDecided_to_cla - somecoeff) + 0.0f*CostFunctionCoeff.M2DifferentFsw*CLA_Power((moduleparams->OptimizationFsw[indexcount]-M1_FswDecided_to_cla)/OPT_FSW_MAX, 2) + CostFunctionCoeff.IqRipple * CLA_Power(moduleparams->SecondHorizon[indexcount].Iq_Ripple_Prediction / IQ_RATED, 2) + CostFunctionCoeff.IqReference * CLA_Power((moduleparams->Reference.Iq - moduleparams->SecondHorizon[indexcount].IqPrediction) / IQ_RATED, 2) + CostFunctionCoeff.IdReference * CLA_Power((moduleparams->Reference.Id - moduleparams->SecondHorizon[indexcount].IdPrediction)/IQ_RATED, 2) + CostFunctionCoeff.Fsw  * moduleparams->OptimizationFsw[indexcount] / OPT_FSW_MAX;
+    //moduleparams->Cost[indexcount] = CostFunctionCoeff_cla.M2FswPhase*CLA_fabsf((CLA_fabsf(M1fsw_M2fsw_PhaseDifference_prediction)*M1_FswDecided_to_cla - somecoeff)*(CLA_fabsf(M1fsw_M2fsw_PhaseDifference_prediction)*M1_FswDecided_to_cla
+    moduleparams->Cost[indexcount] = CostFunctionCoeff_cla.M1FswChange*CLA_fabsf(M2_FswDecided_cla-moduleparams->OptimizationFsw[indexcount])/OPT_FSW_MAX + M1fsw_M2fsw_PhaseDifference_prediction*CostFunctionCoeff_cla.M2FswPhase + 0.0f*CostFunctionCoeff_cla.M2FswPhase*(CLA_fabsf(M1fsw_M2fsw_PhaseDifference_prediction)*M1_FswDecided_to_cla - somecoeff)*(CLA_fabsf(M1fsw_M2fsw_PhaseDifference_prediction)*M1_FswDecided_to_cla - somecoeff) + 0.0f*CostFunctionCoeff_cla.M2DifferentFsw*CLA_Power((moduleparams->OptimizationFsw[indexcount]-M1_FswDecided_to_cla)/OPT_FSW_MAX, 2) + CostFunctionCoeff_cla.IqRipple * CLA_Power(moduleparams->SecondHorizon[indexcount].Iq_Ripple_Prediction / IQ_RATED, 2) + CostFunctionCoeff_cla.IqReference * CLA_Power((moduleparams->Reference.Iq - moduleparams->SecondHorizon[indexcount].IqPrediction) / IQ_RATED, 2) + CostFunctionCoeff_cla.IdReference * CLA_Power((moduleparams->Reference.Id - moduleparams->SecondHorizon[indexcount].IdPrediction)/IQ_RATED, 2) + CostFunctionCoeff_cla.Fsw  * moduleparams->OptimizationFsw[indexcount] / OPT_FSW_MAX;
 
 #elif 1
 
-    moduleparams->Cost[indexcount] = CostFunctionCoeff.M2DifferentFsw*CLA_Power((moduleparams->OptimizationFsw[indexcount]-M1_FswDecided_to_cla)/OPT_FSW_MAX, 2) + CostFunctionCoeff.M2FswPhase*CLA_fabsf((CLA_fabsf(M1fsw_M2fsw_PhaseDifference_prediction)*M1_FswDecided_to_cla - somecoeff)*(CLA_fabsf(M1fsw_M2fsw_PhaseDifference_prediction)*M1_FswDecided_to_cla - somecoeff)) + CostFunctionCoeff.IqRipple * CLA_Power(moduleparams->SecondHorizon[indexcount].Iq_Ripple_Prediction / IQ_RATED, 2) + CostFunctionCoeff.IqReference * CLA_Power((moduleparams->Reference.Iq - moduleparams->SecondHorizon[indexcount].IqPrediction) / IQ_RATED, 2) + CostFunctionCoeff.IdReference * CLA_Power((moduleparams->Reference.Id - moduleparams->SecondHorizon[indexcount].IdPrediction)/IQ_RATED, 2) + CostFunctionCoeff.Fsw  * moduleparams->OptimizationFsw[indexcount] / OPT_FSW_MAX;
+    moduleparams->Cost[indexcount] = CostFunctionCoeff_cla.M2DifferentFsw*CLA_Power((moduleparams->OptimizationFsw[indexcount]-M1_FswDecided_to_cla)/OPT_FSW_MAX, 2) + CostFunctionCoeff_cla.M2FswPhase*CLA_fabsf((CLA_fabsf(M1fsw_M2fsw_PhaseDifference_prediction)*M1_FswDecided_to_cla - somecoeff)*(CLA_fabsf(M1fsw_M2fsw_PhaseDifference_prediction)*M1_FswDecided_to_cla - somecoeff)) + CostFunctionCoeff_cla.IqRipple * CLA_Power(moduleparams->SecondHorizon[indexcount].Iq_Ripple_Prediction / IQ_RATED, 2) + CostFunctionCoeff_cla.IqReference * CLA_Power((moduleparams->Reference.Iq - moduleparams->SecondHorizon[indexcount].IqPrediction) / IQ_RATED, 2) + CostFunctionCoeff_cla.IdReference * CLA_Power((moduleparams->Reference.Id - moduleparams->SecondHorizon[indexcount].IdPrediction)/IQ_RATED, 2) + CostFunctionCoeff_cla.Fsw  * moduleparams->OptimizationFsw[indexcount] / OPT_FSW_MAX;
 #endif
     if (moduleparams->Cost[indexcount] < moduleparams->MinimumCostValue)
     {

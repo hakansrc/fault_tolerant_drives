@@ -15,6 +15,8 @@ __interrupt void Cla1Task1 ( void )
     SpeedErrorRPM_filtered_cla = SpeedErrorRPM_filtered_cla + SpeedErrorRPM_cla;
     SpeedErrorRPM_filtered_cla = SpeedErrorRPM_filtered_cla - SpeedErrorRPM_filtered_cla/100.0f;
 
+    CostFunctionCoeff_cla = CostFunctionCoeff;
+
     //if(M1_OperationMode==MODE_MPCCONTROLLER)
     if(M1_OperationMode==MODE_CLA_MPCCONTROLLER)
     {
@@ -25,18 +27,7 @@ __interrupt void Cla1Task1 ( void )
 
         CalculateParkTransform_cla(&Module1_Parameters_cla);
 
-        if((CLA_fabsf(SpeedErrorRPM_cla)>5.0f)||((SpeedErrorRPM_filtered_cla/100.0f)>5.0f))
-        {
-            CostFunctionCoeff.IdReference = 1000000.0f*100.0f;
-            CostFunctionCoeff.IqReference = 1000000.0f*100.0f;
-        }
-        else
-        {
-            CostFunctionCoeff.IqRipple = 100000.0f;
-            CostFunctionCoeff.IdReference = 1000000.0f;
-            CostFunctionCoeff.IqReference = 1000000.0f;
-            CostFunctionCoeff.Fsw = 1250.0f;
-        }
+
 
 
 #if 0
@@ -434,7 +425,7 @@ void ExecuteSecondPrediction_cla(ModuleParameters *moduleparams, unsigned int in
 #if 0
     moduleparams->Cost[indexcount] = M1_FSW_CHANGE_COEFF*CLA_fabsf(M1_FswDecided_cla-moduleparams->OptimizationFsw[indexcount])/OPT_FSW_MAX  + IQRIPPLECOEFF * CLA_Power(moduleparams->SecondHorizon[indexcount].Iq_Ripple_Prediction / IQ_RATED, 2) + IQREFCOEFF * CLA_Power((moduleparams->Reference.Iq - moduleparams->SecondHorizon[indexcount].IqPrediction) / IQ_RATED, 2) + IDREFCOEFF * CLA_Power((moduleparams->Reference.Id - moduleparams->SecondHorizon[indexcount].IdPrediction)/IQ_RATED, 2) + FSWCOEFF * moduleparams->OptimizationFsw[indexcount] / OPT_FSW_MAX;
 #else
-    moduleparams->Cost[indexcount] = CostFunctionCoeff.M1FswChange*CLA_fabsf(M1_FswDecided_cla-moduleparams->OptimizationFsw[indexcount])/OPT_FSW_MAX  + CostFunctionCoeff.IqRipple * CLA_Power(moduleparams->SecondHorizon[indexcount].Iq_Ripple_Prediction / IQ_RATED, 2) + CostFunctionCoeff.IqReference * CLA_Power((moduleparams->Reference.Iq - moduleparams->SecondHorizon[indexcount].IqPrediction) / IQ_RATED, 2) + CostFunctionCoeff.IdReference * CLA_Power((moduleparams->Reference.Id - moduleparams->SecondHorizon[indexcount].IdPrediction)/IQ_RATED, 2) + CostFunctionCoeff.Fsw * moduleparams->OptimizationFsw[indexcount] / OPT_FSW_MAX;
+    moduleparams->Cost[indexcount] = CostFunctionCoeff_cla.M1FswChange*CLA_fabsf(M1_FswDecided_cla-moduleparams->OptimizationFsw[indexcount])/OPT_FSW_MAX  + CostFunctionCoeff_cla.IqRipple * CLA_Power(moduleparams->SecondHorizon[indexcount].Iq_Ripple_Prediction / IQ_RATED, 2) + CostFunctionCoeff_cla.IqReference * CLA_Power((moduleparams->Reference.Iq - moduleparams->SecondHorizon[indexcount].IqPrediction) / IQ_RATED, 2) + CostFunctionCoeff_cla.IdReference * CLA_Power((moduleparams->Reference.Id - moduleparams->SecondHorizon[indexcount].IdPrediction)/IQ_RATED, 2) + CostFunctionCoeff_cla.Fsw * moduleparams->OptimizationFsw[indexcount] / OPT_FSW_MAX;
 #endif
     if (moduleparams->Cost[indexcount] < moduleparams->MinimumCostValue)
     {

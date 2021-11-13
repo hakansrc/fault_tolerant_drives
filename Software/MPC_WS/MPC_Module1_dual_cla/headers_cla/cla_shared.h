@@ -39,6 +39,7 @@ extern uint16_t             FaultFlagLocal;
 extern unsigned int         index_value;
 extern unsigned int         index_value_prev;
 extern CostFunctionCoefficients    CostFunctionCoeff;
+extern CostFunctionCoefficients    CostFunctionCoeff_cla;
 extern float                M1_FswDecided_prev_cla;
 extern float                SpeedRefRadSec_cla;
 extern float                SpeedErrorRPM_cla;

@@ -64,7 +64,7 @@ PID_Parameters      PI_iq_cla;
 #pragma DATA_SECTION("CLAData")
 float       SpeedRefRadSec = 0;
 #pragma DATA_SECTION("M1_SPEEDREF_LOCATION")
-float       SpeedRefRPM = 30.0f;
+float       SpeedRefRPM = 40.0f;
 #pragma DATA_SECTION("CLAData")
 unsigned int        M1_OperationMode = MODE_NO_OPERATION;
 #pragma DATA_SECTION("CLAData")
@@ -193,7 +193,7 @@ void InitializeGpiosForCpu2(void);
 uint32_t    SvpwmSectorNumber = 0;
 uint32_t    ControlISRCounter = 0;
 uint32_t    AlignmentCounter = 0;
-float       DataToBeSent[16];
+float       DataToBeSent[30];
 uint32_t    SendOneInFour = 0;
 uint32_t    Xint1Count = 0;
 
@@ -302,7 +302,7 @@ int main(void)
     DINT;
     /*Initialize cpu timers*/
     InitCpuTimers();
-    ConfigCpuTimer(&CpuTimer0, 200, 1000000/1250); //1250 Hz
+    ConfigCpuTimer(&CpuTimer0, 200, 1000000/1000); //1000 Hz
     ConfigCpuTimer(&CpuTimer1, 200, 1000000); //1 seconds
     ConfigCpuTimer(&CpuTimer2, 200, 1000000); //1 seconds
     CpuTimer0Regs.TCR.all = 0x4000;           // enable cpu timer interrupt
@@ -480,6 +480,12 @@ __interrupt void cpu_timer0_isr(void)
         DataToBeSent[13] = PCC_Module1_Timing.fDifference;  //execution time of MPC1
         DataToBeSent[14] = PCC_Module2_Timing.fDifference;  // execution time of MPC2
         DataToBeSent[15] = M1fsw_M2fsw_PhaseDifference_to_cpu1*M1_FswDecided_cla*360.0f;  //phases of fsws
+
+        DataToBeSent[16] = M1_Iqref_cla-Module1_Parameters_cla.Measured.Current.transformed.Qvalue;  //execution time of PI
+        DataToBeSent[17] = M2_Iqref-Module2_Parameters.Measured.Current.transformed.Qvalue;  //execution time of TD
+        DataToBeSent[18] = M1_Idref-Module1_Parameters_cla.Measured.Current.transformed.Dvalue;  //execution time of MPC1
+        DataToBeSent[19] = Module2_Parameters.Measured.Current.PhaseB;  // execution time of MPC2
+
 #else
         DataToBeSent[0]  = SpeedRefRPM;
         DataToBeSent[1]  = Module1_Parameters_cla.Measured.Current.PhaseA; // .Measured.Current.PhaseA;
@@ -502,7 +508,7 @@ __interrupt void cpu_timer0_isr(void)
 
 
 
-        SciSendMultipleFloatWithTheTag(DataToBeSent, 16);
+        SciSendMultipleFloatWithTheTag(DataToBeSent, 20);
     }
     SendOneInFour++;
     PieCtrlRegs.PIEACK.all = PIEACK_GROUP1;
@@ -511,10 +517,10 @@ __interrupt void cpu_timer0_isr(void)
 __interrupt void cpu_timer1_isr(void)
 {
     CpuTimer1.InterruptCount++;
-#if 1
+#if 0
     if((M1_OperationMode==MODE_MPCCONTROLLER)||(M1_OperationMode==MODE_CLA_MPCCONTROLLER))
     {
-        if((CpuTimer1.InterruptCount%5)==0)
+        if((CpuTimer1.InterruptCount%2)==0)
         {
             SpeedRefRPM = SpeedRefArray[SpeedRefArrayCount];
             SpeedRefArrayCount++;
@@ -2467,8 +2473,24 @@ __interrupt void CLATask1_PCC_Is_Done(void)
             CostFunctionCoeff.IqRipple = 100000.0f;
             CostFunctionCoeff.IdReference = 1000000.0f;
             CostFunctionCoeff.IqReference = 1000000.0f;
-            CostFunctionCoeff.Fsw = 3000.0f;
+#if 0
+            if(FaultFlagGlobal==1)
+            {
+                CostFunctionCoeff.Fsw = 500.0f;
+                CostFunctionCoeff.IqRipple = 1000.0f;
+                CostFunctionCoeff.M1FswChange = 1000;
+                CostFunctionCoeff.IdReference = 1000000.0f*100.0f;
+                CostFunctionCoeff.IqReference = 1000000.0f*100.0f;
+                CostFunctionCoeff.IqRipple = 1000.0f;
+                CostFunctionCoeff.M2FswPhase = 0.0f;
+            }
+            else
+            {
+                CostFunctionCoeff.Fsw = 3000.0f;
+            }
+#endif
         }
+
     }
 #endif
 
@@ -2803,7 +2825,7 @@ void PerformTorqueDistribution(void)
         M1_Possible_Id = -0.6667f*sinf(0.6667f*PI)*sinf(POLEPAIRS*2.0f*((float) EQep1Regs.QPOSCNT / (float) ENCODERMAXTICKCOUNT * 2.0f * PI));
         */
         M1_Possible_Iq = (1.0f-cosf(POLEPAIRS*2.0f*((float) EQep1Regs.QPOSCNT / (float) ENCODERMAXTICKCOUNT * 2.0f * PI)) );
-        M1_Possible_Id = sinf(POLEPAIRS*2.0f*((float) EQep1Regs.QPOSCNT / (float) ENCODERMAXTICKCOUNT * 2.0f * PI));
+        M1_Possible_Id = -sinf(POLEPAIRS*2.0f*((float) EQep1Regs.QPOSCNT / (float) ENCODERMAXTICKCOUNT * 2.0f * PI));
         M2_Possible_Iq = 1.0f;
         M2_Possible_Id = 0.0f;
     }

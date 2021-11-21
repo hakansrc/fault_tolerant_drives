@@ -14,6 +14,8 @@
 //#include "MultipleFloatDataSender.h" // float data sender will only work from CPU1
 #include "CustomTypeDefs.h"
 
+
+
 #pragma DATA_SECTION("CLAData")
 uint32_t    Cla1Task1_counter = 0;
 #pragma DATA_SECTION("CLAData")
@@ -133,6 +135,8 @@ void ExecuteFirstPrediction(ModuleParameters &moduleparams, unsigned int indexco
 void ExecuteSecondPrediction(ModuleParameters &moduleparams, unsigned int indexcount);
 #endif
 uint32_t    IPCWaitCounter = 0;
+uint16_t    IqRefArrayCount = 0;
+float       IqRefArray[4] = {5,-5,5,-5};
 
 void CLA_configClaMemory(void);
 void CLA_initCpu1Cla1(void);
@@ -235,7 +239,11 @@ int main(void)
     PI_iq_cpu2.Ts =  0.0002f;
     PI_iq_cpu2.Input = 0;
     PI_iq_cpu2.Input_prev = 0;
+#if ENABLE_SPEED_LOOP
     PI_iq_cpu2.Output = 0;
+#else
+    PI_iq_cpu2.Output = 1;
+#endif
     PI_iq_cpu2.Output_prev = 0;
     PI_iq_cpu2.SaturationMax = 4.0f * IQ_RATED;
     PI_iq_cpu2.SaturationMin = -4.0f * IQ_RATED;
@@ -314,7 +322,9 @@ __interrupt void cpu_timer0_isr(void)
         SpeedRefRadSec = SpeedRefRPM/60.0f*2.0f*PI;
         SpeedRefRadSec_cla = SpeedRefRadSec;
         PI_iq_cpu2.Input = SpeedRefRadSec - Module1_Parameters.AngularSpeedRadSec.Mechanical;
+#if ENABLE_SPEED_LOOP
         Run_PI_Controller(PI_iq_cpu2);
+#endif
         PI_Timing.End = GetTime();
         PI_Timing.Difference = PI_Timing.End - PI_Timing.Beginning;
         PI_Timing.fDifference = ((float)PI_Timing.Difference)*5.0f/((float)1000.0f);
@@ -326,6 +336,29 @@ __interrupt void cpu_timer0_isr(void)
 __interrupt void cpu_timer1_isr(void)
 {
     CpuTimer1.InterruptCount++;
+#if ENABLE_SPEED_LOOP ==0
+#if 1
+    if((M2_OperationMode==MODE_MPCCONTROLLER)||(M2_OperationMode==MODE_CLA_MPCCONTROLLER))
+    {
+        if((CpuTimer1.InterruptCount%2)==0)
+        {
+            PI_iq_cpu2.Output = IqRefArray[IqRefArrayCount];
+            IqRefArrayCount++;
+            if(IqRefArrayCount==4)
+            {
+                IqRefArrayCount = 0;
+            }
+        }
+
+    }
+    else
+    {
+        CpuTimer1.InterruptCount = 0;
+    }
+#endif
+#endif
+
+
     PieCtrlRegs.PIEACK.all = PIEACK_GROUP1;
 }
 
@@ -623,7 +656,22 @@ __interrupt void CLATask1_PCC_Is_Done(void)
             CostFunctionCoeff.IdReference = 1000000.0f;
             CostFunctionCoeff.IqReference = 1000000.0f;
             CostFunctionCoeff.M2FswPhase = 15000.0f;
-            CostFunctionCoeff.Fsw = 3000.0f;
+#if 0
+            if(FaultFlagGlobal==1)
+            {
+                CostFunctionCoeff.Fsw = 500.0f;
+                CostFunctionCoeff.IqRipple = 1000.0f;
+                CostFunctionCoeff.M1FswChange = 1000;
+                CostFunctionCoeff.IdReference = 1000000.0f*100.0f;
+                CostFunctionCoeff.IqReference = 1000000.0f*100.0f;
+                CostFunctionCoeff.IqRipple = 1000.0f;
+                CostFunctionCoeff.M2FswPhase = 0.0f;
+            }
+            else
+            {
+                CostFunctionCoeff.Fsw = 3000.0f;
+            }
+#endif
         }
     }
 

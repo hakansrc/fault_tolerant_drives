@@ -11,9 +11,14 @@ __interrupt void Cla1Task1 ( void )
      * */
     Cla1Task1_counter++;
 
+#if ENABLE_SPEED_LOOP
     SpeedErrorRPM_cla = (SpeedRefRadSec_cla - Module1_Parameters_cla.AngularSpeedRadSec.Mechanical)/(2.0f*PI)*60.0f;
     SpeedErrorRPM_filtered_cla = SpeedErrorRPM_filtered_cla + SpeedErrorRPM_cla;
     SpeedErrorRPM_filtered_cla = SpeedErrorRPM_filtered_cla - SpeedErrorRPM_filtered_cla/100.0f;
+#else
+    SpeedErrorRPM_cla = 0;
+    SpeedErrorRPM_filtered_cla = 0;
+#endif
 
     CostFunctionCoeff_cla = CostFunctionCoeff;
 

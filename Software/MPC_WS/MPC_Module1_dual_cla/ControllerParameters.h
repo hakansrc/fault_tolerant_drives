@@ -14,6 +14,8 @@
 
 #define ENABLE_MPC  1
 
+#define ENABLE_SPEED_LOOP 1
+
 
 #define MODE_MPCCONTROLLER      1
 #define MODE_CLA_MPCCONTROLLER  4

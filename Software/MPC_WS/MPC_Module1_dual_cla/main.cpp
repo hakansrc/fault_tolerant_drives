@@ -2824,10 +2824,17 @@ void PerformTorqueDistribution(void)
         M1_Possible_Iq =  0.6667f*sinf(0.6667f*PI)*(1.0f-cosf(POLEPAIRS*2.0f*((float) EQep1Regs.QPOSCNT / (float) ENCODERMAXTICKCOUNT * 2.0f * PI)) );
         M1_Possible_Id = -0.6667f*sinf(0.6667f*PI)*sinf(POLEPAIRS*2.0f*((float) EQep1Regs.QPOSCNT / (float) ENCODERMAXTICKCOUNT * 2.0f * PI));
         */
+#if 0
         M1_Possible_Iq = (1.0f-cosf(POLEPAIRS*2.0f*((float) EQep1Regs.QPOSCNT / (float) ENCODERMAXTICKCOUNT * 2.0f * PI)) );
         M1_Possible_Id = -sinf(POLEPAIRS*2.0f*((float) EQep1Regs.QPOSCNT / (float) ENCODERMAXTICKCOUNT * 2.0f * PI));
         M2_Possible_Iq = 1.0f;
         M2_Possible_Id = 0.0f;
+#else
+        M1_Possible_Iq = 1.0f*2.0f/3.0f*sinf(2.0f*PI/3.0f)*(1.0f+cosf(POLEPAIRS*2.0f*((float) EQep1Regs.QPOSCNT / (float) ENCODERMAXTICKCOUNT * 2.0f * PI)+PI));
+        M1_Possible_Id = 1.0f*2.0f/3.0f*sinf(2.0f*PI/3.0f)*(sinf(POLEPAIRS*2.0f*((float) EQep1Regs.QPOSCNT / (float) ENCODERMAXTICKCOUNT * 2.0f * PI)+PI));
+        M2_Possible_Iq = 1.0f;
+        M2_Possible_Id = 0.0f;
+#endif
     }
     else
     {

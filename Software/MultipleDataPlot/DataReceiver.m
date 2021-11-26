@@ -15,14 +15,14 @@ BaudRateValue = 921600;                         %921600 is the maximum baudrate 
 TimeoutValue = 6;                               %Allowed time in seconds to complete read and write operations, returned as a numeric value.
 TheTag = 'hsrc';                                %the tag which is put in front of every float data, the tag should match the tag used in the DSP
 TheTagByteSize = 4;                             %the byte size of the tag
-NumberOfFloatsPerPacket = 16;                    %number of floats to be sent at one sending
+NumberOfFloatsPerPacket = 20;                    %number of floats to be sent at one sending
 CallbackFunctionByteNumber=512;                 %the callback function is called when this amount of bytes are read from the channel
 %% VARIABLE DEFINITIONS
 EnableSaving = 0;                               %set 0 in order to disable saving of the received data (recommended to stay at 1)
 ProcessRawDataThresholdInBytes = 2048*50*20;       %the received data will be saved and/or converted and plotted when ProcessRawDataThresholdInBytes bytes of data is received
 % ProcessRawDataThresholdInBytes = 2048*20*1;       %the received data will be saved and/or converted and plotted when ProcessRawDataThresholdInBytes bytes of data is received
 EnablePlotting = 1;                             %set 0 in order to disable plotting of taken variables (for live visualization)
-DataSampleRate = 1250;                          %this used for determinining the tag on the plots
+DataSampleRate = 1000;                          %this used for determinining the tag on the plots
 TheSerialChannelDevice = 'COM4';                %set the serial channel device, (this value can be found the device manager)
 
 %% Main function
@@ -69,7 +69,7 @@ while(1)
                     if(numel(TheDataConvertedValues)==1)
                        break; 
                     end
-                    subplot(4,4,i)
+                    subplot(5,4,i)
                     plot((1:numel(TheDataConvertedValues(i,:)))/DataSampleRate,TheDataConvertedValues(i,:));
                     Text = sprintf('MeanValue: %f ',mean(TheDataConvertedValues(i,:)));
                     text(0,double(mean(TheDataConvertedValues(i,:))),Text, 'FontSize', 16,'FontWeight','bold')                    

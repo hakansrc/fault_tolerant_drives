@@ -267,7 +267,7 @@ int main(void)
     CostFunctionCoeff.IqRipple       = 100000.0f;//IQRIPPLECOEFF;
     CostFunctionCoeff.IqReference    = 1000000.0f;//IQREFCOEFF;
     CostFunctionCoeff.IdReference    = 1000000.0f;//IDREFCOEFF;
-    CostFunctionCoeff.Fsw            = 25000.0f;//FSWCOEFF;
+    CostFunctionCoeff.Fsw            = 2500.0f;//FSWCOEFF;
     CostFunctionCoeff.M1FswChange    = 2500.0f;//M1_FSW_CHANGE_COEFF;
     CostFunctionCoeff.M2FswPhase     = 5000.0f;//M2_FSW_PHASE_COEFF;
     CostFunctionCoeff.M2DifferentFsw = 0.0f;//M2_DIFFERENT_FSW_COEFF;
@@ -656,7 +656,7 @@ __interrupt void CLATask1_PCC_Is_Done(void)
             CostFunctionCoeff.IdReference = 1000000.0f;
             CostFunctionCoeff.IqReference = 1000000.0f;
             CostFunctionCoeff.M2FswPhase = 15000.0f;
-#if 0
+#if 1
             if(FaultFlagGlobal==1)
             {
                 CostFunctionCoeff.Fsw = 500.0f;

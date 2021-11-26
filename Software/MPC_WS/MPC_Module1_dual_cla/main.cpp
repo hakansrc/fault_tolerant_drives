@@ -380,7 +380,7 @@ int main(void)
     CostFunctionCoeff.IqRipple       = 100000.0f;   //IQRIPPLECOEFF;
     CostFunctionCoeff.IqReference    = 1000000.0f;  //IQREFCOEFF;
     CostFunctionCoeff.IdReference    = 1000000.0f;  //IDREFCOEFF;
-    CostFunctionCoeff.Fsw            = 2500.0f;     //FSWCOEFF;
+    CostFunctionCoeff.Fsw            = 3500.0f;     //FSWCOEFF;
     CostFunctionCoeff.M1FswChange    = 2500.0f;      //M1_FSW_CHANGE_COEFF;
     CostFunctionCoeff.M2FswPhase     = 5000.0f;     //M2_FSW_PHASE_COEFF;
     CostFunctionCoeff.M2DifferentFsw = 0.0f;//M2_DIFFERENT_FSW_COEFF;
@@ -481,9 +481,9 @@ __interrupt void cpu_timer0_isr(void)
         DataToBeSent[14] = PCC_Module2_Timing.fDifference;  // execution time of MPC2
         DataToBeSent[15] = M1fsw_M2fsw_PhaseDifference_to_cpu1*M1_FswDecided_cla*360.0f;  //phases of fsws
 
-        DataToBeSent[16] = M1_Iqref_cla-Module1_Parameters_cla.Measured.Current.transformed.Qvalue;  //execution time of PI
-        DataToBeSent[17] = M2_Iqref-Module2_Parameters.Measured.Current.transformed.Qvalue;  //execution time of TD
-        DataToBeSent[18] = M1_Idref-Module1_Parameters_cla.Measured.Current.transformed.Dvalue;  //execution time of MPC1
+        DataToBeSent[16] = Module1_Parameters_cla.Measured.Current.PhaseA;  //execution time of PI
+        DataToBeSent[17] = Module1_Parameters_cla.Measured.Current.PhaseB;  //execution time of TD
+        DataToBeSent[18] = Module2_Parameters.Measured.Current.PhaseA;  //execution time of MPC1
         DataToBeSent[19] = Module2_Parameters.Measured.Current.PhaseB;  // execution time of MPC2
 
 #else
@@ -2473,7 +2473,7 @@ __interrupt void CLATask1_PCC_Is_Done(void)
             CostFunctionCoeff.IqRipple = 100000.0f;
             CostFunctionCoeff.IdReference = 1000000.0f;
             CostFunctionCoeff.IqReference = 1000000.0f;
-#if 0
+#if 1
             if(FaultFlagGlobal==1)
             {
                 CostFunctionCoeff.Fsw = 500.0f;
@@ -2830,8 +2830,8 @@ void PerformTorqueDistribution(void)
         M2_Possible_Iq = 1.0f;
         M2_Possible_Id = 0.0f;
 #else
-        M1_Possible_Iq = 1.0f*2.0f/3.0f*sinf(2.0f*PI/3.0f)*(1.0f+cosf(POLEPAIRS*2.0f*((float) EQep1Regs.QPOSCNT / (float) ENCODERMAXTICKCOUNT * 2.0f * PI)+PI));
-        M1_Possible_Id = 1.0f*2.0f/3.0f*sinf(2.0f*PI/3.0f)*(sinf(POLEPAIRS*2.0f*((float) EQep1Regs.QPOSCNT / (float) ENCODERMAXTICKCOUNT * 2.0f * PI)+PI));
+        M1_Possible_Iq = 1.0f*2.0f/3.0f*sinf(2.0f*PI/3.0f)*(1.0f-cosf(POLEPAIRS*2.0f*((float) EQep1Regs.QPOSCNT / (float) ENCODERMAXTICKCOUNT * 2.0f * PI+0.0f*PI/3.0f)));
+        M1_Possible_Id = 1.0f*2.0f/3.0f*sinf(2.0f*PI/3.0f)*(-sinf(POLEPAIRS*2.0f*((float) EQep1Regs.QPOSCNT / (float) ENCODERMAXTICKCOUNT * 2.0f * PI+0.0f*PI/3.0f)));
         M2_Possible_Iq = 1.0f;
         M2_Possible_Id = 0.0f;
 #endif

@@ -656,7 +656,7 @@ __interrupt void CLATask1_PCC_Is_Done(void)
             CostFunctionCoeff.IdReference = 1000000.0f;
             CostFunctionCoeff.IqReference = 1000000.0f;
             CostFunctionCoeff.M2FswPhase = 15000.0f;
-#if 1
+#if 0
             if(FaultFlagGlobal==1)
             {
                 CostFunctionCoeff.Fsw = 500.0f;

@@ -23,7 +23,7 @@ ProcessRawDataThresholdInBytes = 2048*50*20;       %the received data will be sa
 % ProcessRawDataThresholdInBytes = 2048*20*1;       %the received data will be saved and/or converted and plotted when ProcessRawDataThresholdInBytes bytes of data is received
 EnablePlotting = 1;                             %set 0 in order to disable plotting of taken variables (for live visualization)
 DataSampleRate = 1000;                          %this used for determinining the tag on the plots
-TheSerialChannelDevice = 'COM4';                %set the serial channel device, (this value can be found the device manager)
+TheSerialChannelDevice = 'COM7';                %set the serial channel device, (this value can be found the device manager)
 
 %% Main function
 TheRawDataIsInProcessFlag = 0;                  %initialize the variable

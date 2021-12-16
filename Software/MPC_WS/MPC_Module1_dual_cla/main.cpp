@@ -118,6 +118,9 @@ float M2_Iqref = 0.0f;
 #pragma DATA_SECTION("CLAData")
 float M1_Iqref_cla = 0.0f;
 
+#pragma DATA_SECTION("CLAData")
+float M1_Idref_cla = 0.0f;
+
 #pragma DATA_SECTION("M1M2_FSW_PHASE_DIFFERENCE_TO_CPU1_LOCATION")
 float   M1fsw_M2fsw_PhaseDifference_to_cpu1 = 0;
 
@@ -2157,6 +2160,7 @@ __interrupt void epwm1_isr(void)
     {
         memcpy(&PI_iq_cla,&PI_iq_cpu2,sizeof(PID_Parameters));
         M1_Iqref_cla = M1_Iqref;
+        M1_Idref_cla = M1_Idref;
         FaultFlagLocal = FaultFlagGlobal;
         //memcpy(&PI_iq,&PI_iq_cla,sizeof(PID_Parameters));
         EPwm1Regs.ETCLR.bit.INT = 1;

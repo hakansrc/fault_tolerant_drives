@@ -35,6 +35,7 @@ extern uint16_t             ByPass_SpeedMeasurement;
 extern float                M1_ElectricalAngle;
 extern float                M1_minimumloss_iqref;
 extern float                M1_Iqref_cla;
+extern float                M1_Idref_cla;
 extern uint16_t             FaultFlagLocal;
 extern unsigned int         index_value;
 extern unsigned int         index_value_prev;

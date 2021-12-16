@@ -48,7 +48,7 @@ __interrupt void Cla1Task1 ( void )
 #else
         Module1_Parameters_cla.Reference.Iq = PI_iq_cla.Output/((float)2);
 #endif
-        Module1_Parameters_cla.Reference.Id = IDREF;
+        Module1_Parameters_cla.Reference.Id = M1_Idref_cla;
 
         Module1_Parameters_cla.MinimumCostValue = (float)1e35;
 

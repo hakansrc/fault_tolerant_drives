@@ -244,6 +244,7 @@ TimingMeasurement PCC_Module1_Timing = {0,0,0,0};
 float   differencemax = 0.0f;
 inline uint64_t    GetTime(void);
 inline uint64_t    GetTimeFloat(void);
+inline void CalculateSVPWMDutyCycles(float Vd, float Vq, float *DutyA, float *DutyB, float *DutyC);
 
 
 float M1Torque=0;
@@ -3032,4 +3033,79 @@ inline uint64_t    GetTimeFloat(void)
 {
     uint64_t    timer_low = IpcRegs.IPCCOUNTERL;
     return  (float)(((float)((timer_low)+((uint64_t)IpcRegs.IPCCOUNTERH)*((uint64_t)4294967296)))/(float(200e6)));
+}
+inline void CalculateSVPWMDutyCycles(float Vds, float Vqs, float ElectricalPosition, float *DutyA, float *DutyB, float *DutyC)
+{
+#define DC_LINK_VOLTAGE 40.0f
+
+    float Valfa = sinf(ElectricalPosition)*Vds+cosf(ElectricalPosition)*Vqs;
+    float Vbeta =-cos(ElectricalPosition)*Vds+sin(ElectricalPosition)*Vqs;
+
+    float VoltageVectorAngle = atan2f(Vbeta,Valfa)+4.0f*PI;
+
+    float VoltageVectorAngle_mod = fmodf(VoltageVectorAngle,PI/3.0f);
+
+    float ma = sqrtf(powf(Vds,2)+powf(Vqs,2))/(DC_LINK_VOLTAGE/sqrtf(3.0f));
+
+    float Tsw = 1.0f/100000.0f;
+
+    float T1 = Tsw*ma*sinf(PI/3.0f-VoltageVectorAngle_mod);
+    float T2 = Tsw*ma*sinf(VoltageVectorAngle_mod);
+    float T0 = Tsw-T1-T2;
+
+    if ((fmodf(VoltageVectorAngle,2.0f*PI)<=PI/3.0f)&&(fmodf(VoltageVectorAngle,2.0f*PI)>=0))
+    {
+        *DutyA = (T1+T2+T0/2.0f)/Tsw;
+        *DutyB = (T2+T0/2.0f)/Tsw;
+        *DutyC = (T0/2.0f)/Tsw;
+        return;
+    }
+
+    if ((fmodf(VoltageVectorAngle,2.0f*PI)<=2.0f*PI/3.0f)&&(fmodf(VoltageVectorAngle,2.0f*PI)>=PI/3.0f))
+    {
+        *DutyA = (T1+T0/2.0f)/Tsw;
+        *DutyB = (T1+T2+T0/2.0f)/Tsw;
+        *DutyC = (T0/2.0f)/Tsw;
+        return;
+    }
+
+    if ((fmodf(VoltageVectorAngle,2.0f*PI)<=PI)&&(fmodf(VoltageVectorAngle,2.0f*PI)>=2*PI/3.0f))
+    {
+        if(fmodf(VoltageVectorAngle, PI)==0)
+        {
+            *DutyA = (T0/2.0f)/Tsw;
+            *DutyB = (T1+T0/2.0f)/Tsw;
+            *DutyC = (T1+T2+T0/2.0f)/Tsw;
+        }
+        else
+        {
+            *DutyA = (T0/2.0f)/Tsw;
+            *DutyB = (T1+T2+T0/2.0f)/Tsw;
+            *DutyC = (T2+T0/2.0f)/Tsw;
+        }
+        return;
+    }
+
+    if ((fmodf(VoltageVectorAngle,2.0f*PI)<=4.0f*PI/3.0f)&&(fmodf(VoltageVectorAngle,2.0f*PI)>=PI))
+    {
+        *DutyA = (T0/2.0f)/Tsw;
+        *DutyB = (T1+T0/2.0f)/Tsw;
+        *DutyC = (T1+T2+T0/2.0f)/Tsw;
+        return;
+    }
+    if ((fmodf(VoltageVectorAngle,2.0f*PI)<=5.0f*PI/3.0f)&&(fmodf(VoltageVectorAngle,2.0f*PI)>=4.0f*PI/3.0f))
+    {
+        *DutyA = (T2+T0/2.0f)/Tsw;
+        *DutyB = (T0/2.0f)/Tsw;
+        *DutyC = (T1+T2+T0/2.0f)/Tsw;
+        return;
+    }
+    if ((fmodf(VoltageVectorAngle,2.0f*PI)<=2.0f*PI)&&(fmodf(VoltageVectorAngle,2.0f*PI)>=5.0f*PI/3.0f))
+    {
+        *DutyA = (T1+T2+T0/2.0f)/Tsw;
+        *DutyB = (T0/2.0f)/Tsw;
+        *DutyC = (T1+T0/2.0f)/Tsw;
+        return;
+    }
+
 }
